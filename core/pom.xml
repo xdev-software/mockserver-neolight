@@ -201,23 +201,6 @@
 			<artifactId>json-unit</artifactId>
 			<version>2.38.0</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.xmlunit</groupId>
-			<artifactId>xmlunit-core</artifactId>
-			<version>2.10.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.xmlunit</groupId>
-			<artifactId>xmlunit-placeholders</artifactId>
-			<version>2.10.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>4.0.2</version>
-		</dependency>
 	</dependencies>
 
 	<build>

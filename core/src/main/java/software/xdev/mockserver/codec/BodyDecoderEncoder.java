@@ -103,11 +103,6 @@ public class BodyDecoderEncoder {
                     mediaType,
                     DEFAULT_MATCH_TYPE
                 );
-            } else if (mediaType.isXml()) {
-                return new XmlBody(
-                    new String(bodyBytes, mediaType.getCharsetOrDefault()),
-                    mediaType
-                );
             } else if (mediaType.isString()) {
                 return new StringBody(
                     new String(bodyBytes, mediaType.getCharsetOrDefault()),

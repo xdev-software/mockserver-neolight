@@ -61,12 +61,6 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
         } else if (body instanceof StringBody) {
             StringBody stringBody = (StringBody) body;
             result = new StringBodyDTO(stringBody, stringBody.getNot());
-        } else if (body instanceof XmlBody) {
-            XmlBody xmlBody = (XmlBody) body;
-            result = new XmlBodyDTO(xmlBody, xmlBody.getNot());
-        } else if (body instanceof XmlSchemaBody) {
-            XmlSchemaBody xmlSchemaBody = (XmlSchemaBody) body;
-            result = new XmlSchemaBodyDTO(xmlSchemaBody, xmlSchemaBody.getNot());
         } else if (body instanceof XPathBody) {
             XPathBody xPathBody = (XPathBody) body;
             result = new XPathBodyDTO(xPathBody, xPathBody.getNot());
@@ -105,10 +99,6 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
             return ((RegexBodyDTO) body).getRegex();
         } else if (body instanceof StringBodyDTO) {
             return ((StringBodyDTO) body).getString();
-        } else if (body instanceof XmlBodyDTO) {
-            return ((XmlBodyDTO) body).getXml();
-        } else if (body instanceof XmlSchemaBodyDTO) {
-            return ((XmlSchemaBodyDTO) body).getXml();
         } else if (body instanceof XPathBodyDTO) {
             return ((XPathBodyDTO) body).getXPath();
         }

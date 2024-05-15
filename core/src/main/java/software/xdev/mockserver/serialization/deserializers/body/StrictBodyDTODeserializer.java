@@ -58,8 +58,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
         fieldNameToType.put("parameters".toLowerCase(), Body.Type.PARAMETERS);
         fieldNameToType.put("regex".toLowerCase(), Body.Type.REGEX);
         fieldNameToType.put("string".toLowerCase(), Body.Type.STRING);
-        fieldNameToType.put("xml".toLowerCase(), Body.Type.XML);
-        fieldNameToType.put("xmlSchema".toLowerCase(), Body.Type.XML_SCHEMA);
         fieldNameToType.put("xpath".toLowerCase(), Body.Type.XPATH);
     }
 
@@ -276,20 +274,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                             result = new StringBodyDTO(new StringBody(valueJsonValue, rawBytes, subString, null), not);
                             break;
                         }
-                    case XML:
-                        if (contentType != null && isNotBlank(contentType.toString())) {
-                            result = new XmlBodyDTO(new XmlBody(valueJsonValue, rawBytes, contentType), not);
-                            break;
-                        } else if (charset != null) {
-                            result = new XmlBodyDTO(new XmlBody(valueJsonValue, rawBytes, XmlBody.DEFAULT_XML_CONTENT_TYPE.withCharset(charset)), not);
-                            break;
-                        } else {
-                            result = new XmlBodyDTO(new XmlBody(valueJsonValue, rawBytes, XmlBody.DEFAULT_XML_CONTENT_TYPE), not);
-                            break;
-                        }
-                    case XML_SCHEMA:
-                        result = new XmlSchemaBodyDTO(new XmlSchemaBody(valueJsonValue), not);
-                        break;
                     case XPATH:
                         result = new XPathBodyDTO(new XPathBody(valueJsonValue, namespacePrefixes), not);
                         break;

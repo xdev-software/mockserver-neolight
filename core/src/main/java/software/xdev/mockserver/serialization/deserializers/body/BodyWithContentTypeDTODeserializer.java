@@ -49,7 +49,6 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
         fieldNameToType.put("base64Bytes".toLowerCase(), Body.Type.BINARY);
         fieldNameToType.put("json".toLowerCase(), Body.Type.JSON);
         fieldNameToType.put("string".toLowerCase(), Body.Type.STRING);
-        fieldNameToType.put("xml".toLowerCase(), Body.Type.XML);
     }
 
     private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(BodyWithContentTypeDTODeserializer.class);
@@ -200,17 +199,6 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
                             break;
                         } else {
                             result = new StringBodyDTO(new StringBody(valueJsonValue, rawBytes, false, null), not);
-                            break;
-                        }
-                    case XML:
-                        if (contentType != null && isNotBlank(contentType.toString())) {
-                            result = new XmlBodyDTO(new XmlBody(valueJsonValue, rawBytes, contentType), not);
-                            break;
-                        } else if (charset != null) {
-                            result = new XmlBodyDTO(new XmlBody(valueJsonValue, rawBytes, XmlBody.DEFAULT_XML_CONTENT_TYPE.withCharset(charset)), not);
-                            break;
-                        } else {
-                            result = new XmlBodyDTO(new XmlBody(valueJsonValue, rawBytes, XmlBody.DEFAULT_XML_CONTENT_TYPE), not);
                             break;
                         }
                 }

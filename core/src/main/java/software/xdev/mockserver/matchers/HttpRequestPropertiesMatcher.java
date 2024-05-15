@@ -160,10 +160,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                     XPathBody xPathBody = (XPathBody) body;
                     bodyMatcher = new XPathMatcher(mockServerLogger, xPathBody.getValue(), xPathBody.getNamespacePrefixes());
                     break;
-                case XML:
-                    XmlBody xmlBody = (XmlBody) body;
-                    bodyMatcher = new XmlStringMatcher(mockServerLogger, xmlBody.getValue());
-                    break;
                 case JSON:
                     JsonBody jsonBody = (JsonBody) body;
                     bodyMatcher = new JsonStringMatcher(mockServerLogger, jsonBody.getValue(), jsonBody.getMatchType());
@@ -175,10 +171,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                 case JSON_PATH:
                     JsonPathBody jsonPathBody = (JsonPathBody) body;
                     bodyMatcher = new JsonPathMatcher(mockServerLogger, jsonPathBody.getValue());
-                    break;
-                case XML_SCHEMA:
-                    XmlSchemaBody xmlSchemaBody = (XmlSchemaBody) body;
-                    bodyMatcher = new XmlSchemaMatcher(mockServerLogger, xmlSchemaBody.getValue());
                     break;
                 case BINARY:
                     BinaryBody binaryBody = (BinaryBody) body;
@@ -474,11 +466,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                 bodyMatcher instanceof RegexStringMatcher) {
                 // string body matcher
                 bodyMatches = matches(BODY, context, bodyMatcher, string(request.getBodyAsString()));
-            } else if (bodyMatcher instanceof XmlStringMatcher ||
-                bodyMatcher instanceof XmlSchemaMatcher
-            ) {
-                // xml body matcher
-                bodyMatches = matches(BODY, context, bodyMatcher, request.getBodyAsString());
             } else if (bodyMatcher instanceof JsonStringMatcher ||
                 bodyMatcher instanceof JsonSchemaMatcher ||
                 bodyMatcher instanceof JsonPathMatcher

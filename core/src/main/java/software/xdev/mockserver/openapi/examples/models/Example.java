@@ -15,8 +15,6 @@
  */
 package software.xdev.mockserver.openapi.examples.models;
 
-import jakarta.xml.bind.annotation.XmlAttribute;
-
 /**
  * See: https://github.com/swagger-api/swagger-inflector
  */
@@ -25,12 +23,10 @@ public interface Example {
 
     void setName(String name);
 
-    @XmlAttribute
     String getNamespace();
 
     void setNamespace(String namespace);
 
-    @XmlAttribute
     String getPrefix();
 
     void setPrefix(String prefix);

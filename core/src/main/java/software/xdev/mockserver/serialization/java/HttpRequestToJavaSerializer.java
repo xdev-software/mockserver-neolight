@@ -95,23 +95,11 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
                     JsonSchemaBody jsonSchemaBody = (JsonSchemaBody) request.getBody();
                     output.append("new JsonSchemaBody(\"").append(StringEscapeUtils.escapeJava(jsonSchemaBody.getValue())).append("\")");
                     output.append(")");
-                } else if (request.getBody() instanceof XmlBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    XmlBody xmlBody = (XmlBody) request.getBody();
-                    output.append("new XmlBody(\"").append(StringEscapeUtils.escapeJava(xmlBody.getValue())).append("\")");
-                    output.append(")");
                 } else if (request.getBody() instanceof XPathBody) {
                     appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
                     output.append(".withBody(");
                     XPathBody xPathBody = (XPathBody) request.getBody();
                     output.append("new XPathBody(\"").append(StringEscapeUtils.escapeJava(xPathBody.getValue())).append("\")");
-                    output.append(")");
-                } else if (request.getBody() instanceof XmlSchemaBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    XmlSchemaBody xmlSchemaBody = (XmlSchemaBody) request.getBody();
-                    output.append("new XmlSchemaBody(\"").append(StringEscapeUtils.escapeJava(xmlSchemaBody.getValue())).append("\")");
                     output.append(")");
                 } else if (request.getBody() instanceof RegexBody) {
                     appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);

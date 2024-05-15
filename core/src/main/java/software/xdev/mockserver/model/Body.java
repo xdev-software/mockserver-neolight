@@ -74,8 +74,6 @@ public abstract class Body<T> extends Not {
         PARAMETERS,
         REGEX,
         STRING,
-        XML,
-        XML_SCHEMA,
         XPATH,
         LOG_EVENT,
     }
