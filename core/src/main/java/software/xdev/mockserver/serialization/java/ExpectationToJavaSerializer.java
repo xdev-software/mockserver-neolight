@@ -18,7 +18,6 @@ package software.xdev.mockserver.serialization.java;
 import com.google.common.base.Strings;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.model.HttpRequest;
-import software.xdev.mockserver.model.OpenAPIDefinition;
 import software.xdev.mockserver.model.RequestDefinition;
 
 import java.util.List;
@@ -48,8 +47,6 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
             RequestDefinition requestDefinition = expectation.getHttpRequest();
             if (requestDefinition instanceof HttpRequest) {
                 output.append(new HttpRequestToJavaSerializer().serialize(numberOfSpacesToIndent + 1, (HttpRequest) requestDefinition));
-            } else if (requestDefinition instanceof OpenAPIDefinition) {
-                output.append(new OpenAPIMatcherToJavaSerializer().serialize(numberOfSpacesToIndent + 1, (OpenAPIDefinition) requestDefinition));
             }
             output.append(",");
             if (expectation.getTimes() != null) {

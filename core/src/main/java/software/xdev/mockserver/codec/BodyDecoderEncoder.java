@@ -20,10 +20,8 @@ import io.netty.buffer.Unpooled;
 import software.xdev.mockserver.model.*;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static software.xdev.mockserver.model.JsonBody.DEFAULT_MATCH_TYPE;
 
 @SuppressWarnings("rawtypes")
 public class BodyDecoderEncoder {
@@ -96,14 +94,7 @@ public class BodyDecoderEncoder {
     public BodyWithContentType bytesToBody(byte[] bodyBytes, String contentTypeHeader) {
         if (bodyBytes.length > 0) {
             MediaType mediaType = MediaType.parse(contentTypeHeader);
-            if (mediaType.isJson()) {
-                return new JsonBody(
-                    new String(bodyBytes, mediaType.getCharsetOrDefault()),
-                    bodyBytes,
-                    mediaType,
-                    DEFAULT_MATCH_TYPE
-                );
-            } else if (mediaType.isString()) {
+            if (mediaType.isString()) {
                 return new StringBody(
                     new String(bodyBytes, mediaType.getCharsetOrDefault()),
                     bodyBytes,

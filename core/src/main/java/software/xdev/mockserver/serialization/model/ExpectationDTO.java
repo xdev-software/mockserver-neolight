@@ -48,8 +48,6 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
             RequestDefinition requestMatcher = expectation.getHttpRequest();
             if (requestMatcher instanceof HttpRequest) {
                 this.httpRequest = new HttpRequestDTO((HttpRequest) requestMatcher);
-            } else if (requestMatcher instanceof OpenAPIDefinition) {
-                this.httpRequest = new OpenAPIDefinitionDTO((OpenAPIDefinition) requestMatcher);
             }
             HttpResponse httpResponse = expectation.getHttpResponse();
             if (httpResponse != null) {

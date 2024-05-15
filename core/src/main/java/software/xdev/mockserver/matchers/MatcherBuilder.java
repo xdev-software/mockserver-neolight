@@ -19,7 +19,6 @@ import software.xdev.mockserver.cache.LRUCache;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.Expectation;
-import software.xdev.mockserver.model.OpenAPIDefinition;
 import software.xdev.mockserver.model.RequestDefinition;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -39,11 +38,7 @@ public class MatcherBuilder {
     public HttpRequestMatcher transformsToMatcher(RequestDefinition requestDefinition) {
         HttpRequestMatcher httpRequestMatcher = requestMatcherLRUCache.get(requestDefinition);
         if (httpRequestMatcher == null) {
-            if (requestDefinition instanceof OpenAPIDefinition) {
-                httpRequestMatcher = new HttpRequestsPropertiesMatcher(configuration, mockServerLogger);
-            } else {
-                httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration, mockServerLogger);
-            }
+            httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration, mockServerLogger);
             httpRequestMatcher.update(requestDefinition);
             requestMatcherLRUCache.put(requestDefinition, httpRequestMatcher);
         }
@@ -51,12 +46,7 @@ public class MatcherBuilder {
     }
 
     public HttpRequestMatcher transformsToMatcher(Expectation expectation) {
-        HttpRequestMatcher httpRequestMatcher;
-        if (expectation.getHttpRequest() instanceof OpenAPIDefinition) {
-            httpRequestMatcher = new HttpRequestsPropertiesMatcher(configuration, mockServerLogger);
-        } else {
-            httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration, mockServerLogger);
-        }
+        HttpRequestMatcher httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration, mockServerLogger);
         httpRequestMatcher.update(expectation);
         return httpRequestMatcher;
     }

@@ -17,36 +17,20 @@ package software.xdev.mockserver.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.serialization.model.VerificationDTO;
-import software.xdev.mockserver.validator.jsonschema.JsonSchemaVerificationValidator;
 import software.xdev.mockserver.verify.Verification;
 import org.slf4j.event.Level;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
-import static software.xdev.mockserver.validator.jsonschema.JsonSchemaValidator.OPEN_API_SPECIFICATION_URL;
-import static software.xdev.mockserver.validator.jsonschema.JsonSchemaVerificationValidator.jsonSchemaVerificationValidator;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class VerificationSerializer implements Serializer<Verification> {
     private final MockServerLogger mockServerLogger;
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-    private JsonSchemaVerificationValidator verificationValidator;
 
     public VerificationSerializer(MockServerLogger mockServerLogger) {
         this.mockServerLogger = mockServerLogger;
-    }
-
-    private JsonSchemaVerificationValidator getValidator() {
-        if (verificationValidator == null) {
-            verificationValidator = jsonSchemaVerificationValidator(mockServerLogger);
-        }
-        return verificationValidator;
     }
 
     public String serialize(Verification verification) {
@@ -64,37 +48,23 @@ public class VerificationSerializer implements Serializer<Verification> {
     }
 
     public Verification deserialize(String jsonVerification) {
-        if (isBlank(jsonVerification)) {
-            throw new IllegalArgumentException(
-                "1 error:" + NEW_LINE +
-                    " - a verification is required but value was \"" + jsonVerification + "\"" + NEW_LINE +
-                    NEW_LINE +
-                    OPEN_API_SPECIFICATION_URL
-            );
-        } else {
-            String validationErrors = getValidator().isValid(jsonVerification);
-            if (validationErrors.isEmpty()) {
-                Verification verification = null;
-                try {
-                    VerificationDTO verificationDTO = objectMapper.readValue(jsonVerification, VerificationDTO.class);
-                    if (verificationDTO != null) {
-                        verification = verificationDTO.buildObject();
-                    }
-                } catch (Throwable throwable) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception while parsing{}for Verification " + throwable.getMessage())
-                            .setArguments(jsonVerification)
-                            .setThrowable(throwable)
-                    );
-                    throw new IllegalArgumentException("exception while parsing [" + jsonVerification + "] for Verification", throwable);
-                }
-                return verification;
-            } else {
-                throw new IllegalArgumentException(StringUtils.removeEndIgnoreCase(formatLogMessage("incorrect verification json format for:{}schema validation errors:{}", jsonVerification, validationErrors), "\n"));
+        Verification verification = null;
+        try {
+            VerificationDTO verificationDTO = objectMapper.readValue(jsonVerification, VerificationDTO.class);
+            if (verificationDTO != null) {
+                verification = verificationDTO.buildObject();
             }
+        } catch (Throwable throwable) {
+            mockServerLogger.logEvent(
+                new LogEntry()
+                    .setLogLevel(Level.ERROR)
+                    .setMessageFormat("exception while parsing{}for Verification " + throwable.getMessage())
+                    .setArguments(jsonVerification)
+                    .setThrowable(throwable)
+            );
+            throw new IllegalArgumentException("exception while parsing [" + jsonVerification + "] for Verification", throwable);
         }
+        return verification;
     }
 
     @Override

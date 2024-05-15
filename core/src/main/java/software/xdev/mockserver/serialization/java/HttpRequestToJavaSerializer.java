@@ -77,31 +77,7 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
                 output.append(")");
             }
             if (request.getBody() != null) {
-                if (request.getBody() instanceof JsonBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    JsonBody jsonBody = (JsonBody) request.getBody();
-                    output.append("new JsonBody(\"").append(StringEscapeUtils.escapeJava(jsonBody.getValue())).append("\", JsonBodyMatchType.").append(jsonBody.getMatchType()).append(")");
-                    output.append(")");
-                } else if (request.getBody() instanceof JsonPathBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    JsonPathBody jsonPathBody = (JsonPathBody) request.getBody();
-                    output.append("new JsonPathBody(\"").append(StringEscapeUtils.escapeJava(jsonPathBody.getValue())).append("\")");
-                    output.append(")");
-                } else if (request.getBody() instanceof JsonSchemaBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    JsonSchemaBody jsonSchemaBody = (JsonSchemaBody) request.getBody();
-                    output.append("new JsonSchemaBody(\"").append(StringEscapeUtils.escapeJava(jsonSchemaBody.getValue())).append("\")");
-                    output.append(")");
-                } else if (request.getBody() instanceof XPathBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    XPathBody xPathBody = (XPathBody) request.getBody();
-                    output.append("new XPathBody(\"").append(StringEscapeUtils.escapeJava(xPathBody.getValue())).append("\")");
-                    output.append(")");
-                } else if (request.getBody() instanceof RegexBody) {
+                if (request.getBody() instanceof RegexBody) {
                     appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
                     output.append(".withBody(");
                     RegexBody regexBody = (RegexBody) request.getBody();

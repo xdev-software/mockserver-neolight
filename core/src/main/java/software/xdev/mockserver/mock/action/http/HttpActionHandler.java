@@ -34,7 +34,6 @@ import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
 import software.xdev.mockserver.responsewriter.ResponseWriter;
 import software.xdev.mockserver.scheduler.Scheduler;
-import software.xdev.mockserver.serialization.curl.HttpRequestToCurlSerializer;
 import software.xdev.mockserver.socket.tls.NettySslContextFactory;
 import org.slf4j.event.Level;
 
@@ -79,14 +78,12 @@ public class HttpActionHandler {
     // forwarding
     private NettyHttpClient httpClient;
     private HopByHopHeaderFilter hopByHopHeaderFilter = new HopByHopHeaderFilter();
-    private HttpRequestToCurlSerializer httpRequestToCurlSerializer;
 
     public HttpActionHandler(Configuration configuration, EventLoopGroup eventLoopGroup, HttpState httpStateHandler, List<ProxyConfiguration> proxyConfigurations, NettySslContextFactory nettySslContextFactory) {
         this.configuration = configuration;
         this.httpStateHandler = httpStateHandler;
         this.scheduler = httpStateHandler.getScheduler();
         this.mockServerLogger = httpStateHandler.getMockServerLogger();
-        this.httpRequestToCurlSerializer = new HttpRequestToCurlSerializer(mockServerLogger);
         this.httpClient = new NettyHttpClient(configuration, mockServerLogger, eventLoopGroup, proxyConfigurations, true, nettySslContextFactory);
     }
 
@@ -268,8 +265,8 @@ public class HttpActionHandler {
                                             .setHttpRequest(request)
                                             .setHttpResponse(response)
                                             .setExpectation(request, response)
-                                            .setMessageFormat("returning response:{}for forwarded request" + NEW_LINE + NEW_LINE + " in json:{}" + NEW_LINE + NEW_LINE + " in curl:{}")
-                                            .setArguments(response, request, httpRequestToCurlSerializer.toCurl(request, remoteAddress))
+                                            .setMessageFormat("returning response:{}for forwarded request" + NEW_LINE + NEW_LINE + " in json:{}")
+                                            .setArguments(response, request)
                                     );
                                 }
                                 responseWriter.writeResponse(request, response, false);
@@ -383,8 +380,8 @@ public class HttpActionHandler {
                         .setHttpResponse(response)
                         .setExpectation(request, response)
                         .setExpectationId(action.getExpectationId())
-                        .setMessageFormat("returning response:{}for forwarded request" + NEW_LINE + NEW_LINE + " in json:{}" + NEW_LINE + NEW_LINE + " in curl:{}for action:{}from expectation:{}")
-                        .setArguments(response, responseFuture.getHttpRequest(), httpRequestToCurlSerializer.toCurl(responseFuture.getHttpRequest(), responseFuture.getRemoteAddress()), action, action.getExpectationId())
+                        .setMessageFormat("returning response:{}for forwarded request" + NEW_LINE + NEW_LINE + " in json:{}" + NEW_LINE + NEW_LINE + " for action:{}from expectation:{}")
+                        .setArguments(response, responseFuture.getHttpRequest(), responseFuture.getRemoteAddress(), action, action.getExpectationId())
                 );
             } catch (Throwable throwable) {
                 handleExceptionDuringForwardingRequest(action, request, responseWriter, throwable);
@@ -404,8 +401,8 @@ public class HttpActionHandler {
                     .setHttpResponse(response)
                     .setExpectation(request, response)
                     .setExpectationId(action.getExpectationId())
-                    .setMessageFormat("returning response:{}for forwarded request" + NEW_LINE + NEW_LINE + " in json:{}" + NEW_LINE + NEW_LINE + " in curl:{}for action:{}from expectation:{}")
-                    .setArguments(response, response, httpRequestToCurlSerializer.toCurl(request), action, action.getExpectationId())
+                    .setMessageFormat("returning response:{}for forwarded request" + NEW_LINE + NEW_LINE + " in json:{}" + NEW_LINE + NEW_LINE + " for action:{}from expectation:{}")
+                    .setArguments(response, response, action, action.getExpectationId())
             );
         } catch (Throwable throwable) {
             mockServerLogger.logEvent(

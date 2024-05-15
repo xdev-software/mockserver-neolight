@@ -18,10 +18,8 @@ package software.xdev.mockserver.serialization.model;
 import software.xdev.mockserver.model.ExpectationId;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.ObjectWithJsonToString;
-import software.xdev.mockserver.model.OpenAPIDefinition;
 import software.xdev.mockserver.verify.Verification;
 
-import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.verify.Verification.verification;
 import static software.xdev.mockserver.verify.VerificationTimes.once;
 
@@ -35,8 +33,6 @@ public class VerificationDTO extends ObjectWithJsonToString implements DTO<Verif
         if (verification != null) {
             if (verification.getHttpRequest() instanceof HttpRequest) {
                 httpRequest = new HttpRequestDTO((HttpRequest) verification.getHttpRequest());
-            } else if (verification.getHttpRequest() instanceof OpenAPIDefinition) {
-                httpRequest = new OpenAPIDefinitionDTO((OpenAPIDefinition) verification.getHttpRequest());
             }
             expectationId = verification.getExpectationId();
             times = new VerificationTimesDTO(verification.getTimes());

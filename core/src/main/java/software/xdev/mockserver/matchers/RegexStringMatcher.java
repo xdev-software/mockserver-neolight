@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
-import software.xdev.mockserver.model.NottableSchemaString;
 import software.xdev.mockserver.model.NottableString;
 
 import java.util.regex.PatternSyntaxException;
@@ -60,15 +59,7 @@ public class RegexStringMatcher extends BodyMatcher<NottableString> {
     }
 
     public boolean matches(MockServerLogger mockServerLogger, MatchDifference context, NottableString matcher, NottableString matched) {
-        if (matcher instanceof NottableSchemaString && matched instanceof NottableSchemaString) {
-            return controlPlaneMatcher && matchesByNottedStrings(mockServerLogger, context, matcher, matched);
-        } else if (matcher instanceof NottableSchemaString) {
-            return matchesBySchemas(mockServerLogger, context, (NottableSchemaString) matcher, matched);
-        } else if (matched instanceof NottableSchemaString) {
-            return controlPlaneMatcher && matchesBySchemas(mockServerLogger, context, (NottableSchemaString) matched, matcher);
-        } else {
-            return matchesByNottedStrings(mockServerLogger, context, matcher, matched);
-        }
+        return matchesByNottedStrings(mockServerLogger, context, matcher, matched);
     }
 
     private boolean matchesByNottedStrings(MockServerLogger mockServerLogger, MatchDifference context, NottableString matcher, NottableString matched) {
@@ -79,10 +70,6 @@ public class RegexStringMatcher extends BodyMatcher<NottableString> {
             // data plane & control plan match
             return (matcher.isNot() || matched.isNot()) ^ matchesByStrings(mockServerLogger, context, matcher, matched);
         }
-    }
-
-    private boolean matchesBySchemas(MockServerLogger mockServerLogger, MatchDifference context, NottableSchemaString schema, NottableString string) {
-        return string.isNot() != schema.matches(mockServerLogger, context, string.getValue());
     }
 
     private boolean matchesByStrings(MockServerLogger mockServerLogger, MatchDifference context, NottableString matcher, NottableString matched) {

@@ -20,11 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.dashboard.model.DashboardLogEntryDTO;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
-import software.xdev.mockserver.model.OpenAPIDefinition;
-import software.xdev.mockserver.openapi.OpenAPIParser;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static software.xdev.mockserver.openapi.OpenAPIParser.buildOpenAPI;
 
 public class DescriptionProcessor {
 
@@ -62,22 +59,6 @@ public class DescriptionProcessor {
             description = new RequestDefinitionDescription(idMessage + httpRequest.getMethod().getValue(), httpRequest.getPath().getValue(), this, false);
             if (description.length() >= maxHttpRequestLength) {
                 maxHttpRequestLength = description.length();
-            }
-        } else if (object instanceof OpenAPIDefinition) {
-            OpenAPIDefinition openAPIDefinition = (OpenAPIDefinition) object;
-            String operationId = isNotBlank(openAPIDefinition.getOperationId()) ? openAPIDefinition.getOperationId() : "";
-            String specUrlOrPayload = openAPIDefinition.getSpecUrlOrPayload().trim();
-            if (OpenAPIParser.isSpecUrl(specUrlOrPayload)) {
-                description = new RequestDefinitionDescription(idMessage + StringUtils.substringAfterLast(specUrlOrPayload, "/"), operationId, this, true);
-                if (description.length() >= maxOpenAPILength) {
-                    maxOpenAPILength = description.length();
-                }
-            } else {
-                OpenAPI openAPI = buildOpenAPI(specUrlOrPayload, MOCK_SERVER_LOGGER);
-                description = new RequestDefinitionObjectDescription(idMessage + "spec ", openAPI, operationId, this);
-                if (description.length() >= maxOpenAPIObjectLength) {
-                    maxOpenAPIObjectLength = description.length();
-                }
             }
         } else if (object instanceof DashboardLogEntryDTO) {
             DashboardLogEntryDTO logEntryDTO = (DashboardLogEntryDTO) object;

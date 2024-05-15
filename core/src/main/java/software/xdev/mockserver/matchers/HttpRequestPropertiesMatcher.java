@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Joiner;
 import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
-import software.xdev.mockserver.codec.JsonSchemaBodyDecoder;
 import software.xdev.mockserver.codec.PathParametersDecoder;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.model.LogEntry;
@@ -68,8 +67,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
     private BooleanMatcher sslMatcher = null;
     private ExactStringMatcher protocolMatcher = null;
     private ObjectMapper objectMapperWithStrictBodyDTODeserializer;
-    private JsonSchemaBodyDecoder jsonSchemaBodyParser;
-    private MatcherBuilder matcherBuilder;
 
     public HttpRequestPropertiesMatcher(Configuration configuration, MockServerLogger mockServerLogger) {
         super(configuration, mockServerLogger);
@@ -103,7 +100,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                 withKeepAlive(httpRequest.isKeepAlive());
                 withSsl(httpRequest.isSecure());
                 withProtocol(httpRequest.getProtocol());
-                this.jsonSchemaBodyParser = new JsonSchemaBodyDecoder(configuration, mockServerLogger, expectation, httpRequest);
             }
             return true;
         } else {
@@ -155,22 +151,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                 case PARAMETERS:
                     ParameterBody parameterBody = (ParameterBody) body;
                     bodyMatcher = new ParameterStringMatcher(configuration, mockServerLogger, parameterBody.getValue(), controlPlaneMatcher);
-                    break;
-                case XPATH:
-                    XPathBody xPathBody = (XPathBody) body;
-                    bodyMatcher = new XPathMatcher(mockServerLogger, xPathBody.getValue(), xPathBody.getNamespacePrefixes());
-                    break;
-                case JSON:
-                    JsonBody jsonBody = (JsonBody) body;
-                    bodyMatcher = new JsonStringMatcher(mockServerLogger, jsonBody.getValue(), jsonBody.getMatchType());
-                    break;
-                case JSON_SCHEMA:
-                    JsonSchemaBody jsonSchemaBody = (JsonSchemaBody) body;
-                    bodyMatcher = new JsonSchemaMatcher(mockServerLogger, jsonSchemaBody.getValue()).withParameterStyle(jsonSchemaBody.getParameterStyles());
-                    break;
-                case JSON_PATH:
-                    JsonPathBody jsonPathBody = (JsonPathBody) body;
-                    bodyMatcher = new JsonPathMatcher(mockServerLogger, jsonPathBody.getValue());
                     break;
                 case BINARY:
                     BinaryBody binaryBody = (BinaryBody) body;
@@ -240,18 +220,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                                 .setBecause(because)
                         );
                     }
-                }
-            }
-            return overallMatch;
-        } else if (requestDefinition instanceof OpenAPIDefinition) {
-            if (matcherBuilder == null) {
-                matcherBuilder = new MatcherBuilder(configuration, mockServerLogger);
-            }
-            boolean overallMatch = false;
-            for (HttpRequest request : matcherBuilder.transformsToMatcher(requestDefinition).getHttpRequests()) {
-                if (matches(request.cloneWithLogCorrelationId())) {
-                    overallMatch = true;
-                    break;
                 }
             }
             return overallMatch;
@@ -466,19 +434,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                 bodyMatcher instanceof RegexStringMatcher) {
                 // string body matcher
                 bodyMatches = matches(BODY, context, bodyMatcher, string(request.getBodyAsString()));
-            } else if (bodyMatcher instanceof JsonStringMatcher ||
-                bodyMatcher instanceof JsonSchemaMatcher ||
-                bodyMatcher instanceof JsonPathMatcher
-            ) {
-                // json body matcher
-                try {
-                    bodyMatches = matches(BODY, context, bodyMatcher, jsonSchemaBodyParser.convertToJson(request, bodyMatcher));
-                } catch (IllegalArgumentException iae) {
-                    if (context != null) {
-                        context.addDifference(mockServerLogger, iae, iae.getMessage());
-                    }
-                    bodyMatches = matches(BODY, context, bodyMatcher, request.getBodyAsString());
-                }
             } else {
                 bodyMatches = matches(BODY, context, bodyMatcher, request.getBodyAsString());
             }

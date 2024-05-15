@@ -16,7 +16,6 @@
 package software.xdev.mockserver.model;
 
 import static software.xdev.mockserver.model.NottableOptionalString.optional;
-import static software.xdev.mockserver.model.NottableSchemaString.schemaString;
 import static software.xdev.mockserver.model.NottableString.string;
 
 public class Cookie extends KeyAndValue {
@@ -44,10 +43,6 @@ public class Cookie extends KeyAndValue {
 
     public static Cookie cookie(NottableString name, String value) {
         return new Cookie(name, value);
-    }
-
-    public static Cookie schemaCookie(String name, String value) {
-        return new Cookie(string(name), schemaString(value));
     }
 
     public static Cookie optionalCookie(String name, String value) {

@@ -18,23 +18,17 @@ package software.xdev.mockserver.serialization.deserializers.string;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import software.xdev.mockserver.model.NottableString;
 import software.xdev.mockserver.model.ParameterStyle;
-import software.xdev.mockserver.serialization.ObjectMapperFactory;
 
 import java.io.IOException;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static software.xdev.mockserver.model.NottableOptionalString.optional;
-import static software.xdev.mockserver.model.NottableSchemaString.schemaString;
 import static software.xdev.mockserver.model.NottableString.string;
 
 public class NottableStringDeserializer extends StdDeserializer<NottableString> {
-
-    private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.createObjectMapper();
 
     public NottableStringDeserializer() {
         super(NottableString.class);
@@ -46,7 +40,6 @@ public class NottableStringDeserializer extends StdDeserializer<NottableString> 
             Boolean not = null;
             Boolean optional = null;
             String value = null;
-            JsonNode schema = null;
             ParameterStyle parameterStyle = null;
 
             while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
@@ -60,9 +53,6 @@ public class NottableStringDeserializer extends StdDeserializer<NottableString> 
                 } else if ("value".equals(fieldName)) {
                     jsonParser.nextToken();
                     value = ctxt.readValue(jsonParser, String.class);
-                } else if ("schema".equals(fieldName)) {
-                    jsonParser.nextToken();
-                    schema = ctxt.readValue(jsonParser, JsonNode.class);
                 } else if ("parameterStyle".equals(fieldName)) {
                     jsonParser.nextToken();
                     parameterStyle = ctxt.readValue(jsonParser, ParameterStyle.class);
@@ -70,9 +60,7 @@ public class NottableStringDeserializer extends StdDeserializer<NottableString> 
             }
 
             NottableString result = null;
-            if (schema != null) {
-                result = schemaString(schema.toPrettyString(), not);
-            } else if (Boolean.TRUE.equals(optional)) {
+            if (Boolean.TRUE.equals(optional)) {
                 result = optional(value, not);
             } else if (isNotBlank(value)) {
                 result = string(value, not);

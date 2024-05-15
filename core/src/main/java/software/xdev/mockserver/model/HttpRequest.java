@@ -29,7 +29,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.model.Header.header;
-import static software.xdev.mockserver.model.NottableSchemaString.schemaString;
 import static software.xdev.mockserver.model.NottableString.string;
 import static software.xdev.mockserver.model.SocketAddress.Scheme.HTTP;
 import static software.xdev.mockserver.model.SocketAddress.Scheme.HTTPS;
@@ -254,39 +253,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
     }
 
     /**
-     * The HTTP method to match on as a JSON Schema for example:
-     * <pre>
-     * {
-     *     "type": "string",
-     *     "minLength": 2,
-     *     "maxLength": 3
-     * }
-     *
-     * or
-     *
-     * {
-     *     "type": "string",
-     *     "pattern": "^P.{2,3}$"
-     * }
-     *
-     * or
-     *
-     * {
-     *     "type": "string",
-     *     "format": "ipv4"
-     * }
-     * </pre>
-     * <p>
-     * For full details of JSON Schema see, https://json-schema.org/understanding-json-schema/reference/string.html
-     *
-     * @param method the HTTP method to match on as a JSON Schema
-     */
-    public HttpRequest withMethodSchema(String method) {
-        withMethod(schemaString(method));
-        return this;
-    }
-
-    /**
      * The HTTP method all method except a specific value using the "not" operator,
      * for example this allows operations such as not("GET")
      *
@@ -333,39 +299,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
     public HttpRequest withPath(NottableString path) {
         this.path = path;
         this.hashCode = 0;
-        return this;
-    }
-
-    /**
-     * The path to match on as a JSON Schema for example:
-     * <pre>
-     * {
-     *     "type": "string",
-     *     "minLength": 2,
-     *     "maxLength": 3
-     * }
-     *
-     * or
-     *
-     * {
-     *     "type": "string",
-     *     "pattern": "^simp.{2}$"
-     * }
-     *
-     * or
-     *
-     * {
-     *     "type": "string",
-     *     "format": "ipv4"
-     * }
-     * </pre>
-     * <p>
-     * For full details of JSON Schema see, https://json-schema.org/understanding-json-schema/reference/string.html
-     *
-     * @param path the path to match on as a JSON Schema
-     */
-    public HttpRequest withPathSchema(String path) {
-        withPath(schemaString(path));
         return this;
     }
 
@@ -470,22 +403,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             values = new String[]{".*"};
         }
         getOrCreatePathParameters().withEntry(name, values);
-        this.hashCode = 0;
-        return this;
-    }
-
-    /**
-     * Adds one path parameter to match which the values are JSON schema i.e. "{ \"type\": \"string\", \"pattern\": \"^someV[a-z]{4}$\" }"
-     * (for more details of the supported JSON schema see https://json-schema.org)
-     *
-     * @param name   the parameter name
-     * @param values the parameter values which can be a varags of JSON schemas
-     */
-    public HttpRequest withSchemaPathParameter(String name, String... values) {
-        if (values.length == 0) {
-            values = new String[]{".*"};
-        }
-        getOrCreatePathParameters().withEntry(string(name), Arrays.stream(values).map(NottableSchemaString::schemaString).toArray(NottableString[]::new));
         this.hashCode = 0;
         return this;
     }
@@ -621,22 +538,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
      */
     public HttpRequest withQueryStringParameter(String name, String... values) {
         getOrCreateQueryStringParameters().withEntry(name, values);
-        this.hashCode = 0;
-        return this;
-    }
-
-    /**
-     * Adds one query string parameter to match which the values are JSON schema i.e. "{ \"type\": \"string\", \"pattern\": \"^someV[a-z]{4}$\" }"
-     * (for more details of the supported JSON schema see https://json-schema.org)
-     *
-     * @param name   the parameter name
-     * @param values the parameter values which can be a varags of JSON schemas
-     */
-    public HttpRequest withSchemaQueryStringParameter(String name, String... values) {
-        if (values.length == 0) {
-            values = new String[]{".*"};
-        }
-        getOrCreateQueryStringParameters().withEntry(string(name), Arrays.stream(values).map(NottableSchemaString::schemaString).toArray(NottableString[]::new));
         this.hashCode = 0;
         return this;
     }
@@ -796,9 +697,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
      * - new BinaryBody(IOUtils.readFully(getClass().getClassLoader().getResourceAsStream("example.pdf"), 1024));
      * <p>
      * for more details of the supported regular expression syntax see <a href="http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html">http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html</a>
-     * for more details of the supported json syntax see <a href="http://jsonassert.skyscreamer.org">http://jsonassert.skyscreamer.org</a>
-     * for more details of the supported json schema syntax see <a href="http://json-schema.org/">http://json-schema.org/</a>
-     * for more detail of XPath syntax see <a href="http://saxon.sourceforge.net/saxon6.5.3/expressions.html">http://saxon.sourceforge.net/saxon6.5.3/expressions.html</a>
      *
      * @param body an instance of one of the Body subclasses including StringBody, ParameterBody or BinaryBody
      */
@@ -911,22 +809,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             values = new String[]{".*"};
         }
         getOrCreateHeaders().withEntry(header(name, values));
-        this.hashCode = 0;
-        return this;
-    }
-
-    /**
-     * Adds one header to match which the values are JSON schema i.e. "{ \"type\": \"string\", \"pattern\": \"^someV[a-z]{4}$\" }"
-     * (for more details of the supported JSON schema see https://json-schema.org)
-     *
-     * @param name   the header name
-     * @param values the header values which can be a varags of JSON schemas
-     */
-    public HttpRequest withSchemaHeader(String name, String... values) {
-        if (values.length == 0) {
-            values = new String[]{".*"};
-        }
-        getOrCreateHeaders().withEntry(header(string(name), Arrays.stream(values).map(NottableSchemaString::schemaString).toArray(NottableString[]::new)));
         this.hashCode = 0;
         return this;
     }
@@ -1103,19 +985,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
      */
     public HttpRequest withCookie(String name, String value) {
         getOrCreateCookies().withEntry(name, value);
-        this.hashCode = 0;
-        return this;
-    }
-
-    /**
-     * Adds one cookie to match on, which the value the values is JSON schema i.e. "{ \"type\": \"string\", \"pattern\": \"^someV[a-z]{4}$\" }"
-     * (for more details of the supported JSON schema see https://json-schema.org)
-     *
-     * @param name  the cookies name
-     * @param value the cookies value as JSON schema
-     */
-    public HttpRequest withSchemaCookie(String name, String value) {
-        getOrCreateCookies().withEntry(string(name), schemaString(value));
         this.hashCode = 0;
         return this;
     }

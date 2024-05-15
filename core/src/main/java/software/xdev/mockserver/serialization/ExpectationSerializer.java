@@ -18,14 +18,11 @@ package software.xdev.mockserver.serialization;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.fge.jackson.JacksonUtils;
 import com.google.common.base.Joiner;
-import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.serialization.model.ExpectationDTO;
-import software.xdev.mockserver.validator.jsonschema.JsonSchemaExpectationValidator;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -36,9 +33,6 @@ import java.util.function.BiFunction;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
-import static software.xdev.mockserver.validator.jsonschema.JsonSchemaExpectationValidator.jsonSchemaExpectationValidator;
-import static software.xdev.mockserver.validator.jsonschema.JsonSchemaValidator.OPEN_API_SPECIFICATION_URL;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.INFO;
 
@@ -48,8 +42,6 @@ public class ExpectationSerializer implements Serializer<Expectation> {
     private ObjectWriter objectWriter;
     private ObjectMapper objectMapper;
     private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-    private JsonSchemaExpectationValidator expectationValidator;
-    private OpenAPIExpectationSerializer openAPIExpectationSerializer;
 
     public ExpectationSerializer(MockServerLogger mockServerLogger) {
         this(mockServerLogger, false);
@@ -57,16 +49,8 @@ public class ExpectationSerializer implements Serializer<Expectation> {
 
     public ExpectationSerializer(MockServerLogger mockServerLogger, boolean serialiseDefaultValues) {
         this.mockServerLogger = mockServerLogger;
-        this.openAPIExpectationSerializer = new OpenAPIExpectationSerializer(mockServerLogger);
         this.objectWriter = ObjectMapperFactory.createObjectMapper(true, serialiseDefaultValues);
         this.objectMapper = ObjectMapperFactory.createObjectMapper();
-    }
-
-    private JsonSchemaExpectationValidator getValidator() {
-        if (expectationValidator == null) {
-            expectationValidator = jsonSchemaExpectationValidator(mockServerLogger);
-        }
-        return expectationValidator;
     }
 
     public String serialize(Expectation expectation) {
@@ -116,37 +100,23 @@ public class ExpectationSerializer implements Serializer<Expectation> {
     }
 
     public Expectation deserialize(String jsonExpectation) {
-        if (isBlank(jsonExpectation)) {
-            throw new IllegalArgumentException(
-                "1 error:" + NEW_LINE
-                    + " - an expectation is required but value was \"" + jsonExpectation + "\"" + NEW_LINE +
-                    NEW_LINE +
-                    OPEN_API_SPECIFICATION_URL
-            );
-        } else {
-            String validationErrors = getValidator().isValid(jsonExpectation);
-            if (validationErrors.isEmpty()) {
-                Expectation expectation = null;
-                try {
-                    ExpectationDTO expectationDTO = objectMapper.readValue(jsonExpectation, ExpectationDTO.class);
-                    if (expectationDTO != null) {
-                        expectation = expectationDTO.buildObject();
-                    }
-                } catch (Throwable throwable) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception while parsing{}for Expectation " + throwable.getMessage())
-                            .setArguments(jsonExpectation)
-                            .setThrowable(throwable)
-                    );
-                    throw new IllegalArgumentException("exception while parsing [" + jsonExpectation + "] for Expectation", throwable);
-                }
-                return expectation;
-            } else {
-                throw new IllegalArgumentException(StringUtils.removeEndIgnoreCase(formatLogMessage("incorrect expectation json format for:{}schema validation errors:{}", jsonExpectation, validationErrors), "\n"));
+        Expectation expectation = null;
+        try {
+            ExpectationDTO expectationDTO = objectMapper.readValue(jsonExpectation, ExpectationDTO.class);
+            if (expectationDTO != null) {
+                expectation = expectationDTO.buildObject();
             }
+        } catch (Throwable throwable) {
+            mockServerLogger.logEvent(
+                new LogEntry()
+                    .setLogLevel(Level.ERROR)
+                    .setMessageFormat("exception while parsing{}for Expectation " + throwable.getMessage())
+                    .setArguments(jsonExpectation)
+                    .setThrowable(throwable)
+            );
+            throw new IllegalArgumentException("exception while parsing [" + jsonExpectation + "] for Expectation", throwable);
         }
+        return expectation;
     }
 
     @Override
@@ -184,18 +154,10 @@ public class ExpectationSerializer implements Serializer<Expectation> {
                             );
                         }
                     }
-                    if (jsonExpectationList.get(i).has("specUrlOrPayload")) {
-                        try {
-                            expectations.addAll(expectationModifier.apply(jsonExpectation, openAPIExpectationSerializer.deserializeToExpectations(jsonExpectation)));
-                        } catch (IllegalArgumentException iae) {
-                            validationErrorsList.add(iae.getMessage());
-                        }
-                    } else {
-                        try {
-                            expectations.addAll(expectationModifier.apply(jsonExpectation, Collections.singletonList(deserialize(jsonExpectation))));
-                        } catch (IllegalArgumentException iae) {
-                            validationErrorsList.add(iae.getMessage());
-                        }
+                    try {
+                        expectations.addAll(expectationModifier.apply(jsonExpectation, Collections.singletonList(deserialize(jsonExpectation))));
+                    } catch (IllegalArgumentException iae) {
+                        validationErrorsList.add(iae.getMessage());
                     }
                 }
                 if (!validationErrorsList.isEmpty()) {

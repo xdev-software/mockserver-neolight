@@ -76,12 +76,8 @@ public class NottableStringMultiMap extends ObjectWithReflectiveEqualsHashCodeTo
                     for (NottableString matchedValue : matchedValuesForKey) {
                         boolean matchesValue = false;
                         for (NottableString matcherValue : matcherValuesForKey) {
-                            // match first as list
-                            if (matcherValue instanceof NottableSchemaString && ((NottableSchemaString) matcherValue).matches(mockServerLogger, context, matchedValuesForKey)) {
-                                matchesValue = true;
-                                break;
-                                // otherwise match item by item
-                            } else if (regexStringMatcher.matches(mockServerLogger, context, matcherValue, matchedValue)) {
+                            // match item by item
+                            if (regexStringMatcher.matches(mockServerLogger, context, matcherValue, matchedValue)) {
                                 matchesValue = true;
                                 break;
                             } else {

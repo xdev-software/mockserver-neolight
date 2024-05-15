@@ -16,7 +16,6 @@
 package software.xdev.mockserver.serialization.model;
 
 import software.xdev.mockserver.model.BinaryBody;
-import software.xdev.mockserver.model.JsonBody;
 
 public class BinaryBodyDTO extends BodyWithContentTypeDTO {
 

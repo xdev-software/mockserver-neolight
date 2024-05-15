@@ -52,13 +52,9 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
 
     static {
         fieldNameToType.put("base64Bytes".toLowerCase(), Body.Type.BINARY);
-        fieldNameToType.put("json".toLowerCase(), Body.Type.JSON);
-        fieldNameToType.put("jsonSchema".toLowerCase(), Body.Type.JSON_SCHEMA);
-        fieldNameToType.put("jsonPath".toLowerCase(), Body.Type.JSON_PATH);
         fieldNameToType.put("parameters".toLowerCase(), Body.Type.PARAMETERS);
         fieldNameToType.put("regex".toLowerCase(), Body.Type.REGEX);
         fieldNameToType.put("string".toLowerCase(), Body.Type.STRING);
-        fieldNameToType.put("xpath".toLowerCase(), Body.Type.XPATH);
     }
 
     private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(StrictBodyDTODeserializer.class);
@@ -79,9 +75,7 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
         MediaType contentType = null;
         Charset charset = null;
         boolean subString = false;
-        MatchType matchType = JsonBody.DEFAULT_MATCH_TYPE;
         Parameters parameters = null;
-        Map<String, String> namespacePrefixes = null;
         if (currentToken == JsonToken.START_OBJECT) {
             @SuppressWarnings("unchecked") Map<Object, Object> body = (Map<Object, Object>) ctxt.readValue(jsonParser, Map.class);
             for (Map.Entry<Object, Object> entry : body.entrySet()) {
@@ -101,7 +95,7 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                             }
                         }
                     }
-                    if (containsIgnoreCase(key, "string", "regex", "json", "jsonSchema", "jsonPath", "xml", "xmlSchema", "xpath", "base64Bytes") && type != Body.Type.PARAMETERS) {
+                    if (containsIgnoreCase(key, "string", "regex", "base64Bytes") && type != Body.Type.PARAMETERS) {
                         String fieldName = String.valueOf(entry.getKey()).toLowerCase();
                         if (fieldNameToType.containsKey(fieldName)) {
                             type = fieldNameToType.get(fieldName);
@@ -137,20 +131,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                     }
                     if (key.equalsIgnoreCase("optional")) {
                         optional = Boolean.parseBoolean(String.valueOf(entry.getValue()));
-                    }
-                    if (key.equalsIgnoreCase("matchType")) {
-                        try {
-                            matchType = MatchType.valueOf(String.valueOf(entry.getValue()));
-                        } catch (IllegalArgumentException iae) {
-                            if (MockServerLogger.isEnabled(DEBUG)) {
-                                MOCK_SERVER_LOGGER.logEvent(
-                                    new LogEntry()
-                                        .setLogLevel(DEBUG)
-                                        .setMessageFormat("ignoring incorrect JsonBodyMatchType with value \"" + entry.getValue() + "\"")
-                                        .setThrowable(iae)
-                                );
-                            }
-                        }
                     }
                     if (key.equalsIgnoreCase("subString")) {
                         try {
@@ -218,16 +198,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                         }
                         parameters = objectMapper.readValue(objectWriter.writeValueAsString(entry.getValue()), Parameters.class);
                     }
-                    if (key.equalsIgnoreCase("namespacePrefixes")) {
-                        if (objectMapper == null) {
-                            objectMapper = ObjectMapperFactory.createObjectMapper();
-                        }
-                        if (objectWriter == null) {
-                            objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
-                        }
-                        namespacePrefixes = objectMapper.readValue(objectWriter.writeValueAsString(entry.getValue()), new TypeReference<Map<String, String>>(){});
-                    }
-
                 }
             }
             if (type != null) {
@@ -240,23 +210,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                             result = new BinaryBodyDTO(new BinaryBody(rawBytes), not);
                             break;
                         }
-                    case JSON:
-                        if (contentType != null && isNotBlank(contentType.toString())) {
-                            result = new JsonBodyDTO(new JsonBody(valueJsonValue, rawBytes, contentType, matchType), not);
-                            break;
-                        } else if (charset != null) {
-                            result = new JsonBodyDTO(new JsonBody(valueJsonValue, rawBytes, JsonBody.DEFAULT_JSON_CONTENT_TYPE.withCharset(charset), matchType), not);
-                            break;
-                        } else {
-                            result = new JsonBodyDTO(new JsonBody(valueJsonValue, rawBytes, JsonBody.DEFAULT_JSON_CONTENT_TYPE, matchType), not);
-                            break;
-                        }
-                    case JSON_SCHEMA:
-                        result = new JsonSchemaBodyDTO(new JsonSchemaBody(valueJsonValue), not);
-                        break;
-                    case JSON_PATH:
-                        result = new JsonPathBodyDTO(new JsonPathBody(valueJsonValue), not);
-                        break;
                     case PARAMETERS:
                         result = new ParameterBodyDTO(new ParameterBody(parameters), not);
                         break;
@@ -274,9 +227,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                             result = new StringBodyDTO(new StringBody(valueJsonValue, rawBytes, subString, null), not);
                             break;
                         }
-                    case XPATH:
-                        result = new XPathBodyDTO(new XPathBody(valueJsonValue, namespacePrefixes), not);
-                        break;
                 }
             }
         }

@@ -31,8 +31,6 @@ public class LogEventRequestAndResponseDTO extends ObjectWithJsonToString implem
             RequestDefinition httpRequest = httpRequestAndHttpResponse.getHttpRequest();
             if (httpRequest instanceof HttpRequest) {
                 this.httpRequest = new HttpRequestDTO((HttpRequest) httpRequest);
-            } else if (httpRequest instanceof OpenAPIDefinition) {
-                this.httpRequest = new OpenAPIDefinitionDTO((OpenAPIDefinition) httpRequest);
             }
             HttpResponse httpResponse = httpRequestAndHttpResponse.getHttpResponse();
             if (httpResponse != null) {

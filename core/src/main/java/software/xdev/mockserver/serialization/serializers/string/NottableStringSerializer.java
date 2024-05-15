@@ -16,24 +16,15 @@
 package software.xdev.mockserver.serialization.serializers.string;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import software.xdev.mockserver.model.NottableSchemaString;
 import software.xdev.mockserver.model.NottableString;
-import software.xdev.mockserver.serialization.ObjectMapperFactory;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import static software.xdev.mockserver.model.NottableString.serialiseNottableString;
 
 public class NottableStringSerializer extends StdSerializer<NottableString> {
-
-    private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.createObjectMapper();
 
     public NottableStringSerializer() {
         super(NottableString.class);
@@ -41,9 +32,7 @@ public class NottableStringSerializer extends StdSerializer<NottableString> {
 
     @Override
     public void serialize(NottableString nottableString, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        if (nottableString instanceof NottableSchemaString) {
-            writeObject(nottableString, jgen, "schema", OBJECT_MAPPER.readTree(nottableString.getValue()));
-        } else if (nottableString.getParameterStyle() != null) {
+        if (nottableString.getParameterStyle() != null) {
             writeObject(nottableString, jgen, "value", nottableString.getValue());
         } else {
             jgen.writeString(serialiseNottableString(nottableString));

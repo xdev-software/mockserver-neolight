@@ -43,11 +43,9 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 
     private static final Map<String, Body.Type> fieldNameToType = new HashMap<>();
     private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
-    private static ObjectWriter jsonBodyObjectWriter;
 
     static {
         fieldNameToType.put("base64Bytes".toLowerCase(), Body.Type.BINARY);
-        fieldNameToType.put("json".toLowerCase(), Body.Type.JSON);
         fieldNameToType.put("string".toLowerCase(), Body.Type.STRING);
     }
 
@@ -87,20 +85,12 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
                             }
                         }
                     }
-                    if (containsIgnoreCase(key, "string", "regex", "json", "jsonSchema", "jsonPath", "xml", "xmlSchema", "xpath", "base64Bytes") && type != Body.Type.PARAMETERS) {
+                    if (containsIgnoreCase(key, "string", "regex", "base64Bytes") && type != Body.Type.PARAMETERS) {
                         String fieldName = String.valueOf(entry.getKey()).toLowerCase();
                         if (fieldNameToType.containsKey(fieldName)) {
                             type = fieldNameToType.get(fieldName);
                         }
-                        if (Map.class.isAssignableFrom(entry.getValue().getClass()) ||
-                            containsIgnoreCase(key, "json", "jsonSchema") && !String.class.isAssignableFrom(entry.getValue().getClass())) {
-                            if (jsonBodyObjectWriter == null) {
-                                jsonBodyObjectWriter = buildObjectMapperWithoutRemovingEmptyValues().writerWithDefaultPrettyPrinter();
-                            }
-                            valueJsonValue = jsonBodyObjectWriter.writeValueAsString(entry.getValue());
-                        } else {
-                            valueJsonValue = String.valueOf(entry.getValue());
-                        }
+                        valueJsonValue = String.valueOf(entry.getValue());
                     }
                     if (containsIgnoreCase(key, "rawBytes", "base64Bytes")) {
                         if (entry.getValue() instanceof String) {
@@ -179,17 +169,6 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
                             result = new BinaryBodyDTO(new BinaryBody(rawBytes), not);
                             break;
                         }
-                    case JSON:
-                        if (contentType != null && isNotBlank(contentType.toString())) {
-                            result = new JsonBodyDTO(new JsonBody(valueJsonValue, rawBytes, contentType, JsonBody.DEFAULT_MATCH_TYPE), not);
-                            break;
-                        } else if (charset != null) {
-                            result = new JsonBodyDTO(new JsonBody(valueJsonValue, rawBytes, JsonBody.DEFAULT_JSON_CONTENT_TYPE.withCharset(charset), JsonBody.DEFAULT_MATCH_TYPE), not);
-                            break;
-                        } else {
-                            result = new JsonBodyDTO(new JsonBody(valueJsonValue, rawBytes, JsonBody.DEFAULT_JSON_CONTENT_TYPE, JsonBody.DEFAULT_MATCH_TYPE), not);
-                            break;
-                        }
                     case STRING:
                         if (contentType != null && isNotBlank(contentType.toString())) {
                             result = new StringBodyDTO(new StringBody(valueJsonValue, rawBytes, false, contentType), not);
@@ -202,22 +181,9 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
                             break;
                         }
                 }
-            } else if (body.size() > 0) {
-                if (jsonBodyObjectWriter == null) {
-                    jsonBodyObjectWriter = buildObjectMapperWithoutRemovingEmptyValues().writerWithDefaultPrettyPrinter();
-                }
-                result = new JsonBodyDTO(new JsonBody(jsonBodyObjectWriter.writeValueAsString(body), JsonBody.DEFAULT_MATCH_TYPE), null);
             }
-        } else if (currentToken == JsonToken.START_ARRAY) {
-            if (jsonBodyObjectWriter == null) {
-                jsonBodyObjectWriter = buildObjectMapperWithoutRemovingEmptyValues().writerWithDefaultPrettyPrinter();
-            }
-            result = new JsonBodyDTO(new JsonBody(jsonBodyObjectWriter.writeValueAsString(ctxt.readValue(jsonParser, List.class)), JsonBody.DEFAULT_MATCH_TYPE), null);
         } else if (currentToken == JsonToken.VALUE_STRING) {
             result = new StringBodyDTO(new StringBody(jsonParser.getText()));
-        }
-        if (result == null && jsonParser.currentToken() == JsonToken.END_OBJECT) {
-            result = new JsonBodyDTO(JsonBody.json("{ }"));
         }
         if (result != null) {
             result.withOptional(optional);

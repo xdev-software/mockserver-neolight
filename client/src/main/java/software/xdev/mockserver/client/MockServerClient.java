@@ -32,7 +32,6 @@ import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.matchers.TimeToLive;
 import software.xdev.mockserver.matchers.Times;
 import software.xdev.mockserver.mock.Expectation;
-import software.xdev.mockserver.mock.OpenAPIExpectation;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
 import software.xdev.mockserver.scheduler.Scheduler;
@@ -98,7 +97,6 @@ public class MockServerClient implements Stoppable {
     private LogEventRequestAndResponseSerializer httpRequestResponseSerializer = new LogEventRequestAndResponseSerializer(MOCK_SERVER_LOGGER);
     private PortBindingSerializer portBindingSerializer = new PortBindingSerializer(MOCK_SERVER_LOGGER);
     private ExpectationSerializer expectationSerializer = new ExpectationSerializer(MOCK_SERVER_LOGGER);
-    private OpenAPIExpectationSerializer openAPIExpectationSerializer = new OpenAPIExpectationSerializer(MOCK_SERVER_LOGGER);
     private VerificationSerializer verificationSerializer = new VerificationSerializer(MOCK_SERVER_LOGGER);
     private VerificationSequenceSerializer verificationSequenceSerializer = new VerificationSequenceSerializer(MOCK_SERVER_LOGGER);
     private final CompletableFuture<MockServerClient> stopFuture = new CompletableFuture<>();
@@ -1450,49 +1448,6 @@ public class MockServerClient implements Stoppable {
      */
     public ForwardChainExpectation when(RequestDefinition requestDefinition, Times times, TimeToLive timeToLive, Integer priority) {
         return new ForwardChainExpectation(configuration, MOCK_SERVER_LOGGER, getMockServerEventBus(), this, new Expectation(requestDefinition, times, timeToLive, priority));
-    }
-
-    /**
-     * Specify OpenAPI and operations and responses to create matchers and example responses
-     *
-     * @param openAPIExpectations the OpenAPI and operations and responses to create matchers and example responses
-     * @return upserted expectations
-     */
-    public Expectation[] upsert(OpenAPIExpectation... openAPIExpectations) {
-        if (openAPIExpectations != null) {
-            HttpResponse httpResponse = null;
-            if (openAPIExpectations.length == 1) {
-                httpResponse =
-                    sendRequest(
-                        request()
-                            .withMethod("PUT")
-                            .withContentType(APPLICATION_JSON_UTF_8)
-                            .withPath(calculatePath("openapi"))
-                            .withBody(openAPIExpectationSerializer.serialize(openAPIExpectations[0]), StandardCharsets.UTF_8),
-                        false
-                    );
-                if (httpResponse != null && httpResponse.getStatusCode() != 201) {
-                    throw new ClientException(formatLogMessage("error:{}while submitted OpenAPI expectation:{}", httpResponse, openAPIExpectations[0]));
-                }
-            } else if (openAPIExpectations.length > 1) {
-                httpResponse =
-                    sendRequest(
-                        request()
-                            .withMethod("PUT")
-                            .withContentType(APPLICATION_JSON_UTF_8)
-                            .withPath(calculatePath("openapi"))
-                            .withBody(openAPIExpectationSerializer.serialize(openAPIExpectations), StandardCharsets.UTF_8),
-                        true
-                    );
-                if (httpResponse != null && httpResponse.getStatusCode() != 201) {
-                    throw new ClientException(formatLogMessage("error:{}while submitted OpenAPI expectations:{}", httpResponse, openAPIExpectations));
-                }
-            }
-            if (httpResponse != null && isNotBlank(httpResponse.getBodyAsString())) {
-                return expectationSerializer.deserializeArray(httpResponse.getBodyAsString(), true);
-            }
-        }
-        return new Expectation[0];
     }
 
     /**

@@ -40,7 +40,6 @@ import software.xdev.mockserver.mock.listeners.MockServerLogListener;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherListener;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.model.HttpRequest;
-import software.xdev.mockserver.model.OpenAPIDefinition;
 import software.xdev.mockserver.model.RequestDefinition;
 import software.xdev.mockserver.serialization.HttpRequestSerializer;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
@@ -353,12 +352,6 @@ public class DashboardWebSocketHandler extends ChannelInboundHandlerAdapter impl
                         .limit(UI_UPDATE_ITEM_LIMIT)
                         .map(requestMatcher -> {
                             JsonNode expectationJsonNode = objectMapper.valueToTree(new ExpectationDTO(requestMatcher.getExpectation()));
-                            if (requestMatcher.getExpectation().getHttpRequest() instanceof OpenAPIDefinition) {
-                                JsonNode httpRequestJsonNode = expectationJsonNode.get("httpRequest");
-                                if (httpRequestJsonNode instanceof ObjectNode) {
-                                    ((ObjectNode) httpRequestJsonNode).set("requestMatchers", objectMapper.valueToTree(requestMatcher.getHttpRequests()));
-                                }
-                            }
                             Description description = activeExpectationsDescriptionProcessor.description(requestMatcher.getExpectation().getHttpRequest(), requestMatcher.getExpectation().getId());
                             return ImmutableMap.of(
                                 "key", requestMatcher.getExpectation().getId(),

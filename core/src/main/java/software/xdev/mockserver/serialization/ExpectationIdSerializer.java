@@ -19,11 +19,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Joiner;
-import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.ExpectationId;
-import software.xdev.mockserver.validator.jsonschema.JsonSchemaExpectationIdValidator;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -32,9 +30,6 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
-import static software.xdev.mockserver.validator.jsonschema.JsonSchemaExpectationIdValidator.jsonSchemaExpectationIdValidator;
-import static software.xdev.mockserver.validator.jsonschema.JsonSchemaValidator.OPEN_API_SPECIFICATION_URL;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class ExpectationIdSerializer implements Serializer<ExpectationId> {
@@ -42,17 +37,9 @@ public class ExpectationIdSerializer implements Serializer<ExpectationId> {
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
     private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-    private JsonSchemaExpectationIdValidator expectationIdValidator;
 
     public ExpectationIdSerializer(MockServerLogger mockServerLogger) {
         this.mockServerLogger = mockServerLogger;
-    }
-
-    private JsonSchemaExpectationIdValidator getValidator() {
-        if (expectationIdValidator == null) {
-            expectationIdValidator = jsonSchemaExpectationIdValidator(mockServerLogger);
-        }
-        return expectationIdValidator;
     }
 
     public String serialize(ExpectationId expectationId) {
@@ -100,67 +87,53 @@ public class ExpectationIdSerializer implements Serializer<ExpectationId> {
     }
 
     public ExpectationId deserialize(String jsonExpectationId) {
-        if (isBlank(jsonExpectationId)) {
-            throw new IllegalArgumentException(
-                "1 error:" + NEW_LINE
-                    + " - a request is required but value was \"" + jsonExpectationId + "\"" + NEW_LINE +
-                    NEW_LINE +
-                    OPEN_API_SPECIFICATION_URL
-            );
-        } else {
-            if (jsonExpectationId.contains("\"httpRequest\"")) {
-                try {
-                    JsonNode jsonNode = objectMapper.readTree(jsonExpectationId);
-                    if (jsonNode.has("httpRequest")) {
-                        jsonExpectationId = jsonNode.get("httpRequest").toString();
-                    }
-                } catch (Throwable throwable) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
-                            .setArguments(jsonExpectationId)
-                            .setThrowable(throwable)
-                    );
-                    throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
+        if (jsonExpectationId.contains("\"httpRequest\"")) {
+            try {
+                JsonNode jsonNode = objectMapper.readTree(jsonExpectationId);
+                if (jsonNode.has("httpRequest")) {
+                    jsonExpectationId = jsonNode.get("httpRequest").toString();
                 }
-            } else if (jsonExpectationId.contains("\"openAPIDefinition\"")) {
-                try {
-                    JsonNode jsonNode = objectMapper.readTree(jsonExpectationId);
-                    if (jsonNode.has("openAPIDefinition")) {
-                        jsonExpectationId = jsonNode.get("openAPIDefinition").toString();
-                    }
-                } catch (Throwable throwable) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
-                            .setArguments(jsonExpectationId)
-                            .setThrowable(throwable)
-                    );
-                    throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
-                }
+            } catch (Throwable throwable) {
+                mockServerLogger.logEvent(
+                    new LogEntry()
+                        .setLogLevel(Level.ERROR)
+                        .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
+                        .setArguments(jsonExpectationId)
+                        .setThrowable(throwable)
+                );
+                throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
             }
-            String validationErrors = getValidator().isValid(jsonExpectationId);
-            if (validationErrors.isEmpty()) {
-                ExpectationId expectationId;
-                try {
-                    expectationId = objectMapper.readValue(jsonExpectationId, ExpectationId.class);
-                } catch (Throwable throwable) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
-                            .setArguments(jsonExpectationId)
-                            .setThrowable(throwable)
-                    );
-                    throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
+        } else if (jsonExpectationId.contains("\"openAPIDefinition\"")) {
+            try {
+                JsonNode jsonNode = objectMapper.readTree(jsonExpectationId);
+                if (jsonNode.has("openAPIDefinition")) {
+                    jsonExpectationId = jsonNode.get("openAPIDefinition").toString();
                 }
-                return expectationId;
-            } else {
-                throw new IllegalArgumentException(StringUtils.removeEndIgnoreCase(formatLogMessage("incorrect request matcher json format for:{}schema validation errors:{}", jsonExpectationId, validationErrors), "\n"));
+            } catch (Throwable throwable) {
+                mockServerLogger.logEvent(
+                    new LogEntry()
+                        .setLogLevel(Level.ERROR)
+                        .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
+                        .setArguments(jsonExpectationId)
+                        .setThrowable(throwable)
+                );
+                throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
             }
         }
+        ExpectationId expectationId;
+        try {
+            expectationId = objectMapper.readValue(jsonExpectationId, ExpectationId.class);
+        } catch (Throwable throwable) {
+            mockServerLogger.logEvent(
+                new LogEntry()
+                    .setLogLevel(Level.ERROR)
+                    .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
+                    .setArguments(jsonExpectationId)
+                    .setThrowable(throwable)
+            );
+            throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
+        }
+        return expectationId;
     }
 
     @Override

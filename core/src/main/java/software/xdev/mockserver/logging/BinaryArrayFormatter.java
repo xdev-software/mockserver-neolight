@@ -17,8 +17,8 @@ package software.xdev.mockserver.logging;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import org.apache.commons.codec.binary.Hex;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import static software.xdev.mockserver.character.Character.NEW_LINE;
@@ -32,11 +32,23 @@ public class BinaryArrayFormatter {
                 .split(Base64.getEncoder().encodeToString(bytes))) + NEW_LINE +
                 "hex:" + NEW_LINE + "  " + Joiner.on("\n  ").join(Splitter
                 .fixedLength(64)
-                .split(String.valueOf(Hex.encodeHex(bytes))));
+                .split(bytesToHex(bytes)));
         } else {
             return "base64:" + NEW_LINE + NEW_LINE +
                 "hex:" + NEW_LINE;
         }
+    }
+    
+    private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes(StandardCharsets.US_ASCII);
+    
+    private static String bytesToHex(byte[] bytes) {
+        byte[] hexChars = new byte[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars, StandardCharsets.UTF_8);
     }
 
 }

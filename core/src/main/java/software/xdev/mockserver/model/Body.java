@@ -68,14 +68,9 @@ public abstract class Body<T> extends Not {
 
     public enum Type {
         BINARY,
-        JSON,
-        JSON_SCHEMA,
-        JSON_PATH,
         PARAMETERS,
         REGEX,
         STRING,
-        XPATH,
-        LOG_EVENT,
     }
 
     @Override

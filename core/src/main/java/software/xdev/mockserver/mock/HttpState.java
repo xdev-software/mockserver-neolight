@@ -26,7 +26,6 @@ import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.memory.MemoryMonitoring;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier.Cause;
 import software.xdev.mockserver.model.*;
-import software.xdev.mockserver.openapi.OpenAPIConverter;
 import software.xdev.mockserver.persistence.ExpectationFileSystemPersistence;
 import software.xdev.mockserver.persistence.ExpectationFileWatcher;
 import software.xdev.mockserver.responsewriter.ResponseWriter;
@@ -62,7 +61,6 @@ import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.RETRIEV
 import static software.xdev.mockserver.log.model.LogEntryMessages.RECEIVED_REQUEST_MESSAGE_FORMAT;
 import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.model.HttpResponse.response;
-import static software.xdev.mockserver.openapi.OpenAPIParser.OPEN_API_LOAD_ERROR;
 import static org.slf4j.event.Level.TRACE;
 
 public class HttpState {
@@ -86,13 +84,10 @@ public class HttpState {
     private LogEventRequestAndResponseSerializer httpRequestResponseSerializer;
     private ExpectationSerializer expectationSerializer;
     private ExpectationSerializer expectationSerializerThatSerializesBodyDefault;
-    private OpenAPIExpectationSerializer openAPIExpectationSerializer;
     private ExpectationToJavaSerializer expectationToJavaSerializer;
     private VerificationSerializer verificationSerializer;
     private VerificationSequenceSerializer verificationSequenceSerializer;
-    private LogEntrySerializer logEntrySerializer;
     private final MemoryMonitoring memoryMonitoring;
-    private OpenAPIConverter openAPIConverter;
     private AuthenticationHandler controlPlaneAuthenticationHandler;
 
     public static void setPort(final HttpRequest request) {
@@ -254,10 +249,6 @@ public class HttpState {
         });
     }
 
-    public List<Expectation> add(OpenAPIExpectation openAPIExpectation) {
-        return getOpenAPIConverter().buildExpectations(openAPIExpectation.getSpecUrlOrPayload(), openAPIExpectation.getOperationsAndResponses()).stream().map(this::add).flatMap(List::stream).collect(Collectors.toList());
-    }
-
     public List<Expectation> add(Expectation... expectations) {
         List<Expectation> upsertedExpectations = new ArrayList<>();
         for (Expectation expectation : expectations) {
@@ -377,20 +368,6 @@ public class HttpState {
                                         }
                                     );
                                 break;
-                            case LOG_ENTRIES:
-                                mockServerLog
-                                    .retrieveRequestLogEntries(
-                                        requestDefinition,
-                                        logEntries -> {
-                                            response.withBody(
-                                                getLogEntrySerializer().serialize(logEntries),
-                                                MediaType.JSON_UTF_8
-                                            );
-                                            mockServerLogger.logEvent(logEntry);
-                                            httpResponseFuture.complete(response);
-                                        }
-                                    );
-                                break;
                         }
                         break;
                     }
@@ -415,20 +392,6 @@ public class HttpState {
                                         httpRequestAndHttpResponses -> {
                                             response.withBody(
                                                 getHttpRequestResponseSerializer().serialize(httpRequestAndHttpResponses),
-                                                MediaType.JSON_UTF_8
-                                            );
-                                            mockServerLogger.logEvent(logEntry);
-                                            httpResponseFuture.complete(response);
-                                        }
-                                    );
-                                break;
-                            case LOG_ENTRIES:
-                                mockServerLog
-                                    .retrieveRequestResponseMessageLogEntries(
-                                        requestDefinition,
-                                        logEntries -> {
-                                            response.withBody(
-                                                getLogEntrySerializer().serialize(logEntries),
                                                 MediaType.JSON_UTF_8
                                             );
                                             mockServerLogger.logEvent(logEntry);
@@ -476,20 +439,6 @@ public class HttpState {
                                         }
                                     );
                                 break;
-                            case LOG_ENTRIES:
-                                mockServerLog
-                                    .retrieveRecordedExpectationLogEntries(
-                                        requestDefinition,
-                                        logEntries -> {
-                                            response.withBody(
-                                                getLogEntrySerializer().serialize(logEntries),
-                                                MediaType.JSON_UTF_8
-                                            );
-                                            mockServerLogger.logEvent(logEntry);
-                                            httpResponseFuture.complete(response);
-                                        }
-                                    );
-                                break;
                         }
                         break;
                     }
@@ -501,9 +450,6 @@ public class HttpState {
                                 break;
                             case JSON:
                                 response.withBody(getExpectationSerializer().serialize(expectations), MediaType.JSON_UTF_8);
-                                break;
-                            case LOG_ENTRIES:
-                                response.withBody("LOG_ENTRIES not supported for ACTIVE_EXPECTATIONS", MediaType.create("text", "plain").withCharset(UTF_8));
                                 break;
                         }
                         if (MockServerLogger.isEnabled(Level.INFO)) {
@@ -618,36 +564,6 @@ public class HttpState {
                         .withBody(getExpectationSerializer().serialize(upsertedExpectations), MediaType.JSON_UTF_8), true);
                 }
                 canHandle.complete(true);
-
-            } else if (request.matches("PUT", PATH_PREFIX + "/openapi", "/openapi")) {
-
-                if (controlPlaneRequestAuthenticated(request, responseWriter)) {
-                    try {
-                        List<Expectation> upsertedExpectations = new ArrayList<>();
-                        for (OpenAPIExpectation openAPIExpectation : getOpenAPIExpectationSerializer().deserializeArray(request.getBodyAsJsonOrXmlString(), false)) {
-                            upsertedExpectations.addAll(add(openAPIExpectation));
-                        }
-                        responseWriter.writeResponse(request, response()
-                            .withStatusCode(CREATED.code())
-                            .withBody(getExpectationSerializer().serialize(upsertedExpectations), MediaType.JSON_UTF_8), true);
-                    } catch (IllegalArgumentException iae) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setLogLevel(Level.ERROR)
-                                .setMessageFormat("exception handling request for open api expectation:{}error:{}")
-                                .setArguments(request, iae.getMessage())
-                                .setThrowable(iae)
-                        );
-                        responseWriter.writeResponse(
-                            request,
-                            BAD_REQUEST,
-                            (!iae.getMessage().startsWith(OPEN_API_LOAD_ERROR) ? OPEN_API_LOAD_ERROR + (isNotBlank(iae.getMessage()) ? ", " : "") : "") + iae.getMessage(),
-                            MediaType.create("text", "plain").toString()
-                        );
-                    }
-                }
-                canHandle.complete(true);
-
             } else if (request.matches("PUT", PATH_PREFIX + "/clear", "/clear")) {
 
                 if (controlPlaneRequestAuthenticated(request, responseWriter)) {
@@ -828,13 +744,6 @@ public class HttpState {
         return expectationSerializerThatSerializesBodyDefault;
     }
 
-    private OpenAPIExpectationSerializer getOpenAPIExpectationSerializer() {
-        if (this.openAPIExpectationSerializer == null) {
-            this.openAPIExpectationSerializer = new OpenAPIExpectationSerializer(mockServerLogger);
-        }
-        return openAPIExpectationSerializer;
-    }
-
     private ExpectationToJavaSerializer getExpectationToJavaSerializer() {
         if (this.expectationToJavaSerializer == null) {
             this.expectationToJavaSerializer = new ExpectationToJavaSerializer();
@@ -854,19 +763,5 @@ public class HttpState {
             this.verificationSequenceSerializer = new VerificationSequenceSerializer(mockServerLogger);
         }
         return verificationSequenceSerializer;
-    }
-
-    private LogEntrySerializer getLogEntrySerializer() {
-        if (this.logEntrySerializer == null) {
-            this.logEntrySerializer = new LogEntrySerializer(mockServerLogger);
-        }
-        return logEntrySerializer;
-    }
-
-    private OpenAPIConverter getOpenAPIConverter() {
-        if (this.openAPIConverter == null) {
-            this.openAPIConverter = new OpenAPIConverter(mockServerLogger);
-        }
-        return openAPIConverter;
     }
 }

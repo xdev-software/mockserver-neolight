@@ -19,12 +19,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Joiner;
-import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
 import software.xdev.mockserver.serialization.model.HttpRequestAndHttpResponseDTO;
-import software.xdev.mockserver.validator.jsonschema.JsonSchemaHttpRequestAndHttpResponseValidator;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -33,9 +31,6 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
-import static software.xdev.mockserver.validator.jsonschema.JsonSchemaHttpRequestAndHttpResponseValidator.jsonSchemaHttpRequestAndHttpResponseValidator;
-import static software.xdev.mockserver.validator.jsonschema.JsonSchemaValidator.OPEN_API_SPECIFICATION_URL;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequestAndHttpResponse> {
@@ -43,18 +38,9 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
     private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-    private JsonSchemaHttpRequestAndHttpResponseValidator jsonSchemaHttpRequestAndHttpResponseValidator;
 
     public HttpRequestAndHttpResponseSerializer(MockServerLogger mockServerLogger) {
         this.mockServerLogger = mockServerLogger;
-
-    }
-
-    private JsonSchemaHttpRequestAndHttpResponseValidator getValidator() {
-        if (jsonSchemaHttpRequestAndHttpResponseValidator == null) {
-            jsonSchemaHttpRequestAndHttpResponseValidator = jsonSchemaHttpRequestAndHttpResponseValidator(mockServerLogger);
-        }
-        return jsonSchemaHttpRequestAndHttpResponseValidator;
     }
 
     public String serialize(HttpRequestAndHttpResponse httpRequestAndHttpResponse) {
@@ -98,54 +84,40 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
     }
 
     public HttpRequestAndHttpResponse deserialize(String jsonHttpRequest) {
-        if (isBlank(jsonHttpRequest)) {
-            throw new IllegalArgumentException(
-                "1 error:" + NEW_LINE
-                    + " - a request is required but value was \"" + jsonHttpRequest + "\"" + NEW_LINE +
-                    NEW_LINE +
-                    OPEN_API_SPECIFICATION_URL
-            );
-        } else {
-            if (jsonHttpRequest.contains("\"httpRequestAndHttpResponse\"")) {
-                try {
-                    JsonNode jsonNode = objectMapper.readTree(jsonHttpRequest);
-                    if (jsonNode.has("httpRequestAndHttpResponse")) {
-                        jsonHttpRequest = jsonNode.get("httpRequestAndHttpResponse").toString();
-                    }
-                } catch (Throwable throwable) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception while parsing{}for HttpRequestAndHttpResponse " + throwable.getMessage())
-                            .setArguments(jsonHttpRequest)
-                            .setThrowable(throwable)
-                    );
-                    throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", throwable);
+        if (jsonHttpRequest.contains("\"httpRequestAndHttpResponse\"")) {
+            try {
+                JsonNode jsonNode = objectMapper.readTree(jsonHttpRequest);
+                if (jsonNode.has("httpRequestAndHttpResponse")) {
+                    jsonHttpRequest = jsonNode.get("httpRequestAndHttpResponse").toString();
                 }
-            }
-            String validationErrors = getValidator().isValid(jsonHttpRequest);
-            if (validationErrors.isEmpty()) {
-                HttpRequestAndHttpResponse httpRequestAndHttpResponse = null;
-                try {
-                    HttpRequestAndHttpResponseDTO httpRequestDTO = objectMapper.readValue(jsonHttpRequest, HttpRequestAndHttpResponseDTO.class);
-                    if (httpRequestDTO != null) {
-                        httpRequestAndHttpResponse = httpRequestDTO.buildObject();
-                    }
-                } catch (Throwable throwable) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception while parsing{}for HttpRequestAndHttpResponse " + throwable.getMessage())
-                            .setArguments(jsonHttpRequest)
-                            .setThrowable(throwable)
-                    );
-                    throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", throwable);
-                }
-                return httpRequestAndHttpResponse;
-            } else {
-                throw new IllegalArgumentException(StringUtils.removeEndIgnoreCase(formatLogMessage("incorrect json format for:{}schema validation errors:{}", jsonHttpRequest, validationErrors), "\n"));
+            } catch (Throwable throwable) {
+                mockServerLogger.logEvent(
+                    new LogEntry()
+                        .setLogLevel(Level.ERROR)
+                        .setMessageFormat("exception while parsing{}for HttpRequestAndHttpResponse " + throwable.getMessage())
+                        .setArguments(jsonHttpRequest)
+                        .setThrowable(throwable)
+                );
+                throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", throwable);
             }
         }
+        HttpRequestAndHttpResponse httpRequestAndHttpResponse = null;
+        try {
+            HttpRequestAndHttpResponseDTO httpRequestDTO = objectMapper.readValue(jsonHttpRequest, HttpRequestAndHttpResponseDTO.class);
+            if (httpRequestDTO != null) {
+                httpRequestAndHttpResponse = httpRequestDTO.buildObject();
+            }
+        } catch (Throwable throwable) {
+            mockServerLogger.logEvent(
+                new LogEntry()
+                    .setLogLevel(Level.ERROR)
+                    .setMessageFormat("exception while parsing{}for HttpRequestAndHttpResponse " + throwable.getMessage())
+                    .setArguments(jsonHttpRequest)
+                    .setThrowable(throwable)
+            );
+            throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", throwable);
+        }
+        return httpRequestAndHttpResponse;
     }
 
     @Override

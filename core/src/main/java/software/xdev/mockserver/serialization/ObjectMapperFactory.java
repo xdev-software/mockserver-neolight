@@ -28,7 +28,6 @@ import software.xdev.mockserver.serialization.deserializers.collections.HeadersD
 import software.xdev.mockserver.serialization.deserializers.collections.ParametersDeserializer;
 import software.xdev.mockserver.serialization.deserializers.condition.TimeToLiveDTODeserializer;
 import software.xdev.mockserver.serialization.deserializers.condition.VerificationTimesDTODeserializer;
-import software.xdev.mockserver.serialization.deserializers.expectation.OpenAPIExpectationDTODeserializer;
 import software.xdev.mockserver.serialization.deserializers.request.RequestDefinitionDTODeserializer;
 import software.xdev.mockserver.serialization.deserializers.string.NottableStringDeserializer;
 import software.xdev.mockserver.serialization.serializers.body.*;
@@ -38,17 +37,11 @@ import software.xdev.mockserver.serialization.serializers.collections.HeadersSer
 import software.xdev.mockserver.serialization.serializers.collections.ParametersSerializer;
 import software.xdev.mockserver.serialization.serializers.condition.VerificationTimesDTOSerializer;
 import software.xdev.mockserver.serialization.serializers.condition.VerificationTimesSerializer;
-import software.xdev.mockserver.serialization.serializers.expectation.OpenAPIExpectationDTOSerializer;
-import software.xdev.mockserver.serialization.serializers.expectation.OpenAPIExpectationSerializer;
 import software.xdev.mockserver.serialization.serializers.matcher.HttpRequestPropertiesMatcherSerializer;
-import software.xdev.mockserver.serialization.serializers.matcher.HttpRequestsPropertiesMatcherSerializer;
 import software.xdev.mockserver.serialization.serializers.request.HttpRequestDTOSerializer;
-import software.xdev.mockserver.serialization.serializers.request.OpenAPIDefinitionDTOSerializer;
-import software.xdev.mockserver.serialization.serializers.request.OpenAPIDefinitionSerializer;
 import software.xdev.mockserver.serialization.serializers.certificate.X509CertificateSerializer;
 import software.xdev.mockserver.serialization.serializers.response.HttpResponseSerializer;
 import software.xdev.mockserver.serialization.serializers.response.*;
-import software.xdev.mockserver.serialization.serializers.schema.*;
 import software.xdev.mockserver.serialization.serializers.string.NottableStringSerializer;
 
 import java.util.*;
@@ -180,8 +173,6 @@ public class ObjectMapperFactory {
 
     private static void addDeserializers(SimpleModule module, JsonDeserializer[] replacementJsonDeserializers) {
         List<JsonDeserializer> jsonDeserializers = Arrays.asList(
-            // expectation
-            new OpenAPIExpectationDTODeserializer(),
             // request
             new RequestDefinitionDTODeserializer(),
             // times
@@ -213,9 +204,6 @@ public class ObjectMapperFactory {
 
     private static void addSerializers(SimpleModule module, JsonSerializer[] replacementJsonSerializers, boolean serialiseDefaultValues) {
         List<JsonSerializer> jsonSerializers = Arrays.asList(
-            // expectation
-            new OpenAPIExpectationSerializer(),
-            new OpenAPIExpectationDTOSerializer(),
             // times
             new TimesSerializer(),
             new TimesDTOSerializer(),
@@ -224,27 +212,15 @@ public class ObjectMapperFactory {
             // request
             new software.xdev.mockserver.serialization.serializers.request.HttpRequestSerializer(),
             new HttpRequestDTOSerializer(),
-            new OpenAPIDefinitionSerializer(),
-            new OpenAPIDefinitionDTOSerializer(),
             // request body
             new BinaryBodySerializer(),
             new BinaryBodyDTOSerializer(),
-            new JsonBodySerializer(serialiseDefaultValues),
-            new JsonBodyDTOSerializer(serialiseDefaultValues),
-            new JsonSchemaBodySerializer(),
-            new JsonSchemaBodyDTOSerializer(),
-            new JsonPathBodySerializer(),
-            new JsonPathBodyDTOSerializer(),
             new ParameterBodySerializer(),
             new ParameterBodyDTOSerializer(),
             new RegexBodySerializer(),
             new RegexBodyDTOSerializer(),
             new StringBodySerializer(serialiseDefaultValues),
             new StringBodyDTOSerializer(serialiseDefaultValues),
-            new XPathBodySerializer(),
-            new XPathBodyDTOSerializer(),
-            new LogEntryBodySerializer(),
-            new LogEntryBodyDTOSerializer(),
             // condition
             new VerificationTimesDTOSerializer(),
             new VerificationTimesSerializer(),
@@ -260,29 +236,8 @@ public class ObjectMapperFactory {
             // certificates
             new X509CertificateSerializer(),
             new CertificateSerializer(),
-            // log
-            new software.xdev.mockserver.serialization.serializers.log.LogEntrySerializer(),
             // matcher
-            new HttpRequestsPropertiesMatcherSerializer(),
-            new HttpRequestPropertiesMatcherSerializer(),
-            // schema
-            new SchemaSerializer(),
-            new ArraySchemaSerializer(),
-            new BinarySchemaSerializer(),
-            new BooleanSchemaSerializer(),
-            new ByteArraySchemaSerializer(),
-            new ComposedSchemaSerializer(),
-            new DateSchemaSerializer(),
-            new DateTimeSchemaSerializer(),
-            new EmailSchemaSerializer(),
-            new FileSchemaSerializer(),
-            new IntegerSchemaSerializer(),
-            new MapSchemaSerializer(),
-            new NumberSchemaSerializer(),
-            new ObjectSchemaSerializer(),
-            new PasswordSchemaSerializer(),
-            new StringSchemaSerializer(),
-            new UUIDSchemaSerializer()
+            new HttpRequestPropertiesMatcherSerializer()
         );
         Map<Class, JsonSerializer> jsonSerializersByType = new HashMap<>();
         for (JsonSerializer jsonSerializer : jsonSerializers) {

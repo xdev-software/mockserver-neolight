@@ -34,15 +34,9 @@ public abstract class BodyWithContentTypeDTO extends BodyDTO {
         if (body instanceof BinaryBody) {
             BinaryBody binaryBody = (BinaryBody) body;
             result = new BinaryBodyDTO(binaryBody, binaryBody.getNot());
-        } else if (body instanceof JsonBody) {
-            JsonBody jsonBody = (JsonBody) body;
-            result = new JsonBodyDTO(jsonBody, jsonBody.getNot());
         } else if (body instanceof StringBody) {
             StringBody stringBody = (StringBody) body;
             result = new StringBodyDTO(stringBody, stringBody.getNot());
-        } else if (body instanceof LogEntryBody) {
-            LogEntryBody logEventBody = (LogEntryBody) body;
-            result = new LogEntryBodyDTO(logEventBody);
         }
 
         if (result != null) {

@@ -395,36 +395,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
     private RequestDefinition updateBody(RequestDefinition requestDefinition) {
         if (requestDefinition instanceof HttpRequest) {
             HttpRequest httpRequest = (HttpRequest) requestDefinition;
-            Body<?> body = httpRequest.getBody();
-            if (body instanceof JsonBody) {
-                try {
-                    return httpRequest
-                        .shallowClone()
-                        .withBody(
-                            new LogEntryBody(OBJECT_MAPPER.readTree(body.toString()))
-                        );
-                } catch (Throwable throwable) {
-                    return httpRequest
-                        .shallowClone()
-                        .withBody(
-                            new LogEntryBody(body.toString())
-                        );
-                }
-            } else if (body instanceof ParameterBody) {
-                return httpRequest
-                    .shallowClone()
-                    .withBody(
-                        new LogEntryBody(body.toString())
-                    );
-            } else if (body instanceof BodyWithContentType && !(body instanceof LogEntryBody)) {
-                return httpRequest
-                    .shallowClone()
-                    .withBody(
-                        new LogEntryBody(body.toString())
-                    );
-            } else {
-                return httpRequest;
-            }
+            return httpRequest;
         } else {
             return null;
         }
@@ -432,30 +403,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
 
     private HttpResponse updateBody(HttpResponse httpResponse) {
         if (httpResponse != null) {
-            Body<?> body = httpResponse.getBody();
-            if (body != null && JsonBody.class.isAssignableFrom(body.getClass())) {
-                try {
-                    return httpResponse
-                        .shallowClone()
-                        .withBody(
-                            new LogEntryBody(OBJECT_MAPPER.readTree(body.toString()))
-                        );
-                } catch (Throwable throwable) {
-                    return httpResponse
-                        .shallowClone()
-                        .withBody(
-                            new LogEntryBody(body.toString())
-                        );
-                }
-            } else if (body != null && !(body instanceof LogEntryBody)) {
-                return httpResponse
-                    .shallowClone()
-                    .withBody(
-                        new LogEntryBody(body.toString())
-                    );
-            } else {
-                return httpResponse;
-            }
+            return httpResponse;
         } else {
             return null;
         }

@@ -232,26 +232,10 @@ public class NottableString extends ObjectWithJsonToString implements Comparable
     public boolean equals(Object other) {
         if (other instanceof String) {
             return not != other.equals(value);
-        } else if (this instanceof NottableSchemaString && other instanceof NottableSchemaString) {
-            return equalsValue((NottableString) other);
-        } else if (this instanceof NottableSchemaString) {
-            return equalsSchema((NottableSchemaString) this, (NottableString) other);
-        } else if (other instanceof NottableSchemaString) {
-            return equalsSchema((NottableSchemaString) other, this);
         } else if (other instanceof NottableString) {
             return equalsValue((NottableString) other);
         }
         return false;
-    }
-
-    private boolean equalsSchema(NottableSchemaString schema, NottableString string) {
-        if (schema.getValue() == null && string.value == null) {
-            return true;
-        } else if (schema.getValue() == null || string.value == null) {
-            return false;
-        } else {
-            return schema.matches(string.value);
-        }
     }
 
     private boolean equalsString(NottableString one, NottableString two) {

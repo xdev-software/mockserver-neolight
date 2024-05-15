@@ -16,7 +16,6 @@
 package software.xdev.mockserver.serialization.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.codec.binary.Base64;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.*;
@@ -25,6 +24,9 @@ import software.xdev.mockserver.serialization.ObjectMapperFactory;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.slf4j.event.Level.ERROR;
 
+import java.util.Base64;
+
+
 public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
 
     private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(BodyDTO.class);
@@ -32,7 +34,7 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
     private final Body.Type type;
     private Boolean optional;
 
-    public BodyDTO(Body.Type type, Boolean not) {
+    protected BodyDTO(Body.Type type, Boolean not) {
         super(not);
         this.type = type;
     }
@@ -40,30 +42,14 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
     public static BodyDTO createDTO(Body<?> body) {
         BodyDTO result = null;
 
-        if (body instanceof BinaryBody) {
-            BinaryBody binaryBody = (BinaryBody) body;
-            result = new BinaryBodyDTO(binaryBody, binaryBody.getNot());
-        } else if (body instanceof JsonBody) {
-            JsonBody jsonBody = (JsonBody) body;
-            result = new JsonBodyDTO(jsonBody, jsonBody.getNot());
-        } else if (body instanceof JsonSchemaBody) {
-            JsonSchemaBody jsonSchemaBody = (JsonSchemaBody) body;
-            result = new JsonSchemaBodyDTO(jsonSchemaBody, jsonSchemaBody.getNot());
-        } else if (body instanceof JsonPathBody) {
-            JsonPathBody jsonPathBody = (JsonPathBody) body;
-            result = new JsonPathBodyDTO(jsonPathBody, jsonPathBody.getNot());
-        } else if (body instanceof ParameterBody) {
-            ParameterBody parameterBody = (ParameterBody) body;
-            result = new ParameterBodyDTO(parameterBody, parameterBody.getNot());
-        } else if (body instanceof RegexBody) {
-            RegexBody regexBody = (RegexBody) body;
-            result = new RegexBodyDTO(regexBody, regexBody.getNot());
-        } else if (body instanceof StringBody) {
-            StringBody stringBody = (StringBody) body;
-            result = new StringBodyDTO(stringBody, stringBody.getNot());
-        } else if (body instanceof XPathBody) {
-            XPathBody xPathBody = (XPathBody) body;
-            result = new XPathBodyDTO(xPathBody, xPathBody.getNot());
+        if (body instanceof BinaryBody typedDTO) {
+            result = new BinaryBodyDTO(typedDTO, typedDTO.getNot());
+        } else if (body instanceof ParameterBody typedDTO) {
+            result = new ParameterBodyDTO(typedDTO, typedDTO.getNot());
+        } else if (body instanceof RegexBody typedDTO) {
+            result = new RegexBodyDTO(typedDTO, typedDTO.getNot());
+        } else if (body instanceof StringBody typedDTO) {
+            result = new StringBodyDTO(typedDTO, typedDTO.getNot());
         }
 
         if (result != null) {
@@ -74,17 +60,11 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
     }
 
     public static String toString(BodyDTO body) {
-        if (body instanceof BinaryBodyDTO) {
-            return Base64.encodeBase64String(((BinaryBodyDTO) body).getBase64Bytes());
-        } else if (body instanceof JsonBodyDTO) {
-            return ((JsonBodyDTO) body).getJson();
-        } else if (body instanceof JsonSchemaBodyDTO) {
-            return ((JsonSchemaBodyDTO) body).getJson();
-        } else if (body instanceof JsonPathBodyDTO) {
-            return ((JsonPathBodyDTO) body).getJsonPath();
-        } else if (body instanceof ParameterBodyDTO) {
+        if (body instanceof BinaryBodyDTO typedDTO) {
+            return Base64.getEncoder().encodeToString(typedDTO.getBase64Bytes());
+        } else if (body instanceof ParameterBodyDTO typedDTO) {
             try {
-                return OBJECT_MAPPER.writeValueAsString(((ParameterBodyDTO) body).getParameters().getMultimap().asMap());
+                return OBJECT_MAPPER.writeValueAsString(typedDTO.getParameters().getMultimap().asMap());
             } catch (Throwable throwable) {
                 MOCK_SERVER_LOGGER
                     .logEvent(
@@ -95,12 +75,10 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
                     );
                 return "";
             }
-        } else if (body instanceof RegexBodyDTO) {
-            return ((RegexBodyDTO) body).getRegex();
-        } else if (body instanceof StringBodyDTO) {
-            return ((StringBodyDTO) body).getString();
-        } else if (body instanceof XPathBodyDTO) {
-            return ((XPathBodyDTO) body).getXPath();
+        } else if (body instanceof RegexBodyDTO typedDTO) {
+            return typedDTO.getRegex();
+        } else if (body instanceof StringBodyDTO typedDTO) {
+            return typedDTO.getString();
         }
 
         return "";
