@@ -5,6 +5,10 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * client-java -> client
   * core -> core
   * netty -> standalone
-* Removed
-  * Metrics, Templating, OpenAPI and all external Body matching (XPATH, JSON, XML, ..) subsystems - to decrease amount of dependencies (core)
-  * Version - as it's broken and that communication with original implementation is possible
+* Removed everything that is not core functionality
+  * Metrics
+  * MemoryTracing
+  * Templating
+  * OpenAPI 
+  * all external Body matching (XPATH, JSON, XML, ..)
+  * Version

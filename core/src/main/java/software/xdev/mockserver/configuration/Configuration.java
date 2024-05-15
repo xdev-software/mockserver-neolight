@@ -42,15 +42,11 @@ public class Configuration {
     private Boolean disableSystemOut;
     private Boolean disableLogging;
     private Boolean detailedMatchFailures;
-    private Boolean launchUIForLogLevelDebug;
-
-    // memory usage
+    
     private Integer maxExpectations;
     private Integer maxLogEntries;
     private Integer maxWebSocketExpectations;
-    private Boolean outputMemoryUsageCsv;
-    private String memoryUsageCsvDirectory;
-
+    
     // scalability
     private Integer nioEventLoopThreadCount;
     private Integer actionHandlerThreadCount;
@@ -84,13 +80,6 @@ public class Configuration {
     private String corsAllowHeaders;
     private Boolean corsAllowCredentials;
     private Integer corsMaxAgeInSeconds;
-
-    // template restrictions
-    private String javascriptDisallowedClasses;
-    private String javascriptDisallowedText;
-    private Boolean velocityDisallowClassLoading;
-    private String velocityDisallowedText;
-    private String mustacheDisallowedText;
 
     // mock initialization
     private String initializationClass;
@@ -251,23 +240,6 @@ public class Configuration {
         return this;
     }
 
-    public Boolean launchUIForLogLevelDebug() {
-        if (launchUIForLogLevelDebug == null) {
-            return ConfigurationProperties.launchUIForLogLevelDebug();
-        }
-        return launchUIForLogLevelDebug;
-    }
-
-    /**
-     * If true (the default) the ClientAndServer constructor will open the UI in the default browser when the log level is set to DEBUG.
-     *
-     * @param launchUIForLogLevelDebug enabled ClientAndServer constructor launching UI when log level is DEBUG
-     */
-    public Configuration launchUIForLogLevelDebug(Boolean launchUIForLogLevelDebug) {
-        this.launchUIForLogLevelDebug = launchUIForLogLevelDebug;
-        return this;
-    }
-
     public Integer maxExpectations() {
         if (maxExpectations == null) {
             return ConfigurationProperties.maxExpectations();
@@ -289,14 +261,14 @@ public class Configuration {
         this.maxExpectations = maxExpectations;
         return this;
     }
-
+    
     public Integer maxLogEntries() {
         if (maxLogEntries == null) {
             return ConfigurationProperties.maxLogEntries();
         }
         return maxLogEntries;
     }
-
+    
     /**
      * <p>
      * Maximum number of log entries stored in memory.  Log entries are stored in a circular queue so once this limit is reach the oldest log entries are overwritten
@@ -311,14 +283,14 @@ public class Configuration {
         this.maxLogEntries = maxLogEntries;
         return this;
     }
-
+    
     public Integer maxWebSocketExpectations() {
         if (maxWebSocketExpectations == null) {
             return ConfigurationProperties.maxWebSocketExpectations();
         }
         return maxWebSocketExpectations;
     }
-
+    
     /**
      * <p>
      * Maximum number of remote (not the same JVM) method callbacks (i.e. web sockets) registered for expectations.  The web socket client registry entries are stored in a circular queue so once this limit is reach the oldest are overwritten.
@@ -331,40 +303,6 @@ public class Configuration {
      */
     public Configuration maxWebSocketExpectations(Integer maxWebSocketExpectations) {
         this.maxWebSocketExpectations = maxWebSocketExpectations;
-        return this;
-    }
-
-    public Boolean outputMemoryUsageCsv() {
-        if (outputMemoryUsageCsv == null) {
-            return ConfigurationProperties.outputMemoryUsageCsv();
-        }
-        return outputMemoryUsageCsv;
-    }
-
-    /**
-     * <p>Output JVM memory usage metrics to CSV file periodically called <strong>memoryUsage_&lt;yyyy-MM-dd&gt;.csv</strong></p>
-     *
-     * @param outputMemoryUsageCsv output of JVM memory metrics
-     */
-    public Configuration outputMemoryUsageCsv(Boolean outputMemoryUsageCsv) {
-        this.outputMemoryUsageCsv = outputMemoryUsageCsv;
-        return this;
-    }
-
-    public String memoryUsageCsvDirectory() {
-        if (memoryUsageCsvDirectory == null) {
-            return ConfigurationProperties.memoryUsageCsvDirectory();
-        }
-        return memoryUsageCsvDirectory;
-    }
-
-    /**
-     * <p>Directory to output JVM memory usage metrics CSV files to when outputMemoryUsageCsv enabled</p>
-     *
-     * @param memoryUsageCsvDirectory directory to save JVM memory metrics CSV files
-     */
-    public Configuration memoryUsageCsvDirectory(String memoryUsageCsvDirectory) {
-        this.memoryUsageCsvDirectory = memoryUsageCsvDirectory;
         return this;
     }
 
@@ -819,103 +757,6 @@ public class Configuration {
      */
     public Configuration corsMaxAgeInSeconds(Integer corsMaxAgeInSeconds) {
         this.corsMaxAgeInSeconds = corsMaxAgeInSeconds;
-        return this;
-    }
-
-    // template restrictions
-
-    public String javascriptDisallowedClasses() {
-        if (javascriptDisallowedClasses == null) {
-            return ConfigurationProperties.javascriptDisallowedClasses();
-        }
-        return javascriptDisallowedClasses;
-    }
-
-    /**
-     * Set comma separate list of classes not allowed to be used by javascript templates
-     * <p>
-     * The default is all allowed
-     *
-     * @param javascriptDisallowedClasses comma separated list of classes not allowed to be used
-     */
-    public Configuration javascriptDisallowedClasses(String javascriptDisallowedClasses) {
-        this.javascriptDisallowedClasses = javascriptDisallowedClasses;
-        return this;
-    }
-
-    public String javascriptDisallowedText() {
-        if (javascriptDisallowedText == null) {
-            return ConfigurationProperties.javascriptDisallowedText();
-        }
-        return javascriptDisallowedText;
-    }
-
-    /**
-     * Set comma separate list of text not allowed to be contained in javascript templates
-     * <p>
-     * The default is all allowed
-     *
-     * @param javascriptDisallowedText comma separated list of text not allowed to be contained in javascript templates
-     */
-    public Configuration javascriptDisallowedText(String javascriptDisallowedText) {
-        this.javascriptDisallowedText = javascriptDisallowedText;
-        return this;
-    }
-
-    public Boolean velocityDisallowClassLoading() {
-        if (velocityDisallowClassLoading == null) {
-            return ConfigurationProperties.velocityDisallowClassLoading();
-        }
-        return velocityDisallowClassLoading;
-    }
-
-    /**
-     * If true class loading is not allowed in velocity templates
-     * <p>
-     * The default is false
-     *
-     * @param velocityDisallowClassLoading class loading is not allowed in velocity templates
-     */
-    public Configuration velocityDisallowClassLoading(Boolean velocityDisallowClassLoading) {
-        this.velocityDisallowClassLoading = velocityDisallowClassLoading;
-        return this;
-    }
-
-    public String velocityDisallowedText() {
-        if (velocityDisallowedText == null) {
-            return ConfigurationProperties.velocityDisallowedText();
-        }
-        return velocityDisallowedText;
-    }
-
-    /**
-     * Set comma separate list of text not allowed to be contained in velocity templates
-     * <p>
-     * The default is all allowed
-     *
-     * @param velocityDisallowedText comma separated list of text not allowed to be contained in velocity templates
-     */
-    public Configuration velocityDisallowedText(String velocityDisallowedText) {
-        this.velocityDisallowedText = velocityDisallowedText;
-        return this;
-    }
-
-    public String mustacheDisallowedText() {
-        if (mustacheDisallowedText == null) {
-            return ConfigurationProperties.mustacheDisallowedText();
-        }
-        return mustacheDisallowedText;
-    }
-
-    /**
-     * Set comma separate list of text not allowed to be contained in mustache templates
-     * <p>
-     * The default is all allowed
-     *
-     * @param mustacheDisallowedText comma separated list of text not allowed to be contained in mustache templates
-     */
-    public Configuration mustacheDisallowedText(String mustacheDisallowedText) {
-        this.mustacheDisallowedText = mustacheDisallowedText;
         return this;
     }
 
@@ -1884,11 +1725,11 @@ public class Configuration {
         sslSubjectAlternativeNameDomains.clear();
         rebuildServerTLSContext(true);
     }
-
+    
     public int ringBufferSize() {
         return nextPowerOfTwo(maxLogEntries());
     }
-
+    
     private int nextPowerOfTwo(int value) {
         for (int i = 0; i < 16; i++) {
             double powOfTwo = Math.pow(2, i);
@@ -1898,5 +1739,4 @@ public class Configuration {
         }
         return (int) Math.pow(2, 16);
     }
-
 }

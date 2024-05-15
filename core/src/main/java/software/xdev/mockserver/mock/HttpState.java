@@ -23,7 +23,6 @@ import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.MockServerEventLog;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
-import software.xdev.mockserver.memory.MemoryMonitoring;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier.Cause;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.persistence.ExpectationFileSystemPersistence;
@@ -87,7 +86,6 @@ public class HttpState {
     private ExpectationToJavaSerializer expectationToJavaSerializer;
     private VerificationSerializer verificationSerializer;
     private VerificationSequenceSerializer verificationSequenceSerializer;
-    private final MemoryMonitoring memoryMonitoring;
     private AuthenticationHandler controlPlaneAuthenticationHandler;
 
     public static void setPort(final HttpRequest request) {
@@ -134,7 +132,6 @@ public class HttpState {
                 this.expectationFileWatcher = new ExpectationFileWatcher(configuration, mockServerLogger, requestMatchers, expectationInitializerLoader);
             }
         }
-        this.memoryMonitoring = new MemoryMonitoring(configuration, this.mockServerLog, this.requestMatchers);
         if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
             mockServerLogger.logEvent(
                 new LogEntry()
@@ -232,21 +229,6 @@ public class HttpState {
                     .setMessageFormat("resetting all expectations and request logs")
             );
         }
-        new Scheduler.SchedulerThreadFactory("MockServer Memory Metrics").newThread(() -> {
-            try {
-                SECONDS.sleep(10);
-                memoryMonitoring.logMemoryMetrics();
-            } catch (InterruptedException ie) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception handling reset request:{}")
-                        .setArguments(ie.getMessage())
-                        .setThrowable(ie)
-                );
-                ie.printStackTrace();
-            }
-        });
     }
 
     public List<Expectation> add(Expectation... expectations) {

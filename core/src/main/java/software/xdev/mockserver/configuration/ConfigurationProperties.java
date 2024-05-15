@@ -25,8 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.file.FileReader;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
-import software.xdev.mockserver.memory.MemoryMonitoring;
-import software.xdev.mockserver.memory.Summary;
 import software.xdev.mockserver.socket.tls.ForwardProxyTLSX509CertificatesTrustManager;
 import software.xdev.mockserver.socket.tls.KeyAndCertificateFactory;
 import org.slf4j.event.Level;
@@ -59,15 +57,11 @@ public class ConfigurationProperties {
     private static final String MOCKSERVER_DISABLE_SYSTEM_OUT = "mockserver.disableSystemOut";
     private static final String MOCKSERVER_DISABLE_LOGGING = "mockserver.disableLogging";
     private static final String MOCKSERVER_DETAILED_MATCH_FAILURES = "mockserver.detailedMatchFailures";
-    private static final String MOCKSERVER_LAUNCH_UI_FOR_LOG_LEVEL_DEBUG = "mockserver.launchUIForLogLevelDebug";
-    private static final String MOCKSERVER_METRICS_ENABLED = "mockserver.metricsEnabled";
 
     // memory usage
     private static final String MOCKSERVER_MAX_EXPECTATIONS = "mockserver.maxExpectations";
     private static final String MOCKSERVER_MAX_LOG_ENTRIES = "mockserver.maxLogEntries";
     private static final String MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS = "mockserver.maxWebSocketExpectations";
-    private static final String MOCKSERVER_OUTPUT_MEMORY_USAGE_CSV = "mockserver.outputMemoryUsageCsv";
-    private static final String MOCKSERVER_MEMORY_USAGE_CSV_DIRECTORY = "mockserver.memoryUsageCsvDirectory";
 
     // scalability
     private static final String MOCKSERVER_NIO_EVENT_LOOP_THREAD_COUNT = "mockserver.nioEventLoopThreadCount";
@@ -338,42 +332,8 @@ public class ConfigurationProperties {
         setProperty(MOCKSERVER_DETAILED_MATCH_FAILURES, "" + enable);
     }
 
-    public static boolean launchUIForLogLevelDebug() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_LAUNCH_UI_FOR_LOG_LEVEL_DEBUG, "MOCKSERVER_LAUNCH_UI_FOR_LOG_LEVEL_DEBUG", "" + false));
-    }
-
-    /**
-     * If true (the default) the ClientAndServer constructor will open the UI in the default browser when the log level is set to DEBUG.
-     *
-     * @param enable enabled ClientAndServer constructor launching UI when log level is DEBUG
-     */
-    public static void launchUIForLogLevelDebug(boolean enable) {
-        setProperty(MOCKSERVER_LAUNCH_UI_FOR_LOG_LEVEL_DEBUG, "" + enable);
-    }
-
-    public static boolean metricsEnabled() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_METRICS_ENABLED, "MOCKSERVER_METRICS_ENABLED", "" + false));
-    }
-
-    /**
-     * Enable gathering of metrics, default is false
-     *
-     * @param enable enable metrics
-     */
-    public static void metricsEnabled(boolean enable) {
-        setProperty(MOCKSERVER_METRICS_ENABLED, "" + enable);
-    }
-
-    // memory usage
-
-    public static long heapAvailableInKB() {
-        Summary heap = MemoryMonitoring.getJVMMemory(MemoryType.HEAP);
-        long baseMemory  = 20 * 1024L;
-        return ((heap.getNet().getMax() - heap.getNet().getUsed()) / 1024L) - baseMemory;
-    }
-
     public static int maxExpectations() {
-        return readIntegerProperty(MOCKSERVER_MAX_EXPECTATIONS, "MOCKSERVER_MAX_EXPECTATIONS", Math.min((int) (heapAvailableInKB() / 75), 5000));
+        return readIntegerProperty(MOCKSERVER_MAX_EXPECTATIONS, "MOCKSERVER_MAX_EXPECTATIONS", 5000);
     }
 
     /**
@@ -391,7 +351,7 @@ public class ConfigurationProperties {
     }
 
     public static int maxLogEntries() {
-        return readIntegerProperty(MOCKSERVER_MAX_LOG_ENTRIES, "MOCKSERVER_MAX_LOG_ENTRIES", Math.min((int) (heapAvailableInKB() / 80), 60000));
+        return readIntegerProperty(MOCKSERVER_MAX_LOG_ENTRIES, "MOCKSERVER_MAX_LOG_ENTRIES", 60000);
     }
 
     /**
@@ -424,33 +384,6 @@ public class ConfigurationProperties {
      */
     public static void maxWebSocketExpectations(int count) {
         setProperty(MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS, "" + count);
-    }
-
-    public static boolean outputMemoryUsageCsv() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_OUTPUT_MEMORY_USAGE_CSV, "MOCKSERVER_OUTPUT_MEMORY_USAGE_CSV", "false"));
-    }
-
-    /**
-     * <p>Output JVM memory usage metrics to CSV file periodically called <strong>memoryUsage_&lt;yyyy-MM-dd&gt;.csv</strong></p>
-     *
-     * @param enable output of JVM memory metrics
-     */
-    public static void outputMemoryUsageCsv(boolean enable) {
-        setProperty(MOCKSERVER_OUTPUT_MEMORY_USAGE_CSV, "" + enable);
-    }
-
-    public static String memoryUsageCsvDirectory() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_MEMORY_USAGE_CSV_DIRECTORY, "MOCKSERVER_MEMORY_USAGE_CSV_DIRECTORY", ".");
-    }
-
-    /**
-     * <p>Directory to output JVM memory usage metrics CSV files to when outputMemoryUsageCsv enabled</p>
-     *
-     * @param directory directory to save JVM memory metrics CSV files
-     */
-    public static void memoryUsageCsvDirectory(String directory) {
-        fileExists(directory);
-        setProperty(MOCKSERVER_MEMORY_USAGE_CSV_DIRECTORY, directory);
     }
 
     // scalability
@@ -809,84 +742,6 @@ public class ConfigurationProperties {
      */
     public static void corsMaxAgeInSeconds(int ageInSeconds) {
         setProperty(MOCKSERVER_CORS_MAX_AGE_IN_SECONDS, "" + ageInSeconds);
-    }
-
-    // template restrictions
-
-    public static String javascriptDisallowedClasses() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_JAVASCRIPT_DISALLOWED_CLASSES, "MOCKSERVER_JAVASCRIPT_DISALLOWED_CLASSES", "");
-    }
-
-    /**
-     * Set comma separate list of classes not allowed to be used by javascript templates
-     * <p>
-     * The default is all allowed
-     *
-     * @param javascriptDisallowedClasses comma separated list of classes not allowed to be used
-     */
-    public static void javascriptDisallowedClasses(String javascriptDisallowedClasses) {
-        setProperty(MOCKSERVER_JAVASCRIPT_DISALLOWED_CLASSES, javascriptDisallowedClasses);
-    }
-
-    public static String javascriptDisallowedText() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_JAVASCRIPT_DISALLOWED_TEXT, "MOCKSERVER_JAVASCRIPT_DISALLOWED_TEXT", "");
-    }
-
-    /**
-     * Set comma separate list of text not allowed to be contained in javascript templates
-     * <p>
-     * The default is all allowed
-     *
-     * @param javascriptDisallowedText comma separated list of text not allowed to be contained in javascript templates
-     */
-    public static void javascriptDisallowedText(String javascriptDisallowedText) {
-        setProperty(MOCKSERVER_JAVASCRIPT_DISALLOWED_TEXT, javascriptDisallowedText);
-    }
-
-
-    public static boolean velocityDisallowClassLoading() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_VELOCITY_DISALLOW_CLASS_LOADING, "MOCKSERVER_VELOCITY_DISALLOW_CLASS_LOADING", "" + false));
-    }
-
-    /**
-     * If true class loading is not allowed in velocity templates
-     * <p>
-     * The default is false
-     *
-     * @param velocityDisallowClassLoading class loading is not allowed in velocity templates
-     */
-    public static void velocityDisallowClassLoading(boolean velocityDisallowClassLoading) {
-        setProperty(MOCKSERVER_VELOCITY_DISALLOW_CLASS_LOADING, "" + velocityDisallowClassLoading);
-    }
-
-    public static String velocityDisallowedText() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_VELOCITY_DISALLOWED_TEXT, "MOCKSERVER_VELOCITY_DISALLOWED_TEXT", "");
-    }
-
-    /**
-     * Set comma separate list of text not allowed to be contained in velocity templates
-     * <p>
-     * The default is all allowed
-     *
-     * @param velocityDisallowedText comma separated list of text not allowed to be contained in velocity templates
-     */
-    public static void velocityDisallowedText(String velocityDisallowedText) {
-        setProperty(MOCKSERVER_VELOCITY_DISALLOWED_TEXT, velocityDisallowedText);
-    }
-
-    public static String mustacheDisallowedText() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_MUSTACHE_DISALLOWED_TEXT, "MOCKSERVER_MUSTACHE_DISALLOWED_TEXT", "");
-    }
-
-    /**
-     * Set comma separate list of text not allowed to be contained in mustache templates
-     * <p>
-     * The default is all allowed
-     *
-     * @param mustacheDisallowedText comma separated list of text not allowed to be contained in mustache templates
-     */
-    public static void mustacheDisallowedText(String mustacheDisallowedText) {
-        setProperty(MOCKSERVER_MUSTACHE_DISALLOWED_TEXT, mustacheDisallowedText);
     }
 
     // mock initialization
