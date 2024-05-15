@@ -28,11 +28,9 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
     private Integer priority;
     private RequestDefinitionDTO httpRequest;
     private HttpResponseDTO httpResponse;
-    private HttpTemplateDTO httpResponseTemplate;
     private HttpClassCallbackDTO httpResponseClassCallback;
     private HttpObjectCallbackDTO httpResponseObjectCallback;
     private HttpForwardDTO httpForward;
-    private HttpTemplateDTO httpForwardTemplate;
     private HttpClassCallbackDTO httpForwardClassCallback;
     private HttpObjectCallbackDTO httpForwardObjectCallback;
     private HttpOverrideForwardedRequestDTO httpOverrideForwardedRequest;
@@ -57,10 +55,6 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
             if (httpResponse != null) {
                 this.httpResponse = new HttpResponseDTO(httpResponse);
             }
-            HttpTemplate httpResponseTemplate = expectation.getHttpResponseTemplate();
-            if (httpResponseTemplate != null) {
-                this.httpResponseTemplate = new HttpTemplateDTO(httpResponseTemplate);
-            }
             HttpClassCallback httpResponseClassCallback = expectation.getHttpResponseClassCallback();
             if (httpResponseClassCallback != null) {
                 this.httpResponseClassCallback = new HttpClassCallbackDTO(httpResponseClassCallback);
@@ -72,10 +66,6 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
             HttpForward httpForward = expectation.getHttpForward();
             if (httpForward != null) {
                 this.httpForward = new HttpForwardDTO(httpForward);
-            }
-            HttpTemplate httpForwardTemplate = expectation.getHttpForwardTemplate();
-            if (httpForwardTemplate != null) {
-                this.httpForwardTemplate = new HttpTemplateDTO(httpForwardTemplate);
             }
             HttpClassCallback httpForwardClassCallback = expectation.getHttpForwardClassCallback();
             if (httpForwardClassCallback != null) {
@@ -110,11 +100,9 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
     public Expectation buildObject() {
         RequestDefinition httpRequest = null;
         HttpResponse httpResponse = null;
-        HttpTemplate httpResponseTemplate = null;
         HttpClassCallback httpResponseClassCallback = null;
         HttpObjectCallback httpResponseObjectCallback = null;
         HttpForward httpForward = null;
-        HttpTemplate httpForwardTemplate = null;
         HttpClassCallback httpForwardClassCallback = null;
         HttpObjectCallback httpForwardObjectCallback = null;
         HttpOverrideForwardedRequest httpOverrideForwardedRequest = null;
@@ -128,9 +116,6 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
         if (this.httpResponse != null) {
             httpResponse = this.httpResponse.buildObject();
         }
-        if (this.httpResponseTemplate != null) {
-            httpResponseTemplate = this.httpResponseTemplate.buildObject();
-        }
         if (this.httpResponseClassCallback != null) {
             httpResponseClassCallback = this.httpResponseClassCallback.buildObject();
         }
@@ -139,9 +124,6 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
         }
         if (this.httpForward != null) {
             httpForward = this.httpForward.buildObject();
-        }
-        if (this.httpForwardTemplate != null) {
-            httpForwardTemplate = this.httpForwardTemplate.buildObject();
         }
         if (this.httpForwardClassCallback != null) {
             httpForwardClassCallback = this.httpForwardClassCallback.buildObject();
@@ -173,11 +155,9 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
         return new Expectation(httpRequest, times, timeToLive, priority)
             .withId(this.id)
             .thenRespond(httpResponse)
-            .thenRespond(httpResponseTemplate)
             .thenRespond(httpResponseClassCallback)
             .thenRespond(httpResponseObjectCallback)
             .thenForward(httpForward)
-            .thenForward(httpForwardTemplate)
             .thenForward(httpForwardClassCallback)
             .thenForward(httpForwardObjectCallback)
             .thenForward(httpOverrideForwardedRequest)
@@ -220,15 +200,6 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
         return this;
     }
 
-    public HttpTemplateDTO getHttpResponseTemplate() {
-        return httpResponseTemplate;
-    }
-
-    public ExpectationDTO setHttpResponseTemplate(HttpTemplateDTO httpResponseTemplate) {
-        this.httpResponseTemplate = httpResponseTemplate;
-        return this;
-    }
-
     public HttpClassCallbackDTO getHttpResponseClassCallback() {
         return httpResponseClassCallback;
     }
@@ -253,15 +224,6 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
 
     public ExpectationDTO setHttpForward(HttpForwardDTO httpForward) {
         this.httpForward = httpForward;
-        return this;
-    }
-
-    public HttpTemplateDTO getHttpForwardTemplate() {
-        return httpForwardTemplate;
-    }
-
-    public ExpectationDTO setHttpForwardTemplate(HttpTemplateDTO httpForwardTemplate) {
-        this.httpForwardTemplate = httpForwardTemplate;
         return this;
     }
 

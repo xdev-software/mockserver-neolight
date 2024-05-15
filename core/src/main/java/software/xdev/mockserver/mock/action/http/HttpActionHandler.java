@@ -68,11 +68,9 @@ public class HttpActionHandler {
     private final Scheduler scheduler;
     private MockServerLogger mockServerLogger;
     private HttpResponseActionHandler httpResponseActionHandler;
-    private HttpResponseTemplateActionHandler httpResponseTemplateActionHandler;
     private HttpResponseClassCallbackActionHandler httpResponseClassCallbackActionHandler;
     private HttpResponseObjectCallbackActionHandler httpResponseObjectCallbackActionHandler;
     private HttpForwardActionHandler httpForwardActionHandler;
-    private HttpForwardTemplateActionHandler httpForwardTemplateActionHandler;
     private HttpForwardClassCallbackActionHandler httpForwardClassCallbackActionHandler;
     private HttpForwardObjectCallbackActionHandler httpForwardObjectCallbackActionHandler;
     private HttpOverrideForwardedRequestActionHandler httpOverrideForwardedRequestCallbackActionHandler;
@@ -120,14 +118,6 @@ public class HttpActionHandler {
                     }), synchronous);
                     break;
                 }
-                case RESPONSE_TEMPLATE: {
-                    scheduler.schedule(() -> handleAnyException(request, responseWriter, synchronous, action, () -> {
-                        final HttpResponse response = getHttpResponseTemplateActionHandler().handle((HttpTemplate) action, request);
-                        writeResponseActionResponse(response, responseWriter, request, action, synchronous);
-                        expectationPostProcessor.run();
-                    }), synchronous, action.getDelay());
-                    break;
-                }
                 case RESPONSE_CLASS_CALLBACK: {
                     scheduler.schedule(() -> handleAnyException(request, responseWriter, synchronous, action, () -> {
                         final HttpResponse response = getHttpResponseClassCallbackActionHandler().handle((HttpClassCallback) action, request);
@@ -145,14 +135,6 @@ public class HttpActionHandler {
                 case FORWARD: {
                     scheduler.schedule(() -> handleAnyException(request, responseWriter, synchronous, action, () -> {
                         final HttpForwardActionResult responseFuture = getHttpForwardActionHandler().handle((HttpForward) action, request);
-                        writeForwardActionResponse(responseFuture, responseWriter, request, action, synchronous);
-                        expectationPostProcessor.run();
-                    }), synchronous, action.getDelay());
-                    break;
-                }
-                case FORWARD_TEMPLATE: {
-                    scheduler.schedule(() -> handleAnyException(request, responseWriter, synchronous, action, () -> {
-                        final HttpForwardActionResult responseFuture = getHttpForwardTemplateActionHandler().handle((HttpTemplate) action, request);
                         writeForwardActionResponse(responseFuture, responseWriter, request, action, synchronous);
                         expectationPostProcessor.run();
                     }), synchronous, action.getDelay());
@@ -527,13 +509,6 @@ public class HttpActionHandler {
         return httpResponseActionHandler;
     }
 
-    private HttpResponseTemplateActionHandler getHttpResponseTemplateActionHandler() {
-        if (httpResponseTemplateActionHandler == null) {
-            httpResponseTemplateActionHandler = new HttpResponseTemplateActionHandler(mockServerLogger, configuration);
-        }
-        return httpResponseTemplateActionHandler;
-    }
-
     private HttpResponseClassCallbackActionHandler getHttpResponseClassCallbackActionHandler() {
         if (httpResponseClassCallbackActionHandler == null) {
             httpResponseClassCallbackActionHandler = new HttpResponseClassCallbackActionHandler(mockServerLogger);
@@ -553,13 +528,6 @@ public class HttpActionHandler {
             httpForwardActionHandler = new HttpForwardActionHandler(mockServerLogger, httpClient);
         }
         return httpForwardActionHandler;
-    }
-
-    private HttpForwardTemplateActionHandler getHttpForwardTemplateActionHandler() {
-        if (httpForwardTemplateActionHandler == null) {
-            httpForwardTemplateActionHandler = new HttpForwardTemplateActionHandler(mockServerLogger, configuration, httpClient);
-        }
-        return httpForwardTemplateActionHandler;
     }
 
     private HttpForwardClassCallbackActionHandler getHttpForwardClassCallbackActionHandler() {

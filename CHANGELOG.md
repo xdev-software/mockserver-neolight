@@ -8,3 +8,4 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 * Removed
   * Metrics subsystem - to decrease amount of dependencies (core)
   * Version - as it's broken and that communication with original implementation is possible
+  * Templating subsystem - to decrease amount of dependencies (core)

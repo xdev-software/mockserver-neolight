@@ -96,18 +96,6 @@ public class ForwardChainExpectation {
     }
 
     /**
-     * Evaluate Velocity or JavaScript template to generate response
-     * to return when expectation is matched
-     *
-     * @param httpTemplate Velocity or JavaScript template used to generate response
-     * @return added or updated expectations
-     */
-    public Expectation[] respond(final HttpTemplate httpTemplate) {
-        expectation.thenRespond(httpTemplate);
-        return mockServerClient.upsert(expectation);
-    }
-
-    /**
      * Call method on local class in same JVM implementing ExpectationResponseCallback
      * to generate response to return when expectation is matched
      * <p>
@@ -161,18 +149,6 @@ public class ForwardChainExpectation {
      */
     public Expectation[] forward(final HttpForward httpForward) {
         expectation.thenForward(httpForward);
-        return mockServerClient.upsert(expectation);
-    }
-
-    /**
-     * Evaluate Velocity or JavaScript template to generate
-     * request to forward when expectation is matched
-     *
-     * @param httpTemplate Velocity or JavaScript template used to generate response
-     * @return added or updated expectations
-     */
-    public Expectation[] forward(final HttpTemplate httpTemplate) {
-        expectation.thenForward(httpTemplate);
         return mockServerClient.upsert(expectation);
     }
 

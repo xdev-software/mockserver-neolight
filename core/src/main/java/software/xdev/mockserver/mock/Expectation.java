@@ -42,11 +42,9 @@ public class Expectation extends ObjectWithJsonToString {
     private final Times times;
     private final TimeToLive timeToLive;
     private HttpResponse httpResponse;
-    private HttpTemplate httpResponseTemplate;
     private HttpClassCallback httpResponseClassCallback;
     private HttpObjectCallback httpResponseObjectCallback;
     private HttpForward httpForward;
-    private HttpTemplate httpForwardTemplate;
     private HttpClassCallback httpForwardClassCallback;
     private HttpObjectCallback httpForwardObjectCallback;
     private HttpOverrideForwardedRequest httpOverrideForwardedRequest;
@@ -343,10 +341,6 @@ public class Expectation extends ObjectWithJsonToString {
         return httpResponse;
     }
 
-    public HttpTemplate getHttpResponseTemplate() {
-        return httpResponseTemplate;
-    }
-
     public HttpClassCallback getHttpResponseClassCallback() {
         return httpResponseClassCallback;
     }
@@ -357,10 +351,6 @@ public class Expectation extends ObjectWithJsonToString {
 
     public HttpForward getHttpForward() {
         return httpForward;
-    }
-
-    public HttpTemplate getHttpForwardTemplate() {
-        return httpForwardTemplate;
     }
 
     public HttpClassCallback getHttpForwardClassCallback() {
@@ -384,16 +374,12 @@ public class Expectation extends ObjectWithJsonToString {
         Action action = null;
         if (httpResponse != null) {
             action = getHttpResponse();
-        } else if (httpResponseTemplate != null) {
-            action = getHttpResponseTemplate();
         } else if (httpResponseClassCallback != null) {
             action = getHttpResponseClassCallback();
         } else if (httpResponseObjectCallback != null) {
             action = getHttpResponseObjectCallback();
         } else if (httpForward != null) {
             action = getHttpForward();
-        } else if (httpForwardTemplate != null) {
-            action = getHttpForwardTemplate();
         } else if (httpForwardClassCallback != null) {
             action = getHttpForwardClassCallback();
         } else if (httpForwardObjectCallback != null) {
@@ -426,16 +412,6 @@ public class Expectation extends ObjectWithJsonToString {
         return this;
     }
 
-    public Expectation thenRespond(HttpTemplate httpTemplate) {
-        if (httpTemplate != null) {
-            httpTemplate.withActionType(Action.Type.RESPONSE_TEMPLATE);
-            validationErrors("a response template", httpTemplate.getType());
-            this.httpResponseTemplate = httpTemplate;
-            this.hashCode = 0;
-        }
-        return this;
-    }
-
     public Expectation thenRespond(HttpClassCallback httpClassCallback) {
         if (httpClassCallback != null) {
             httpClassCallback.withActionType(Action.Type.RESPONSE_CLASS_CALLBACK);
@@ -460,16 +436,6 @@ public class Expectation extends ObjectWithJsonToString {
         if (httpForward != null) {
             validationErrors("a forward", httpForward.getType());
             this.httpForward = httpForward;
-            this.hashCode = 0;
-        }
-        return this;
-    }
-
-    public Expectation thenForward(HttpTemplate httpTemplate) {
-        if (httpTemplate != null) {
-            httpTemplate.withActionType(Action.Type.FORWARD_TEMPLATE);
-            validationErrors("a forward template", httpTemplate.getType());
-            this.httpForwardTemplate = httpTemplate;
             this.hashCode = 0;
         }
         return this;
@@ -518,9 +484,6 @@ public class Expectation extends ObjectWithJsonToString {
         if (actionType != Action.Type.RESPONSE && httpResponse != null) {
             throw new IllegalArgumentException("It is not possible to set " + actionDescription + " once a response has been set");
         }
-        if (actionType != Action.Type.RESPONSE_TEMPLATE && httpResponseTemplate != null) {
-            throw new IllegalArgumentException("It is not possible to set " + actionDescription + " once a response template has been set");
-        }
         if (actionType != Action.Type.RESPONSE_CLASS_CALLBACK && httpResponseClassCallback != null) {
             throw new IllegalArgumentException("It is not possible to set " + actionDescription + " once a class callback has been set");
         }
@@ -529,9 +492,6 @@ public class Expectation extends ObjectWithJsonToString {
         }
         if (actionType != Action.Type.FORWARD && httpForward != null) {
             throw new IllegalArgumentException("It is not possible to set " + actionDescription + " once a forward has been set");
-        }
-        if (actionType != Action.Type.FORWARD_TEMPLATE && httpForwardTemplate != null) {
-            throw new IllegalArgumentException("It is not possible to set " + actionDescription + " once a forward template has been set");
         }
         if (actionType != Action.Type.FORWARD_CLASS_CALLBACK && httpForwardClassCallback != null) {
             throw new IllegalArgumentException("It is not possible to set " + actionDescription + " once a class callback has been set");
@@ -578,11 +538,9 @@ public class Expectation extends ObjectWithJsonToString {
             .withId(id)
             .withCreated(created)
             .thenRespond(httpResponse)
-            .thenRespond(httpResponseTemplate)
             .thenRespond(httpResponseClassCallback)
             .thenRespond(httpResponseObjectCallback)
             .thenForward(httpForward)
-            .thenForward(httpForwardTemplate)
             .thenForward(httpForwardClassCallback)
             .thenForward(httpForwardObjectCallback)
             .thenForward(httpOverrideForwardedRequest)
@@ -612,11 +570,9 @@ public class Expectation extends ObjectWithJsonToString {
             Objects.equals(times, that.times) &&
             Objects.equals(timeToLive, that.timeToLive) &&
             Objects.equals(httpResponse, that.httpResponse) &&
-            Objects.equals(httpResponseTemplate, that.httpResponseTemplate) &&
             Objects.equals(httpResponseClassCallback, that.httpResponseClassCallback) &&
             Objects.equals(httpResponseObjectCallback, that.httpResponseObjectCallback) &&
             Objects.equals(httpForward, that.httpForward) &&
-            Objects.equals(httpForwardTemplate, that.httpForwardTemplate) &&
             Objects.equals(httpForwardClassCallback, that.httpForwardClassCallback) &&
             Objects.equals(httpForwardObjectCallback, that.httpForwardObjectCallback) &&
             Objects.equals(httpOverrideForwardedRequest, that.httpOverrideForwardedRequest) &&
@@ -626,7 +582,7 @@ public class Expectation extends ObjectWithJsonToString {
     @Override
     public int hashCode() {
         if (hashCode == 0) {
-            hashCode = Objects.hash(priority, httpRequest, times, timeToLive, httpResponse, httpResponseTemplate, httpResponseClassCallback, httpResponseObjectCallback, httpForward, httpForwardTemplate, httpForwardClassCallback, httpForwardObjectCallback, httpOverrideForwardedRequest, httpError);
+            hashCode = Objects.hash(priority, httpRequest, times, timeToLive, httpResponse, httpResponseClassCallback, httpResponseObjectCallback, httpForward, httpForwardClassCallback, httpForwardObjectCallback, httpOverrideForwardedRequest, httpError);
         }
         return hashCode;
     }

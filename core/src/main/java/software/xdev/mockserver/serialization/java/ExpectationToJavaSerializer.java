@@ -71,11 +71,6 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
                 output.append(new HttpResponseToJavaSerializer().serialize(numberOfSpacesToIndent + 1, expectation.getHttpResponse()));
                 appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
             }
-            if (expectation.getHttpResponseTemplate() != null) {
-                appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".respond(");
-                output.append(new HttpTemplateToJavaSerializer().serialize(numberOfSpacesToIndent + 1, expectation.getHttpResponseTemplate()));
-                appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
-            }
             if (expectation.getHttpResponseClassCallback() != null) {
                 appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".respond(");
                 output.append(new HttpClassCallbackToJavaSerializer().serialize(numberOfSpacesToIndent + 1, expectation.getHttpResponseClassCallback()));
@@ -92,11 +87,6 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
             if (expectation.getHttpOverrideForwardedRequest() != null) {
                 appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".forward(");
                 output.append(new HttpOverrideForwardedRequestToJavaSerializer().serialize(numberOfSpacesToIndent + 1, expectation.getHttpOverrideForwardedRequest()));
-                appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
-            }
-            if (expectation.getHttpForwardTemplate() != null) {
-                appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".forward(");
-                output.append(new HttpTemplateToJavaSerializer().serialize(numberOfSpacesToIndent + 1, expectation.getHttpForwardTemplate()));
                 appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
             }
             if (expectation.getHttpForwardClassCallback() != null) {

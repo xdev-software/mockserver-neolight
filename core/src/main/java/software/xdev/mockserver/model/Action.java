@@ -68,12 +68,10 @@ public abstract class Action<T extends Action> extends ObjectWithJsonToString {
 
     public enum Type {
         FORWARD(Direction.FORWARD),
-        FORWARD_TEMPLATE(Direction.FORWARD),
         FORWARD_CLASS_CALLBACK(Direction.FORWARD),
         FORWARD_OBJECT_CALLBACK(Direction.FORWARD),
         FORWARD_REPLACE(Direction.FORWARD),
         RESPONSE(Direction.RESPONSE),
-        RESPONSE_TEMPLATE(Direction.RESPONSE),
         RESPONSE_CLASS_CALLBACK(Direction.RESPONSE),
         RESPONSE_OBJECT_CALLBACK(Direction.RESPONSE),
         ERROR(Direction.RESPONSE);
