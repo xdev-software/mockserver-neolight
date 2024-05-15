@@ -145,16 +145,11 @@
 			<version>33.2.0-jre</version>
 		</dependency>
 
+		<!-- TODO: Remove with logging -->
 		<dependency>
 			<groupId>com.lmax</groupId>
 			<artifactId>disruptor</artifactId>
 			<version>4.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.networknt</groupId>
-			<artifactId>json-schema-validator</artifactId>
-			<version>1.4.0</version>
 		</dependency>
 
 		<dependency>
