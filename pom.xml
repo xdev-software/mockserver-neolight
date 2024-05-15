@@ -15,8 +15,9 @@
 	</organization>
 
 	<modules>
-		<module>mockserver-neo</module>
-		<module>mockserver-neo-demo</module>
+		<module>mockserver-neo-client</module>
+		<module>mockserver-neo-core</module>
+		<module>mockserver-neo-netty</module>
 	</modules>
 
 	<licenses>
