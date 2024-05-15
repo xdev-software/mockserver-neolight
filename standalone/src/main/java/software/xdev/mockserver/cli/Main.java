@@ -22,7 +22,6 @@ import software.xdev.mockserver.configuration.IntegerStringListParser;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.netty.MockServer;
-import software.xdev.mockserver.version.Version;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -36,8 +35,6 @@ import static org.slf4j.event.Level.*;
 
 public class Main {
     static final String USAGE = "" +
-        "   version: " + Version.getVersion() + NEW_LINE +
-        "    " + NEW_LINE +
         "   java -jar <path to mockserver-netty-jar-with-dependencies.jar> -serverPort <port> [-proxyRemotePort <port>] [-proxyRemoteHost <hostname>] [-logLevel <level>] " + NEW_LINE +
         "                                                                                                                                                                 " + NEW_LINE +
         "     valid options are:                                                                                                                                          " + NEW_LINE +

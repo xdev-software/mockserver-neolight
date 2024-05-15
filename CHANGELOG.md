@@ -6,4 +6,5 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * core -> core
   * netty -> standalone
 * Removed
-  * Metrics subsystem (core)
+  * Metrics subsystem - to decrease amount of dependencies (core)
+  * Version - as it's broken and that communication with original implementation is possible

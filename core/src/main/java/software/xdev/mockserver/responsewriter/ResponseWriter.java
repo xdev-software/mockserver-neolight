@@ -23,7 +23,6 @@ import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
-import software.xdev.mockserver.version.Version;
 import org.slf4j.event.Level;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
@@ -92,7 +91,6 @@ public abstract class ResponseWriter {
             }
         }
         if (apiResponse) {
-            response.withHeader("version", Version.getVersion());
             final String path = request.getPath().getValue();
             if (!path.startsWith(PATH_PREFIX) && !path.equals(configuration.livenessHttpGetPath())) {
                 response.withHeader("deprecated",

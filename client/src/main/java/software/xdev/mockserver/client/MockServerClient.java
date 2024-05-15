@@ -42,7 +42,6 @@ import software.xdev.mockserver.stop.Stoppable;
 import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
 import software.xdev.mockserver.verify.VerificationTimes;
-import software.xdev.mockserver.version.Version;
 
 import javax.net.ssl.SSLException;
 import java.awt.*;
@@ -423,11 +422,6 @@ public class MockServerClient implements Stoppable {
                         } else if (response.getStatusCode() == UNAUTHORIZED.code()) {
                             throw new AuthenticationException(response.getBodyAsString());
                         }
-                    }
-                    String serverVersion = response.getFirstHeader("version");
-                    String clientVersion = Version.getVersion();
-                    if (!Version.matchesMajorMinorVersion(serverVersion)) {
-                        throw new ClientException("Client version \"" + clientVersion + "\" major and minor versions do not match server version \"" + serverVersion + "\"");
                     }
                 }
 

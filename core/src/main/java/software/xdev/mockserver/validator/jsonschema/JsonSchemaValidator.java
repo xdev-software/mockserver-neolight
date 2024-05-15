@@ -31,7 +31,6 @@ import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString
 import software.xdev.mockserver.model.RequestDefinition;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 import software.xdev.mockserver.validator.Validator;
-import software.xdev.mockserver.version.Version;
 import org.slf4j.event.Level;
 
 import java.util.*;
@@ -44,7 +43,7 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 public class JsonSchemaValidator extends ObjectWithReflectiveEqualsHashCodeToString implements Validator<String> {
 
-    public static final String OPEN_API_SPECIFICATION_URL = "OpenAPI Specification: https://app.swaggerhub.com/apis/jamesdbloom/mock-server-openapi/" + Version.getMajorMinorVersion() + ".x" + NEW_LINE +
+    public static final String OPEN_API_SPECIFICATION_URL = "OpenAPI Specification: https://app.swaggerhub.com/apis/jamesdbloom/mock-server-openapi/" + NEW_LINE +
         "Documentation: https://mock-server.com/mock_server/creating_expectations.html";
     private static final Map<String, String> schemaCache = new ConcurrentHashMap<>();
     // using draft 07 as default due to TLS issues downloading draft 2019-09 which causes errors
