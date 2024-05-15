@@ -15,10 +15,6 @@
  */
 package software.xdev.mockserver.file;
 
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.Resource;
-import io.github.classgraph.ResourceList;
-import io.github.classgraph.ScanResult;
 import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
@@ -47,23 +43,6 @@ public class FilePath {
             return resource.getPath();
         }
         return new File(filename).getAbsolutePath();
-    }
-
-    public static URL getURL(String filepath) {
-        File file = new File(filepath);
-        if (file.exists()) {
-            try {
-                return file.toURI().toURL();
-            } catch (MalformedURLException murle) {
-                new MockServerLogger(FileReader.class).logEvent(
-                    new LogEntry()
-                        .setLogLevel(ERROR)
-                        .setMessageFormat("exception while build file URL " + murle.getMessage())
-                        .setThrowable(murle)
-                );
-            }
-        }
-        return FileReader.class.getClassLoader().getResource(filepath);
     }
 
     public static List<String> expandFilePathGlobs(String filePath) {
@@ -99,14 +78,6 @@ public class FilePath {
                             .setThrowable(throwable)
                     );
                     throw new RuntimeException(throwable);
-                }
-                try (ScanResult result = new ClassGraph().scan()) {
-                    ResourceList resources = result.getResourcesWithExtension(StringUtils.substringAfterLast(filePath, "."));
-                    expandedFilePaths.addAll(resources
-                        .stream()
-                        .map(Resource::getPath)
-                        .filter(path -> pathMatcher.matches(new File(path).toPath()))
-                        .collect(Collectors.toList()));
                 }
                 return expandedFilePaths.stream().sorted().collect(Collectors.toList());
             } else {
