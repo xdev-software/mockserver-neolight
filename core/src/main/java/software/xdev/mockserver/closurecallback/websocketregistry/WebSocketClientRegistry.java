@@ -23,7 +23,6 @@ import software.xdev.mockserver.collections.CircularHashMap;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
-import software.xdev.mockserver.metrics.Metrics;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
 import software.xdev.mockserver.model.HttpResponse;
@@ -34,8 +33,6 @@ import software.xdev.mockserver.serialization.model.WebSocketErrorDTO;
 import java.util.Collections;
 import java.util.Map;
 
-import static software.xdev.mockserver.metrics.Metrics.Name.*;
-import static software.xdev.mockserver.metrics.Metrics.clearWebSocketMetrics;
 import static software.xdev.mockserver.model.HttpResponse.response;
 import static org.slf4j.event.Level.TRACE;
 import static org.slf4j.event.Level.WARN;
@@ -48,7 +45,6 @@ public class WebSocketClientRegistry {
     private final Map<String, Channel> clientRegistry;
     private final Map<String, WebSocketResponseCallback> responseCallbackRegistry;
     private final Map<String, WebSocketRequestCallback> forwardCallbackRegistry;
-    private final Metrics metrics;
 
     public WebSocketClientRegistry(Configuration configuration, MockServerLogger mockServerLogger) {
         this.mockServerLogger = mockServerLogger;
@@ -56,7 +52,6 @@ public class WebSocketClientRegistry {
         this.clientRegistry = Collections.synchronizedMap(new CircularHashMap<>(configuration.maxWebSocketExpectations()));
         this.responseCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
         this.forwardCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
-        this.metrics = new Metrics(configuration);
     }
 
     public void receivedTextWebSocketFrame(TextWebSocketFrame textWebSocketFrame) {
@@ -122,7 +117,6 @@ public class WebSocketClientRegistry {
             throw new WebSocketException("Exception while sending web socket registration client id message to client " + clientId, e);
         }
         clientRegistry.put(clientId, ctx.channel());
-        metrics.set(WEBSOCKET_CALLBACK_CLIENTS_COUNT, clientRegistry.size());
         if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
             mockServerLogger.logEvent(
                 new LogEntry()
@@ -138,7 +132,6 @@ public class WebSocketClientRegistry {
         if (removeChannel != null && removeChannel.isOpen()) {
             removeChannel.close();
         }
-        metrics.set(WEBSOCKET_CALLBACK_CLIENTS_COUNT, clientRegistry.size());
         if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
             mockServerLogger.logEvent(
                 new LogEntry()
@@ -150,7 +143,6 @@ public class WebSocketClientRegistry {
 
     public void registerResponseCallbackHandler(String webSocketCorrelationId, WebSocketResponseCallback expectationResponseCallback) {
         responseCallbackRegistry.put(webSocketCorrelationId, expectationResponseCallback);
-        metrics.set(WEBSOCKET_CALLBACK_RESPONSE_HANDLERS_COUNT, responseCallbackRegistry.size());
         if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
             mockServerLogger.logEvent(
                 new LogEntry()
@@ -162,7 +154,6 @@ public class WebSocketClientRegistry {
 
     public void unregisterResponseCallbackHandler(String webSocketCorrelationId) {
         responseCallbackRegistry.remove(webSocketCorrelationId);
-        metrics.set(WEBSOCKET_CALLBACK_RESPONSE_HANDLERS_COUNT, responseCallbackRegistry.size());
         if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
             mockServerLogger.logEvent(
                 new LogEntry()
@@ -174,7 +165,6 @@ public class WebSocketClientRegistry {
 
     public void registerForwardCallbackHandler(String webSocketCorrelationId, WebSocketRequestCallback expectationForwardCallback) {
         forwardCallbackRegistry.put(webSocketCorrelationId, expectationForwardCallback);
-        metrics.set(WEBSOCKET_CALLBACK_FORWARD_HANDLERS_COUNT, forwardCallbackRegistry.size());
         if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
             mockServerLogger.logEvent(
                 new LogEntry()
@@ -186,7 +176,6 @@ public class WebSocketClientRegistry {
 
     public void unregisterForwardCallbackHandler(String webSocketCorrelationId) {
         forwardCallbackRegistry.remove(webSocketCorrelationId);
-        metrics.set(WEBSOCKET_CALLBACK_FORWARD_HANDLERS_COUNT, forwardCallbackRegistry.size());
         if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
             mockServerLogger.logEvent(
                 new LogEntry()
@@ -251,6 +240,5 @@ public class WebSocketClientRegistry {
             channel.close();
         });
         clientRegistry.clear();
-        clearWebSocketMetrics();
     }
 }

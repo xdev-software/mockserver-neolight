@@ -43,7 +43,6 @@ public class Configuration {
     private Boolean disableLogging;
     private Boolean detailedMatchFailures;
     private Boolean launchUIForLogLevelDebug;
-    private Boolean metricsEnabled;
 
     // memory usage
     private Integer maxExpectations;
@@ -266,23 +265,6 @@ public class Configuration {
      */
     public Configuration launchUIForLogLevelDebug(Boolean launchUIForLogLevelDebug) {
         this.launchUIForLogLevelDebug = launchUIForLogLevelDebug;
-        return this;
-    }
-
-    public Boolean metricsEnabled() {
-        if (metricsEnabled == null) {
-            return ConfigurationProperties.metricsEnabled();
-        }
-        return metricsEnabled;
-    }
-
-    /**
-     * Enable gathering of metrics, default is false
-     *
-     * @param metricsEnabled enable metrics
-     */
-    public Configuration metricsEnabled(Boolean metricsEnabled) {
-        this.metricsEnabled = metricsEnabled;
         return this;
     }
 

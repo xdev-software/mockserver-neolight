@@ -24,7 +24,6 @@ import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.matchers.HttpRequestMatcher;
 import software.xdev.mockserver.matchers.MatchDifference;
 import software.xdev.mockserver.matchers.MatcherBuilder;
-import software.xdev.mockserver.metrics.Metrics;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.scheduler.Scheduler;
@@ -40,7 +39,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.*;
 import static software.xdev.mockserver.log.model.LogEntryMessages.*;
-import static software.xdev.mockserver.metrics.Metrics.Name.*;
 import static software.xdev.mockserver.mock.SortableExpectationId.EXPECTATION_SORTABLE_PRIORITY_COMPARATOR;
 import static software.xdev.mockserver.mock.SortableExpectationId.NULL;
 import static org.slf4j.event.Level.DEBUG;
@@ -56,7 +54,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
     private final Scheduler scheduler;
     private WebSocketClientRegistry webSocketClientRegistry;
     private MatcherBuilder matcherBuilder;
-    private Metrics metrics;
 
     public RequestMatchers(Configuration configuration, MockServerLogger mockServerLogger, Scheduler scheduler, WebSocketClientRegistry webSocketClientRegistry) {
         super(scheduler);
@@ -65,7 +62,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
         this.matcherBuilder = new MatcherBuilder(configuration, mockServerLogger);
         this.mockServerLogger = mockServerLogger;
         this.webSocketClientRegistry = webSocketClientRegistry;
-        this.metrics = new Metrics(configuration);
         httpRequestMatchers = new CircularPriorityQueue<>(
             configuration.maxExpectations(),
             EXPECTATION_SORTABLE_PRIORITY_COMPARATOR,
@@ -89,9 +85,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
             upsertedExpectation = httpRequestMatchers
                 .getByKey(expectation.getId())
                 .map(httpRequestMatcher -> {
-                    if (httpRequestMatcher.getExpectation() != null && httpRequestMatcher.getExpectation().getAction() != null) {
-                        metrics.decrement(httpRequestMatcher.getExpectation().getAction().getType());
-                    }
                     if (httpRequestMatcher.getExpectation() != null) {
                         // propagate created time from previous entry to avoid re-ordering on update
                         expectation.withCreated(httpRequestMatcher.getExpectation().getCreated());
@@ -108,9 +101,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
                                     .setMessageFormat(UPDATED_EXPECTATION_MESSAGE_FORMAT)
                                     .setArguments(expectation.clone(), expectation.getId())
                             );
-                        }
-                        if (expectation.getAction() != null) {
-                            metrics.increment(expectation.getAction().getType());
                         }
                     } else {
                         httpRequestMatchers.addPriorityKey(httpRequestMatcher);
@@ -147,9 +137,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
                             HttpRequestMatcher httpRequestMatcher = httpRequestMatchersByKey.get(expectation.getId());
                             // update source to new cause
                             httpRequestMatcher.withSource(cause);
-                            if (httpRequestMatcher.getExpectation() != null && httpRequestMatcher.getExpectation().getAction() != null) {
-                                metrics.decrement(httpRequestMatcher.getExpectation().getAction().getType());
-                            }
                             if (httpRequestMatcher.getExpectation() != null) {
                                 // propagate created time from previous entry to avoid re-ordering on update
                                 expectation.withCreated(httpRequestMatcher.getExpectation().getCreated());
@@ -168,9 +155,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
                                             .setArguments(expectation.clone(), expectation.getId())
                                     );
                                 }
-                                if (expectation.getAction() != null) {
-                                    metrics.increment(expectation.getAction().getType());
-                                }
                             } else {
                                 httpRequestMatchers.addPriorityKey(httpRequestMatcher);
                             }
@@ -185,9 +169,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
                     numberOfChanges.getAndIncrement();
                     HttpRequestMatcher httpRequestMatcher = httpRequestMatchersByKey.get(key);
                     removeHttpRequestMatcher(httpRequestMatcher, cause, false, UUIDService.getUUID());
-                    if (httpRequestMatcher.getExpectation() != null && httpRequestMatcher.getExpectation().getAction() != null) {
-                        metrics.decrement(httpRequestMatcher.getExpectation().getAction().getType());
-                    }
                 });
             if (numberOfChanges.get() > 0) {
                 notifyListeners(this, cause);
@@ -199,9 +180,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
         HttpRequestMatcher httpRequestMatcher = matcherBuilder.transformsToMatcher(expectation);
         httpRequestMatchers.add(httpRequestMatcher);
         httpRequestMatcher.withSource(cause);
-        if (expectation.getAction() != null) {
-            metrics.increment(expectation.getAction().getType());
-        }
         if (MockServerLogger.isEnabled(Level.INFO)) {
             mockServerLogger.logEvent(
                 new LogEntry()
@@ -222,8 +200,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
     public void reset(Cause cause) {
         httpRequestMatchers.stream().forEach(httpRequestMatcher -> removeHttpRequestMatcher(httpRequestMatcher, cause, false, UUIDService.getUUID()));
         expectationRequestDefinitions.clear();
-        Metrics.clearActionMetrics();
-        Metrics.clearRequestAndExpectationMetrics();
         notifyListeners(this, cause);
     }
 
@@ -252,15 +228,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
             })
             .filter(Objects::nonNull)
             .findFirst();
-        if (configuration.metricsEnabled()) {
-            if (!first.isPresent() || first.get().getAction() == null) {
-                metrics.increment(EXPECTATIONS_NOT_MATCHED_COUNT);
-            } else if (first.get().getAction().getType().direction == Action.Direction.FORWARD) {
-                metrics.increment(FORWARD_EXPECTATIONS_MATCHED_COUNT);
-            } else {
-                metrics.increment(RESPONSE_EXPECTATIONS_MATCHED_COUNT);
-            }
-        }
         return first.orElse(null);
     }
 
@@ -354,9 +321,6 @@ public class RequestMatchers extends MockServerMatcherNotifier {
                 final Action action = httpRequestMatcher.getExpectation().getAction();
                 if (action instanceof HttpObjectCallback) {
                     webSocketClientRegistry.unregisterClient(((HttpObjectCallback) action).getClientId());
-                }
-                if (notifyAndUpdateMetrics && action != null) {
-                    metrics.decrement(action.getType());
                 }
             }
             if (notifyAndUpdateMetrics) {

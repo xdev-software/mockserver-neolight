@@ -5,3 +5,5 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * client-java -> client
   * core -> core
   * netty -> standalone
+* Removed
+  * Metrics subsystem (core)
