@@ -22,19 +22,19 @@ import java.util.Objects;
 public class Times extends ObjectWithReflectiveEqualsHashCodeToString {
 
     private static final Times TIMES_UNLIMITED = new Times(-1, true) {
-        public final int getRemainingTimes() {
+        public int getRemainingTimes() {
             return -1;
         }
 
-        public final boolean isUnlimited() {
+        public boolean isUnlimited() {
             return true;
         }
 
-        public final boolean greaterThenZero() {
+        public boolean greaterThenZero() {
             return true;
         }
 
-        public final boolean decrement() {
+        public boolean decrement() {
             return false;
         }
     };

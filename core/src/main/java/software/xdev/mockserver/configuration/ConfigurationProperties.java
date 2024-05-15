@@ -96,22 +96,6 @@ public class ConfigurationProperties {
     private static final String MOCKSERVER_CORS_ALLOW_CREDENTIALS = "mockserver.corsAllowCredentials";
     private static final String MOCKSERVER_CORS_MAX_AGE_IN_SECONDS = "mockserver.corsMaxAgeInSeconds";
 
-    // template restrictions
-    private static final String MOCKSERVER_JAVASCRIPT_DISALLOWED_CLASSES = "mockserver.javascriptDisallowedClasses";
-    private static final String MOCKSERVER_JAVASCRIPT_DISALLOWED_TEXT = "mockserver.javascriptDisallowedText";
-    private static final String MOCKSERVER_VELOCITY_DISALLOW_CLASS_LOADING = "mockserver.velocityDisallowClassLoading";
-    private static final String MOCKSERVER_VELOCITY_DISALLOWED_TEXT = "mockserver.velocityDisallowedText";
-    private static final String MOCKSERVER_MUSTACHE_DISALLOWED_TEXT = "mockserver.mustacheDisallowedText";
-
-    // mock initialization
-    private static final String MOCKSERVER_INITIALIZATION_CLASS = "mockserver.initializationClass";
-    private static final String MOCKSERVER_INITIALIZATION_JSON_PATH = "mockserver.initializationJsonPath";
-    private static final String MOCKSERVER_WATCH_INITIALIZATION_JSON = "mockserver.watchInitializationJson";
-
-    // mock persistence
-    private static final String MOCKSERVER_PERSIST_EXPECTATIONS = "mockserver.persistExpectations";
-    private static final String MOCKSERVER_PERSISTED_EXPECTATIONS_PATH = "mockserver.persistedExpectationsPath";
-
     // verification
     private static final String MOCKSERVER_MAXIMUM_NUMBER_OF_REQUESTS_TO_RETURN_IN_VERIFICATION_FAILURE = "mockserver.maximumNumberOfRequestToReturnInVerificationFailure";
 
@@ -742,87 +726,6 @@ public class ConfigurationProperties {
      */
     public static void corsMaxAgeInSeconds(int ageInSeconds) {
         setProperty(MOCKSERVER_CORS_MAX_AGE_IN_SECONDS, "" + ageInSeconds);
-    }
-
-    // mock initialization
-
-    public static String initializationClass() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_INITIALIZATION_CLASS, "MOCKSERVER_INITIALIZATION_CLASS", "");
-    }
-
-    /**
-     * The class (and package) used to initialize expectations in MockServer at startup, if set MockServer will load and call this class to initialise expectations when is starts.
-     * <p>
-     * The default is null
-     *
-     * @param initializationClass class (and package) used to initialize expectations in MockServer at startup
-     */
-    public static void initializationClass(String initializationClass) {
-        setProperty(MOCKSERVER_INITIALIZATION_CLASS, initializationClass);
-    }
-
-    public static String initializationJsonPath() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_INITIALIZATION_JSON_PATH, "MOCKSERVER_INITIALIZATION_JSON_PATH", "");
-    }
-
-    /**
-     * <p>The path to the json file used to initialize expectations in MockServer at startup, if set MockServer will load this file and initialise expectations for each item in the file when is starts.</p>
-     * <p>The expected format of the file is a JSON array of expectations, as per the <a target="_blank" href="https://app.swaggerhub.com/apis/jamesdbloom/mock-server-openapi/5.15.x#/Expectations" target="_blank">REST API format</a></p>
-     * <p>To watch multiple files use a file globs as documented here: https://mock-server.com/mock_server/initializing_expectations.html#expectation_initializer_json_glob_patterns</p>
-     *
-     * @param initializationJsonPath path to the json file used to initialize expectations in MockServer at startup
-     */
-    public static void initializationJsonPath(String initializationJsonPath) {
-        setProperty(MOCKSERVER_INITIALIZATION_JSON_PATH, initializationJsonPath);
-    }
-
-    public static boolean watchInitializationJson() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_WATCH_INITIALIZATION_JSON, "MOCKSERVER_WATCH_INITIALIZATION_JSON", "" + false));
-    }
-
-    /**
-     * <p>If enabled the initialization json file will be watched for changes, any changes found will result in expectations being created, remove or updated by matching against their key.</p>
-     * <p>If duplicate keys exist only the last duplicate key in the file will be processed and all duplicates except the last duplicate will be removed.</p>
-     * <p>The order of expectations in the file is the order in which they are created if they are new, however, re-ordering existing expectations does not change the order they are matched against incoming requests.</p>
-     *
-     * <p>The default is false</p>
-     *
-     * @param enable if enabled the initialization json file will be watched for changes
-     */
-    public static void watchInitializationJson(boolean enable) {
-        setProperty(MOCKSERVER_WATCH_INITIALIZATION_JSON, "" + enable);
-    }
-
-    // mock persistence
-
-    public static boolean persistExpectations() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_PERSIST_EXPECTATIONS, "MOCKSERVER_PERSIST_EXPECTATIONS", "" + false));
-    }
-
-    /**
-     * Enable the persisting of expectations as json, which is updated whenever the expectation state is updated (i.e. add, clear, expires, etc)
-     * <p>
-     * The default is false
-     *
-     * @param enable the persisting of expectations as json
-     */
-    public static void persistExpectations(boolean enable) {
-        setProperty(MOCKSERVER_PERSIST_EXPECTATIONS, "" + enable);
-    }
-
-    public static String persistedExpectationsPath() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_PERSISTED_EXPECTATIONS_PATH, "MOCKSERVER_PERSISTED_EXPECTATIONS_PATH", "persistedExpectations.json");
-    }
-
-    /**
-     * The file path used to save persisted expectations as json, which is updated whenever the expectation state is updated (i.e. add, clear, expires, etc)
-     * <p>
-     * The default is "persistedExpectations.json"
-     *
-     * @param persistedExpectationsPath file path used to save persisted expectations as json
-     */
-    public static void persistedExpectationsPath(String persistedExpectationsPath) {
-        setProperty(MOCKSERVER_PERSISTED_EXPECTATIONS_PATH, persistedExpectationsPath);
     }
 
     // verification

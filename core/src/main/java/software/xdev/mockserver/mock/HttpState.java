@@ -25,13 +25,10 @@ import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier.Cause;
 import software.xdev.mockserver.model.*;
-import software.xdev.mockserver.persistence.ExpectationFileSystemPersistence;
-import software.xdev.mockserver.persistence.ExpectationFileWatcher;
 import software.xdev.mockserver.responsewriter.ResponseWriter;
 import software.xdev.mockserver.scheduler.Scheduler;
 import software.xdev.mockserver.serialization.*;
 import software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer;
-import software.xdev.mockserver.server.initialize.ExpectationInitializerLoader;
 import software.xdev.mockserver.uuid.UUIDService;
 import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
@@ -70,8 +67,6 @@ public class HttpState {
     private final String uniqueLoopPreventionHeaderValue = "MockServer_" + UUIDService.getUUID();
     private final MockServerEventLog mockServerLog;
     private final Scheduler scheduler;
-    private ExpectationFileSystemPersistence expectationFileSystemPersistence;
-    private ExpectationFileWatcher expectationFileWatcher;
     // mockserver
     private final RequestMatchers requestMatchers;
     private final Configuration configuration;
@@ -123,16 +118,7 @@ public class HttpState {
         LocalCallbackRegistry.setMaxWebSocketExpectations(configuration.maxWebSocketExpectations());
         this.mockServerLog = new MockServerEventLog(configuration, mockServerLogger, scheduler, true);
         this.requestMatchers = new RequestMatchers(configuration, mockServerLogger, scheduler, webSocketClientRegistry);
-        if (configuration.persistExpectations()) {
-            this.expectationFileSystemPersistence = new ExpectationFileSystemPersistence(configuration, mockServerLogger, requestMatchers);
-        }
-        if (isNotBlank(configuration.initializationJsonPath()) || isNotBlank(configuration.initializationClass())) {
-            ExpectationInitializerLoader expectationInitializerLoader = new ExpectationInitializerLoader(configuration, mockServerLogger, requestMatchers);
-            if (isNotBlank(configuration.initializationJsonPath()) && configuration.watchInitializationJson()) {
-                this.expectationFileWatcher = new ExpectationFileWatcher(configuration, mockServerLogger, requestMatchers, expectationInitializerLoader);
-            }
-        }
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
+        if (MockServerLogger.isEnabled(TRACE)) {
             mockServerLogger.logEvent(
                 new LogEntry()
                     .setLogLevel(TRACE)
@@ -682,12 +668,6 @@ public class HttpState {
     }
 
     public void stop() {
-        if (expectationFileSystemPersistence != null) {
-            expectationFileSystemPersistence.stop();
-        }
-        if (expectationFileWatcher != null) {
-            expectationFileWatcher.stop();
-        }
         getMockServerLog().stop();
     }
 

@@ -15,17 +15,14 @@
  */
 package software.xdev.mockserver.dashboard.serializers;
 
-import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.dashboard.model.DashboardLogEntryDTO;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class DescriptionProcessor {
 
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger();
     private int maxHttpRequestLength;
     private int maxOpenAPILength;
     private int maxOpenAPIObjectLength;

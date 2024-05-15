@@ -81,15 +81,6 @@ public class Configuration {
     private Boolean corsAllowCredentials;
     private Integer corsMaxAgeInSeconds;
 
-    // mock initialization
-    private String initializationClass;
-    private String initializationJsonPath;
-    private Boolean watchInitializationJson;
-
-    // mock persistence
-    private Boolean persistExpectations;
-    private String persistedExpectationsPath;
-
     // verification
     private Integer maximumNumberOfRequestToReturnInVerificationFailure;
 
@@ -757,103 +748,6 @@ public class Configuration {
      */
     public Configuration corsMaxAgeInSeconds(Integer corsMaxAgeInSeconds) {
         this.corsMaxAgeInSeconds = corsMaxAgeInSeconds;
-        return this;
-    }
-
-    public String initializationClass() {
-        if (initializationClass == null) {
-            return ConfigurationProperties.initializationClass();
-        }
-        return initializationClass;
-    }
-
-    /**
-     * The class (and package) used to initialize expectations in MockServer at startup, if set MockServer will load and call this class to initialize expectations when is starts.
-     * <p>
-     * The default is null
-     *
-     * @param initializationClass class (and package) used to initialize expectations in MockServer at startup
-     */
-    public Configuration initializationClass(String initializationClass) {
-        this.initializationClass = initializationClass;
-        return this;
-    }
-
-    public String initializationJsonPath() {
-        if (initializationJsonPath == null) {
-            return ConfigurationProperties.initializationJsonPath();
-        }
-        return initializationJsonPath;
-    }
-
-    /**
-     * <p>The path to the json file used to initialize expectations in MockServer at startup, if set MockServer will load this file and initialise expectations for each item in the file when is starts.</p>
-     * <p>The expected format of the file is a JSON array of expectations, as per the <a target="_blank" href="https://app.swaggerhub.com/apis/jamesdbloom/mock-server-openapi/5.15.x#/Expectations" target="_blank">REST API format</a></p>
-     * <p>To watch multiple files use a file globs as documented here: https://mock-server.com/mock_server/initializing_expectations.html#expectation_initializer_json_glob_patterns</p>
-     *
-     * @param initializationJsonPath path to the json file used to initialize expectations in MockServer at startup
-     */
-    public Configuration initializationJsonPath(String initializationJsonPath) {
-        this.initializationJsonPath = initializationJsonPath;
-        return this;
-    }
-
-    public Boolean watchInitializationJson() {
-        if (watchInitializationJson == null) {
-            return ConfigurationProperties.watchInitializationJson();
-        }
-        return watchInitializationJson;
-    }
-
-    /**
-     * <p>If enabled the initialization json file will be watched for changes, any changes found will result in expectations being created, remove or updated by matching against their key.</p>
-     * <p>If duplicate keys exist only the last duplicate key in the file will be processed and all duplicates except the last duplicate will be removed.</p>
-     * <p>The order of expectations in the file is the order in which they are created if they are new, however, re-ordering existing expectations does not change the order they are matched against incoming requests.</p>
-     *
-     * <p>The default is false</p>
-     *
-     * @param watchInitializationJson if enabled the initialization json file will be watched for changes
-     */
-    public Configuration watchInitializationJson(Boolean watchInitializationJson) {
-        this.watchInitializationJson = watchInitializationJson;
-        return this;
-    }
-
-    public Boolean persistExpectations() {
-        if (persistExpectations == null) {
-            return ConfigurationProperties.persistExpectations();
-        }
-        return persistExpectations;
-    }
-
-    /**
-     * Enable the persisting of expectations as json, which is updated whenever the expectation state is updated (i.e. add, clear, expires, etc.)
-     * <p>
-     * The default is false
-     *
-     * @param persistExpectations the persisting of expectations as json
-     */
-    public Configuration persistExpectations(Boolean persistExpectations) {
-        this.persistExpectations = persistExpectations;
-        return this;
-    }
-
-    public String persistedExpectationsPath() {
-        if (persistedExpectationsPath == null) {
-            return ConfigurationProperties.persistedExpectationsPath();
-        }
-        return persistedExpectationsPath;
-    }
-
-    /**
-     * The file path used to save persisted expectations as json, which is updated whenever the expectation state is updated (i.e. add, clear, expires, etc.)
-     * <p>
-     * The default is "persistedExpectations.json"
-     *
-     * @param persistedExpectationsPath file path used to save persisted expectations as json
-     */
-    public Configuration persistedExpectationsPath(String persistedExpectationsPath) {
-        this.persistedExpectationsPath = persistedExpectationsPath;
         return this;
     }
 
