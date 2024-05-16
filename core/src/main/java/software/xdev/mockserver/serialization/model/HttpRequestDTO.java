@@ -32,7 +32,6 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
     private Headers headers;
     private Boolean keepAlive;
     private Protocol protocol;
-    private List<X509Certificate> clientCertificateChain;
     private SocketAddress socketAddress;
     private String localAddress;
     private String remoteAddress;
@@ -53,7 +52,6 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
             body = BodyDTO.createDTO(httpRequest.getBody());
             keepAlive = httpRequest.isKeepAlive();
             protocol = httpRequest.getProtocol();
-            clientCertificateChain = httpRequest.getClientCertificateChain();
             socketAddress = httpRequest.getSocketAddress();
             localAddress = httpRequest.getLocalAddress();
             remoteAddress = httpRequest.getRemoteAddress();
@@ -71,7 +69,6 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
             .withCookies(cookies)
             .withProtocol(protocol)
             .withKeepAlive(keepAlive)
-            .withClientCertificateChain(clientCertificateChain)
             .withSocketAddress(socketAddress)
             .withLocalAddress(localAddress)
             .withRemoteAddress(remoteAddress)
@@ -156,15 +153,6 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
 
     public HttpRequestDTO setProtocol(Protocol protocol) {
         this.protocol = protocol;
-        return this;
-    }
-
-    public List<X509Certificate> getClientCertificateChain() {
-        return clientCertificateChain;
-    }
-
-    public HttpRequestDTO setClientCertificateChain(List<X509Certificate> clientCertificateChain) {
-        this.clientCertificateChain = clientCertificateChain;
         return this;
     }
 

@@ -86,7 +86,6 @@ public class MockServerClient implements Stoppable {
     private HttpRequest requestOverride;
     private ClientConfiguration configuration;
     private ProxyConfiguration proxyConfiguration;
-    private Supplier<String> controlPlaneJWTSupplier;
     private NettyHttpClient nettyHttpClient;
     private RequestDefinitionSerializer requestDefinitionSerializer = new RequestDefinitionSerializer();
     private ExpectationIdSerializer expectationIdSerializer = new ExpectationIdSerializer();
@@ -254,21 +253,6 @@ public class MockServerClient implements Stoppable {
     }
 
     /**
-     * Specify JWT to use for control plane authorisation
-     */
-    public MockServerClient withControlPlaneJWT(String controlPlaneJWT) {
-        return withControlPlaneJWT(() -> controlPlaneJWT);
-    }
-
-    /**
-     * Specify JWT supplier to use for control plane authorisation
-     */
-    public MockServerClient withControlPlaneJWT(Supplier<String> controlPlaneJWTSupplier) {
-        this.controlPlaneJWTSupplier = controlPlaneJWTSupplier;
-        return this;
-    }
-
-    /**
      * @deprecated use withRequestOverride which is more consistent with MockServer API style
      */
     @Deprecated
@@ -354,14 +338,6 @@ public class MockServerClient implements Stoppable {
                 }
                 if (requestOverride != null) {
                     request = request.update(requestOverride, null);
-                }
-                if (controlPlaneJWTSupplier != null) {
-                    String jwt = controlPlaneJWTSupplier.get();
-                    if (isNotBlank(jwt)) {
-                        request.withHeader(AUTHORIZATION.toString(), "Bearer " + jwt);
-                    } else {
-                        throw new IllegalArgumentException("Control plane jwt supplier returned invalid JWT \"" + jwt + "\"");
-                    }
                 }
                 HttpResponse response = getNettyHttpClient().sendRequest(
                     request.withHeader(HOST.toString(), this.host + ":" + port()),

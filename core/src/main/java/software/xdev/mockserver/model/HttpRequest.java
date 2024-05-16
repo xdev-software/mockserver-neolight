@@ -46,7 +46,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
     private Boolean keepAlive = null;
     private Protocol protocol = null;
     private Integer streamId = null;
-    private List<X509Certificate> clientCertificateChain;
     private SocketAddress socketAddress;
     private String localAddress;
     private String remoteAddress;
@@ -100,16 +99,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
      */
     public HttpRequest withStreamId(Integer streamId) {
         this.streamId = streamId;
-        this.hashCode = 0;
-        return this;
-    }
-
-    public List<X509Certificate> getClientCertificateChain() {
-        return clientCertificateChain;
-    }
-
-    public HttpRequest withClientCertificateChain(List<X509Certificate> clientCertificateChain) {
-        this.clientCertificateChain = clientCertificateChain;
         this.hashCode = 0;
         return this;
     }
@@ -998,7 +987,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             .withKeepAlive(keepAlive)
             .withProtocol(protocol)
             .withStreamId(streamId)
-            .withClientCertificateChain(clientCertificateChain)
             .withSocketAddress(socketAddress)
             .withLocalAddress(localAddress)
             .withRemoteAddress(remoteAddress);
@@ -1017,7 +1005,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             .withKeepAlive(keepAlive)
             .withProtocol(protocol)
             .withStreamId(streamId)
-            .withClientCertificateChain(clientCertificateChain != null && !clientCertificateChain.isEmpty() ? clientCertificateChain.stream().map(X509Certificate::clone).collect(Collectors.toList()) : null)
             .withSocketAddress(socketAddress)
             .withLocalAddress(localAddress)
             .withRemoteAddress(remoteAddress);
@@ -1092,26 +1079,25 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             return false;
         }
         HttpRequest that = (HttpRequest) o;
-        return Objects.equals(method, that.method) &&
-            Objects.equals(path, that.path) &&
-            Objects.equals(pathParameters, that.pathParameters) &&
-            Objects.equals(queryStringParameters, that.queryStringParameters) &&
-            Objects.equals(body, that.body) &&
-            Objects.equals(headers, that.headers) &&
-            Objects.equals(cookies, that.cookies) &&
-            Objects.equals(keepAlive, that.keepAlive) &&
-            Objects.equals(protocol, that.protocol) &&
-            Objects.equals(streamId, that.streamId) &&
-            Objects.equals(clientCertificateChain, that.clientCertificateChain) &&
-            Objects.equals(socketAddress, that.socketAddress) &&
-            Objects.equals(localAddress, that.localAddress) &&
-            Objects.equals(remoteAddress, that.remoteAddress);
+        return Objects.equals(method, that.method)
+            && Objects.equals(path, that.path)
+            && Objects.equals(pathParameters, that.pathParameters)
+            && Objects.equals(queryStringParameters, that.queryStringParameters)
+            && Objects.equals(body, that.body)
+            && Objects.equals(headers, that.headers)
+            && Objects.equals(cookies, that.cookies)
+            && Objects.equals(keepAlive, that.keepAlive)
+            && Objects.equals(protocol, that.protocol)
+            && Objects.equals(streamId, that.streamId)
+            && Objects.equals(socketAddress, that.socketAddress)
+            && Objects.equals(localAddress, that.localAddress)
+            && Objects.equals(remoteAddress, that.remoteAddress);
     }
 
     @Override
     public int hashCode() {
         if (hashCode == 0) {
-            hashCode = Objects.hash(super.hashCode(), method, path, pathParameters, queryStringParameters, body, headers, cookies, keepAlive, protocol, streamId, clientCertificateChain, socketAddress, localAddress, remoteAddress);
+            hashCode = Objects.hash(super.hashCode(), method, path, pathParameters, queryStringParameters, body, headers, cookies, keepAlive, protocol, streamId, socketAddress, localAddress, remoteAddress);
         }
         return hashCode;
     }

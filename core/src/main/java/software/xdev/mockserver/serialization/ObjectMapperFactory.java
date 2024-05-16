@@ -31,7 +31,6 @@ import software.xdev.mockserver.serialization.deserializers.condition.Verificati
 import software.xdev.mockserver.serialization.deserializers.request.RequestDefinitionDTODeserializer;
 import software.xdev.mockserver.serialization.deserializers.string.NottableStringDeserializer;
 import software.xdev.mockserver.serialization.serializers.body.*;
-import software.xdev.mockserver.serialization.serializers.certificate.CertificateSerializer;
 import software.xdev.mockserver.serialization.serializers.collections.CookiesSerializer;
 import software.xdev.mockserver.serialization.serializers.collections.HeadersSerializer;
 import software.xdev.mockserver.serialization.serializers.collections.ParametersSerializer;
@@ -39,7 +38,6 @@ import software.xdev.mockserver.serialization.serializers.condition.Verification
 import software.xdev.mockserver.serialization.serializers.condition.VerificationTimesSerializer;
 import software.xdev.mockserver.serialization.serializers.matcher.HttpRequestPropertiesMatcherSerializer;
 import software.xdev.mockserver.serialization.serializers.request.HttpRequestDTOSerializer;
-import software.xdev.mockserver.serialization.serializers.certificate.X509CertificateSerializer;
 import software.xdev.mockserver.serialization.serializers.response.HttpResponseSerializer;
 import software.xdev.mockserver.serialization.serializers.response.*;
 import software.xdev.mockserver.serialization.serializers.string.NottableStringSerializer;
@@ -231,9 +229,6 @@ public class ObjectMapperFactory {
             new HeadersSerializer(),
             new ParametersSerializer(),
             new CookiesSerializer(),
-            // certificates
-            new X509CertificateSerializer(),
-            new CertificateSerializer(),
             // matcher
             new HttpRequestPropertiesMatcherSerializer()
         );
