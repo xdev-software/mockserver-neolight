@@ -18,7 +18,7 @@ package software.xdev.mockserver.matchers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.codec.PathParametersDecoder;
 import software.xdev.mockserver.configuration.Configuration;
@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.matchers.MatchDifference.Field.*;
 import static software.xdev.mockserver.model.NottableString.string;

@@ -30,7 +30,7 @@ import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.AttributeKey;
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
 import software.xdev.mockserver.codec.PreserveHeadersNettyRemoves;
 import software.xdev.mockserver.configuration.Configuration;

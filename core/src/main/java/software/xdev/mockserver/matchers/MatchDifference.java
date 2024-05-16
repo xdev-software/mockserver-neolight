@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
 import static org.slf4j.event.Level.TRACE;
 

@@ -36,8 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
 import static software.xdev.mockserver.model.HttpRequest.request;
 

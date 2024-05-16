@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.serialization.ObjectMapperFactory.buildObjectMapperWithoutRemovingEmptyValues;
 import static org.slf4j.event.Level.DEBUG;
 

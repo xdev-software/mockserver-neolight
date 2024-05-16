@@ -24,7 +24,7 @@ import software.xdev.mockserver.model.ParameterStyle;
 
 import java.io.IOException;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.model.NottableOptionalString.optional;
 import static software.xdev.mockserver.model.NottableString.string;
 

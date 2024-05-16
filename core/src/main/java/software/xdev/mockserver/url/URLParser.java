@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.url;
 
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static software.xdev.mockserver.util.StringUtils.substringBefore;
 
 public class URLParser {
 

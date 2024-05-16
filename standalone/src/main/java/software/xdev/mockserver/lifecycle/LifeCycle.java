@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.configuration.Configuration.configuration;
 import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.SERVER_CONFIGURATION;
 import static software.xdev.mockserver.mock.HttpState.setPort;

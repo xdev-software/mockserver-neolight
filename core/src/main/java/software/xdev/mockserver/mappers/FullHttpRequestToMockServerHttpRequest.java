@@ -20,7 +20,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http2.HttpConversionUtil;
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.codec.BodyDecoderEncoder;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.configuration.Configuration;

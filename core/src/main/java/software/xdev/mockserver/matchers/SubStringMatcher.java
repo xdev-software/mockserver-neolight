@@ -15,10 +15,10 @@
  */
 package software.xdev.mockserver.matchers;
 
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.model.NottableString;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static software.xdev.mockserver.util.StringUtils.*;
 import static software.xdev.mockserver.model.NottableString.string;
 
 public class SubStringMatcher extends BodyMatcher<NottableString> {

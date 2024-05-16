@@ -17,7 +17,7 @@ package software.xdev.mockserver.model;
 
 import java.util.Objects;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.model.NottableString.string;
 
 public class KeyAndValue extends ObjectWithJsonToString {

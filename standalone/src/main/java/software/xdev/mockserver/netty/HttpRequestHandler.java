@@ -48,7 +48,7 @@ import java.util.Set;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.exception.ExceptionHandling.closeOnFlush;
 import static software.xdev.mockserver.exception.ExceptionHandling.connectionClosedException;
 import static software.xdev.mockserver.mock.HttpState.PATH_PREFIX;

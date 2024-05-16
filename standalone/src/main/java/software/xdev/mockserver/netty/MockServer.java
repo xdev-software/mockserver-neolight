@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.configuration.Configuration.configuration;
 import static software.xdev.mockserver.mock.action.http.HttpActionHandler.REMOTE_SOCKET;
 import static software.xdev.mockserver.netty.HttpRequestHandler.PROXYING;

@@ -21,7 +21,7 @@ import software.xdev.mockserver.model.*;
 
 import java.nio.charset.Charset;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 @SuppressWarnings("rawtypes")
 public class BodyDecoderEncoder {

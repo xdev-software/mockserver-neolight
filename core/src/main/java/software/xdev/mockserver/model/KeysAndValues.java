@@ -17,7 +17,7 @@ package software.xdev.mockserver.model;
 
 import java.util.*;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.model.NottableString.string;
 
 @SuppressWarnings({"rawtypes", "unchecked"})

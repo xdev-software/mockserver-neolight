@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpHeaderNames.HOST;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.model.Header.header;
 import static software.xdev.mockserver.model.NottableString.string;

@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.java;
 
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 
 public class JDKVersion {
 

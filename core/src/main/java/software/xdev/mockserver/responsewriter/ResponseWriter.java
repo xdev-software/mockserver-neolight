@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpHeaderValues.CLOSE;
 import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.mock.HttpState.PATH_PREFIX;
 import static software.xdev.mockserver.model.Header.header;
 import static software.xdev.mockserver.model.HttpResponse.notFoundResponse;

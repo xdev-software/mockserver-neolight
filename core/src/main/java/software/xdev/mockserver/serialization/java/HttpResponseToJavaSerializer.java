@@ -21,7 +21,7 @@ import software.xdev.mockserver.model.*;
 
 import java.util.List;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 

@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.matchers;
 
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

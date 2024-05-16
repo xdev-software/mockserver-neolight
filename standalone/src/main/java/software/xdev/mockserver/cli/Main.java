@@ -24,7 +24,7 @@ import software.xdev.mockserver.netty.MockServer;
 import java.io.PrintStream;
 import java.util.*;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static software.xdev.mockserver.util.StringUtils.*;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.cli.Main.Arguments.*;
 import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.SERVER_CONFIGURATION;

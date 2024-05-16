@@ -26,7 +26,7 @@ import javax.net.ssl.SSLException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.httpclient.NettyHttpClient.RESPONSE_FUTURE;
 
 @ChannelHandler.Sharable

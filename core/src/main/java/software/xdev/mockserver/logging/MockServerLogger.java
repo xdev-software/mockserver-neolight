@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.logging.LogManager;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.*;
 import static org.slf4j.event.Level.ERROR;

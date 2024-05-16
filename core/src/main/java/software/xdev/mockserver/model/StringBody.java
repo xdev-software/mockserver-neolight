@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.model.MediaType.DEFAULT_TEXT_HTTP_CHARACTER_SET;
 
 public class StringBody extends BodyWithContentType<String> {

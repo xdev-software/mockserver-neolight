@@ -56,7 +56,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.UNAUTHORIZED;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.commons.lang3.StringUtils.*;
+import static software.xdev.mockserver.util.StringUtils.*;
 import static software.xdev.mockserver.configuration.ClientConfiguration.clientConfiguration;
 import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
 import static software.xdev.mockserver.mock.HttpState.LOG_SEPARATOR;

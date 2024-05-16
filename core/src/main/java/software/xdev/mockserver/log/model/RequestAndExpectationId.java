@@ -18,7 +18,7 @@ package software.xdev.mockserver.log.model;
 import software.xdev.mockserver.model.ExpectationId;
 import software.xdev.mockserver.model.RequestDefinition;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 public class RequestAndExpectationId {
 

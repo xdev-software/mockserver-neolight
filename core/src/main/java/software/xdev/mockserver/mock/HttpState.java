@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.apache.commons.lang3.StringUtils.*;
+import static software.xdev.mockserver.util.StringUtils.*;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.log.model.LogEntryMessages.RECEIVED_REQUEST_MESSAGE_FORMAT;
 import static software.xdev.mockserver.model.HttpRequest.request;

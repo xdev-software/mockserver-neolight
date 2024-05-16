@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.codec;
 
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.NottableString;
 import software.xdev.mockserver.model.Parameters;

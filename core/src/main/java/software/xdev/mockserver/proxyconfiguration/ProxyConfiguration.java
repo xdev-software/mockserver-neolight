@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.PROXY_AUTHORIZATION;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 public class ProxyConfiguration extends ObjectWithJsonToString {
 

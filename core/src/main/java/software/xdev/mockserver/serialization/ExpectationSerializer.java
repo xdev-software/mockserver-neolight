@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 @SuppressWarnings("FieldMayBeFinal")

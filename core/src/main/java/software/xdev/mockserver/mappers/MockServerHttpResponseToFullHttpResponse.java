@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
+import static software.xdev.mockserver.util.StringUtils.isEmpty;
 
 public class MockServerHttpResponseToFullHttpResponse {
     

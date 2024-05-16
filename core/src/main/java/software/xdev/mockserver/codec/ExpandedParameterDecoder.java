@@ -17,7 +17,7 @@ package software.xdev.mockserver.codec;
 
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.log.model.LogEntry;
@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.model.NottableOptionalString.optional;
 import static software.xdev.mockserver.model.NottableString.string;
 

@@ -16,12 +16,12 @@
 package software.xdev.mockserver.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.StringUtils;
+import software.xdev.mockserver.util.StringUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.model.NottableOptionalString.OPTIONAL_CHAR;
 import static software.xdev.mockserver.model.NottableOptionalString.optional;
 import static software.xdev.mockserver.model.ParameterStyle.DEEP_OBJECT;

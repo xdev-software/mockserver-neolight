@@ -35,7 +35,7 @@ import java.util.concurrent.CompletableFuture;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpHeaderNames.UPGRADE;
 import static io.netty.handler.codec.http.HttpHeaderValues.WEBSOCKET;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient.CLIENT_REGISTRATION_ID_HEADER;
 import static software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient.REGISTRATION_FUTURE;
 import static org.slf4j.event.Level.*;

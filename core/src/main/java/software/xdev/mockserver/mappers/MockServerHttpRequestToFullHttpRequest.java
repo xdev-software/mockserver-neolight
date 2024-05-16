@@ -36,7 +36,7 @@ import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
 import static io.netty.handler.codec.http.HttpHeaderValues.*;
 import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 public class MockServerHttpRequestToFullHttpRequest {
     

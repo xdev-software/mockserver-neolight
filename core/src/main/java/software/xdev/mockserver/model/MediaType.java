@@ -24,7 +24,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static software.xdev.mockserver.util.StringUtils.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
