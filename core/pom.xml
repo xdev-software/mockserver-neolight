@@ -139,23 +139,10 @@
 			<version>3.14.0</version>
 		</dependency>
 
-		<!-- TODO: Remove with logging -->
-		<dependency>
-			<groupId>com.lmax</groupId>
-			<artifactId>disruptor</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
 			<version>6.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-			<version>1.12.0</version>
 		</dependency>
 	</dependencies>
 

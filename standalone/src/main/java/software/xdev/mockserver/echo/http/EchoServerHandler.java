@@ -42,27 +42,18 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
     private static final Logger LOG = LoggerFactory.getLogger(EchoServerHandler.class);
     
     private final EchoServer.Error error;
-    private final MockServerEventLog mockServerEventLog;
     private final EchoServer.NextResponse nextResponse;
     private final EchoServer.LastRequest lastRequest;
 
-    EchoServerHandler(EchoServer.Error error, MockServerEventLog mockServerEventLog, EchoServer.NextResponse nextResponse, EchoServer.LastRequest lastRequest) {
+    EchoServerHandler(EchoServer.Error error, EchoServer.NextResponse nextResponse, EchoServer.LastRequest lastRequest) {
         this.error = error;
-        this.mockServerEventLog = mockServerEventLog;
         this.nextResponse = nextResponse;
         this.lastRequest = lastRequest;
     }
 
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest request) {
-
-        mockServerEventLog.add(
-            new LogEntry()
-                .setType(RECEIVED_REQUEST)
-                .setLogLevel(INFO)
-                .setHttpRequest(request)
-                .setMessageFormat("EchoServer received request{}")
-                .setArguments(request)
-        );
+        
+        LOG.info("EchoServer received request {}", request);
 
         if (!lastRequest.httpRequest.get().isDone()) {
             lastRequest.httpRequest.get().complete(request);
@@ -95,14 +86,8 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
             }
 
             if (LOG.isInfoEnabled()) {
-                mockServerEventLog.add(
-                    new LogEntry()
-                        .setLogLevel(INFO)
-                        .setHttpRequest(request)
-                        .setHttpResponse(httpResponse)
-                        .setMessageFormat("EchoServer returning response{}for request{}")
-                        .setArguments(httpResponse, request)
-                );
+                LOG.info("EchoServer returning response {} for request {}",
+                    httpResponse, request);
             }
 
             // write and flush

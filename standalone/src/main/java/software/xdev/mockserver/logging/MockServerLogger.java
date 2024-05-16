@@ -30,23 +30,4 @@ public class MockServerLogger {
     public static void writeToSystemOut(Logger logger, LogEntry logEntry) {
         // NOOP
     }
-
-    private static String portInformation(LogEntry logEntry) {
-        Integer port = logEntry.getPort();
-        if (port != null) {
-            return port + " ";
-        } else {
-            return "";
-        }
-    }
-
-    @Deprecated
-    public static boolean isEnabled(final Level level) {
-        return false;
-    }
-
-    @Deprecated
-    public static boolean isEnabled(final Level level, final Level configuredLevel) {
-        return false;
-    }
 }

@@ -29,14 +29,4 @@ public class CircularHashMap<K, V> extends LinkedHashMap<K, V> {
     protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
         return size() > maxSize;
     }
-
-    public K findKey(V value) {
-        for (Map.Entry<K, V> entry : entrySet()) {
-            V entryValue = entry.getValue();
-            if (entryValue == value || (value != null && value.equals(entryValue))) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
 }

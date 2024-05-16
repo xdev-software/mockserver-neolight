@@ -77,7 +77,6 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new MockServerHttpServerCodec(configuration, channel.localAddress().getPort()));
         pipeline.addLast(new EchoServerHandler(
             error,
-            channel.attr(EchoServer.LOG_FILTER).get(),
             channel.attr(EchoServer.NEXT_RESPONSE).get(),
             channel.attr(EchoServer.LAST_REQUEST).get()
         ));

@@ -23,7 +23,6 @@ import software.xdev.mockserver.mappers.FullHttpRequestToMockServerHttpRequest;
 import software.xdev.mockserver.model.Header;
 
 import java.net.SocketAddress;
-import java.security.cert.Certificate;
 import java.util.List;
 
 public class NettyHttpToMockServerHttpRequestDecoder extends MessageToMessageDecoder<FullHttpRequest> {

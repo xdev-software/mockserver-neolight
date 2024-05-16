@@ -40,7 +40,6 @@ public class SchedulerThreadFactory implements ThreadFactory
 	}
 	
 	@Override
-	@SuppressWarnings("NullableProblems")
 	public Thread newThread(Runnable runnable)
 	{
 		Thread thread = new Thread(runnable, "MockServer-" + name + THREAD_INIT_NUMBER.get());
