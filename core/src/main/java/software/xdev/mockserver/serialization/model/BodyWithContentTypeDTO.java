@@ -22,7 +22,7 @@ public abstract class BodyWithContentTypeDTO extends BodyDTO {
 
     protected final String contentType;
 
-    public BodyWithContentTypeDTO(Body.Type type, Boolean not, Body<?> body) {
+    protected BodyWithContentTypeDTO(Body.Type type, Boolean not, Body<?> body) {
         super(type, not);
         this.contentType = body.getContentType();
         withOptional(body.getOptional());

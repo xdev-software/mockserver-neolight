@@ -15,8 +15,7 @@
  */
 package software.xdev.mockserver.model;
 
-import org.apache.commons.lang3.ArrayUtils;
-
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static software.xdev.mockserver.model.NottableString.*;
@@ -75,7 +74,7 @@ public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends Key
 
     @SafeVarargs
     public final K withEntries(final T... entries) {
-        if (ArrayUtils.isNotEmpty(entries)) {
+        if (arrayIsNotEmpty(entries)) {
             withEntries(Arrays.asList(entries));
         }
         return k;
@@ -122,7 +121,7 @@ public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends Key
     }
 
     public K withEntry(final NottableString name, final NottableString... values) {
-        if (ArrayUtils.isNotEmpty(values)) {
+        if (arrayIsNotEmpty(values)) {
             withEntry(name, Arrays.asList(values));
         }
         return k;
@@ -179,7 +178,7 @@ public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends Key
 
     @SuppressWarnings("UnusedReturnValue")
     public K replaceEntry(final String name, final String... values) {
-        if (ArrayUtils.isNotEmpty(values)) {
+        if (arrayIsNotEmpty(values)) {
             isModified();
             remove(name);
             multimap.put(string(name), deserializeNottableStrings(values));
@@ -296,5 +295,13 @@ public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends Key
     @Override
     public int hashCode() {
         return Objects.hash(multimap);
+    }
+    
+    private static boolean arrayIsNotEmpty(Object array) {
+        return !arrayIsEmpty(array);
+    }
+    
+    private static boolean arrayIsEmpty(Object array) {
+        return array == null || Array.getLength(array) == 0;
     }
 }
