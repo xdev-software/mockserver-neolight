@@ -12,3 +12,4 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * all body matching that requires an external lib (XPATH, JSON, XML, OpenAPI, ...)
   * Version
   * Persistence of expectations
+  * Dashboard

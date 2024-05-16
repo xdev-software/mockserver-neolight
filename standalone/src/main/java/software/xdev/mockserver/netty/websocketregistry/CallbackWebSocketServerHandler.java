@@ -26,7 +26,6 @@ import io.netty.util.ReferenceCountUtil;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
 import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
-import software.xdev.mockserver.dashboard.DashboardWebSocketHandler;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.HttpState;
@@ -106,7 +105,6 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
                         ctx.channel().newPromise()
                     )
                     .addListener((ChannelFutureListener) future -> {
-                        ctx.pipeline().remove(DashboardWebSocketHandler.class);
                         ctx.pipeline().remove(MockServerHttpServerCodec.class);
                         ctx.pipeline().remove(HttpRequestHandler.class);
                         if (MockServerLogger.isEnabled(Level.TRACE)) {

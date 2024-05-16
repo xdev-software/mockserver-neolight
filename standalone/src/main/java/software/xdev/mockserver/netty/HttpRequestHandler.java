@@ -21,7 +21,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import org.apache.commons.text.StringEscapeUtils;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.dashboard.DashboardHandler;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.MockServerLogger;
@@ -70,7 +69,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
     private MockServerLogger mockServerLogger;
     private PortBindingSerializer portBindingSerializer;
     private HttpActionHandler httpActionHandler;
-    private DashboardHandler dashboardHandler;
 
     public HttpRequestHandler(Configuration configuration, LifeCycle server, HttpState httpState, HttpActionHandler httpActionHandler) {
         super(false);
@@ -80,7 +78,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
         this.mockServerLogger = httpState.getMockServerLogger();
         this.portBindingSerializer = new PortBindingSerializer(mockServerLogger);
         this.httpActionHandler = httpActionHandler;
-        this.dashboardHandler = new DashboardHandler();
     }
 
     private static boolean isProxyingRequest(ChannelHandlerContext ctx) {
@@ -139,10 +136,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 
                     ctx.writeAndFlush(response().withStatusCode(OK.code()));
                     new Scheduler.SchedulerThreadFactory("MockServer Stop").newThread(() -> server.stop()).start();
-
-                } else if (request.getMethod().getValue().equals("GET") && request.getPath().getValue().startsWith(PATH_PREFIX + "/dashboard")) {
-
-                    dashboardHandler.renderDashboard(ctx, request);
 
                 } else if (request.getMethod().getValue().equals("CONNECT")) {
 

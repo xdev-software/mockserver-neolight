@@ -34,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
 import software.xdev.mockserver.codec.PreserveHeadersNettyRemoves;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.dashboard.DashboardWebSocketHandler;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.LoggingHandler;
@@ -285,7 +284,6 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
             addLastIfNotPresent(pipeline, http2ConnectionHandlerBuilder.connection(connection).build());
             // TODO(jamesdbloom) consider Http2MultiplexHandler and test behaviour when multiple requests sent over the same connection
             addLastIfNotPresent(pipeline, new CallbackWebSocketServerHandler(httpState));
-            addLastIfNotPresent(pipeline, new DashboardWebSocketHandler(httpState, isSslEnabledUpstream(ctx.channel()), false));
             addLastIfNotPresent(pipeline, new MockServerHttpServerCodec(configuration, mockServerLogger, isSslEnabledUpstream(ctx.channel()), SniHandler.retrieveClientCertificates(mockServerLogger, ctx), ctx.channel().localAddress()));
             addLastIfNotPresent(pipeline, new HttpRequestHandler(configuration, server, httpState, actionHandler));
             pipeline.remove(this);
@@ -336,7 +334,6 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
                     .addListener((ChannelFuture future) -> future.channel().disconnect().awaitUninterruptibly());
             } else {
                 addLastIfNotPresent(pipeline, new CallbackWebSocketServerHandler(httpState));
-                addLastIfNotPresent(pipeline, new DashboardWebSocketHandler(httpState, isSslEnabledUpstream(ctx.channel()), false));
                 addLastIfNotPresent(pipeline, new MockServerHttpServerCodec(configuration, mockServerLogger, isSslEnabledUpstream(ctx.channel()), SniHandler.retrieveClientCertificates(mockServerLogger, ctx), ctx.channel().localAddress()));
                 addLastIfNotPresent(pipeline, new HttpRequestHandler(configuration, server, httpState, actionHandler));
                 pipeline.remove(this);
