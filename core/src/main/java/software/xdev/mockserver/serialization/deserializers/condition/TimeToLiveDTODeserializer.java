@@ -19,13 +19,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import software.xdev.mockserver.log.model.LogEntry;
+
 import software.xdev.mockserver.matchers.TimeToLive;
 import software.xdev.mockserver.serialization.model.TimeToLiveDTO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

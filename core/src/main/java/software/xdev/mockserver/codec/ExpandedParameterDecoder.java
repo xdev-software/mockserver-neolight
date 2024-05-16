@@ -19,8 +19,6 @@ import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.configuration.ConfigurationProperties;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.NottableString;
 import software.xdev.mockserver.model.Parameter;
 import software.xdev.mockserver.model.ParameterStyle;
@@ -28,7 +26,6 @@ import software.xdev.mockserver.model.Parameters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -27,12 +27,10 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.LoggingHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;

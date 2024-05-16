@@ -22,7 +22,6 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.ssl.NotSslRecordException;
 import io.netty.util.internal.PlatformDependent;
 import software.xdev.mockserver.httpclient.SocketConnectionException;
-import software.xdev.mockserver.log.model.LogEntry;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -36,12 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
-
-import static org.slf4j.event.Level.WARN;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,22 +43,9 @@ import org.slf4j.LoggerFactory;
 
 public final class ExceptionHandling {
     
-    private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandling.class);
-    
     private static final Pattern IGNORABLE_CLASS_IN_STACK = Pattern.compile("^.*(?:Socket|Datagram|Sctp|Udt)Channel.*$");
     private static final Pattern IGNORABLE_ERROR_MESSAGE = Pattern.compile("^.*(?:connection.*(?:reset|closed|abort|broken)|broken.*pipe).*$", Pattern.CASE_INSENSITIVE);
     
-    public static <T> T handleThrowable(Callable<T> callable) {
-        try {
-            return callable.call();
-        } catch (Exception ex) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("", ex);
-            }
-            throw new RuntimeException(ex);
-        }
-    }
-
     /**
      * Closes the specified channel after all queued write requests are flushed.
      */

@@ -18,14 +18,12 @@ package software.xdev.mockserver.closurecallback.websocketclient;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.LoggingHandler;
 import software.xdev.mockserver.mappers.FullHttpResponseToMockServerHttpResponse;
 import software.xdev.mockserver.model.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -38,7 +36,7 @@ import static io.netty.handler.codec.http.HttpHeaderValues.WEBSOCKET;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient.CLIENT_REGISTRATION_ID_HEADER;
 import static software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient.REGISTRATION_FUTURE;
-import static org.slf4j.event.Level.*;
+
 
 @SuppressWarnings("rawtypes")
 public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {

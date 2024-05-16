@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.logging.MockServerLogger.configureLogger;
 
 public class ConfigurationProperties {
 

@@ -21,8 +21,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.ssl.SslHandler;
-import software.xdev.mockserver.log.model.LogEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

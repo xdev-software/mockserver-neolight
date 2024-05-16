@@ -20,14 +20,12 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import software.xdev.mockserver.codec.BodyDecoderEncoder;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.model.NottableString;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.ArrayList;
 import java.util.Collections;

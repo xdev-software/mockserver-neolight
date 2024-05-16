@@ -22,7 +22,6 @@ import io.netty.util.AttributeKey;
 import org.apache.commons.text.StringEscapeUtils;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
 import software.xdev.mockserver.model.HttpRequest;
@@ -32,13 +31,12 @@ import software.xdev.mockserver.model.PortBinding;
 import software.xdev.mockserver.netty.proxy.connect.HttpConnectHandler;
 import software.xdev.mockserver.netty.responsewriter.NettyResponseWriter;
 import software.xdev.mockserver.responsewriter.ResponseWriter;
-import software.xdev.mockserver.scheduler.Scheduler;
+import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.serialization.Base64Converter;
 import software.xdev.mockserver.serialization.PortBindingSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.net.BindException;
 import java.nio.charset.StandardCharsets;
@@ -134,7 +132,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
                 } else if (request.matches("PUT", PATH_PREFIX + "/stop", "/stop")) {
 
                     ctx.writeAndFlush(response().withStatusCode(OK.code()));
-                    new Scheduler.SchedulerThreadFactory("MockServer Stop").newThread(() -> server.stop()).start();
+                    new SchedulerThreadFactory("MockServer Stop").newThread(() -> server.stop()).start();
 
                 } else if (request.getMethod().getValue().equals("CONNECT")) {
 

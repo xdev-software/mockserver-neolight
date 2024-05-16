@@ -19,17 +19,13 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.socksx.v5.*;
-import io.netty.handler.ssl.SslHandler;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
-import software.xdev.mockserver.log.model.LogEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.AUTHENTICATION_FAILED;
 import static software.xdev.mockserver.netty.unification.PortUnificationHandler.isSslEnabledUpstream;
 
 @ChannelHandler.Sharable

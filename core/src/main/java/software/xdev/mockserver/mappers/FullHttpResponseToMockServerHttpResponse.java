@@ -20,12 +20,10 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.cookie.ClientCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import software.xdev.mockserver.codec.BodyDecoderEncoder;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.Set;
 

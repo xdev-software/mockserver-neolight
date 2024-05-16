@@ -19,11 +19,10 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.log.MockServerEventLog;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.scheduler.Scheduler;
+import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.stop.Stoppable;
 
 import java.net.InetSocketAddress;
@@ -40,9 +39,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.configuration.Configuration.configuration;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.SERVER_CONFIGURATION;
 import static software.xdev.mockserver.mock.HttpState.setPort;
-import static org.slf4j.event.Level.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +60,8 @@ public abstract class LifeCycle implements Stoppable {
 
     protected LifeCycle(Configuration configuration) {
         this.configuration = configuration != null ? configuration : configuration();
-        this.bossGroup = new NioEventLoopGroup(5, new Scheduler.SchedulerThreadFactory(this.getClass().getSimpleName() + "-bossEventLoop"));
-        this.workerGroup = new NioEventLoopGroup(this.configuration.nioEventLoopThreadCount(), new Scheduler.SchedulerThreadFactory(this.getClass().getSimpleName() + "-workerEventLoop"));
+        this.bossGroup = new NioEventLoopGroup(5, new SchedulerThreadFactory(this.getClass().getSimpleName() + "-bossEventLoop"));
+        this.workerGroup = new NioEventLoopGroup(this.configuration.nioEventLoopThreadCount(), new SchedulerThreadFactory(this.getClass().getSimpleName() + "-workerEventLoop"));
         this.scheduler = new Scheduler(this.configuration);
         this.httpState = new HttpState(this.configuration, this.scheduler);
     }
@@ -75,7 +72,7 @@ public abstract class LifeCycle implements Stoppable {
             if (LOG.isInfoEnabled()) {
                 LOG.info(message);
             }
-            new Scheduler.SchedulerThreadFactory("Stop").newThread(() -> {
+            new SchedulerThreadFactory("Stop").newThread(() -> {
                 List<ChannelFuture> collect = serverChannelFutures
                     .stream()
                     .flatMap(channelFuture -> {
@@ -186,7 +183,7 @@ public abstract class LifeCycle implements Stoppable {
             try {
                 final CompletableFuture<Channel> channelOpened = new CompletableFuture<>();
                 channelFutures.add(channelOpened);
-                new Scheduler.SchedulerThreadFactory("MockServer thread for port: " + portToBind, false).newThread(() -> {
+                new SchedulerThreadFactory("MockServer thread for port: " + portToBind, false).newThread(() -> {
                     try {
                         InetSocketAddress inetSocketAddress;
                         if (isBlank(localBoundIP)) {

@@ -25,11 +25,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslProvider;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.util.AttributeKey;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.LoggingHandler;
 import software.xdev.mockserver.mock.action.ExpectationCallback;
 import software.xdev.mockserver.mock.action.ExpectationForwardAndResponseCallback;
@@ -43,17 +39,14 @@ import software.xdev.mockserver.serialization.model.WebSocketErrorDTO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
-import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import static software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry.WEB_SOCKET_CORRELATION_ID_HEADER_NAME;
-import static org.slf4j.event.Level.TRACE;
-import static org.slf4j.event.Level.WARN;
+
 
 @SuppressWarnings("rawtypes")
 public class WebSocketClient<T extends HttpMessage> {

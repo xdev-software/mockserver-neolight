@@ -18,11 +18,9 @@ package software.xdev.mockserver.netty.proxy.relay;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.FullHttpResponse;
-import software.xdev.mockserver.log.model.LogEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ClosedSelectorException;

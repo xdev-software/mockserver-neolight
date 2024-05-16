@@ -15,11 +15,8 @@
  */
 package software.xdev.mockserver.cli;
 
-import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.configuration.IntegerStringListParser;
 import software.xdev.mockserver.configuration.ServerConfigurationProperties;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.logging.MockServerLoggerConfiguration;
 import software.xdev.mockserver.netty.MockServer;
 
@@ -30,9 +27,7 @@ import java.util.stream.Collectors;
 import static software.xdev.mockserver.util.StringUtils.*;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.cli.Main.Arguments.*;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.SERVER_CONFIGURATION;
 import static software.xdev.mockserver.mock.HttpState.setPort;
-import static org.slf4j.event.Level.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -306,7 +301,7 @@ public class Main {
         }
     }
 
-    static class CaseInsensitiveList extends ArrayList<String> {
+    public static class CaseInsensitiveList extends ArrayList<String> {
 
         CaseInsensitiveList() {
             super();

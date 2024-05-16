@@ -24,17 +24,14 @@ import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.codec.BodyDecoderEncoder;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.url.URLParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Set;
 

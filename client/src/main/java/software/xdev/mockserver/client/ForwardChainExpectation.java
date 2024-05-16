@@ -27,7 +27,7 @@ import software.xdev.mockserver.mock.action.ExpectationForwardAndResponseCallbac
 import software.xdev.mockserver.mock.action.ExpectationForwardCallback;
 import software.xdev.mockserver.mock.action.ExpectationResponseCallback;
 import software.xdev.mockserver.model.*;
-import software.xdev.mockserver.scheduler.Scheduler;
+import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.uuid.UUIDService;
 
 import java.util.concurrent.Future;
@@ -265,7 +265,7 @@ public class ForwardChainExpectation {
             LocalCallbackRegistry.registerCallback(clientId, expectationCallback);
             LocalCallbackRegistry.registerCallback(clientId, expectationForwardResponseCallback);
             final WebSocketClient<T> webSocketClient = new WebSocketClient<>(
-                new NioEventLoopGroup(configuration.webSocketClientEventLoopThreadCount(), new Scheduler.SchedulerThreadFactory(WebSocketClient.class.getSimpleName() + "-eventLoop")),
+                new NioEventLoopGroup(configuration.webSocketClientEventLoopThreadCount(), new SchedulerThreadFactory(WebSocketClient.class.getSimpleName() + "-eventLoop")),
                 clientId
             );
             final Future<String> register = webSocketClient.registerExpectationCallback(

@@ -17,14 +17,11 @@ package software.xdev.mockserver.mock.action.http;
 
 import software.xdev.mockserver.httpclient.NettyHttpClient;
 import software.xdev.mockserver.filters.HopByHopHeaderFilter;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
-import software.xdev.mockserver.model.Protocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;

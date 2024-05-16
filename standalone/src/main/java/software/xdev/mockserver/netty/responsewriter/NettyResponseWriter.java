@@ -19,17 +19,12 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.configuration.ConfigurationProperties;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.responsewriter.ResponseWriter;
 import software.xdev.mockserver.scheduler.Scheduler;
-
-import static org.slf4j.event.Level.TRACE;
-import static org.slf4j.event.Level.WARN;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

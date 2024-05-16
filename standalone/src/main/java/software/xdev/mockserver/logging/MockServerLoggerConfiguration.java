@@ -23,12 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.logging.LogManager;
 
-import org.slf4j.Logger;
-import org.slf4j.event.Level;
-
-import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.configuration.ServerConfigurationProperties;
-import software.xdev.mockserver.log.model.LogEntry;
 
 
 public final class MockServerLoggerConfiguration

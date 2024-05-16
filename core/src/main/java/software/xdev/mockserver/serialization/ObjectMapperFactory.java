@@ -16,8 +16,11 @@
 package software.xdev.mockserver.serialization;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import software.xdev.mockserver.exception.ExceptionHandling;
@@ -36,7 +39,6 @@ import software.xdev.mockserver.serialization.serializers.collections.HeadersSer
 import software.xdev.mockserver.serialization.serializers.collections.ParametersSerializer;
 import software.xdev.mockserver.serialization.serializers.condition.VerificationTimesDTOSerializer;
 import software.xdev.mockserver.serialization.serializers.condition.VerificationTimesSerializer;
-import software.xdev.mockserver.serialization.serializers.matcher.HttpRequestPropertiesMatcherSerializer;
 import software.xdev.mockserver.serialization.serializers.request.HttpRequestDTOSerializer;
 import software.xdev.mockserver.serialization.serializers.response.HttpResponseSerializer;
 import software.xdev.mockserver.serialization.serializers.response.*;
@@ -45,7 +47,7 @@ import software.xdev.mockserver.serialization.serializers.string.NottableStringS
 import java.util.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class ObjectMapperFactory {
+public final class ObjectMapperFactory {
 
     private static ObjectMapper objectMapper = buildObjectMapperWithDeserializerAndSerializers(Collections.emptyList(), Collections.emptyList(), false);
     private static final ObjectWriter prettyPrintWriter = buildObjectMapperWithDeserializerAndSerializers(Collections.emptyList(), Collections.emptyList(), false).writerWithDefaultPrettyPrinter();
@@ -57,17 +59,6 @@ public class ObjectMapperFactory {
             objectMapper = buildObjectMapperWithDeserializerAndSerializers(Collections.emptyList(), Collections.emptyList(), false);
         }
         return objectMapper;
-    }
-
-    public static ObjectMapper createObjectMapper(JsonSerializer... additionJsonSerializers) {
-        if (additionJsonSerializers == null || additionJsonSerializers.length == 0) {
-            if (objectMapper == null) {
-                objectMapper = buildObjectMapperWithDeserializerAndSerializers(Collections.emptyList(), Collections.emptyList(), false);
-            }
-            return objectMapper;
-        } else {
-            return buildObjectMapperWithDeserializerAndSerializers(Collections.emptyList(), Arrays.asList(additionJsonSerializers), false);
-        }
     }
 
     public static ObjectMapper createObjectMapper(JsonDeserializer... replacementJsonDeserializers) {
@@ -99,61 +90,45 @@ public class ObjectMapperFactory {
         }
     }
 
-    @SuppressWarnings("deprecation")
     public static ObjectMapper buildObjectMapperWithoutRemovingEmptyValues() {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // ignore failures
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS, false));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, false));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(MapperFeature.REQUIRE_SETTERS_FOR_GETTERS, false));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(MapperFeature.AUTO_DETECT_GETTERS, true));
-
-        // relax parsing
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_YAML_COMMENTS, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_MISSING_VALUES, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.ALLOW_TRAILING_COMMA, true));
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(JsonParser.Feature.IGNORE_UNDEFINED, true));
-
-        // use arrays
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true));
-
-        // consistent json output
-        ExceptionHandling.handleThrowable(() -> objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true));
-
-        return objectMapper;
+        return new ObjectMapper(JsonFactory.builder()
+            // relax parsing
+            .configure(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS, true)
+            .configure(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
+            .configure(JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS, true)
+            .configure(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS, true)
+            .configure(JsonReadFeature.ALLOW_MISSING_VALUES, true)
+            .configure(JsonReadFeature.ALLOW_TRAILING_COMMA, true)
+            .build())
+            // ignore failures
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+            .configure(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS, false)
+            .configure(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, false)
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            // relax parsing
+            .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+            .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true)
+            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+            .configure(JsonParser.Feature.ALLOW_YAML_COMMENTS, true)
+            .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+            .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+            .configure(JsonParser.Feature.IGNORE_UNDEFINED, true)
+            // use arrays
+            .configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true)
+            // consistent json output
+            .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
     }
 
     public static ObjectMapper buildObjectMapperWithOnlyConfigurationDefaults() {
-        ObjectMapper objectMapper = buildObjectMapperWithoutRemovingEmptyValues();
-
-        // remove empty values from JSON
-        ExceptionHandling.handleThrowable(() -> objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT));
-        ExceptionHandling.handleThrowable(() -> objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL));
-        ExceptionHandling.handleThrowable(() -> objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY));
-
-        // add support for java date time serialisation and de-serialisation
-        objectMapper.registerModule(new JavaTimeModule());
-
-        return objectMapper;
+        return buildObjectMapperWithoutRemovingEmptyValues()
+            // remove empty values from JSON
+            .setSerializationInclusion(JsonInclude.Include.NON_DEFAULT)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+            // add support for java date time serialisation and de-serialisation
+            .registerModule(new JavaTimeModule());
     }
 
     private static ObjectMapper buildObjectMapperWithDeserializerAndSerializers(List<JsonDeserializer> replacementJsonDeserializers, List<JsonSerializer> replacementJsonSerializers, boolean serialiseDefaultValues) {
@@ -228,10 +203,11 @@ public class ObjectMapperFactory {
             // key and multivalue
             new HeadersSerializer(),
             new ParametersSerializer(),
-            new CookiesSerializer(),
-            // matcher
-            new HttpRequestPropertiesMatcherSerializer()
+            new CookiesSerializer()
         );
+        customizers().stream()
+            .flatMap(c -> c.additionalSerializers().stream())
+            .forEach(jsonSerializers::add);
         Map<Class, JsonSerializer> jsonSerializersByType = new HashMap<>();
         for (JsonSerializer jsonSerializer : jsonSerializers) {
             jsonSerializersByType.put(jsonSerializer.handledType(), jsonSerializer);
@@ -243,6 +219,20 @@ public class ObjectMapperFactory {
         for (Map.Entry<Class, JsonSerializer> additionJsonSerializer : jsonSerializersByType.entrySet()) {
             module.addSerializer(additionJsonSerializer.getKey(), additionJsonSerializer.getValue());
         }
+    }
+    
+    private static List<ObjectMapperFactoryCustomizer> _customizers;
+    
+    private static List<ObjectMapperFactoryCustomizer> customizers() {
+        if(_customizers == null) {
+            _customizers =  ServiceLoader.load(ObjectMapperFactoryCustomizer.class).stream()
+                .map(ServiceLoader.Provider::get)
+                .toList();
+        }
+        return _customizers;
+    }
+    
+    private ObjectMapperFactory() {
     }
 
 }

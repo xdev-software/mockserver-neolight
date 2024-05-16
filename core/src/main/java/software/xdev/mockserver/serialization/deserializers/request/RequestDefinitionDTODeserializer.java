@@ -19,7 +19,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.model.BodyDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
@@ -27,9 +26,7 @@ import software.xdev.mockserver.serialization.model.RequestDefinitionDTO;
 
 import java.io.IOException;
 
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.EXCEPTION;
 import static software.xdev.mockserver.model.NottableString.string;
-import static org.slf4j.event.Level.ERROR;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

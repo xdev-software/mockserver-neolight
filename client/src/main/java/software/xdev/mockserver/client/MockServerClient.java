@@ -29,7 +29,7 @@ import software.xdev.mockserver.matchers.Times;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
-import software.xdev.mockserver.scheduler.Scheduler;
+import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.serialization.*;
 import software.xdev.mockserver.stop.Stoppable;
 import software.xdev.mockserver.verify.Verification;
@@ -51,7 +51,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static software.xdev.mockserver.util.StringUtils.*;
 import static software.xdev.mockserver.configuration.ClientConfiguration.clientConfiguration;
 import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
-import static software.xdev.mockserver.mock.HttpState.LOG_SEPARATOR;
 import static software.xdev.mockserver.model.ExpectationId.expectationId;
 import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.model.MediaType.APPLICATION_JSON_UTF_8;
@@ -225,7 +224,7 @@ public class MockServerClient implements Stoppable {
     }
 
     private NioEventLoopGroup eventLoopGroup() {
-        return new NioEventLoopGroup(configuration.clientNioEventLoopThreadCount(), new Scheduler.SchedulerThreadFactory(this.getClass().getSimpleName() + "-eventLoop"));
+        return new NioEventLoopGroup(configuration.clientNioEventLoopThreadCount(), new SchedulerThreadFactory(this.getClass().getSimpleName() + "-eventLoop"));
     }
 
     /**
@@ -489,7 +488,7 @@ public class MockServerClient implements Stoppable {
         if (!stopFuture.isDone()) {
             getMockServerEventBus().publish(EventType.STOP);
             removeMockServerEventBus();
-            new Scheduler.SchedulerThreadFactory("ClientStop").newThread(() -> {
+            new SchedulerThreadFactory("ClientStop").newThread(() -> {
                 try {
                     sendRequest(request().withMethod("PUT").withPath(calculatePath("stop")), false);
                     if (!hasStopped()) {
@@ -1107,35 +1106,6 @@ public class MockServerClient implements Stoppable {
             true
         );
         return httpResponse.getBodyAsString();
-    }
-
-    /**
-     * Retrieve the logs associated to a specific requests, this shows all logs for expectation matching, verification, clearing, etc
-     *
-     * @param requestDefinition the http request that is matched against when deciding whether to return each request, use null for the parameter to retrieve for all requests
-     * @return all log messages recorded by the MockServer when creating expectations, matching expectations, performing verification, clearing logs, etc
-     */
-    public String retrieveLogMessages(RequestDefinition requestDefinition) {
-        HttpResponse httpResponse = sendRequest(
-            request()
-                .withMethod("PUT")
-                .withContentType(APPLICATION_JSON_UTF_8)
-                .withPath(calculatePath("retrieve"))
-                .withQueryStringParameter("type", RetrieveType.LOGS.name())
-                .withBody(requestDefinition != null ? requestDefinitionSerializer.serialize(requestDefinition) : "", StandardCharsets.UTF_8),
-            true
-        );
-        return httpResponse.getBodyAsString();
-    }
-
-    /**
-     * Retrieve the logs associated to a specific requests, this shows all logs for expectation matching, verification, clearing, etc
-     *
-     * @param requestDefinition the http request that is matched against when deciding whether to return each request, use null for the parameter to retrieve for all requests
-     * @return an array of all log messages recorded by the MockServer when creating expectations, matching expectations, performing verification, clearing logs, etc
-     */
-    public String[] retrieveLogMessagesArray(RequestDefinition requestDefinition) {
-        return retrieveLogMessages(requestDefinition).split(LOG_SEPARATOR);
     }
 
     /**

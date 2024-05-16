@@ -23,15 +23,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.BinaryMessage;
 import software.xdev.mockserver.model.BinaryProxyListener;
 import software.xdev.mockserver.scheduler.Scheduler;
-import software.xdev.mockserver.uuid.UUIDService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -41,8 +38,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static software.xdev.mockserver.exception.ExceptionHandling.closeOnFlush;
 import static software.xdev.mockserver.exception.ExceptionHandling.connectionClosedException;
 import static software.xdev.mockserver.formatting.StringFormatter.formatBytes;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.FORWARDED_REQUEST;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.RECEIVED_REQUEST;
 import static software.xdev.mockserver.mock.action.http.HttpActionHandler.getRemoteAddress;
 import static software.xdev.mockserver.model.BinaryMessage.bytes;
 import static software.xdev.mockserver.netty.unification.PortUnificationHandler.isSslEnabledUpstream;

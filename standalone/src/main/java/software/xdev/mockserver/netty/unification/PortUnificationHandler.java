@@ -22,12 +22,10 @@ import io.netty.handler.codec.ReplayingDecoder;
 import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http2.*;
 import io.netty.handler.codec.socksx.v4.Socks4ServerDecoder;
 import io.netty.handler.codec.socksx.v4.Socks4ServerEncoder;
 import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
-import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.AttributeKey;
 import software.xdev.mockserver.util.StringUtils;
@@ -35,12 +33,9 @@ import software.xdev.mockserver.codec.MockServerHttpServerCodec;
 import software.xdev.mockserver.codec.PreserveHeadersNettyRemoves;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.LoggingHandler;
-import software.xdev.mockserver.mappers.MockServerHttpResponseToFullHttpResponse;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
-import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.netty.HttpRequestHandler;
 import software.xdev.mockserver.netty.proxy.BinaryRequestProxyingHandler;
 import software.xdev.mockserver.netty.proxy.socks.Socks4ProxyHandler;
@@ -50,7 +45,6 @@ import software.xdev.mockserver.netty.websocketregistry.CallbackWebSocketServerH
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

@@ -16,12 +16,10 @@
 package software.xdev.mockserver.serialization.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-import static org.slf4j.event.Level.ERROR;
 
 import java.util.Base64;
 

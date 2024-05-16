@@ -21,8 +21,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.matchers.MatchType;
+
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 import software.xdev.mockserver.serialization.model.*;
@@ -33,12 +32,10 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.serialization.ObjectMapperFactory.buildObjectMapperWithoutRemovingEmptyValues;
-import static org.slf4j.event.Level.DEBUG;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

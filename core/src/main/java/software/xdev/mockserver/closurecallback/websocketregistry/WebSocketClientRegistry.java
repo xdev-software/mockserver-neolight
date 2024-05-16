@@ -21,7 +21,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import software.xdev.mockserver.closurecallback.websocketclient.WebSocketException;
 import software.xdev.mockserver.collections.CircularHashMap;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
 import software.xdev.mockserver.model.HttpResponse;
@@ -33,8 +32,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import static software.xdev.mockserver.model.HttpResponse.response;
-import static org.slf4j.event.Level.TRACE;
-import static org.slf4j.event.Level.WARN;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

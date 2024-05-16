@@ -16,7 +16,6 @@
 package software.xdev.mockserver.mock.action.http;
 
 import software.xdev.mockserver.httpclient.NettyHttpClient;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.mock.action.ExpectationCallback;
 import software.xdev.mockserver.mock.action.ExpectationForwardAndResponseCallback;
 import software.xdev.mockserver.mock.action.ExpectationForwardCallback;
@@ -25,7 +24,6 @@ import software.xdev.mockserver.model.HttpRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
