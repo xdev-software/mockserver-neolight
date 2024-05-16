@@ -15,8 +15,6 @@
  */
 package software.xdev.mockserver.configuration;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.Logger;
@@ -24,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -113,38 +112,36 @@ public class ConfigurationProperties {
 
     private static Map<String, String> getSLF4JOrJavaLoggerToJavaLoggerLevelMapping() {
         if (slf4jOrJavaLoggerToJavaLoggerLevelMapping == null) {
-            slf4jOrJavaLoggerToJavaLoggerLevelMapping = ImmutableMap
-                .<String, String>builder()
-                .put("TRACE", "FINEST")
-                .put("DEBUG", "FINE")
-                .put("INFO", "INFO")
-                .put("WARN", "WARNING")
-                .put("ERROR", "SEVERE")
-                .put("FINEST", "FINEST")
-                .put("FINE", "FINE")
-                .put("WARNING", "WARNING")
-                .put("SEVERE", "SEVERE")
-                .put("OFF", "OFF")
-                .build();
+            slf4jOrJavaLoggerToJavaLoggerLevelMapping = Map.ofEntries(
+                Map.entry("TRACE", "FINEST"),
+                Map.entry("DEBUG", "FINE"),
+                Map.entry("INFO", "INFO"),
+                Map.entry("WARN", "WARNING"),
+                Map.entry("ERROR", "SEVERE"),
+                Map.entry("FINEST", "FINEST"),
+                Map.entry("FINE", "FINE"),
+                Map.entry("WARNING", "WARNING"),
+                Map.entry("SEVERE", "SEVERE"),
+                Map.entry("OFF", "OFF")
+            );
         }
         return slf4jOrJavaLoggerToJavaLoggerLevelMapping;
     }
 
     private static Map<String, String> getSLF4JOrJavaLoggerToSLF4JLevelMapping() {
         if (slf4jOrJavaLoggerToSLF4JLevelMapping == null) {
-            slf4jOrJavaLoggerToSLF4JLevelMapping = ImmutableMap
-                .<String, String>builder()
-                .put("FINEST", "TRACE")
-                .put("FINE", "DEBUG")
-                .put("INFO", "INFO")
-                .put("WARNING", "WARN")
-                .put("SEVERE", "ERROR")
-                .put("TRACE", "TRACE")
-                .put("DEBUG", "DEBUG")
-                .put("WARN", "WARN")
-                .put("ERROR", "ERROR")
-                .put("OFF", "ERROR")
-                .build();
+            slf4jOrJavaLoggerToSLF4JLevelMapping = Map.ofEntries(
+                Map.entry("FINEST", "TRACE"),
+                Map.entry("FINE", "DEBUG"),
+                Map.entry("INFO", "INFO"),
+                Map.entry("WARNING", "WARN"),
+                Map.entry("SEVERE", "ERROR"),
+                Map.entry("TRACE", "TRACE"),
+                Map.entry("DEBUG", "DEBUG"),
+                Map.entry("WARN", "WARN"),
+                Map.entry("ERROR", "ERROR"),
+                Map.entry("OFF", "ERROR")
+            );
         }
         return slf4jOrJavaLoggerToSLF4JLevelMapping;
     }
@@ -465,7 +462,7 @@ public class ConfigurationProperties {
      */
     public static void localBoundIP(String localBoundIP) {
         if (isNotBlank(localBoundIP)) {
-            setProperty(MOCKSERVER_LOCAL_BOUND_IP, InetAddresses.forString(localBoundIP).getHostAddress());
+            setProperty(MOCKSERVER_LOCAL_BOUND_IP, localBoundIP);
         }
     }
 

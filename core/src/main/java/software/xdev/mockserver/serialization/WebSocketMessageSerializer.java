@@ -18,7 +18,6 @@ package software.xdev.mockserver.serialization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.google.common.collect.ImmutableMap;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
 import software.xdev.mockserver.model.HttpResponse;
@@ -35,7 +34,7 @@ public class WebSocketMessageSerializer {
     private Map<Class, Serializer> serializers;
 
     public WebSocketMessageSerializer() {
-        serializers = ImmutableMap.of(
+        serializers = Map.of(
             HttpRequest.class, new HttpRequestSerializer(),
             HttpResponse.class, new HttpResponseSerializer(),
             HttpRequestAndHttpResponse.class, new HttpRequestAndHttpResponseSerializer()

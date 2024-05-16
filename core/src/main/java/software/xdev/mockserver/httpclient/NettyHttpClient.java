@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.httpclient;
 
-import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -64,7 +63,10 @@ public class NettyHttpClient {
     public NettyHttpClient(Configuration configuration, EventLoopGroup eventLoopGroup, List<ProxyConfiguration> proxyConfigurations, boolean forwardProxyClient) {
         this.configuration = configuration;
         this.eventLoopGroup = eventLoopGroup;
-        this.proxyConfigurations = proxyConfigurations != null ? proxyConfigurations.stream().collect(Collectors.toMap(ProxyConfiguration::getType, proxyConfiguration -> proxyConfiguration)) : ImmutableMap.of();
+        this.proxyConfigurations = proxyConfigurations != null
+            ? proxyConfigurations.stream()
+            .collect(Collectors.toMap(ProxyConfiguration::getType, proxyConfiguration -> proxyConfiguration))
+            : Map.of();
         this.forwardProxyClient = forwardProxyClient;
     }
 

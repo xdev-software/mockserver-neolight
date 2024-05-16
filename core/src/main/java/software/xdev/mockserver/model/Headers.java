@@ -15,10 +15,10 @@
  */
 package software.xdev.mockserver.model;
 
-import com.google.common.collect.Multimap;
-
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
 
 public class Headers extends KeysToMultiValues<Header, Headers> {
 
@@ -30,7 +30,7 @@ public class Headers extends KeysToMultiValues<Header, Headers> {
         withEntries(headers);
     }
 
-    public Headers(Multimap<NottableString, NottableString> headers) {
+    public Headers(Map<NottableString, List<NottableString>> headers) {
         super(headers);
     }
 

@@ -16,7 +16,6 @@
 package software.xdev.mockserver.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Joiner;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -177,14 +176,6 @@ public class NottableString extends ObjectWithJsonToString implements Comparable
         }
         this.parameterStyle = style;
         return this;
-    }
-
-    NottableString capitalize() {
-        final String[] split = (value + "_").split("-");
-        for (int i = 0; i < split.length; i++) {
-            split[i] = StringUtils.capitalize(split[i]);
-        }
-        return new NottableString(StringUtils.substringBeforeLast(Joiner.on("-").join(split), "_"), not);
     }
 
     public NottableString lowercase() {

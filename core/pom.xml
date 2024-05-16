@@ -139,12 +139,6 @@
 			<version>3.14.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>33.2.0-jre</version>
-		</dependency>
-
 		<!-- TODO: Remove with logging -->
 		<dependency>
 			<groupId>com.lmax</groupId>

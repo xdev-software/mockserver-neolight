@@ -16,7 +16,6 @@
 package software.xdev.mockserver.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Multimap;
 import io.netty.handler.codec.http.cookie.ClientCookieDecoder;
 
 import java.nio.charset.Charset;
@@ -331,7 +330,7 @@ public class HttpResponse extends Action<HttpResponse> implements HttpMessage<Ht
         }
     }
 
-    public Multimap<NottableString, NottableString> getHeaderMultimap() {
+    public Map<NottableString, List<NottableString>> getHeaderMultimap() {
         if (this.headers != null) {
             return this.headers.getMultimap();
         } else {

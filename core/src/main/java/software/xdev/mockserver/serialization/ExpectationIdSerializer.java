@@ -18,7 +18,6 @@ package software.xdev.mockserver.serialization;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.google.common.base.Joiner;
 import software.xdev.mockserver.model.ExpectationId;
 
 import java.util.ArrayList;
@@ -100,7 +99,9 @@ public class ExpectationIdSerializer implements Serializer<ExpectationId> {
 
                 }
                 if (!validationErrorsList.isEmpty()) {
-                    throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "") + Joiner.on("," + NEW_LINE).join(validationErrorsList) + (validationErrorsList.size() > 1 ? "]" : ""));
+                    throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
+                        + String.join("," + NEW_LINE, validationErrorsList)
+                        + (validationErrorsList.size() > 1 ? "]" : ""));
                 }
             }
         }

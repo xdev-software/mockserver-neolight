@@ -103,11 +103,13 @@ public class MockServerHttpResponseToFullHttpResponse {
         if (httpResponse.getHeaderMultimap() != null) {
             httpResponse
                 .getHeaderMultimap()
-                .entries()
+                .entrySet()
+                .stream()
+                .flatMap(e -> e.getValue().stream().map(e2 -> Map.entry(e.getKey(), e2.getValue())))
                 .forEach(entry ->
                     response
                         .headers()
-                        .add(entry.getKey().getValue(), entry.getValue().getValue())
+                        .add(entry.getKey().getValue(), entry.getValue())
                 );
         }
 

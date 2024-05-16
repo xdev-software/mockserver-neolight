@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import com.google.common.base.Strings;
 import software.xdev.mockserver.model.NottableString;
 import software.xdev.mockserver.model.Parameter;
 
@@ -29,7 +28,7 @@ public class ParameterToJavaSerializer implements MultiValueToJavaSerializer<Par
     @Override
     public String serialize(int numberOfSpacesToIndent, Parameter parameter) {
         StringBuilder output = new StringBuilder();
-        output.append(NEW_LINE).append(Strings.padStart("", numberOfSpacesToIndent * INDENT_SIZE, ' '));
+        output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent * INDENT_SIZE));
         String serializedKey = NottableStringToJavaSerializer.serialize(parameter.getName(), false);
         output.append("new Parameter(").append(serializedKey);
         for (NottableString value : parameter.getValues()) {

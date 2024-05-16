@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.codec;
 
-import com.google.common.base.Joiner;
 import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.NottableString;
@@ -26,33 +25,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
 public class PathParametersDecoder {
 
     private static final Pattern PATH_VARIABLE_NAME_PATTERN = Pattern.compile("\\{[.;]?([^*]+)\\*?}");
-
-    public String validatePath(HttpRequest matcher) {
-        String error = "";
-        if (matcher.getPath() != null) {
-            if (matcher.getPathParameters() != null && !matcher.getPathParameters().isEmpty()) {
-                List<String> actualParameterNames = new ArrayList<>();
-                for (String matcherPathPart : matcher.getPath().getValue().split("/")) {
-                    Matcher pathParameterName = PATH_VARIABLE_NAME_PATTERN.matcher(matcherPathPart);
-                    if (pathParameterName.matches()) {
-                        actualParameterNames.add(pathParameterName.group(1));
-                    }
-                }
-                List<String> expectedParameterNames = matcher.getPathParameters().keySet().stream().map(NottableString::getValue).collect(Collectors.toList());
-                if (!expectedParameterNames.equals(actualParameterNames)) {
-                    error = "path parameters specified " + expectedParameterNames + " but found " + actualParameterNames + " in path matcher";
-                }
-            }
-        }
-        return error;
-    }
 
     public NottableString normalisePathWithParametersForMatching(HttpRequest matcher) {
         NottableString result = null;
@@ -69,7 +47,7 @@ public class PathParametersDecoder {
                             pathParts.add(pathPart);
                         }
                     }
-                    result = string(Joiner.on("/").join(pathParts) + (value.endsWith("/") ? "/" : ""));
+                    result = string(String.join("/", pathParts) + (value.endsWith("/") ? "/" : ""));
                 } else {
                     result = matcher.getPath();
                 }

@@ -15,10 +15,10 @@
  */
 package software.xdev.mockserver.model;
 
-import com.google.common.collect.Multimap;
-
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
 
 public class Parameters extends KeysToMultiValues<Parameter, Parameters> {
 
@@ -32,7 +32,7 @@ public class Parameters extends KeysToMultiValues<Parameter, Parameters> {
         withEntries(parameters);
     }
 
-    public Parameters(Multimap<NottableString, NottableString> headers) {
+    public Parameters(Map<NottableString, List<NottableString>> headers) {
         super(headers);
     }
 

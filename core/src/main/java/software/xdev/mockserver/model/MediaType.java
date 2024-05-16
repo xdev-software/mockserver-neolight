@@ -15,10 +15,6 @@
  */
 package software.xdev.mockserver.model;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.serialization.ObjectMapperFactory;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -29,8 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.*;
-import static org.slf4j.event.Level.DEBUG;
-import static org.slf4j.event.Level.WARN;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +117,7 @@ public class MediaType extends ObjectWithJsonToString {
             Map<String, String> parameterMap = new ConcurrentHashMap<>();
             if (isNotBlank(parameters)) {
                 try {
-                    for (String parameter : Splitter.on(';').split(parameters)) {
+                    for (String parameter : parameters.split(";")) {
                         String parameterTrimmed = parameter.trim();
                         String key = substringBefore(parameterTrimmed, "=").trim();
                         String value = substringAfter(parameterTrimmed, "=").trim();
@@ -213,10 +207,12 @@ public class MediaType extends ObjectWithJsonToString {
             stringBuilder.append(type).append(TYPE_SEPARATOR).append(subtype);
         }
         if (!parameters.isEmpty()) {
-            if (stringBuilder.length() > 0) {
+            if (!stringBuilder.isEmpty()) {
                 stringBuilder.append(PARAMETER_START).append(' ');
             }
-            stringBuilder.append(Joiner.on("; ").withKeyValueSeparator("=").join(parameters));
+            stringBuilder.append(parameters.entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining("; ")));
         }
         return stringBuilder.toString();
     }

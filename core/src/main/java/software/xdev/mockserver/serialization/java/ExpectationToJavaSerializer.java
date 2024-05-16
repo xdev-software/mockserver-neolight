@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import com.google.common.base.Strings;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.RequestDefinition;
@@ -105,6 +104,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
     }
 
     private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
-        return output.append(NEW_LINE).append(Strings.padStart("", numberOfSpacesToIndent, ' '));
+        return output.append(NEW_LINE)
+            .append(" ".repeat(numberOfSpacesToIndent));
     }
 }

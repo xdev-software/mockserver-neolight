@@ -67,7 +67,7 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
             return Base64.getEncoder().encodeToString(typedDTO.getBase64Bytes());
         } else if (body instanceof ParameterBodyDTO typedDTO) {
             try {
-                return OBJECT_MAPPER.writeValueAsString(typedDTO.getParameters().getMultimap().asMap());
+                return OBJECT_MAPPER.writeValueAsString(typedDTO.getParameters().getMultimap());
             } catch (Exception ex) {
                 LOG.error("Serialising parameter body into json string for javascript template {}",
                     (isNotBlank(ex.getMessage()) ? " " + ex.getMessage() : ""),

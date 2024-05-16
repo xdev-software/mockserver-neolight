@@ -15,17 +15,15 @@
  */
 package software.xdev.mockserver.configuration;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import software.xdev.mockserver.log.model.LogEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class IntegerStringListParser {
     
@@ -37,7 +35,7 @@ public class IntegerStringListParser {
 
     List<Integer> toList(String integers) {
         List<Integer> integerList = new ArrayList<Integer>();
-        for (String integer : Splitter.on(",").split(integers)) {
+        for (String integer : integers.split(",")) {
             try {
                 integerList.add(Integer.parseInt(integer.trim()));
             } catch (NumberFormatException nfe) {
@@ -52,6 +50,8 @@ public class IntegerStringListParser {
     }
 
     public String toString(List<Integer> integers) {
-        return Joiner.on(",").join(integers);
+        return integers.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(","));
     }
 }

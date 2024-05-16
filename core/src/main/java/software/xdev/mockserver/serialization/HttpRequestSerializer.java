@@ -18,15 +18,9 @@ package software.xdev.mockserver.serialization;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.google.common.base.Joiner;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestPrettyPrintedDTO;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,7 +135,9 @@ public class HttpRequestSerializer implements Serializer<HttpRequest> {
 
                 }
                 if (!validationErrorsList.isEmpty()) {
-                    throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "") + Joiner.on("," + NEW_LINE).join(validationErrorsList) + (validationErrorsList.size() > 1 ? "]" : ""));
+                    throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
+                        + String.join("," + NEW_LINE, validationErrorsList)
+                        + (validationErrorsList.size() > 1 ? "]" : ""));
                 }
             }
         }

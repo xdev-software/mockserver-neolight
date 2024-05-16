@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.codec;
 
-import com.google.common.collect.ImmutableList;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -35,10 +34,10 @@ public class PreserveHeadersNettyRemoves extends MessageToMessageDecoder<HttpObj
 
     @Override
     protected void decode(ChannelHandlerContext ctx, HttpObject httpObject, List<Object> out) throws Exception {
-        if (httpObject instanceof HttpMessage) {
-            final HttpHeaders headers = ((HttpMessage) httpObject).headers();
+        if (httpObject instanceof HttpMessage httpMessage) {
+            final HttpHeaders headers = httpMessage.headers();
             if (headers.contains(HttpHeaderNames.CONTENT_ENCODING)) {
-                ctx.channel().attr(PRESERVED_HEADERS).set(ImmutableList.of(
+                ctx.channel().attr(PRESERVED_HEADERS).set(List.of(
                     new Header(HttpHeaderNames.CONTENT_ENCODING.toString(), headers.getAll(HttpHeaderNames.CONTENT_ENCODING))
                 ));
             }
@@ -50,9 +49,8 @@ public class PreserveHeadersNettyRemoves extends MessageToMessageDecoder<HttpObj
     public static List<Header> preservedHeaders(Channel channel) {
         if (channel.attr(PRESERVED_HEADERS) != null && channel.attr(PRESERVED_HEADERS).get() != null) {
             return channel.attr(PRESERVED_HEADERS).get();
-        } else {
-            return ImmutableList.of();
         }
+        return List.of();
     }
 
 }

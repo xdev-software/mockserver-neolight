@@ -22,16 +22,13 @@ import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.uuid.UUIDService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.List;
 
-import static com.google.common.net.HttpHeaders.HOST;
 import static software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient.CLIENT_REGISTRATION_ID_HEADER;
 
 @ChannelHandler.Sharable
@@ -81,7 +78,7 @@ public class EchoWebSocketServerHandler extends ChannelInboundHandlerAdapter {
 
     private void upgradeChannel(final ChannelHandlerContext ctx, FullHttpRequest httpRequest) {
         handshaker = new WebSocketServerHandshakerFactory(
-            "ws://" + httpRequest.headers().get(HOST) + UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI,
+            "ws://" + httpRequest.headers().get("Host") + UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI,
             null,
             true,
             Integer.MAX_VALUE

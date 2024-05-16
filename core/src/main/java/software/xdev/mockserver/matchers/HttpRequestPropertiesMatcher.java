@@ -18,12 +18,10 @@ package software.xdev.mockserver.matchers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.google.common.base.Joiner;
 import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.codec.PathParametersDecoder;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 import software.xdev.mockserver.serialization.deserializers.body.StrictBodyDTODeserializer;
@@ -31,7 +29,6 @@ import software.xdev.mockserver.serialization.model.BodyDTO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.Collections;
 import java.util.List;
@@ -320,7 +317,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
             if (context != null && context.getDifferences(fieldName) != null && !context.getDifferences(fieldName).isEmpty()) {
                 becauseBuilder
                     .append(COLON_NEW_LINES)
-                    .append(Joiner.on(NEW_LINE).join(context.getDifferences(fieldName)));
+                    .append(String.join(NEW_LINE, context.getDifferences(fieldName)));
             }
         }
         if (!fieldMatches) {

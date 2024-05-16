@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import com.google.common.base.Strings;
 import software.xdev.mockserver.matchers.TimeToLive;
 
 import static software.xdev.mockserver.character.Character.NEW_LINE;
@@ -39,6 +38,6 @@ public class TimeToLiveToJavaSerializer implements ToJavaSerializer<TimeToLive> 
     }
 
     private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
-        return output.append(NEW_LINE).append(Strings.padStart("", numberOfSpacesToIndent, ' '));
+        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

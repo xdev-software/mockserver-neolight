@@ -15,28 +15,26 @@
  */
 package software.xdev.mockserver.logging;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 
+
 public class BinaryArrayFormatter {
 
     public static String byteArrayToString(byte[] bytes) {
         if (bytes != null && bytes.length > 0) {
-            return "base64:" + NEW_LINE + "  " + Joiner.on("\n  ").join(Splitter
-                .fixedLength(64)
-                .split(Base64.getEncoder().encodeToString(bytes))) + NEW_LINE +
-                "hex:" + NEW_LINE + "  " + Joiner.on("\n  ").join(Splitter
-                .fixedLength(64)
-                .split(bytesToHex(bytes)));
+            return "base64:" + NEW_LINE + "  " + formatFixedLength(Base64.getEncoder().encodeToString(bytes)) + NEW_LINE +
+                "hex:" + NEW_LINE + "  " + formatFixedLength(bytesToHex(bytes));
         } else {
             return "base64:" + NEW_LINE + NEW_LINE +
                 "hex:" + NEW_LINE;
         }
+    }
+    
+    private static String formatFixedLength(String s) {
+        return String.join("\n", s.split("(?<=\\G.{64})"));
     }
     
     private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes(StandardCharsets.US_ASCII);

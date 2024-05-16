@@ -16,7 +16,6 @@
 package software.xdev.mockserver.cli;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.configuration.IntegerStringListParser;
 import software.xdev.mockserver.log.model.LogEntry;
@@ -233,11 +232,11 @@ public class Main {
                 maxLengthMessage = errorMessage.length();
             }
         }
-        systemOut.println(NEW_LINE + "   " + Strings.padEnd("", maxLengthMessage, '='));
+        systemOut.println(NEW_LINE + "   " + "=".repeat(maxLengthMessage));
         for (String errorMessage : errorMessages) {
             systemOut.println("   " + errorMessage);
         }
-        systemOut.println("   " + Strings.padEnd("", maxLengthMessage, '=') + NEW_LINE);
+        systemOut.println("   " + "=".repeat(maxLengthMessage) + NEW_LINE);
     }
 
     private static void showUsage(String errorMessage) {

@@ -15,10 +15,7 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import software.xdev.mockserver.model.*;
-import software.xdev.mockserver.serialization.Base64Converter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,8 +24,6 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
 public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<HttpRequestModifier> {
-
-    private final Base64Converter base64Converter = new Base64Converter();
 
     public String serialize(List<HttpRequestModifier> httpRequestModifiers) {
         StringBuilder output = new StringBuilder();
@@ -108,7 +103,10 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 
     private void outputList(int numberOfSpacesToIndent, StringBuffer output, List<String> add) {
         if (add != null && !add.isEmpty()) {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("ImmutableList.of(").append(Joiner.on(",").join(add.stream().map(s -> "\"" + s + "\"").collect(Collectors.toList()))).append(")");
+            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output)
+                .append("List.of(")
+                .append(add.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(",")))
+                .append(")");
         } else {
             appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null");
         }
@@ -119,6 +117,6 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
     }
 
     private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
-        return output.append(NEW_LINE).append(Strings.padStart("", numberOfSpacesToIndent, ' '));
+        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }
