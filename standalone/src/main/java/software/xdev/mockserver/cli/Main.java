@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.cli;
 
-import com.google.common.base.Joiner;
 import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.configuration.IntegerStringListParser;
 import software.xdev.mockserver.log.model.LogEntry;
@@ -23,6 +22,7 @@ import software.xdev.mockserver.netty.MockServer;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static software.xdev.mockserver.util.StringUtils.*;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
@@ -135,9 +135,9 @@ public class Main {
 
             if (LOG.isInfoEnabled()) {
                 LOG.info("Using environment variables: {} and system properties: {} and command line options: {}",
-                    "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(environmentVariableArguments) + "\n]",
-                    "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(systemPropertyArguments) + "\n]",
-                    "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(commandLineArguments) + "\n]");
+                    formatArgsForLog(environmentVariableArguments),
+                    formatArgsForLog(systemPropertyArguments),
+                    formatArgsForLog(commandLineArguments));
             }
 
             if (!parsedArguments.isEmpty() && parsedArguments.containsKey(serverPort.name())) {
@@ -166,6 +166,15 @@ public class Main {
                 new RuntimeException("exception while starting: " + ex.getMessage()).printStackTrace(System.err);
             }
         }
+    }
+    
+    static String formatArgsForLog(Map<String, String> args) {
+        return "[\n\t"
+            + args.entrySet()
+            .stream()
+            .map(e -> e.getKey() + "=" + e.getValue())
+            .collect(Collectors.joining(",\n\t"))
+            + "\n]";
     }
 
     private static Map<String, String> parseArguments(String... arguments) {

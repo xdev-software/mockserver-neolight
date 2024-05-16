@@ -15,8 +15,11 @@
  */
 package software.xdev.mockserver.client;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
  * A publish/subscribe communication channel between {@link MockServerClient} and {@link ForwardChainExpectation} instances
@@ -24,7 +27,7 @@ import com.google.common.collect.Multimap;
  * @author albans
  */
 final class MockServerEventBus {
-    private final Multimap<EventType, SubscriberHandler> subscribers = LinkedListMultimap.create();
+    private final Map<EventType, Set<SubscriberHandler>> subscribers = new LinkedHashMap<>();
 
     void publish(EventType event) {
         for (SubscriberHandler subscriber : subscribers.get(event)) {
@@ -34,7 +37,7 @@ final class MockServerEventBus {
 
     public void subscribe(SubscriberHandler subscriber, EventType... events) {
         for (EventType event : events) {
-            subscribers.put(event, subscriber);
+            subscribers.computeIfAbsent(event, x -> new LinkedHashSet<>()).add(subscriber);
         }
     }
 

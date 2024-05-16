@@ -32,12 +32,12 @@ public class SubStringMatcher extends BodyMatcher<NottableString> {
         if (isEmpty(matcher)) {
             return true;
         } else if (matched != null) {
-            if (contains(matched, matcher)) {
+            if (matched.contains(matcher)) {
                 return true;
             }
             // case insensitive comparison is mainly to improve matching in web containers like Tomcat that convert header names to lower case
             if (ignoreCase) {
-                return containsIgnoreCase(matched, matcher);
+                return matched.toLowerCase().contains(matcher.toLowerCase());
             }
         }
 

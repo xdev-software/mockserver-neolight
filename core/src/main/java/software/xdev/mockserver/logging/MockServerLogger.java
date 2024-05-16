@@ -74,24 +74,9 @@ public class MockServerLogger {
         this(MockServerLogger.class);
     }
 
-    public MockServerLogger(final Logger logger) {
-        this.logger = logger;
-        this.httpStateHandler = null;
-    }
-
     public MockServerLogger(final Class<?> loggerClass) {
         this.logger = LoggerFactory.getLogger(loggerClass);
         this.httpStateHandler = null;
-    }
-
-    public MockServerLogger(final HttpState httpStateHandler) {
-        this.logger = null;
-        this.httpStateHandler = httpStateHandler;
-    }
-
-    public MockServerLogger setHttpStateHandler(HttpState httpStateHandler) {
-        this.httpStateHandler = httpStateHandler;
-        return this;
     }
 
     public void logEvent(LogEntry logEntry) {

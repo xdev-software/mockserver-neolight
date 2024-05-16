@@ -26,16 +26,13 @@ import io.netty.util.ReferenceCountUtil;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
 import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.netty.HttpRequestHandler;
 import software.xdev.mockserver.uuid.UUIDService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
-import static com.google.common.net.HttpHeaders.HOST;
 import static software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient.CLIENT_REGISTRATION_ID_HEADER;
 import static software.xdev.mockserver.exception.ExceptionHandling.connectionClosedException;
 import static software.xdev.mockserver.netty.unification.PortUnificationHandler.isSslEnabledUpstream;
@@ -83,7 +80,7 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
 
     private void upgradeChannel(final ChannelHandlerContext ctx, FullHttpRequest httpRequest) {
         handshaker = new WebSocketServerHandshakerFactory(
-            (isSslEnabledUpstream(ctx.channel()) ? "wss" : "ws") + "://" + httpRequest.headers().get(HOST) + UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI,
+            (isSslEnabledUpstream(ctx.channel()) ? "wss" : "ws") + "://" + httpRequest.headers().get("Host") + UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI,
             null,
             true,
             Integer.MAX_VALUE

@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.netty;
 
-import com.google.common.collect.ImmutableList;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelOption;
@@ -72,7 +71,7 @@ public class MockServer extends LifeCycle {
      * @param localPorts         the local port(s) to use, use 0 or no vararg values to specify any free port
      */
     public MockServer(final ProxyConfiguration proxyConfiguration, final Integer... localPorts) {
-        this(null, ImmutableList.of(proxyConfiguration), localPorts);
+        this(null, List.of(proxyConfiguration), localPorts);
     }
 
     /**
@@ -119,7 +118,7 @@ public class MockServer extends LifeCycle {
      * @param remotePort the port of the remote server to connect to
      */
     public MockServer(final Configuration configuration, final ProxyConfiguration proxyConfiguration, String remoteHost, final Integer remotePort, final Integer... localPorts) {
-        this(configuration, ImmutableList.of(proxyConfiguration), remoteHost, remotePort, localPorts);
+        this(configuration, List.of(proxyConfiguration), remoteHost, remotePort, localPorts);
     }
 
     /**

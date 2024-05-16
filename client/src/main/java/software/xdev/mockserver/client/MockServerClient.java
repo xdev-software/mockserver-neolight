@@ -15,11 +15,8 @@
  */
 package software.xdev.mockserver.client;
 
-import com.google.common.collect.ImmutableList;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 import software.xdev.mockserver.authentication.AuthenticationException;
 import software.xdev.mockserver.client.MockServerEventBus.EventType;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
@@ -39,17 +36,12 @@ import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
 import software.xdev.mockserver.verify.VerificationTimes;
 
-import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
@@ -321,7 +313,7 @@ public class MockServerClient implements Stoppable {
             this.nettyHttpClient = new NettyHttpClient(
                 configuration.toServerConfiguration(),
                 eventLoopGroup,
-                proxyConfiguration != null ? ImmutableList.of(proxyConfiguration) : null,
+                proxyConfiguration != null ? List.of(proxyConfiguration) : null,
                 false
             );
         }
