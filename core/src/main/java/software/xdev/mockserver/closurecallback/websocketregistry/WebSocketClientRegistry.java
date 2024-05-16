@@ -22,7 +22,6 @@ import software.xdev.mockserver.closurecallback.websocketclient.WebSocketExcepti
 import software.xdev.mockserver.collections.CircularHashMap;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
 import software.xdev.mockserver.model.HttpResponse;
@@ -37,18 +36,22 @@ import static software.xdev.mockserver.model.HttpResponse.response;
 import static org.slf4j.event.Level.TRACE;
 import static org.slf4j.event.Level.WARN;
 
-public class WebSocketClientRegistry {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+public class WebSocketClientRegistry {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketClientRegistry.class);
+    
     public static final String WEB_SOCKET_CORRELATION_ID_HEADER_NAME = "WebSocketCorrelationId";
-    private final MockServerLogger mockServerLogger;
     private final WebSocketMessageSerializer webSocketMessageSerializer;
     private final Map<String, Channel> clientRegistry;
     private final Map<String, WebSocketResponseCallback> responseCallbackRegistry;
     private final Map<String, WebSocketRequestCallback> forwardCallbackRegistry;
 
-    public WebSocketClientRegistry(Configuration configuration, MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
-        this.webSocketMessageSerializer = new WebSocketMessageSerializer(mockServerLogger);
+    public WebSocketClientRegistry(Configuration configuration) {
+        this.webSocketMessageSerializer = new WebSocketMessageSerializer();
         this.clientRegistry = Collections.synchronizedMap(new CircularHashMap<>(configuration.maxWebSocketExpectations()));
         this.responseCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
         this.forwardCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
@@ -57,30 +60,22 @@ public class WebSocketClientRegistry {
     public void receivedTextWebSocketFrame(TextWebSocketFrame textWebSocketFrame) {
         try {
             Object deserializedMessage = webSocketMessageSerializer.deserialize(textWebSocketFrame.text());
-            if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(TRACE)
-                        .setMessageFormat("received message over websocket{}")
-                        .setArguments(deserializedMessage)
-                );
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Received message over websocket {}", deserializedMessage);
             }
-            if (deserializedMessage instanceof HttpResponse) {
-                HttpResponse httpResponse = (HttpResponse) deserializedMessage;
+            if (deserializedMessage instanceof HttpResponse httpResponse) {
                 String firstHeader = httpResponse.getFirstHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME);
                 WebSocketResponseCallback webSocketResponseCallback = responseCallbackRegistry.get(firstHeader);
                 if (webSocketResponseCallback != null) {
                     webSocketResponseCallback.handle(httpResponse);
                 }
-            } else if (deserializedMessage instanceof HttpRequest) {
-                HttpRequest httpRequest = (HttpRequest) deserializedMessage;
+            } else if (deserializedMessage instanceof HttpRequest httpRequest) {
                 final String firstHeader = httpRequest.getFirstHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME);
                 WebSocketRequestCallback webSocketRequestCallback = forwardCallbackRegistry.get(firstHeader);
                 if (webSocketRequestCallback != null) {
                     webSocketRequestCallback.handle(httpRequest);
                 }
-            } else if (deserializedMessage instanceof WebSocketErrorDTO) {
-                WebSocketErrorDTO webSocketErrorDTO = (WebSocketErrorDTO) deserializedMessage;
+            } else if (deserializedMessage instanceof WebSocketErrorDTO webSocketErrorDTO) {
                 if (forwardCallbackRegistry.containsKey(webSocketErrorDTO.getWebSocketCorrelationId())) {
                     forwardCallbackRegistry
                         .get(webSocketErrorDTO.getWebSocketCorrelationId())
@@ -117,12 +112,8 @@ public class WebSocketClientRegistry {
             throw new WebSocketException("Exception while sending web socket registration client id message to client " + clientId, e);
         }
         clientRegistry.put(clientId, ctx.channel());
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("registering client " + clientId + "")
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Registering client {}", clientId);
         }
     }
 
@@ -132,56 +123,36 @@ public class WebSocketClientRegistry {
         if (removeChannel != null && removeChannel.isOpen()) {
             removeChannel.close();
         }
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("unregistering client " + clientId + "")
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Unregistering client {}", clientId);
         }
     }
 
     public void registerResponseCallbackHandler(String webSocketCorrelationId, WebSocketResponseCallback expectationResponseCallback) {
         responseCallbackRegistry.put(webSocketCorrelationId, expectationResponseCallback);
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("registering response callback " + webSocketCorrelationId)
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Registering response callback {}", webSocketCorrelationId);
         }
     }
 
     public void unregisterResponseCallbackHandler(String webSocketCorrelationId) {
         responseCallbackRegistry.remove(webSocketCorrelationId);
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("unregistering response callback " + webSocketCorrelationId + "")
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Unregistering response callback {}", webSocketCorrelationId);
         }
     }
 
     public void registerForwardCallbackHandler(String webSocketCorrelationId, WebSocketRequestCallback expectationForwardCallback) {
         forwardCallbackRegistry.put(webSocketCorrelationId, expectationForwardCallback);
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("registering forward callback " + webSocketCorrelationId)
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Registering forward callback {}", webSocketCorrelationId);
         }
     }
 
     public void unregisterForwardCallbackHandler(String webSocketCorrelationId) {
         forwardCallbackRegistry.remove(webSocketCorrelationId);
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("unregistering forward callback " + webSocketCorrelationId + "")
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Unregistering forward callback {}", webSocketCorrelationId);
         }
     }
 
@@ -189,41 +160,26 @@ public class WebSocketClientRegistry {
         try {
             if (clientRegistry.containsKey(clientId)) {
                 if (httpResponse == null) {
-                    if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setLogLevel(TRACE)
-                                .setHttpRequest(httpRequest)
-                                .setMessageFormat("sending message{}to client " + clientId)
-                                .setArguments(httpRequest)
-                        );
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Sending message {} to client {}", httpRequest, clientId);
                     }
                     clientRegistry.get(clientId).writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(httpRequest)));
                 } else {
                     HttpRequestAndHttpResponse httpRequestAndHttpResponse = new HttpRequestAndHttpResponse()
                         .withHttpRequest(httpRequest)
                         .withHttpResponse(httpResponse);
-                    if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setLogLevel(TRACE)
-                                .setHttpRequest(httpRequest)
-                                .setMessageFormat("sending message{}to client " + clientId + "")
-                                .setArguments(httpRequestAndHttpResponse)
-                        );
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Sending message {} to client {}", httpRequestAndHttpResponse, clientId);
                     }
                     clientRegistry.get(clientId).writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(httpRequestAndHttpResponse)));
                 }
                 return true;
             } else {
-                if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(WARN)
-                            .setHttpRequest(httpRequest)
-                            .setMessageFormat("client " + clientId + " not found for request{}client registry only contains{}")
-                            .setArguments(httpRequest, clientRegistry)
-                    );
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("Client {} not found for request {} client registry only contains {}",
+                        clientId,
+                        httpRequest,
+                        clientRegistry);
                 }
                 return false;
             }

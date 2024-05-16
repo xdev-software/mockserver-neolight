@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.cache;
 
-import software.xdev.mockserver.logging.MockServerLogger;
 
 import java.util.Collections;
 import java.util.Set;
@@ -33,10 +32,8 @@ public class LRUCache<K, V> {
     private final int maxSize;
     private final ConcurrentHashMap<K, Entry<V>> map;
     private final ConcurrentLinkedQueue<K> queue;
-    private final MockServerLogger mockServerLogger;
 
-    public LRUCache(final MockServerLogger mockServerLogger, final int maxSize, long ttlInMillis) {
-        this.mockServerLogger = mockServerLogger;
+    public LRUCache(final int maxSize, long ttlInMillis) {
         this.maxSize = maxSize;
         this.map = new ConcurrentHashMap<>(maxSize);
         this.queue = new ConcurrentLinkedQueue<>();

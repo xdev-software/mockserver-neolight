@@ -44,7 +44,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
     private Headers headers;
     private Cookies cookies;
     private Boolean keepAlive = null;
-    private Boolean secure = null;
     private Protocol protocol = null;
     private Integer streamId = null;
     private List<X509Certificate> clientCertificateChain;
@@ -71,32 +70,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
      */
     public HttpRequest withKeepAlive(Boolean isKeepAlive) {
         this.keepAlive = isKeepAlive;
-        this.hashCode = 0;
-        return this;
-    }
-
-    public Boolean isSecure() {
-        if (socketAddress != null && socketAddress.getScheme() != null) {
-            if (socketAddress.getScheme() == SocketAddress.Scheme.HTTPS) {
-                secure = true;
-                this.hashCode = 0;
-            }
-        }
-        return secure;
-    }
-
-    /**
-     * Match on whether the request was made over TLS or SSL (i.e. HTTPS)
-     *
-     * @param isSecure true if the request was made with TLS or SSL
-     */
-    public HttpRequest withSecure(Boolean isSecure) {
-        this.secure = isSecure;
-        if (socketAddress != null && socketAddress.getScheme() != null) {
-            if (socketAddress.getScheme() == SocketAddress.Scheme.HTTPS) {
-                secure = true;
-            }
-        }
         this.hashCode = 0;
         return this;
     }
@@ -153,11 +126,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
      */
     public HttpRequest withSocketAddress(SocketAddress socketAddress) {
         this.socketAddress = socketAddress;
-        if (socketAddress != null && socketAddress.getScheme() != null) {
-            if (socketAddress.getScheme() == SocketAddress.Scheme.HTTPS) {
-                secure = true;
-            }
-        }
         this.hashCode = 0;
         return this;
     }
@@ -179,23 +147,12 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
         return this;
     }
 
-    /**
-     * Specify remote address by attempting to derive it from the host header and / or the specified port
-     *
-     * @param host the remote host or ip to send request to
-     * @param port the remote port to send request to
-     */
-    public HttpRequest withSocketAddress(String host, Integer port) {
-        withSocketAddress(secure, host, port);
-        this.hashCode = 0;
-        return this;
-    }
 
     /**
      * Specify remote address by attempting to derive it from the host header
      */
     public HttpRequest withSocketAddressFromHostHeader() {
-        withSocketAddress(secure, getFirstHeader("host"), null);
+        withSocketAddress(getFirstHeader("host"), null);
         this.hashCode = 0;
         return this;
     }
@@ -207,14 +164,11 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
      * @param host     the remote host or ip to send request to
      * @param port     the remote port to send request to
      */
-    public HttpRequest withSocketAddress(Boolean isSecure, String host, Integer port) {
+    public HttpRequest withSocketAddress(String host, Integer port) {
         if (isNotBlank(host)) {
             String[] hostParts = host.split(":");
-            boolean secure = Boolean.TRUE.equals(isSecure);
             if (hostParts.length > 1) {
-                withSocketAddress(hostParts[0], port != null ? port : Integer.parseInt(hostParts[1]), secure ? HTTPS : HTTP);
-            } else if (secure) {
-                withSocketAddress(host, port != null ? port : 443, HTTPS);
+                withSocketAddress(hostParts[0], port != null ? port : Integer.parseInt(hostParts[1]), HTTP);
             } else {
                 withSocketAddress(host, port != null ? port : 80, HTTP);
             }
@@ -311,9 +265,17 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
     }
 
     public boolean matches(final String method, final String... paths) {
+        if(!matches(method))
+        {
+            return false;
+        }
+        return matchesPath(paths);
+    }
+    
+    public boolean matchesPath(final String... paths) {
         boolean matches = false;
         for (String path : paths) {
-            matches = this.method.getValue().equals(method) && this.path.getValue().equals(path);
+            matches = this.path.getValue().equals(path);
             if (matches) {
                 break;
             }
@@ -1017,9 +979,8 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             boolean isSsl = socketAddress.getScheme() != null && socketAddress.getScheme().equals(SocketAddress.Scheme.HTTPS);
             return new InetSocketAddress(socketAddress.getHost(), socketAddress.getPort() != null ? socketAddress.getPort() : isSsl ? 443 : 80);
         } else if (isNotBlank(getFirstHeader(HOST.toString()))) {
-            boolean isSsl = isSecure() != null && isSecure();
             String[] hostHeaderParts = getFirstHeader(HOST.toString()).split(":");
-            return new InetSocketAddress(hostHeaderParts[0], hostHeaderParts.length > 1 ? Integer.parseInt(hostHeaderParts[1]) : isSsl ? 443 : 80);
+            return new InetSocketAddress(hostHeaderParts[0], hostHeaderParts.length > 1 ? Integer.parseInt(hostHeaderParts[1]) : 80);
         } else {
             throw new IllegalArgumentException("Host header must be provided to determine remote socket address, the request does not include the \"Host\" header:" + NEW_LINE + this);
         }
@@ -1035,7 +996,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             .withHeaders(headers)
             .withCookies(cookies)
             .withKeepAlive(keepAlive)
-            .withSecure(secure)
             .withProtocol(protocol)
             .withStreamId(streamId)
             .withClientCertificateChain(clientCertificateChain)
@@ -1055,7 +1015,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             .withHeaders(headers != null ? headers.clone() : null)
             .withCookies(cookies != null ? cookies.clone() : null)
             .withKeepAlive(keepAlive)
-            .withSecure(secure)
             .withProtocol(protocol)
             .withStreamId(streamId)
             .withClientCertificateChain(clientCertificateChain != null && !clientCertificateChain.isEmpty() ? clientCertificateChain.stream().map(X509Certificate::clone).collect(Collectors.toList()) : null)
@@ -1086,9 +1045,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             }
             for (Cookie cookie : requestOverride.getCookieList()) {
                 withCookie(cookie);
-            }
-            if (requestOverride.isSecure() != null) {
-                withSecure(requestOverride.isSecure());
             }
             if (requestOverride.getProtocol() != null) {
                 withProtocol(requestOverride.getProtocol());
@@ -1144,7 +1100,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
             Objects.equals(headers, that.headers) &&
             Objects.equals(cookies, that.cookies) &&
             Objects.equals(keepAlive, that.keepAlive) &&
-            Objects.equals(secure, that.secure) &&
             Objects.equals(protocol, that.protocol) &&
             Objects.equals(streamId, that.streamId) &&
             Objects.equals(clientCertificateChain, that.clientCertificateChain) &&
@@ -1155,10 +1110,8 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 
     @Override
     public int hashCode() {
-        // need to call isSecure because getter can change the hashcode
-        isSecure();
         if (hashCode == 0) {
-            hashCode = Objects.hash(super.hashCode(), method, path, pathParameters, queryStringParameters, body, headers, cookies, keepAlive, secure, protocol, streamId, clientCertificateChain, socketAddress, localAddress, remoteAddress);
+            hashCode = Objects.hash(super.hashCode(), method, path, pathParameters, queryStringParameters, body, headers, cookies, keepAlive, protocol, streamId, clientCertificateChain, socketAddress, localAddress, remoteAddress);
         }
         return hashCode;
     }

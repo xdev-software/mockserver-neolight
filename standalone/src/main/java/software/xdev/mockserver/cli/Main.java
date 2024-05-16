@@ -20,7 +20,6 @@ import com.google.common.base.Strings;
 import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.configuration.IntegerStringListParser;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.netty.MockServer;
 
 import java.io.PrintStream;
@@ -33,7 +32,14 @@ import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.SERVER_
 import static software.xdev.mockserver.mock.HttpState.setPort;
 import static org.slf4j.event.Level.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public class Main {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+    
     static final String USAGE = "" +
         "   java -jar <path to mockserver-netty-jar-with-dependencies.jar> -serverPort <port> [-proxyRemotePort <port>] [-proxyRemoteHost <hostname>] [-logLevel <level>] " + NEW_LINE +
         "                                                                                                                                                                 " + NEW_LINE +
@@ -67,7 +73,6 @@ public class Main {
         "                                                                                                                                                                 " + NEW_LINE +
         "   i.e. java -jar ./mockserver-netty-jar-with-dependencies.jar -serverPort 1080 -proxyRemotePort 80 -proxyRemoteHost www.mock-server.com -logLevel WARN                         " + NEW_LINE +
         "                                                                                                                                                                 " + NEW_LINE;
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(Main.class);
     private static final IntegerStringListParser INTEGER_STRING_LIST_PARSER = new IntegerStringListParser();
     static PrintStream systemErr = System.err;
     static PrintStream systemOut = System.out;
@@ -129,21 +134,14 @@ public class Main {
                 }
             }
 
-            if (MockServerLogger.isEnabled(INFO)) {
-                MOCK_SERVER_LOGGER.logEvent(
-                    new LogEntry()
-                        .setType(SERVER_CONFIGURATION)
-                        .setLogLevel(INFO)
-                        .setMessageFormat("using environment variables:{}and system properties:{}and command line options:{}")
-                        .setArguments(
-                            "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(environmentVariableArguments) + "\n]",
-                            "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(systemPropertyArguments) + "\n]",
-                            "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(commandLineArguments) + "\n]"
-                        )
-                );
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Using environment variables: {} and system properties: {} and command line options: {}",
+                    "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(environmentVariableArguments) + "\n]",
+                    "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(systemPropertyArguments) + "\n]",
+                    "[\n\t" + Joiner.on(",\n\t").withKeyValueSeparator("=").join(commandLineArguments) + "\n]");
             }
 
-            if (parsedArguments.size() > 0 && parsedArguments.containsKey(serverPort.name())) {
+            if (!parsedArguments.isEmpty() && parsedArguments.containsKey(serverPort.name())) {
                 if (parsedArguments.containsKey(logLevel.name())) {
                     ConfigurationProperties.logLevel(parsedArguments.get(logLevel.name()));
                 }
@@ -158,30 +156,15 @@ public class Main {
                     new MockServer(localPorts);
                 }
                 setPort(localPorts);
-
-                if (ConfigurationProperties.logLevel() != null) {
-                    MOCK_SERVER_LOGGER.logEvent(
-                        new LogEntry()
-                            .setType(SERVER_CONFIGURATION)
-                            .setLogLevel(ConfigurationProperties.logLevel())
-                            .setMessageFormat("logger level is " + ConfigurationProperties.logLevel() + ", change using:\n - 'ConfigurationProperties.logLevel(String level)' in Java code,\n - '-logLevel' command line argument,\n - 'mockserver.logLevel' JVM system property or,\n - 'mockserver.logLevel' property value in 'mockserver.properties'")
-                    );
-                }
             } else {
                 showUsage("\"" + serverPort.name() + "\" not specified");
             }
 
-        } catch (Throwable throwable) {
-            MOCK_SERVER_LOGGER.logEvent(
-                new LogEntry()
-                    .setType(SERVER_CONFIGURATION)
-                    .setLogLevel(ERROR)
-                    .setMessageFormat("exception while starting:{}")
-                    .setThrowable(throwable)
-            );
+        } catch (Exception ex) {
+            LOG.error("Exception while starting", ex);
             showUsage(null);
             if (ConfigurationProperties.disableSystemOut()) {
-                new RuntimeException("exception while starting: " + throwable.getMessage()).printStackTrace(System.err);
+                new RuntimeException("exception while starting: " + ex.getMessage()).printStackTrace(System.err);
             }
         }
     }

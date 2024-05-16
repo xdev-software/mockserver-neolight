@@ -23,7 +23,6 @@ import io.netty.handler.ssl.NotSslRecordException;
 import io.netty.util.internal.PlatformDependent;
 import software.xdev.mockserver.httpclient.SocketConnectionException;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -44,79 +43,26 @@ import java.util.regex.Pattern;
 
 import static org.slf4j.event.Level.WARN;
 
-public class ExceptionHandling {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    static MockServerLogger mockServerLogger = new MockServerLogger();
 
+public final class ExceptionHandling {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandling.class);
+    
     private static final Pattern IGNORABLE_CLASS_IN_STACK = Pattern.compile("^.*(?:Socket|Datagram|Sctp|Udt)Channel.*$");
     private static final Pattern IGNORABLE_ERROR_MESSAGE = Pattern.compile("^.*(?:connection.*(?:reset|closed|abort|broken)|broken.*pipe).*$", Pattern.CASE_INSENSITIVE);
-
-
-    public static <T> T handleThrowable(CompletableFuture<T> future, long timeout, TimeUnit unit) {
-        try {
-            return future.get(timeout, unit);
-        } catch (Throwable throwable) {
-            if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(WARN)
-                        .setMessageFormat(throwable.getMessage())
-                        .setThrowable(throwable)
-                );
-            }
-            throw new RuntimeException(throwable);
-        }
-    }
-
+    
     public static <T> T handleThrowable(Callable<T> callable) {
         try {
             return callable.call();
-        } catch (Throwable throwable) {
-            if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(WARN)
-                        .setMessageFormat(throwable.getMessage())
-                        .setThrowable(throwable)
-                );
+        } catch (Exception ex) {
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("", ex);
             }
-            throw new RuntimeException(throwable);
+            throw new RuntimeException(ex);
         }
-    }
-
-    public static void swallowThrowable(ThrowingRunnable runnable) {
-        try {
-            runnable.run();
-        } catch (Throwable throwable) {
-            if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(WARN)
-                        .setMessageFormat(throwable.getMessage())
-                        .setThrowable(throwable)
-                );
-            }
-        }
-    }
-
-    @FunctionalInterface
-    public interface ThrowingRunnable {
-        void run() throws Throwable;
-    }
-
-    @FunctionalInterface
-    public interface ThrowingConsumer<T> extends Consumer<T> {
-
-        @Override
-        default void accept(final T elem) {
-            try {
-                acceptThrows(elem);
-            } catch (final Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        void acceptThrows(T elem) throws Exception;
     }
 
     /**
@@ -222,6 +168,9 @@ public class ExceptionHandling {
         } else {
             return new ArrayList<>(Collections.singletonList(throwable.getClass()));
         }
+    }
+    
+    private ExceptionHandling() {
     }
 
 }

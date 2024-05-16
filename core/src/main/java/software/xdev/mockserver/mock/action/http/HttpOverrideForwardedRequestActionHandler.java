@@ -16,14 +16,13 @@
 package software.xdev.mockserver.mock.action.http;
 
 import software.xdev.mockserver.httpclient.NettyHttpClient;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpOverrideForwardedRequest;
 import software.xdev.mockserver.model.HttpRequest;
 
 public class HttpOverrideForwardedRequestActionHandler extends HttpForwardAction {
 
-    public HttpOverrideForwardedRequestActionHandler(MockServerLogger logFormatter, NettyHttpClient httpClient) {
-        super(logFormatter, httpClient);
+    public HttpOverrideForwardedRequestActionHandler(NettyHttpClient httpClient) {
+        super(httpClient);
     }
 
     public HttpForwardActionResult handle(final HttpOverrideForwardedRequest httpOverrideForwardedRequest, final HttpRequest request) {

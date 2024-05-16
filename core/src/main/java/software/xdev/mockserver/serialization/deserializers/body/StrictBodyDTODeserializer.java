@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.matchers.MatchType;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
@@ -42,8 +41,14 @@ import static software.xdev.mockserver.serialization.ObjectMapperFactory.buildOb
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.TRACE;
 
-public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(StrictBodyDTODeserializer.class);
+    
     private static final Map<String, Body.Type> fieldNameToType = new HashMap<>();
     private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
     private static ObjectWriter objectWriter;
@@ -56,8 +61,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
         fieldNameToType.put("regex".toLowerCase(), Body.Type.REGEX);
         fieldNameToType.put("string".toLowerCase(), Body.Type.STRING);
     }
-
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(StrictBodyDTODeserializer.class);
 
     public StrictBodyDTODeserializer() {
         super(BodyDTO.class);
@@ -79,19 +82,14 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
         if (currentToken == JsonToken.START_OBJECT) {
             @SuppressWarnings("unchecked") Map<Object, Object> body = (Map<Object, Object>) ctxt.readValue(jsonParser, Map.class);
             for (Map.Entry<Object, Object> entry : body.entrySet()) {
-                if (entry.getKey() instanceof String) {
-                    String key = (String) entry.getKey();
+                if (entry.getKey() instanceof String key) {
                     if (key.equalsIgnoreCase("type")) {
                         try {
                             type = Body.Type.valueOf(String.valueOf(entry.getValue()));
                         } catch (IllegalArgumentException iae) {
-                            if (MockServerLogger.isEnabled(TRACE)) {
-                                MOCK_SERVER_LOGGER.logEvent(
-                                    new LogEntry()
-                                        .setLogLevel(TRACE)
-                                        .setMessageFormat("ignoring invalid value for \"type\" field of \"" + entry.getValue() + "\"")
-                                        .setThrowable(iae)
-                                );
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace("ignoring invalid value for \"type\" field of \"{}\"",
+                                    entry.getValue(), iae);
                             }
                         }
                     }
@@ -111,17 +109,13 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                         }
                     }
                     if (containsIgnoreCase(key, "rawBytes", "base64Bytes")) {
-                        if (entry.getValue() instanceof String) {
+                        if (entry.getValue() instanceof String s) {
                             try {
-                                rawBytes = BASE64_DECODER.decode((String) entry.getValue());
-                            } catch (Throwable throwable) {
-                                if (MockServerLogger.isEnabled(DEBUG)) {
-                                    MOCK_SERVER_LOGGER.logEvent(
-                                        new LogEntry()
-                                            .setLogLevel(DEBUG)
-                                            .setMessageFormat("invalid base64 encoded rawBytes with value \"" + entry.getValue() + "\"")
-                                            .setThrowable(throwable)
-                                    );
+                                rawBytes = BASE64_DECODER.decode(s);
+                            } catch (Exception ex) {
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("Invalid base64 encoded rawBytes with value \"{}\"",
+                                        entry.getValue(), ex);
                                 }
                             }
                         }
@@ -136,13 +130,9 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                         try {
                             subString = Boolean.parseBoolean(String.valueOf(entry.getValue()));
                         } catch (IllegalArgumentException uce) {
-                            if (MockServerLogger.isEnabled(DEBUG)) {
-                                MOCK_SERVER_LOGGER.logEvent(
-                                    new LogEntry()
-                                        .setLogLevel(DEBUG)
-                                        .setMessageFormat("ignoring unsupported boolean with value \"" + entry.getValue() + "\"")
-                                        .setThrowable(uce)
-                                );
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Ignoring unsupported boolean with value \"{}\"",
+                                    entry.getValue(), uce);
                             }
                         }
                     }
@@ -156,13 +146,9 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                                 }
                             }
                         } catch (IllegalArgumentException uce) {
-                            if (MockServerLogger.isEnabled(DEBUG)) {
-                                MOCK_SERVER_LOGGER.logEvent(
-                                    new LogEntry()
-                                        .setLogLevel(DEBUG)
-                                        .setMessageFormat("ignoring unsupported MediaType with value \"" + entry.getValue() + "\"")
-                                        .setThrowable(uce)
-                                );
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Ignoring unsupported MediaType with value \"{}\"",
+                                    entry.getValue(), uce);
                             }
                         }
                     }
@@ -170,22 +156,14 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO> {
                         try {
                             charset = Charset.forName(String.valueOf(entry.getValue()));
                         } catch (UnsupportedCharsetException uce) {
-                            if (MockServerLogger.isEnabled(DEBUG)) {
-                                MOCK_SERVER_LOGGER.logEvent(
-                                    new LogEntry()
-                                        .setLogLevel(DEBUG)
-                                        .setMessageFormat("ignoring unsupported Charset with value \"" + entry.getValue() + "\"")
-                                        .setThrowable(uce)
-                                );
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Ignoring unsupported Charset with value \"{}\"",
+                                    entry.getValue(), uce);
                             }
                         } catch (IllegalCharsetNameException icne) {
-                            if (MockServerLogger.isEnabled(DEBUG)) {
-                                MOCK_SERVER_LOGGER.logEvent(
-                                    new LogEntry()
-                                        .setLogLevel(DEBUG)
-                                        .setMessageFormat("ignoring invalid Charset with value \"" + entry.getValue() + "\"")
-                                        .setThrowable(icne)
-                                );
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Ignoring invalid Charset with value \"{}\"",
+                                    entry.getValue(), icne);
                             }
                         }
                     }

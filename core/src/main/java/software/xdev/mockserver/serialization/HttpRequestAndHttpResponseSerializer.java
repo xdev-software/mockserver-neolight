@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Joiner;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
 import software.xdev.mockserver.serialization.model.HttpRequestAndHttpResponseDTO;
 import org.slf4j.event.Level;
@@ -34,26 +33,15 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequestAndHttpResponse> {
-    private final MockServerLogger mockServerLogger;
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
     private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-
-    public HttpRequestAndHttpResponseSerializer(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
-    }
 
     public String serialize(HttpRequestAndHttpResponse httpRequestAndHttpResponse) {
         try {
             return objectWriter.writeValueAsString(new HttpRequestAndHttpResponseDTO(httpRequestAndHttpResponse));
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing HttpRequestAndHttpResponse to JSON with value " + httpRequestAndHttpResponse)
-                    .setThrowable(e)
-            );
-            throw new RuntimeException("Exception while serializing HttpRequestAndHttpResponse to JSON with value " + httpRequestAndHttpResponse, e);
+            throw new IllegalStateException("Exception while serializing HttpRequestAndHttpResponse to JSON with value " + httpRequestAndHttpResponse, e);
         }
     }
 
@@ -73,13 +61,7 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
                 return "[]";
             }
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing HttpRequestAndHttpResponse to JSON with value " + Arrays.asList(httpRequests))
-                    .setThrowable(e)
-            );
-            throw new RuntimeException("Exception while serializing HttpRequestAndHttpResponse to JSON with value " + Arrays.asList(httpRequests), e);
+            throw new IllegalStateException("Exception while serializing HttpRequestAndHttpResponse to JSON with value " + Arrays.asList(httpRequests), e);
         }
     }
 
@@ -90,15 +72,8 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
                 if (jsonNode.has("httpRequestAndHttpResponse")) {
                     jsonHttpRequest = jsonNode.get("httpRequestAndHttpResponse").toString();
                 }
-            } catch (Throwable throwable) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception while parsing{}for HttpRequestAndHttpResponse " + throwable.getMessage())
-                        .setArguments(jsonHttpRequest)
-                        .setThrowable(throwable)
-                );
-                throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", throwable);
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
             }
         }
         HttpRequestAndHttpResponse httpRequestAndHttpResponse = null;
@@ -107,15 +82,8 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
             if (httpRequestDTO != null) {
                 httpRequestAndHttpResponse = httpRequestDTO.buildObject();
             }
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while parsing{}for HttpRequestAndHttpResponse " + throwable.getMessage())
-                    .setArguments(jsonHttpRequest)
-                    .setThrowable(throwable)
-            );
-            throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", throwable);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
         }
         return httpRequestAndHttpResponse;
     }

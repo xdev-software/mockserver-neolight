@@ -15,32 +15,29 @@
  */
 package software.xdev.mockserver.matchers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import software.xdev.mockserver.model.NottableString;
 
 import java.util.regex.PatternSyntaxException;
 
 import static software.xdev.mockserver.model.NottableString.string;
-import static org.slf4j.event.Level.DEBUG;
 
 public class RegexStringMatcher extends BodyMatcher<NottableString> {
-
-    private static final String[] EXCLUDED_FIELDS = {"mockServerLogger"};
-    private final MockServerLogger mockServerLogger;
+    
+    private static final Logger LOG = LoggerFactory.getLogger(RegexStringMatcher.class);
+    
     private final NottableString matcher;
     private final boolean controlPlaneMatcher;
 
-    public RegexStringMatcher(MockServerLogger mockServerLogger, boolean controlPlaneMatcher) {
-        this.mockServerLogger = mockServerLogger;
+    public RegexStringMatcher(boolean controlPlaneMatcher) {
         this.controlPlaneMatcher = controlPlaneMatcher;
         this.matcher = null;
     }
 
-    RegexStringMatcher(MockServerLogger mockServerLogger, NottableString matcher, boolean controlPlaneMatcher) {
-        this.mockServerLogger = mockServerLogger;
+    RegexStringMatcher(NottableString matcher, boolean controlPlaneMatcher) {
         this.controlPlaneMatcher = controlPlaneMatcher;
         this.matcher = matcher;
     }
@@ -50,29 +47,29 @@ public class RegexStringMatcher extends BodyMatcher<NottableString> {
     }
 
     public boolean matches(final MatchDifference context, NottableString matched) {
-        boolean result = matcher == null || matches(mockServerLogger, context, matcher, matched);
+        boolean result = matcher == null || matches(context, matcher, matched);
         return not != result;
     }
 
     public boolean matches(NottableString matcher, NottableString matched) {
-        return matches(mockServerLogger, null, matcher, matched);
+        return matches(null, matcher, matched);
     }
 
-    public boolean matches(MockServerLogger mockServerLogger, MatchDifference context, NottableString matcher, NottableString matched) {
-        return matchesByNottedStrings(mockServerLogger, context, matcher, matched);
+    public boolean matches(MatchDifference context, NottableString matcher, NottableString matched) {
+        return matchesByNottedStrings(context, matcher, matched);
     }
 
-    private boolean matchesByNottedStrings(MockServerLogger mockServerLogger, MatchDifference context, NottableString matcher, NottableString matched) {
+    private boolean matchesByNottedStrings(MatchDifference context, NottableString matcher, NottableString matched) {
         if (matcher.isNot() && matched.isNot()) {
             // mutual notted control plane match
-            return matchesByStrings(mockServerLogger, context, matcher, matched);
+            return matchesByStrings(context, matcher, matched);
         } else {
             // data plane & control plan match
-            return (matcher.isNot() || matched.isNot()) ^ matchesByStrings(mockServerLogger, context, matcher, matched);
+            return (matcher.isNot() || matched.isNot()) ^ matchesByStrings(context, matcher, matched);
         }
     }
 
-    private boolean matchesByStrings(MockServerLogger mockServerLogger, MatchDifference context, NottableString matcher, NottableString matched) {
+    private boolean matchesByStrings(MatchDifference context, NottableString matcher, NottableString matched) {
         if (matcher == null) {
             return true;
         }
@@ -94,36 +91,21 @@ public class RegexStringMatcher extends BodyMatcher<NottableString> {
                             return true;
                         }
                     } catch (PatternSyntaxException pse) {
-                        if (MockServerLogger.isEnabled(DEBUG) && mockServerLogger != null) {
-                            mockServerLogger.logEvent(
-                                new LogEntry()
-                                    .setLogLevel(DEBUG)
-                                    .setMessageFormat("error while matching regex [" + matcher + "] for string [" + matched + "] " + pse.getMessage())
-                                    .setThrowable(pse)
-                            );
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
                         }
                     }
                     // match as regex - matched -> matcher (control plane only)
                     try {
                         if (controlPlaneMatcher && matched.matches(matcherValue)) {
                             return true;
-                        } else if (MockServerLogger.isEnabled(DEBUG) && matched.matches(matcherValue) && mockServerLogger != null) {
-                            mockServerLogger.logEvent(
-                                new LogEntry()
-                                    .setLogLevel(DEBUG)
-                                    .setMessageFormat("matcher{}would match{}if matcher was used for control plane")
-                                    .setArguments(matcher, matched)
-                            );
+                        } else if (LOG.isDebugEnabled() && matched.matches(matcherValue)) {
+                            LOG.debug("Matcher {} would match {} if matcher was used for control plane", matcher, matched);
                         }
                     } catch (PatternSyntaxException pse) {
                         if (controlPlaneMatcher) {
-                            if (MockServerLogger.isEnabled(DEBUG) && mockServerLogger != null) {
-                                mockServerLogger.logEvent(
-                                    new LogEntry()
-                                        .setLogLevel(DEBUG)
-                                        .setMessageFormat("error while matching regex [" + matched + "] for string [" + matcher + "] " + pse.getMessage())
-                                        .setThrowable(pse)
-                                );
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
                             }
                         }
                     }
@@ -131,7 +113,7 @@ public class RegexStringMatcher extends BodyMatcher<NottableString> {
             }
         }
         if (context != null) {
-            context.addDifference(mockServerLogger, "string or regex match failed expected:{}found:{}", matcher, matched);
+            context.addDifference("string or regex match failed expected:{}found:{}", matcher, matched);
         }
 
         return false;
@@ -139,11 +121,5 @@ public class RegexStringMatcher extends BodyMatcher<NottableString> {
 
     public boolean isBlank() {
         return matcher == null || StringUtils.isBlank(matcher.getValue());
-    }
-
-    @Override
-    @JsonIgnore
-    protected String[] fieldsExcludedFromEqualsAndHashCode() {
-        return EXCLUDED_FIELDS;
     }
 }

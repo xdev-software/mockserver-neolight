@@ -16,19 +16,15 @@
 package software.xdev.mockserver.matchers;
 
 import org.apache.commons.lang3.StringUtils;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.NottableString;
 
 import static org.apache.commons.lang3.StringUtils.*;
 import static software.xdev.mockserver.model.NottableString.string;
 
 public class SubStringMatcher extends BodyMatcher<NottableString> {
-    private static final String[] excludedFields = {"mockserverLogger"};
-    private final MockServerLogger mockServerLogger;
     private final NottableString matcher;
 
-    SubStringMatcher(MockServerLogger mockServerLogger, NottableString matcher) {
-        this.mockServerLogger = mockServerLogger;
+    SubStringMatcher(NottableString matcher) {
         this.matcher = matcher;
     }
 
@@ -64,7 +60,7 @@ public class SubStringMatcher extends BodyMatcher<NottableString> {
         }
 
         if (!result && context != null) {
-            context.addDifference(mockServerLogger, "substring match failed expected:{}found:{}", this.matcher, matched);
+            context.addDifference("substring match failed expected:{}found:{}", this.matcher, matched);
         }
 
         if (matched == null) {
@@ -76,10 +72,5 @@ public class SubStringMatcher extends BodyMatcher<NottableString> {
 
     public boolean isBlank() {
         return matcher == null || StringUtils.isBlank(matcher.getValue());
-    }
-
-    @Override
-    public String[] fieldsExcludedFromEqualsAndHashCode() {
-        return excludedFields;
     }
 }

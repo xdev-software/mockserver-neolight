@@ -16,32 +16,20 @@
 package software.xdev.mockserver.streams;
 
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import org.slf4j.event.Level;
 
 import jakarta.servlet.ServletResponse;
 import java.io.*;
 
 public class IOStreamUtils {
-    private final MockServerLogger mockServerLogger;
-
-    public IOStreamUtils(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
-    }
-
+    
     public void writeToOutputStream(byte[] data, ServletResponse response) {
         try {
             OutputStream output = response.getOutputStream();
             output.write(data);
             output.close();
         } catch (IOException ioe) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("IOException while writing [" + new String(data) + "] to HttpServletResponse output stream")
-                    .setThrowable(ioe)
-            );
-            throw new RuntimeException("IOException while writing [" + new String(data) + "] to HttpServletResponse output stream", ioe);
+            throw new UncheckedIOException("IOException while writing [" + new String(data) + "] to HttpServletResponse output stream", ioe);
         }
     }
 

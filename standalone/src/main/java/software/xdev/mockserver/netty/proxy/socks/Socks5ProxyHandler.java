@@ -23,7 +23,9 @@ import io.netty.handler.ssl.SslHandler;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -32,9 +34,11 @@ import static software.xdev.mockserver.netty.unification.PortUnificationHandler.
 
 @ChannelHandler.Sharable
 public class Socks5ProxyHandler extends SocksProxyHandler<Socks5Message> {
-
-    public Socks5ProxyHandler(Configuration configuration, MockServerLogger mockServerLogger, LifeCycle server) {
-        super(configuration, mockServerLogger, server);
+    
+    private static final Logger LOG = LoggerFactory.getLogger(Socks5ProxyHandler.class);
+    
+    public Socks5ProxyHandler(Configuration configuration, LifeCycle server) {
+        super(configuration, server);
     }
 
     @Override
@@ -102,18 +106,13 @@ public class Socks5ProxyHandler extends SocksProxyHandler<Socks5Message> {
             ctx.writeAndFlush(new DefaultSocks5PasswordAuthResponse(Socks5PasswordAuthStatus.SUCCESS)).awaitUninterruptibly();
         } else {
             ctx.writeAndFlush(new DefaultSocks5PasswordAuthResponse(Socks5PasswordAuthStatus.FAILURE)).addListener(ChannelFutureListener.CLOSE);
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setType(AUTHENTICATION_FAILED)
-                    .setLogLevel(Level.INFO)
-                    .setMessageFormat("proxy authentication failed so returning SOCKS FAILURE response")
-            );
+            LOG.info("Proxy authentication failed so returning SOCKS FAILURE response");
         }
     }
 
     private void handleCommandRequest(ChannelHandlerContext ctx, final Socks5CommandRequest commandRequest) {
         if (commandRequest.type().equals(Socks5CommandType.CONNECT)) { // IN HERE
-            forwardConnection(ctx, new Socks5ConnectHandler(configuration, mockServerLogger, server, commandRequest.dstAddr(), commandRequest.dstPort()), commandRequest.dstAddr(), commandRequest.dstPort());
+            forwardConnection(ctx, new Socks5ConnectHandler(configuration, server, commandRequest.dstAddr(), commandRequest.dstPort()));
             ctx.fireChannelRead(commandRequest);
         } else {
             ctx.writeAndFlush(new DefaultSocks5CommandResponse(Socks5CommandStatus.COMMAND_UNSUPPORTED, Socks5AddressType.DOMAIN, "", 0)).addListener(ChannelFutureListener.CLOSE);

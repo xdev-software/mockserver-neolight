@@ -20,9 +20,11 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.LoggingHandler;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mappers.FullHttpResponseToMockServerHttpResponse;
 import software.xdev.mockserver.model.MediaType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
@@ -40,17 +42,17 @@ import static org.slf4j.event.Level.*;
 
 @SuppressWarnings("rawtypes")
 public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketClientHandler.class);
+    
     private final WebSocketClient webSocketClient;
     private final WebSocketClientHandshaker handshaker;
-    private final MockServerLogger mockServerLogger;
     private final String clientId;
 
-    WebSocketClientHandler(MockServerLogger mockServerLogger, String clientId, InetSocketAddress serverAddress, String contextPath, WebSocketClient webSocketClient, boolean isSecure) throws URISyntaxException {
-        this.mockServerLogger = mockServerLogger;
+    WebSocketClientHandler(String clientId, InetSocketAddress serverAddress, String contextPath, WebSocketClient webSocketClient) throws URISyntaxException {
         this.clientId = clientId;
         this.handshaker = WebSocketClientHandshakerFactory.newHandshaker(
-            new URI((isSecure ? "wss" : "ws") + "://" + serverAddress.getHostName() + ":" + serverAddress.getPort() + cleanContextPath(contextPath) + "/_mockserver_callback_websocket"),
+            new URI("ws://" + serverAddress.getHostName() + ":" + serverAddress.getPort() + cleanContextPath(contextPath) + "/_mockserver_callback_websocket"),
             WebSocketVersion.V13,
             null,
             false,
@@ -75,103 +77,64 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("web socket client disconnected")
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Web socket client disconnected");
         }
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) {
         Channel ch = ctx.channel();
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("web socket client handshake handler received{}")
-                    .setArguments(msg)
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Web socket client handshake handler received {}", msg);
         }
-        if (msg instanceof FullHttpResponse) {
-            FullHttpResponse httpResponse = (FullHttpResponse) msg;
+        if (msg instanceof FullHttpResponse httpResponse) {
             final CompletableFuture<String> registrationFuture = ch.attr(REGISTRATION_FUTURE).get();
             if (httpResponse.headers().contains(UPGRADE, WEBSOCKET, true) && !handshaker.isHandshakeComplete()) {
                 handshaker.finishHandshake(ch, httpResponse);
                 registrationFuture.complete(clientId);
-                if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(TRACE)
-                            .setMessageFormat("web socket client " + clientId + " connected")
-                    );
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("web socket client {} connected", clientId);
                 }
                 // add extra logging
-                if (MockServerLogger.isEnabled(TRACE)) {
+                if (LOG.isTraceEnabled()) {
                     ch.pipeline().addFirst(new LoggingHandler(WebSocketClient.class.getName() + "-first"));
                 }
             } else if (httpResponse.status().equals(HttpResponseStatus.NOT_IMPLEMENTED)) {
                 String message = readRequestBody(httpResponse);
                 registrationFuture.completeExceptionally(new WebSocketException(message));
-                if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(WARN)
-                            .setMessageFormat(message)
-                    );
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn(message);
                 }
             } else if (httpResponse.status().equals(HttpResponseStatus.RESET_CONTENT)) {
-                if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(TRACE)
-                            .setMessageFormat("web socket client not required MockServer in same JVM as client")
-                    );
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Web socket client not required MockServer in same JVM as client");
                 }
                 registrationFuture.complete(clientId);
             } else {
-                registrationFuture.completeExceptionally(new WebSocketException("handshake failure unsupported message received " + new FullHttpResponseToMockServerHttpResponse(mockServerLogger).mapFullHttpResponseToMockServerResponse(httpResponse)));
-                if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(WARN)
-                            .setMessageFormat("web socket client handshake handler received an unsupported FullHttpResponse message{}")
-                            .setArguments(msg)
-                    );
+                registrationFuture.completeExceptionally(
+                    new WebSocketException("handshake failure unsupported message received "
+                        + new FullHttpResponseToMockServerHttpResponse()
+                        .mapFullHttpResponseToMockServerResponse(httpResponse)));
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("web socket client handshake handler received an unsupported FullHttpResponse message {}", msg);
                 }
             }
-        } else if (msg instanceof WebSocketFrame) {
-            WebSocketFrame frame = (WebSocketFrame) msg;
-            if (frame instanceof TextWebSocketFrame) {
-                webSocketClient.receivedTextWebSocketFrame((TextWebSocketFrame) frame);
+        } else if (msg instanceof WebSocketFrame frame) {
+            if (frame instanceof TextWebSocketFrame txtFrame) {
+                webSocketClient.receivedTextWebSocketFrame(txtFrame);
             } else if (frame instanceof PingWebSocketFrame) {
                 ctx.write(new PongWebSocketFrame(frame.content().retain()));
             } else if (frame instanceof CloseWebSocketFrame) {
-                if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(TRACE)
-                            .setMessageFormat("web socket client received request to close")
-                    );
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Web socket client received request to close");
                 }
                 ch.close();
-            } else if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(WARN)
-                        .setMessageFormat("web socket client received an unsupported WebSocketFrame message{}")
-                        .setArguments(msg)
-                );
+            } else if (LOG.isWarnEnabled()) {
+                LOG.warn("Web socket client received an unsupported WebSocketFrame message {}", msg);
             }
-        } else if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(WARN)
-                    .setMessageFormat("web socket client received a message of unknown type{}")
-                    .setArguments(msg)
-            );
+        } else if (LOG.isWarnEnabled()) {
+            LOG.warn("Web socket client received a message of unknown type {}", msg);
         }
     }
 
@@ -187,12 +150,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        mockServerLogger.logEvent(
-            new LogEntry()
-                .setLogLevel(Level.ERROR)
-                .setMessageFormat("web socket client caught exception")
-                .setThrowable(cause)
-        );
+        LOG.error("Web socket client caught exception", cause);
         final CompletableFuture<String> registrationFuture = ctx.channel().attr(REGISTRATION_FUTURE).get();
         if (!registrationFuture.isDone()) {
             registrationFuture.completeExceptionally(cause);

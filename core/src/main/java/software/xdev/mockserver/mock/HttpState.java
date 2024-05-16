@@ -22,7 +22,6 @@ import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClien
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.MockServerEventLog;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier.Cause;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.responsewriter.ResponseWriter;
@@ -32,6 +31,9 @@ import software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer;
 import software.xdev.mockserver.uuid.UUIDService;
 import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -60,7 +62,9 @@ import static software.xdev.mockserver.model.HttpResponse.response;
 import static org.slf4j.event.Level.TRACE;
 
 public class HttpState {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(HttpState.class);
+    
     public static final String LOG_SEPARATOR = NEW_LINE + "------------------------------------" + NEW_LINE;
     public static final String PATH_PREFIX = "/mockserver";
     private static final ThreadLocal<Integer> LOCAL_PORT = new ThreadLocal<>();
@@ -70,7 +74,6 @@ public class HttpState {
     // mockserver
     private final RequestMatchers requestMatchers;
     private final Configuration configuration;
-    private final MockServerLogger mockServerLogger;
     private final WebSocketClientRegistry webSocketClientRegistry;
     // serializers
     private ExpectationIdSerializer expectationIdSerializer;
@@ -101,7 +104,7 @@ public class HttpState {
     }
 
     public static void setPort(final List<Integer> port) {
-        if (port != null && port.size() > 0) {
+        if (port != null && !port.isEmpty()) {
             setPort(port.get(0));
         }
     }
@@ -110,29 +113,20 @@ public class HttpState {
         return LOCAL_PORT.get();
     }
 
-    public HttpState(Configuration configuration, MockServerLogger mockServerLogger, Scheduler scheduler) {
+    public HttpState(Configuration configuration, Scheduler scheduler) {
         this.configuration = configuration;
-        this.mockServerLogger = mockServerLogger.setHttpStateHandler(this);
         this.scheduler = scheduler;
-        this.webSocketClientRegistry = new WebSocketClientRegistry(configuration, mockServerLogger);
+        this.webSocketClientRegistry = new WebSocketClientRegistry(configuration);
         LocalCallbackRegistry.setMaxWebSocketExpectations(configuration.maxWebSocketExpectations());
-        this.mockServerLog = new MockServerEventLog(configuration, mockServerLogger, scheduler, true);
-        this.requestMatchers = new RequestMatchers(configuration, mockServerLogger, scheduler, webSocketClientRegistry);
-        if (MockServerLogger.isEnabled(TRACE)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("log ring buffer created, with size " + configuration.ringBufferSize())
-            );
+        this.mockServerLog = new MockServerEventLog(configuration, scheduler, true);
+        this.requestMatchers = new RequestMatchers(configuration, scheduler, webSocketClientRegistry);
+        if(LOG.isTraceEnabled()) {
+            LOG.trace("Log ring buffer created, with size {}", configuration.ringBufferSize());
         }
     }
 
     public void setControlPlaneAuthenticationHandler(AuthenticationHandler controlPlaneAuthenticationHandler) {
         this.controlPlaneAuthenticationHandler = controlPlaneAuthenticationHandler;
-    }
-
-    public MockServerLogger getMockServerLogger() {
-        return mockServerLogger;
     }
 
     public void clear(HttpRequest request) {
@@ -177,14 +171,6 @@ public class HttpState {
                     break;
             }
         } catch (IllegalArgumentException iae) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setCorrelationId(logCorrelationId)
-                    .setMessageFormat("exception handling request:{}error:{}")
-                    .setArguments(request, iae.getMessage())
-                    .setThrowable(iae)
-            );
             throw new IllegalArgumentException("\"" + request.getFirstQueryStringParameter("type") + "\" is not a valid value for \"type\" parameter, only the following values are supported " + Arrays.stream(ClearType.values()).map(input -> input.name().toLowerCase()).collect(Collectors.toList()));
         }
     }
@@ -206,27 +192,14 @@ public class HttpState {
         requestMatchers.reset();
         mockServerLog.reset();
         webSocketClientRegistry.reset();
-        if (MockServerLogger.isEnabled(Level.INFO)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setType(CLEARED)
-                    .setLogLevel(Level.INFO)
-                    .setHttpRequest(request())
-                    .setMessageFormat("resetting all expectations and request logs")
-            );
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Resetting all expectations and request logs");
         }
     }
 
     public List<Expectation> add(Expectation... expectations) {
         List<Expectation> upsertedExpectations = new ArrayList<>();
         for (Expectation expectation : expectations) {
-            RequestDefinition requestDefinition = expectation.getHttpRequest();
-            if (requestDefinition instanceof HttpRequest) {
-                final String hostHeader = ((HttpRequest) requestDefinition).getFirstHeader(HOST.toString());
-                if (isNotBlank(hostHeader)) {
-                    scheduler.submit(() -> configuration.addSubjectAlternativeName(hostHeader));
-                }
-            }
             upsertedExpectations.add(requestMatchers.add(expectation, Cause.API));
         }
         return upsertedExpectations;
@@ -284,29 +257,22 @@ public class HttpState {
                             }
                             stringBuffer.append(NEW_LINE);
                             response.withBody(stringBuffer.toString(), MediaType.PLAIN_TEXT_UTF_8);
-                            if (MockServerLogger.isEnabled(Level.INFO)) {
-                                mockServerLogger.logEvent(
-                                    new LogEntry()
-                                        .setType(RETRIEVED)
-                                        .setLogLevel(Level.INFO)
-                                        .setCorrelationId(logCorrelationId)
-                                        .setHttpRequest(requestDefinition)
-                                        .setMessageFormat("retrieved logs that match:{}")
-                                        .setArguments(requestDefinition)
-                                );
+                            if (LOG.isInfoEnabled()) {
+                                LOG.info(
+                                    "Retrieved logs that match: {}",
+                                    requestDefinition);
                             }
                             httpResponseFuture.complete(response);
                         });
                         break;
                     }
                     case REQUESTS: {
-                        LogEntry logEntry = new LogEntry()
-                            .setType(RETRIEVED)
-                            .setLogLevel(Level.INFO)
-                            .setCorrelationId(logCorrelationId)
-                            .setHttpRequest(requestDefinition)
-                            .setMessageFormat("retrieved requests in " + format.name().toLowerCase() + " that match:{}")
-                            .setArguments(requestDefinition);
+                        if (LOG.isInfoEnabled()) {
+                            LOG.info(
+                                "Retrieved requests in {} that match: {}",
+                                format.name().toLowerCase(),
+                                requestDefinition);
+                        }
                         switch (format) {
                             case JAVA:
                                 mockServerLog
@@ -317,7 +283,6 @@ public class HttpState {
                                                 getRequestDefinitionSerializer().serialize(requests),
                                                 MediaType.create("application", "java").withCharset(UTF_8)
                                             );
-                                            mockServerLogger.logEvent(logEntry);
                                             httpResponseFuture.complete(response);
                                         }
                                     );
@@ -331,7 +296,6 @@ public class HttpState {
                                                 getRequestDefinitionSerializer().serialize(true, requests),
                                                 MediaType.JSON_UTF_8
                                             );
-                                            mockServerLogger.logEvent(logEntry);
                                             httpResponseFuture.complete(response);
                                         }
                                     );
@@ -340,17 +304,15 @@ public class HttpState {
                         break;
                     }
                     case REQUEST_RESPONSES: {
-                        LogEntry logEntry = new LogEntry()
-                            .setType(RETRIEVED)
-                            .setLogLevel(Level.INFO)
-                            .setCorrelationId(logCorrelationId)
-                            .setHttpRequest(requestDefinition)
-                            .setMessageFormat("retrieved requests and responses in " + format.name().toLowerCase() + " that match:{}")
-                            .setArguments(requestDefinition);
+                        if (LOG.isInfoEnabled()) {
+                            LOG.info(
+                                "Retrieved requests and responses in {} that match: {}",
+                                format.name().toLowerCase(),
+                                requestDefinition);
+                        }
                         switch (format) {
                             case JAVA:
                                 response.withBody("JAVA not supported for REQUEST_RESPONSES", MediaType.create("text", "plain").withCharset(UTF_8));
-                                mockServerLogger.logEvent(logEntry);
                                 httpResponseFuture.complete(response);
                                 break;
                             case JSON:
@@ -362,7 +324,6 @@ public class HttpState {
                                                 getHttpRequestResponseSerializer().serialize(httpRequestAndHttpResponses),
                                                 MediaType.JSON_UTF_8
                                             );
-                                            mockServerLogger.logEvent(logEntry);
                                             httpResponseFuture.complete(response);
                                         }
                                     );
@@ -371,13 +332,12 @@ public class HttpState {
                         break;
                     }
                     case RECORDED_EXPECTATIONS: {
-                        LogEntry logEntry = new LogEntry()
-                            .setType(RETRIEVED)
-                            .setLogLevel(Level.INFO)
-                            .setCorrelationId(logCorrelationId)
-                            .setHttpRequest(requestDefinition)
-                            .setMessageFormat("retrieved recorded expectations in " + format.name().toLowerCase() + " that match:{}")
-                            .setArguments(requestDefinition);
+                        if (LOG.isInfoEnabled()) {
+                            LOG.info(
+                                "Retrieved recorded expectations in {} that match: {}",
+                                format.name().toLowerCase(),
+                                requestDefinition);
+                        }
                         switch (format) {
                             case JAVA:
                                 mockServerLog
@@ -388,7 +348,6 @@ public class HttpState {
                                                 getExpectationToJavaSerializer().serialize(requests),
                                                 MediaType.create("application", "java").withCharset(UTF_8)
                                             );
-                                            mockServerLogger.logEvent(logEntry);
                                             httpResponseFuture.complete(response);
                                         }
                                     );
@@ -402,7 +361,6 @@ public class HttpState {
                                                 getExpectationSerializerThatSerializesBodyDefault().serialize(requests),
                                                 MediaType.JSON_UTF_8
                                             );
-                                            mockServerLogger.logEvent(logEntry);
                                             httpResponseFuture.complete(response);
                                         }
                                     );
@@ -420,16 +378,11 @@ public class HttpState {
                                 response.withBody(getExpectationSerializer().serialize(expectations), MediaType.JSON_UTF_8);
                                 break;
                         }
-                        if (MockServerLogger.isEnabled(Level.INFO)) {
-                            mockServerLogger.logEvent(
-                                new LogEntry()
-                                    .setType(RETRIEVED)
-                                    .setLogLevel(Level.INFO)
-                                    .setCorrelationId(logCorrelationId)
-                                    .setHttpRequest(requestDefinition)
-                                    .setMessageFormat("retrieved " + expectations.size() + " active expectations in " + format.name().toLowerCase() + " that match:{}")
-                                    .setArguments(requestDefinition)
-                            );
+                        if (LOG.isInfoEnabled()) {
+                            LOG.info("Retrieved {} active expectations in {} that match: {}",
+                                expectations.size(),
+                                format.name().toLowerCase(),
+                                requestDefinition);
                         }
                         httpResponseFuture.complete(response);
                         break;
@@ -439,25 +392,11 @@ public class HttpState {
                 try {
                     return httpResponseFuture.get(configuration.maxFutureTimeoutInMillis(), MILLISECONDS);
                 } catch (ExecutionException | InterruptedException | TimeoutException ex) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setCorrelationId(logCorrelationId)
-                            .setMessageFormat("exception handling request:{}error:{}")
-                            .setArguments(request, ex.getMessage())
-                            .setThrowable(ex)
-                    );
-                    throw new RuntimeException("Exception retrieving state for " + request, ex);
+                    LOG.error("Exception handling request: {}", request, ex);
+                    throw new IllegalStateException("Exception retrieving state for " + request, ex);
                 }
             } catch (IllegalArgumentException iae) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setCorrelationId(logCorrelationId)
-                        .setMessageFormat("exception handling request:{}error:{}")
-                        .setArguments(request, iae.getMessage())
-                        .setThrowable(iae)
-                );
+                LOG.error("Exception handling request: {}", request, iae);
                 if (iae.getMessage().contains(RetrieveType.class.getSimpleName())) {
                     throw new IllegalArgumentException("\"" + request.getFirstQueryStringParameter("type") + "\" is not a valid value for \"type\" parameter, only the following values are supported " + Arrays.stream(RetrieveType.values()).map(input -> input.name().toLowerCase()).collect(Collectors.toList()));
                 }
@@ -503,21 +442,15 @@ public class HttpState {
         request.withLogCorrelationId(UUIDService.getUUID());
         setPort(request);
 
-        if (MockServerLogger.isEnabled(Level.TRACE)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.TRACE)
-                    .setHttpRequest(request)
-                    .setMessageFormat(RECEIVED_REQUEST_MESSAGE_FORMAT)
-                    .setArguments(request)
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace(RECEIVED_REQUEST_MESSAGE_FORMAT, request);
         }
 
         if (request.matches("PUT")) {
 
             CompletableFuture<Boolean> canHandle = new CompletableFuture<>();
 
-            if (request.matches("PUT", PATH_PREFIX + "/expectation", "/expectation")) {
+            if (request.matchesPath(PATH_PREFIX + "/expectation", "/expectation")) {
 
                 if (controlPlaneRequestAuthenticated(request, responseWriter)) {
                     List<Expectation> upsertedExpectations = new ArrayList<>();
@@ -532,7 +465,7 @@ public class HttpState {
                         .withBody(getExpectationSerializer().serialize(upsertedExpectations), MediaType.JSON_UTF_8), true);
                 }
                 canHandle.complete(true);
-            } else if (request.matches("PUT", PATH_PREFIX + "/clear", "/clear")) {
+            } else if (request.matchesPath(PATH_PREFIX + "/clear", "/clear")) {
 
                 if (controlPlaneRequestAuthenticated(request, responseWriter)) {
                     clear(request);
@@ -540,7 +473,7 @@ public class HttpState {
                 }
                 canHandle.complete(true);
 
-            } else if (request.matches("PUT", PATH_PREFIX + "/reset", "/reset")) {
+            } else if (request.matchesPath(PATH_PREFIX + "/reset", "/reset")) {
 
                 if (controlPlaneRequestAuthenticated(request, responseWriter)) {
                     reset();
@@ -548,14 +481,14 @@ public class HttpState {
                 }
                 canHandle.complete(true);
 
-            } else if (request.matches("PUT", PATH_PREFIX + "/retrieve", "/retrieve")) {
+            } else if (request.matchesPath(PATH_PREFIX + "/retrieve", "/retrieve")) {
 
                 if (controlPlaneRequestAuthenticated(request, responseWriter)) {
                     responseWriter.writeResponse(request, retrieve(request), true);
                 }
                 canHandle.complete(true);
 
-            } else if (request.matches("PUT", PATH_PREFIX + "/verify", "/verify")) {
+            } else if (request.matchesPath(PATH_PREFIX + "/verify", "/verify")) {
 
                 if (controlPlaneRequestAuthenticated(request, responseWriter)) {
                     verify(getVerificationSerializer().deserialize(request.getBodyAsJsonOrXmlString()), result -> {
@@ -570,7 +503,7 @@ public class HttpState {
                     canHandle.complete(true);
                 }
 
-            } else if (request.matches("PUT", PATH_PREFIX + "/verifySequence", "/verifySequence")) {
+            } else if (request.matchesPath(PATH_PREFIX + "/verifySequence", "/verifySequence")) {
 
                 if (controlPlaneRequestAuthenticated(request, responseWriter)) {
                     verify(getVerificationSequenceSerializer().deserialize(request.getBodyAsJsonOrXmlString()), result -> {
@@ -586,21 +519,13 @@ public class HttpState {
                 }
 
             } else {
-
                 canHandle.complete(false);
-
             }
 
             try {
                 return canHandle.get(configuration.maxFutureTimeoutInMillis(), MILLISECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception handling request:{}error:{}")
-                        .setArguments(request, ex.getMessage())
-                        .setThrowable(ex)
-                );
+                LOG.error("Exception handling request: {}", request, ex);
                 return false;
             }
 
@@ -673,35 +598,35 @@ public class HttpState {
 
     private ExpectationIdSerializer getExpectationIdSerializer() {
         if (this.expectationIdSerializer == null) {
-            this.expectationIdSerializer = new ExpectationIdSerializer(mockServerLogger);
+            this.expectationIdSerializer = new ExpectationIdSerializer();
         }
         return expectationIdSerializer;
     }
 
     private RequestDefinitionSerializer getRequestDefinitionSerializer() {
         if (this.requestDefinitionSerializer == null) {
-            this.requestDefinitionSerializer = new RequestDefinitionSerializer(mockServerLogger);
+            this.requestDefinitionSerializer = new RequestDefinitionSerializer();
         }
         return requestDefinitionSerializer;
     }
 
     private LogEventRequestAndResponseSerializer getHttpRequestResponseSerializer() {
         if (this.httpRequestResponseSerializer == null) {
-            this.httpRequestResponseSerializer = new LogEventRequestAndResponseSerializer(mockServerLogger);
+            this.httpRequestResponseSerializer = new LogEventRequestAndResponseSerializer();
         }
         return httpRequestResponseSerializer;
     }
 
     private ExpectationSerializer getExpectationSerializer() {
         if (this.expectationSerializer == null) {
-            this.expectationSerializer = new ExpectationSerializer(mockServerLogger);
+            this.expectationSerializer = new ExpectationSerializer();
         }
         return expectationSerializer;
     }
 
     private ExpectationSerializer getExpectationSerializerThatSerializesBodyDefault() {
         if (this.expectationSerializerThatSerializesBodyDefault == null) {
-            this.expectationSerializerThatSerializesBodyDefault = new ExpectationSerializer(mockServerLogger, true);
+            this.expectationSerializerThatSerializesBodyDefault = new ExpectationSerializer(true);
         }
         return expectationSerializerThatSerializesBodyDefault;
     }
@@ -715,14 +640,14 @@ public class HttpState {
 
     private VerificationSerializer getVerificationSerializer() {
         if (this.verificationSerializer == null) {
-            this.verificationSerializer = new VerificationSerializer(mockServerLogger);
+            this.verificationSerializer = new VerificationSerializer();
         }
         return verificationSerializer;
     }
 
     private VerificationSequenceSerializer getVerificationSequenceSerializer() {
         if (this.verificationSequenceSerializer == null) {
-            this.verificationSequenceSerializer = new VerificationSequenceSerializer(mockServerLogger);
+            this.verificationSequenceSerializer = new VerificationSequenceSerializer();
         }
         return verificationSequenceSerializer;
     }

@@ -20,10 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Joiner;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestPrettyPrintedDTO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -35,14 +37,10 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class HttpRequestSerializer implements Serializer<HttpRequest> {
-    private final MockServerLogger mockServerLogger;
+    
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
     private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-
-    public HttpRequestSerializer(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
-    }
 
     public String serialize(HttpRequest httpRequest) {
         return serialize(false, httpRequest);
@@ -56,12 +54,6 @@ public class HttpRequestSerializer implements Serializer<HttpRequest> {
                 return objectWriter.writeValueAsString(new HttpRequestDTO(httpRequest));
             }
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing HttpRequest to JSON with value " + httpRequest)
-                    .setThrowable(e)
-            );
             throw new RuntimeException("Exception while serializing HttpRequest to JSON with value " + httpRequest, e);
         }
     }
@@ -98,13 +90,7 @@ public class HttpRequestSerializer implements Serializer<HttpRequest> {
                 return "[]";
             }
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing HttpRequest to JSON with value " + Arrays.asList(httpRequests))
-                    .setThrowable(e)
-            );
-            throw new RuntimeException("Exception while serializing HttpRequest to JSON with value " + Arrays.asList(httpRequests), e);
+            throw new IllegalStateException("Exception while serializing HttpRequest to JSON with value " + Arrays.asList(httpRequests), e);
         }
     }
 
@@ -115,15 +101,8 @@ public class HttpRequestSerializer implements Serializer<HttpRequest> {
                 if (jsonNode.has("httpRequest")) {
                     jsonHttpRequest = jsonNode.get("httpRequest").toString();
                 }
-            } catch (Throwable throwable) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception while parsing{}for HttpRequest " + throwable.getMessage())
-                        .setArguments(jsonHttpRequest)
-                        .setThrowable(throwable)
-                );
-                throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequest", throwable);
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequest", ex);
             }
         }
         HttpRequest httpRequest = null;
@@ -132,15 +111,8 @@ public class HttpRequestSerializer implements Serializer<HttpRequest> {
             if (httpRequestDTO != null) {
                 httpRequest = httpRequestDTO.buildObject();
             }
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while parsing{}for HttpRequest" + throwable.getMessage())
-                    .setArguments(jsonHttpRequest)
-                    .setThrowable(throwable)
-            );
-            throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequest", throwable);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequest", ex);
         }
         return httpRequest;
     }

@@ -21,7 +21,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.MockServerEventLog;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.scheduler.Scheduler;
@@ -45,9 +44,13 @@ import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.SERVER_
 import static software.xdev.mockserver.mock.HttpState.setPort;
 import static org.slf4j.event.Level.*;
 
-public abstract class LifeCycle implements Stoppable {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    protected final MockServerLogger mockServerLogger;
+
+public abstract class LifeCycle implements Stoppable {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(LifeCycle.class);
     protected final EventLoopGroup bossGroup;
     protected final EventLoopGroup workerGroup;
     protected final HttpState httpState;
@@ -60,23 +63,17 @@ public abstract class LifeCycle implements Stoppable {
 
     protected LifeCycle(Configuration configuration) {
         this.configuration = configuration != null ? configuration : configuration();
-        this.mockServerLogger = new MockServerLogger(MockServerEventLog.class);
         this.bossGroup = new NioEventLoopGroup(5, new Scheduler.SchedulerThreadFactory(this.getClass().getSimpleName() + "-bossEventLoop"));
         this.workerGroup = new NioEventLoopGroup(this.configuration.nioEventLoopThreadCount(), new Scheduler.SchedulerThreadFactory(this.getClass().getSimpleName() + "-workerEventLoop"));
-        this.scheduler = new Scheduler(this.configuration, this.mockServerLogger);
-        this.httpState = new HttpState(this.configuration, this.mockServerLogger, this.scheduler);
+        this.scheduler = new Scheduler(this.configuration);
+        this.httpState = new HttpState(this.configuration, this.scheduler);
     }
 
     public CompletableFuture<String> stopAsync() {
         if (!stopFuture.isDone() && stopping.compareAndSet(false, true)) {
             final String message = "stopped for port" + (getLocalPorts().size() == 1 ? ": " + getLocalPorts().get(0) : "s: " + getLocalPorts());
-            if (MockServerLogger.isEnabled(INFO) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setType(SERVER_CONFIGURATION)
-                        .setLogLevel(INFO)
-                        .setMessageFormat(message)
-                );
+            if (LOG.isInfoEnabled()) {
+                LOG.info(message);
             }
             new Scheduler.SchedulerThreadFactory("Stop").newThread(() -> {
                 List<ChannelFuture> collect = serverChannelFutures
@@ -84,9 +81,8 @@ public abstract class LifeCycle implements Stoppable {
                     .flatMap(channelFuture -> {
                         try {
                             return Stream.of(channelFuture.get());
-                        } catch (Throwable throwable) {
+                        } catch (Exception ex) {
                             // ignore
-                            throwable.printStackTrace();
                             return Stream.empty();
                         }
                     })
@@ -96,9 +92,8 @@ public abstract class LifeCycle implements Stoppable {
                     for (ChannelFuture channelFuture : collect) {
                         channelFuture.get();
                     }
-                } catch (Throwable throwable) {
+                } catch (Exception ex) {
                     // ignore
-                    throwable.printStackTrace();
                 }
 
                 httpState.stop();
@@ -121,14 +116,9 @@ public abstract class LifeCycle implements Stoppable {
     public void stop() {
         try {
             stopAsync().get(10, SECONDS);
-        } catch (Throwable throwable) {
-            if (MockServerLogger.isEnabled(DEBUG) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(DEBUG)
-                        .setMessageFormat("exception while stopping - " + throwable.getMessage())
-                        .setArguments(throwable)
-                );
+        } catch (Exception ex) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception while stopping", ex);
             }
         }
     }
@@ -154,14 +144,6 @@ public abstract class LifeCycle implements Stoppable {
         return getBoundPorts(serverChannelFutures);
     }
 
-    /**
-     * @deprecated use getLocalPort instead of getPort
-     */
-    @Deprecated
-    public Integer getPort() {
-        return getLocalPort();
-    }
-
     public int getLocalPort() {
         return getFirstBoundPort(serverChannelFutures);
     }
@@ -170,14 +152,9 @@ public abstract class LifeCycle implements Stoppable {
         for (Future<Channel> channelOpened : channelFutures) {
             try {
                 return ((InetSocketAddress) channelOpened.get(15, SECONDS).localAddress()).getPort();
-            } catch (Throwable throwable) {
-                if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(WARN)
-                            .setMessageFormat("exception while retrieving port from channel future, ignoring port for this channel - " + throwable.getMessage())
-                            .setArguments(throwable)
-                    );
+            } catch (Exception ex) {
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("Exception while retrieving port from channel future, ignoring port for this channel", ex);
                 }
             }
         }
@@ -190,13 +167,8 @@ public abstract class LifeCycle implements Stoppable {
             try {
                 ports.add(((InetSocketAddress) channelOpened.get(3, SECONDS).localAddress()).getPort());
             } catch (Exception e) {
-                if (MockServerLogger.isEnabled(DEBUG) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(DEBUG)
-                            .setMessageFormat("exception while retrieving port from channel future, ignoring port for this channel")
-                            .setArguments(e)
-                    );
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Exception while retrieving port from channel future, ignoring port for this channel", e);
                 }
             }
         }
@@ -247,15 +219,10 @@ public abstract class LifeCycle implements Stoppable {
     }
 
     protected void startedServer(List<Integer> ports) {
-        final String message = "started on port" + (ports.size() == 1 ? ": " + ports.get(0) : "s: " + ports);
         setPort(ports);
-        if (MockServerLogger.isEnabled(INFO) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setType(SERVER_CONFIGURATION)
-                    .setLogLevel(INFO)
-                    .setMessageFormat(message)
-            );
+        if (LOG.isInfoEnabled()) {
+            LOG.info("started on port {}",
+                ports.size() == 1 ? ": " + ports.get(0) : "s: " + ports);
         }
     }
 

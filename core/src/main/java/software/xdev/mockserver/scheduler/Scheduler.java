@@ -18,14 +18,17 @@ package software.xdev.mockserver.scheduler;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.httpclient.SocketCommunicationException;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.action.http.HttpForwardActionResult;
 import software.xdev.mockserver.model.BinaryMessage;
 import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -35,17 +38,19 @@ import static software.xdev.mockserver.mock.HttpState.getPort;
 import static software.xdev.mockserver.mock.HttpState.setPort;
 
 public class Scheduler {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(Scheduler.class);
     private final Configuration configuration;
     private final ScheduledExecutorService scheduler;
 
     private final boolean synchronous;
 
     public static class SchedulerThreadFactory implements ThreadFactory {
-
+        
+        private static final AtomicInteger THREAD_INIT_NUMBER = new AtomicInteger(0);
+        
         private final String name;
         private final boolean daemon;
-        private static int threadInitNumber;
 
         public SchedulerThreadFactory(String name) {
             this.name = name;
@@ -60,21 +65,18 @@ public class Scheduler {
         @Override
         @SuppressWarnings("NullableProblems")
         public Thread newThread(Runnable runnable) {
-            Thread thread = new Thread(runnable, "MockServer-" + name + threadInitNumber++);
+            Thread thread = new Thread(runnable, "MockServer-" + name + THREAD_INIT_NUMBER.get());
             thread.setDaemon(daemon);
             return thread;
         }
     }
 
-    private final MockServerLogger mockServerLogger;
-
-    public Scheduler(Configuration configuration, MockServerLogger mockServerLogger) {
-        this(configuration, mockServerLogger, false);
+    public Scheduler(Configuration configuration) {
+        this(configuration, false);
     }
 
-    public Scheduler(Configuration configuration, MockServerLogger mockServerLogger, boolean synchronous) {
+    public Scheduler(Configuration configuration, boolean synchronous) {
         this.configuration = configuration;
-        this.mockServerLogger = mockServerLogger;
         this.synchronous = synchronous;
         if (!this.synchronous) {
             this.scheduler = new ScheduledThreadPoolExecutor(
@@ -102,15 +104,9 @@ public class Scheduler {
         setPort(port);
         try {
             command.run();
-        } catch (Throwable throwable) {
-            if (MockServerLogger.isEnabled(Level.INFO)) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setType(WARN)
-                        .setLogLevel(Level.INFO)
-                        .setMessageFormat(throwable.getMessage())
-                        .setThrowable(throwable)
-                );
+        } catch (Exception ex) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Failed to run", ex);
             }
         }
     }
@@ -170,21 +166,20 @@ public class Scheduler {
                 try {
                     future.getHttpResponse().get(configuration.maxSocketTimeoutInMillis(), MILLISECONDS);
                 } catch (TimeoutException e) {
-                    future.getHttpResponse().completeExceptionally(new SocketCommunicationException("Response was not received after " + configuration.maxSocketTimeoutInMillis() + " milliseconds, to make the proxy wait longer please use \"mockserver.maxSocketTimeout\" system property or configuration.maxSocketTimeout(long milliseconds)", e.getCause()));
+                    future.getHttpResponse().completeExceptionally(
+                        new SocketCommunicationException("Response was not received after "
+                            + configuration.maxSocketTimeoutInMillis()
+                            + " milliseconds, to make the proxy wait longer please use \"mockserver.maxSocketTimeout\" "
+                            + "system property or configuration.maxSocketTimeout(long milliseconds)",
+                            e.getCause()));
                 } catch (InterruptedException | ExecutionException ex) {
                     future.getHttpResponse().completeExceptionally(ex);
                 }
                 run(command, port);
             } else {
                 future.getHttpResponse().whenCompleteAsync((httpResponse, throwable) -> {
-                    if (throwable != null && MockServerLogger.isEnabled(Level.INFO) && logException.test(throwable)) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setType(WARN)
-                                .setLogLevel(Level.INFO)
-                                .setMessageFormat(throwable.getMessage())
-                                .setThrowable(throwable)
-                        );
+                    if (throwable != null && LOG.isInfoEnabled() && logException.test(throwable)) {
+                        LOG.warn("", throwable);
                     }
                     run(command, port);
                 }, scheduler);
@@ -224,15 +219,9 @@ public class Scheduler {
                 }
                 try {
                     consumer.accept(httpResponse, exception);
-                } catch (Throwable throwable) {
-                    if (MockServerLogger.isEnabled(Level.INFO)) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setType(WARN)
-                                .setLogLevel(Level.INFO)
-                                .setMessageFormat(throwable.getMessage())
-                                .setThrowable(throwable)
-                        );
+                } catch (Exception ex) {
+                    if (LOG.isInfoEnabled()) {
+                        LOG.warn("", ex);
                     }
                 }
             } else {

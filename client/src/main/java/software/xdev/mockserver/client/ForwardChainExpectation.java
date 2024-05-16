@@ -21,7 +21,6 @@ import software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient;
 import software.xdev.mockserver.closurecallback.websocketclient.WebSocketException;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
 import software.xdev.mockserver.configuration.ClientConfiguration;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.mock.action.ExpectationCallback;
 import software.xdev.mockserver.mock.action.ExpectationForwardAndResponseCallback;
@@ -38,14 +37,12 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public class ForwardChainExpectation {
 
     private final ClientConfiguration configuration;
-    private final MockServerLogger mockServerLogger;
     private final MockServerClient mockServerClient;
     private final Expectation expectation;
     private final MockServerEventBus mockServerEventBus;
 
-    ForwardChainExpectation(ClientConfiguration configuration, MockServerLogger mockServerLogger, MockServerEventBus mockServerEventBus, MockServerClient mockServerClient, Expectation expectation) {
+    ForwardChainExpectation(ClientConfiguration configuration, MockServerEventBus mockServerEventBus, MockServerClient mockServerClient, Expectation expectation) {
         this.configuration = configuration;
-        this.mockServerLogger = mockServerLogger;
         this.mockServerEventBus = mockServerEventBus;
         this.mockServerClient = mockServerClient;
         this.expectation = expectation;
@@ -269,15 +266,13 @@ public class ForwardChainExpectation {
             LocalCallbackRegistry.registerCallback(clientId, expectationForwardResponseCallback);
             final WebSocketClient<T> webSocketClient = new WebSocketClient<>(
                 new NioEventLoopGroup(configuration.webSocketClientEventLoopThreadCount(), new Scheduler.SchedulerThreadFactory(WebSocketClient.class.getSimpleName() + "-eventLoop")),
-                clientId,
-                mockServerLogger
+                clientId
             );
             final Future<String> register = webSocketClient.registerExpectationCallback(
                 expectationCallback,
                 expectationForwardResponseCallback,
                 mockServerClient.remoteAddress(),
-                mockServerClient.contextPath(),
-                mockServerClient.isSecure()
+                mockServerClient.contextPath()
             );
             mockServerEventBus.subscribe(webSocketClient::stopClient, EventType.STOP, EventType.RESET);
             return register.get(configuration.maxFutureTimeoutInMillis(), MILLISECONDS);

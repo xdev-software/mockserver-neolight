@@ -17,18 +17,14 @@ package software.xdev.mockserver.matchers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.NottableString;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
 public class ExactStringMatcher extends BodyMatcher<NottableString> {
-    private static final String[] excludedFields = {"mockServerLogger"};
-    private final MockServerLogger mockServerLogger;
     private final NottableString matcher;
 
-    ExactStringMatcher(MockServerLogger mockServerLogger, NottableString matcher) {
-        this.mockServerLogger = mockServerLogger;
+    ExactStringMatcher(NottableString matcher) {
         this.matcher = matcher;
     }
 
@@ -65,7 +61,7 @@ public class ExactStringMatcher extends BodyMatcher<NottableString> {
         }
 
         if (!result && context != null) {
-            context.addDifference(mockServerLogger, "exact string match failed expected:{}found:{}", this.matcher, matched);
+            context.addDifference("exact string match failed expected:{}found:{}", this.matcher, matched);
         }
 
         if (matched == null) {
@@ -77,11 +73,5 @@ public class ExactStringMatcher extends BodyMatcher<NottableString> {
 
     public boolean isBlank() {
         return matcher == null || StringUtils.isBlank(matcher.getValue());
-    }
-
-    @Override
-    @JsonIgnore
-    public String[] fieldsExcludedFromEqualsAndHashCode() {
-        return excludedFields;
     }
 }

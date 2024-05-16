@@ -32,11 +32,8 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.*;
 import static org.slf4j.event.Level.ERROR;
 
+@Deprecated
 public class MockServerLogger {
-
-    static {
-        configureLogger();
-    }
 
     public static void configureLogger() {
         try {
@@ -145,10 +142,12 @@ public class MockServerLogger {
         }
     }
 
+    @Deprecated
     public static boolean isEnabled(final Level level) {
         return isEnabled(level, ConfigurationProperties.logLevel());
     }
 
+    @Deprecated
     public static boolean isEnabled(final Level level, final Level configuredLevel) {
         return configuredLevel != null && level.toInt() >= configuredLevel.toInt();
     }

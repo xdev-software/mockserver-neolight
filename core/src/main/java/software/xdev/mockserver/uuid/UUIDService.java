@@ -18,17 +18,18 @@ package software.xdev.mockserver.uuid;
 import java.util.UUID;
 
 
-public class UUIDService {
+public final class UUIDService {
 
-    public static final String FIXED_UUID_FOR_TESTS = UUIDService.getUUID();
-    public static boolean fixedUUID = false;
+    static String fixedUuidForTests = null;
 
     public static String getUUID() {
-        if (!fixedUUID) {
-            return UUID.randomUUID().toString();
-        } else {
-            return FIXED_UUID_FOR_TESTS;
+        if (fixedUuidForTests != null) {
+            return fixedUuidForTests;
         }
+        return UUID.randomUUID().toString();
     }
 
+    private UUIDService() {
+    
+    }
 }

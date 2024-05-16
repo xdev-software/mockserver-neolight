@@ -18,7 +18,9 @@ package software.xdev.mockserver.configuration;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -26,9 +28,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class IntegerStringListParser {
-
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(IntegerStringListParser.class);
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(IntegerStringListParser.class);
+    
     public Integer[] toArray(String integers) {
         return toList(integers).toArray(new Integer[0]);
     }
@@ -39,12 +41,7 @@ public class IntegerStringListParser {
             try {
                 integerList.add(Integer.parseInt(integer.trim()));
             } catch (NumberFormatException nfe) {
-                MOCK_SERVER_LOGGER.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("NumberFormatException converting " + integer + " to integer")
-                        .setThrowable(nfe)
-                );
+                LOG.error("NumberFormatException converting {} to integer", integer, nfe);
             }
         }
         return integerList;

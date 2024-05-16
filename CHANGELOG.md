@@ -13,3 +13,6 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * Version
   * Persistence of expectations
   * Dashboard
+  * parts of Logging
+  * TLS/SSL MitM (did never work with TLS 1.3+ and HTTP2+ anyway) 
+  * JWT + mDNS auth

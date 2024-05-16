@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.model.BodyDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
@@ -32,8 +31,14 @@ import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.EXCEPTI
 import static software.xdev.mockserver.model.NottableString.string;
 import static org.slf4j.event.Level.ERROR;
 
-public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDefinitionDTO> {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDefinitionDTO> {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(RequestDefinitionDTODeserializer.class);
+    
     public RequestDefinitionDTODeserializer() {
         super(RequestDefinitionDTO.class);
     }
@@ -53,11 +58,10 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
         Cookies cookies = null;
         Headers headers = null;
         Boolean keepAlive = null;
-        Boolean secure = null;
         Protocol protocol = null;
         SocketAddress socketAddress = null;
         while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
-            String fieldName = jsonParser.getCurrentName();
+            String fieldName = jsonParser.currentName();
             if (fieldName != null) {
                 switch (fieldName) {
                     case "not": {
@@ -105,11 +109,6 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
                         keepAlive = ctxt.readValue(jsonParser, Boolean.class);
                         break;
                     }
-                    case "secure": {
-                        jsonParser.nextToken();
-                        secure = ctxt.readValue(jsonParser, Boolean.class);
-                        break;
-                    }
                     case "socketAddress": {
                         jsonParser.nextToken();
                         socketAddress = ctxt.readValue(jsonParser, SocketAddress.class);
@@ -119,14 +118,8 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
                         jsonParser.nextToken();
                         try {
                             protocol = Protocol.valueOf(ctxt.readValue(jsonParser, String.class));
-                        } catch (Throwable throwable) {
-                            new MockServerLogger().logEvent(
-                                new LogEntry()
-                                    .setType(EXCEPTION)
-                                    .setLogLevel(ERROR)
-                                    .setMessageFormat("exception while parsing protocol value for RequestDefinitionDTO - " + throwable.getMessage())
-                                    .setThrowable(throwable)
-                            );
+                        } catch (Exception ex) {
+                            LOG.error("Exception while parsing protocol value for RequestDefinitionDTO", ex);
                         }
                         break;
                     }
@@ -142,7 +135,6 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
             .setCookies(cookies)
             .setHeaders(headers)
             .setKeepAlive(keepAlive)
-            .setSecure(secure)
             .setProtocol(protocol)
             .setSocketAddress(socketAddress)
             .setNot(not);

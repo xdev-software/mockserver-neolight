@@ -57,9 +57,6 @@ public class HttpRequestSerializer extends StdSerializer<HttpRequest> {
         if (httpRequest.isKeepAlive() != null) {
             jgen.writeBooleanField("keepAlive", httpRequest.isKeepAlive());
         }
-        if (httpRequest.isSecure() != null) {
-            jgen.writeBooleanField("secure", httpRequest.isSecure());
-        }
         if (httpRequest.getClientCertificateChain() != null && !httpRequest.getClientCertificateChain().isEmpty()) {
             jgen.writeObjectField("clientCertificateChain", httpRequest.getClientCertificateChain());
         }

@@ -16,7 +16,6 @@
 package software.xdev.mockserver.matchers;
 
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.RequestDefinition;
 
 import java.util.ArrayList;
@@ -63,27 +62,6 @@ public class MatchDifference {
     public MatchDifference(boolean detailedMatchFailures, RequestDefinition httpRequest) {
         this.detailedMatchFailures = detailedMatchFailures;
         this.httpRequest = httpRequest;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public MatchDifference addDifference(MockServerLogger mockServerLogger, Throwable throwable, String messageFormat, Object... arguments) {
-        if (mockServerLogger != null && MockServerLogger.isEnabled(TRACE)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setHttpRequest(httpRequest)
-                    .setCorrelationId(httpRequest.getLogCorrelationId())
-                    .setMessageFormat(messageFormat)
-                    .setArguments(arguments)
-                    .setThrowable(throwable)
-            );
-        }
-        return addDifference(messageFormat, arguments);
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public MatchDifference addDifference(MockServerLogger mockServerLogger, String messageFormat, Object... arguments) {
-        return addDifference(mockServerLogger, null, messageFormat, arguments);
     }
 
     public MatchDifference addDifference(Field fieldName, String messageFormat, Object... arguments) {

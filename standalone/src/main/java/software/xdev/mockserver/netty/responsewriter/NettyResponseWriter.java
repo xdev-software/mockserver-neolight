@@ -21,7 +21,6 @@ import io.netty.channel.ChannelHandlerContext;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpRequest;
@@ -32,13 +31,19 @@ import software.xdev.mockserver.scheduler.Scheduler;
 import static org.slf4j.event.Level.TRACE;
 import static org.slf4j.event.Level.WARN;
 
-public class NettyResponseWriter extends ResponseWriter {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+public class NettyResponseWriter extends ResponseWriter {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(NettyResponseWriter.class);
+    
     private final ChannelHandlerContext ctx;
     private final Scheduler scheduler;
 
-    public NettyResponseWriter(Configuration configuration, MockServerLogger mockServerLogger, ChannelHandlerContext ctx, Scheduler scheduler) {
-        super(configuration, mockServerLogger);
+    public NettyResponseWriter(Configuration configuration, ChannelHandlerContext ctx, Scheduler scheduler) {
+        super(configuration);
         this.ctx = ctx;
         this.scheduler = scheduler;
     }
@@ -82,30 +87,19 @@ public class NettyResponseWriter extends ResponseWriter {
                             .close()
                             .addListener(closeFuture -> {
                                 if (disconnectFuture.isSuccess()) {
-                                    if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                                        mockServerLogger
-                                            .logEvent(new LogEntry()
-                                                .setLogLevel(TRACE)
-                                                .setMessageFormat("disconnected and closed socket " + future.channel().localAddress())
-                                            );
+                                    if (LOG.isTraceEnabled()) {
+                                        LOG.trace("Disconnected and closed socket {}", future.channel().localAddress());
                                     }
                                 } else {
-                                    if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                                        mockServerLogger
-                                            .logEvent(new LogEntry()
-                                                .setLogLevel(WARN)
-                                                .setMessageFormat("exception closing socket " + future.channel().localAddress())
-                                                .setThrowable(disconnectFuture.cause())
-                                            );
+                                    if (LOG.isWarnEnabled()) {
+                                        LOG.warn("Exception closing socket {}", future.channel().localAddress());
                                     }
                                 }
                             });
-                    } else if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                        mockServerLogger
-                            .logEvent(new LogEntry()
-                                .setLogLevel(WARN)
-                                .setMessageFormat("exception disconnecting socket " + future.channel().localAddress())
-                                .setThrowable(disconnectFuture.cause()));
+                    } else if (LOG.isWarnEnabled()) {
+                        LOG.warn("Exception disconnecting socket {}",
+                            future.channel().localAddress(),
+                            disconnectFuture.cause());
                     }
                 }
             );

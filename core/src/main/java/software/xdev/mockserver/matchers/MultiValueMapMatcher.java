@@ -17,7 +17,6 @@ package software.xdev.mockserver.matchers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import software.xdev.mockserver.collections.NottableStringMultiMap;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.KeyMatchStyle;
 import software.xdev.mockserver.model.KeyToMultiValue;
 import software.xdev.mockserver.model.KeysToMultiValues;
@@ -26,20 +25,17 @@ import static software.xdev.mockserver.model.NottableString.string;
 
 @SuppressWarnings("rawtypes")
 public class MultiValueMapMatcher extends NotMatcher<KeysToMultiValues<? extends KeyToMultiValue, ? extends KeysToMultiValues>> {
-    private static final String[] EXCLUDED_FIELDS = {"mockServerLogger"};
-    private final MockServerLogger mockServerLogger;
     private final NottableStringMultiMap matcher;
     private final KeysToMultiValues keysToMultiValues;
     private final boolean controlPlaneMatcher;
     private Boolean allKeysNotted;
     private Boolean allKeysOptional;
 
-    MultiValueMapMatcher(MockServerLogger mockServerLogger, KeysToMultiValues<? extends KeyToMultiValue, ? extends KeysToMultiValues> keysToMultiValues, boolean controlPlaneMatcher) {
-        this.mockServerLogger = mockServerLogger;
+    MultiValueMapMatcher(KeysToMultiValues<? extends KeyToMultiValue, ? extends KeysToMultiValues> keysToMultiValues, boolean controlPlaneMatcher) {
         this.keysToMultiValues = keysToMultiValues;
         this.controlPlaneMatcher = controlPlaneMatcher;
         if (keysToMultiValues != null) {
-            this.matcher = new NottableStringMultiMap(this.mockServerLogger, this.controlPlaneMatcher, keysToMultiValues.getKeyMatchStyle(), keysToMultiValues.getEntries());
+            this.matcher = new NottableStringMultiMap(this.controlPlaneMatcher, keysToMultiValues.getKeyMatchStyle(), keysToMultiValues.getEntries());
         } else {
             this.matcher = null;
         }
@@ -59,11 +55,11 @@ public class MultiValueMapMatcher extends NotMatcher<KeysToMultiValues<? extends
             }
             result = allKeysNotted || allKeysOptional;
         } else {
-            result = new NottableStringMultiMap(mockServerLogger, controlPlaneMatcher, matched.getKeyMatchStyle(), matched.getEntries()).containsAll(mockServerLogger, context, matcher);
+            result = new NottableStringMultiMap(controlPlaneMatcher, matched.getKeyMatchStyle(), matched.getEntries()).containsAll(context, matcher);
         }
 
         if (!result && context != null) {
-            context.addDifference(mockServerLogger, "multimap match failed expected:{}found:{}failed because:{}", keysToMultiValues, matched != null ? matched : "none", matched != null ? (matcher.getKeyMatchStyle() == KeyMatchStyle.SUB_SET ? "multimap is not a subset" : "multimap values don't match") : "none is not a subset");
+            context.addDifference("multimap match failed expected:{}found:{}failed because:{}", keysToMultiValues, matched != null ? matched : "none", matched != null ? (matcher.getKeyMatchStyle() == KeyMatchStyle.SUB_SET ? "multimap is not a subset" : "multimap values don't match") : "none is not a subset");
         }
 
         return not != result;
@@ -71,11 +67,5 @@ public class MultiValueMapMatcher extends NotMatcher<KeysToMultiValues<? extends
 
     public boolean isBlank() {
         return matcher == null || matcher.isEmpty();
-    }
-
-    @Override
-    @JsonIgnore
-    protected String[] fieldsExcludedFromEqualsAndHashCode() {
-        return EXCLUDED_FIELDS;
     }
 }

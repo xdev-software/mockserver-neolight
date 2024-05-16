@@ -15,41 +15,31 @@
  */
 package software.xdev.mockserver.configuration;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.StringUtils;
-import software.xdev.mockserver.file.FileReader;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
-import software.xdev.mockserver.socket.tls.ForwardProxyTLSX509CertificatesTrustManager;
-import software.xdev.mockserver.socket.tls.KeyAndCertificateFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.io.*;
-import java.lang.management.MemoryType;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.SERVER_CONFIGURATION;
 import static software.xdev.mockserver.logging.MockServerLogger.configureLogger;
-import static org.slf4j.event.Level.DEBUG;
 
 public class ConfigurationProperties {
 
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(ConfigurationProperties.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigurationProperties.class);
+    
     private static final String DEFAULT_LOG_LEVEL = "INFO";
 
     // logging
@@ -102,7 +92,6 @@ public class ConfigurationProperties {
     // proxy
     private static final String MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION = "mockserver.attemptToProxyIfNoMatchingExpectation";
     private static final String MOCKSERVER_FORWARD_HTTP_PROXY = "mockserver.forwardHttpProxy";
-    private static final String MOCKSERVER_FORWARD_HTTPS_PROXY = "mockserver.forwardHttpsProxy";
     private static final String MOCKSERVER_FORWARD_SOCKS_PROXY = "mockserver.forwardSocksProxy";
     private static final String MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_USERNAME = "mockserver.forwardProxyAuthenticationUsername";
     private static final String MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_PASSWORD = "mockserver.forwardProxyAuthenticationPassword";
@@ -113,56 +102,6 @@ public class ConfigurationProperties {
 
     // liveness
     private static final String MOCKSERVER_LIVENESS_HTTP_GET_PATH = "mockserver.livenessHttpGetPath";
-
-    // control plane authentication
-    private static final String MOCKSERVER_CONTROL_PLANE_TLS_MUTUAL_AUTHENTICATION_REQUIRED = "mockserver.controlPlaneTLSMutualAuthenticationRequired";
-    private static final String MOCKSERVER_CONTROL_PLANE_TLS_MUTUAL_AUTHENTICATION_CERTIFICATE_CHAIN = "mockserver.controlPlaneTLSMutualAuthenticationCAChain";
-    private static final String MOCKSERVER_CONTROL_PLANE_TLS_PRIVATE_KEY_PATH = "mockserver.controlPlanePrivateKeyPath";
-    private static final String MOCKSERVER_CONTROL_PLANE_TLS_X509_CERTIFICATE_PATH = "mockserver.controlPlaneX509CertificatePath";
-    private static final String MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_REQUIRED = "mockserver.controlPlaneJWTAuthenticationRequired";
-    private static final String MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_JWK_SOURCE = "mockserver.controlPlaneJWTAuthenticationJWKSource";
-    private static final String MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_EXPECTED_AUDIENCE = "mockserver.controlPlaneJWTAuthenticationExpectedAudience";
-    private static final String MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_MATCHING_CLAIMS = "mockserver.controlPlaneJWTAuthenticationMatchingClaims";
-    private static final String MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_REQUIRED_CLAIMS = "mockserver.controlPlaneJWTAuthenticationRequiredClaims";
-
-    // TLS
-    private static final String MOCKSERVER_PROACTIVELY_INITIALISE_TLS = "mockserver.proactivelyInitialiseTLS";
-    private static final String MOCKSERVER_TLS_PROTOCOLS = "mockserver.tlsProtocols";
-
-    // inbound - dynamic CA
-    private static final String MOCKSERVER_DYNAMICALLY_CREATE_CERTIFICATE_AUTHORITY_CERTIFICATE = "mockserver.dynamicallyCreateCertificateAuthorityCertificate";
-    private static final String MOCKSERVER_CERTIFICATE_DIRECTORY_TO_SAVE_DYNAMIC_SSL_CERTIFICATE = "mockserver.directoryToSaveDynamicSSLCertificate";
-
-    // inbound - dynamic private key & x509
-    private static final String MOCKSERVER_PREVENT_CERTIFICATE_DYNAMIC_UPDATE = "mockserver.preventCertificateDynamicUpdate";
-    private static final String MOCKSERVER_SSL_CERTIFICATE_DOMAIN_NAME = "mockserver.sslCertificateDomainName";
-    private static final String MOCKSERVER_SSL_SUBJECT_ALTERNATIVE_NAME_DOMAINS = "mockserver.sslSubjectAlternativeNameDomains";
-    private static final String MOCKSERVER_SSL_SUBJECT_ALTERNATIVE_NAME_IPS = "mockserver.sslSubjectAlternativeNameIps";
-
-    // inbound - fixed CA
-    // inbound - fixed CA
-    private static final String MOCKSERVER_CERTIFICATE_AUTHORITY_PRIVATE_KEY = "mockserver.certificateAuthorityPrivateKey";
-    private static final String MOCKSERVER_CERTIFICATE_AUTHORITY_X509_CERTIFICATE = "mockserver.certificateAuthorityCertificate";
-    public static final String DEFAULT_CERTIFICATE_AUTHORITY_PRIVATE_KEY = "org/mockserver/socket/PKCS8CertificateAuthorityPrivateKey.pem";
-    public static final String DEFAULT_CERTIFICATE_AUTHORITY_X509_CERTIFICATE = "org/mockserver/socket/CertificateAuthorityCertificate.pem";
-
-    // inbound - fixed private key & x509
-    private static final String MOCKSERVER_TLS_PRIVATE_KEY_PATH = "mockserver.privateKeyPath";
-    private static final String MOCKSERVER_TLS_X509_CERTIFICATE_PATH = "mockserver.x509CertificatePath";
-
-    // inbound - mTLS
-    private static final String MOCKSERVER_TLS_MUTUAL_AUTHENTICATION_REQUIRED = "mockserver.tlsMutualAuthenticationRequired";
-    private static final String MOCKSERVER_TLS_MUTUAL_AUTHENTICATION_CERTIFICATE_CHAIN = "mockserver.tlsMutualAuthenticationCertificateChain";
-
-    // outbound - CA
-    private static final String MOCKSERVER_FORWARD_PROXY_TLS_X509_CERTIFICATES_TRUST_MANAGER_TYPE = "mockserver.forwardProxyTLSX509CertificatesTrustManagerType";
-
-    // outbound - fixed CA
-    private static final String MOCKSERVER_FORWARD_PROXY_TLS_CUSTOM_TRUST_X509_CERTIFICATES = "mockserver.forwardProxyTLSCustomTrustX509Certificates";
-
-    // outbound - fixed private key & x509
-    private static final String MOCKSERVER_FORWARD_PROXY_TLS_PRIVATE_KEY = "mockserver.forwardProxyPrivateKey";
-    private static final String MOCKSERVER_FORWARD_PROXY_TLS_X509_CERTIFICATE_CHAIN = "mockserver.forwardProxyCertificateChain";
 
     // properties file
     private static final String MOCKSERVER_PROPERTY_FILE = "mockserver.propertyFile";
@@ -785,32 +724,6 @@ public class ConfigurationProperties {
         validateHostAndPortAndSetProperty(hostAndPort.toString(), MOCKSERVER_FORWARD_HTTP_PROXY);
     }
 
-    public static InetSocketAddress forwardHttpsProxy() {
-        return readInetSocketAddressProperty(MOCKSERVER_FORWARD_HTTPS_PROXY, "MOCKSERVER_FORWARD_HTTPS_PROXY");
-    }
-
-    /**
-     * Use HTTPS proxy (i.e. HTTP CONNECT) for all outbound / forwarded requests, supports TLS tunnelling of HTTPS requests
-     * <p>
-     * The default is null
-     *
-     * @param hostAndPort host and port for HTTPS proxy (i.e. HTTP CONNECT) for all outbound / forwarded requests
-     */
-    public static void forwardHttpsProxy(String hostAndPort) {
-        validateHostAndPortAndSetProperty(hostAndPort, MOCKSERVER_FORWARD_HTTPS_PROXY);
-    }
-
-    /**
-     * Use HTTPS proxy (i.e. HTTP CONNECT) for all outbound / forwarded requests, supports TLS tunnelling of HTTPS requests
-     * <p>
-     * The default is null
-     *
-     * @param hostAndPort host and port for HTTPS proxy (i.e. HTTP CONNECT) for all outbound / forwarded requests
-     */
-    public static void forwardHttpsProxy(InetSocketAddress hostAndPort) {
-        validateHostAndPortAndSetProperty(hostAndPort.toString(), MOCKSERVER_FORWARD_HTTPS_PROXY);
-    }
-
     public static InetSocketAddress forwardSocksProxy() {
         return readInetSocketAddressProperty(MOCKSERVER_FORWARD_SOCKS_PROXY, "MOCKSERVER_FORWARD_SOCKS_PROXY");
     }
@@ -957,481 +870,6 @@ public class ConfigurationProperties {
         setProperty(MOCKSERVER_LIVENESS_HTTP_GET_PATH, livenessPath);
     }
 
-    // control plane authentication
-
-    public static boolean controlPlaneTLSMutualAuthenticationRequired() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_TLS_MUTUAL_AUTHENTICATION_REQUIRED, "MOCKSERVER_CONTROL_PLANE_TLS_MUTUAL_AUTHENTICATION_REQUIRED", "false"));
-    }
-
-    /**
-     * Require mTLS (also called client authentication and two-way TLS) for all control plane requests
-     *
-     * @param enable TLS mutual authentication for all control plane requests
-     */
-    public static void controlPlaneTLSMutualAuthenticationRequired(boolean enable) {
-        setProperty(MOCKSERVER_CONTROL_PLANE_TLS_MUTUAL_AUTHENTICATION_REQUIRED, "" + enable);
-    }
-
-    public static String controlPlaneTLSMutualAuthenticationCAChain() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_TLS_MUTUAL_AUTHENTICATION_CERTIFICATE_CHAIN, "MOCKSERVER_CONTROL_PLANE_TLS_MUTUAL_AUTHENTICATION_CERTIFICATE_CHAIN", "");
-    }
-
-    /**
-     * File system path or classpath location of custom mTLS (TLS client authentication) X.509 Certificate Chain for control plane mTLS authentication
-     * <p>
-     * The X.509 Certificate Chain is for trusting (i.e. signature verification of) Client X.509 Certificates, the certificate chain must be a X509 PEM file.
-     * <p>
-     * This certificate chain will be used for to performs mTLS (client authentication) for inbound TLS connections if controlPlaneTLSMutualAuthenticationRequired is enabled
-     *
-     * @param trustCertificateChain File system path or classpath location of custom mTLS (TLS client authentication) X.509 Certificate Chain for Trusting (i.e. signature verification of) Client X.509 Certificates
-     */
-    public static void controlPlaneTLSMutualAuthenticationCAChain(String trustCertificateChain) {
-        setProperty(MOCKSERVER_CONTROL_PLANE_TLS_MUTUAL_AUTHENTICATION_CERTIFICATE_CHAIN, "" + trustCertificateChain);
-    }
-
-    public static String controlPlanePrivateKeyPath() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_TLS_PRIVATE_KEY_PATH, "MOCKSERVER_CONTROL_PLANE_TLS_PRIVATE_KEY_PATH", "");
-    }
-
-    /**
-     * File system path or classpath location of a fixed custom private key for control plane connections using mTLS for authentication.
-     * <p>
-     * The private key must be a PKCS#8 or PKCS#1 PEM file and must be the private key corresponding to the controlPlaneX509CertificatePath X509 (public key) configuration.
-     * The controlPlaneTLSMutualAuthenticationCAChain configuration must be the Certificate Authority for the corresponding X509 certificate (i.e. able to valid its signature).
-     * <p>
-     * To convert a PKCS#1 (i.e. default for Bouncy Castle) to a PKCS#8 the following command can be used: openssl pkcs8 -topk8 -inform PEM -in private_key_PKCS_1.pem -out private_key_PKCS_8.pem -nocrypt
-     * <p>
-     * This configuration will be ignored unless x509CertificatePath is also set.
-     *
-     * @param privateKeyPath location of the PKCS#8 PEM file containing the private key
-     */
-    public static void controlPlanePrivateKeyPath(String privateKeyPath) {
-        fileExists(privateKeyPath);
-        setProperty(MOCKSERVER_CONTROL_PLANE_TLS_PRIVATE_KEY_PATH, privateKeyPath);
-    }
-
-
-    public static String controlPlaneX509CertificatePath() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_TLS_X509_CERTIFICATE_PATH, "MOCKSERVER_CONTROL_PLANE_TLS_X509_CERTIFICATE_PATH", "");
-    }
-
-    /**
-     * File system path or classpath location of a fixed custom X.509 Certificate for control plane connections using mTLS for authentication.
-     * <p>
-     * The certificate must be a X509 PEM file and must be the public key corresponding to the controlPlanePrivateKeyPath private key configuration.
-     * The controlPlaneTLSMutualAuthenticationCAChain configuration must be the Certificate Authority for this certificate (i.e. able to valid its signature).
-     * <p>
-     * This configuration will be ignored unless privateKeyPath is also set.
-     *
-     * @param x509CertificatePath location of the PEM file containing the X509 certificate
-     */
-    public static void controlPlaneX509CertificatePath(String x509CertificatePath) {
-        fileExists(x509CertificatePath);
-        setProperty(MOCKSERVER_CONTROL_PLANE_TLS_X509_CERTIFICATE_PATH, x509CertificatePath);
-    }
-
-    public static boolean controlPlaneJWTAuthenticationRequired() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_REQUIRED, "MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_REQUIRED", "false"));
-    }
-
-    /**
-     * <p>
-     * Require JWT authentication for all control plane requests
-     * </p>
-     *
-     * @param enable TLS mutual authentication for all control plane requests
-     */
-    public static void controlPlaneJWTAuthenticationRequired(boolean enable) {
-        setProperty(MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_REQUIRED, "" + enable);
-    }
-
-    public static String controlPlaneJWTAuthenticationJWKSource() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_JWK_SOURCE, "MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_JWK_SOURCE", "");
-    }
-
-    /**
-     * <p>
-     * JWK source used when JWT authentication is enabled for control plane requests
-     * </p>
-     * <p>
-     * JWK source can be a file system path, classpath location or a URL
-     * </p>
-     * <p>
-     * See: https://openid.net/specs/draft-jones-json-web-key-03.html
-     * </p>
-     *
-     * @param controlPlaneJWTAuthenticationJWKSource file system path, classpath location or a URL of JWK source
-     */
-    public static void controlPlaneJWTAuthenticationJWKSource(String controlPlaneJWTAuthenticationJWKSource) {
-        setProperty(MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_JWK_SOURCE, "" + controlPlaneJWTAuthenticationJWKSource);
-    }
-
-    public static String controlPlaneJWTAuthenticationExpectedAudience() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_EXPECTED_AUDIENCE, "MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_EXPECTED_AUDIENCE", "");
-    }
-
-    /**
-     * <p>
-     * Audience claim (i.e. aud) required when JWT authentication is enabled for control plane requests
-     * </p>
-     *
-     * @param controlPlaneJWTAuthenticationExpectedAudience required value for audience claim (i.e. aud)
-     */
-    public static void controlPlaneJWTAuthenticationExpectedAudience(String controlPlaneJWTAuthenticationExpectedAudience) {
-        setProperty(MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_EXPECTED_AUDIENCE, "" + controlPlaneJWTAuthenticationExpectedAudience);
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    public static Map<String, String> controlPlaneJWTAuthenticationMatchingClaims() {
-        String jwtAuthenticationMatchingClaims = readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_MATCHING_CLAIMS, "MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_MATCHING_CLAIMS", "");
-        if (isNotBlank(jwtAuthenticationMatchingClaims)) {
-            return Splitter.on(",").withKeyValueSeparator("=").split(jwtAuthenticationMatchingClaims);
-        } else {
-            return ImmutableMap.of();
-        }
-    }
-
-    /**
-     * <p>
-     * Matching claims expected when JWT authentication is enabled for control plane requests
-     * </p>
-     * <p>
-     * Value should be string with comma separated key=value items, for example: scope=internal public,sub=some_subject
-     * </p>
-     *
-     * @param controlPlaneJWTAuthenticationMatchingClaims required values for claims
-     */
-    public static void controlPlaneJWTAuthenticationMatchingClaims(Map<String, String> controlPlaneJWTAuthenticationMatchingClaims) {
-        setProperty(MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_MATCHING_CLAIMS, Joiner.on(",").withKeyValueSeparator("=").join(controlPlaneJWTAuthenticationMatchingClaims));
-    }
-
-    public static Set<String> controlPlaneJWTAuthenticationRequiredClaims() {
-        String jwtAuthenticationRequiredClaims = readPropertyHierarchically(PROPERTIES, MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_REQUIRED_CLAIMS, "MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_REQUIRED_CLAIMS", "");
-        if (isNotBlank(jwtAuthenticationRequiredClaims)) {
-            return Sets.newConcurrentHashSet(Arrays.asList(jwtAuthenticationRequiredClaims.split(",")));
-        } else {
-            return ImmutableSet.of();
-        }
-    }
-
-    /**
-     * <p>
-     * Required claims that should exist (i.e. with any value) when JWT authentication is enabled for control plane requests
-     * </p>
-     * <p>
-     * Value should be string with comma separated values, for example: scope,sub
-     * </p>
-     *
-     * @param controlPlaneJWTAuthenticationRequiredClaims required claims
-     */
-    public static void controlPlaneJWTAuthenticationRequiredClaims(Set<String> controlPlaneJWTAuthenticationRequiredClaims) {
-        setProperty(MOCKSERVER_CONTROL_PLANE_JWT_AUTHENTICATION_REQUIRED_CLAIMS, Joiner.on(",").join(controlPlaneJWTAuthenticationRequiredClaims));
-    }
-
-    // TLS
-
-    /**
-     * <p>Proactively initialise TLS during start to ensure that if dynamicallyCreateCertificateAuthorityCertificate is enabled the Certificate Authority X.509 Certificate and Private Key will be created during start up and not when the first TLS connection is received.</p>
-     * <p>This setting will also ensure any configured private key and X.509 will be loaded during start up and not when the first TLS connection is received to give immediate feedback on any related TLS configuration errors.</p>
-     *
-     * @param enable proactively initialise TLS at startup
-     */
-    public static void proactivelyInitialiseTLS(boolean enable) {
-        setProperty(MOCKSERVER_PROACTIVELY_INITIALISE_TLS, "" + enable);
-    }
-
-    public static boolean proactivelyInitialiseTLS() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_PROACTIVELY_INITIALISE_TLS, "MOCKSERVER_PROACTIVELY_INITIALISE_TLS", "false"));
-    }
-
-    public static String tlsProtocols() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_TLS_PROTOCOLS, "MOCKSERVER_TLS_PROTOCOLS", "TLSv1,TLSv1.1,TLSv1.2");
-    }
-
-    /**
-     * Comma seperated list of TLS protocols, by default TLSv1,TLSv1.1,TLSv1.2
-     *
-     * @param tlsProtocols comma seperated list of TLS protocols
-     */
-    public static  void tlsProtocols(String tlsProtocols) {
-        setProperty(MOCKSERVER_TLS_PROTOCOLS, tlsProtocols);
-    }
-
-    public static boolean dynamicallyCreateCertificateAuthorityCertificate() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_DYNAMICALLY_CREATE_CERTIFICATE_AUTHORITY_CERTIFICATE, "MOCKSERVER_DYNAMICALLY_CREATE_CERTIFICATE_AUTHORITY_CERTIFICATE", "false"));
-    }
-
-    /**
-     * Enable dynamic creation of Certificate Authority X509 certificate and private key.
-     * <p>
-     * Enable this property to increase the security of trusting the MockServer Certificate Authority X509 by ensuring a local dynamic value is used instead of the public value in the MockServer git repo.
-     * <p>
-     * These PEM files will be created and saved in the directory specified with configuration property directoryToSaveDynamicSSLCertificate.
-     *
-     * @param enable dynamic creation of Certificate Authority X509 certificate and private key.
-     */
-    public static void dynamicallyCreateCertificateAuthorityCertificate(boolean enable) {
-        setProperty(MOCKSERVER_DYNAMICALLY_CREATE_CERTIFICATE_AUTHORITY_CERTIFICATE, "" + enable);
-    }
-
-    public static String directoryToSaveDynamicSSLCertificate() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CERTIFICATE_DIRECTORY_TO_SAVE_DYNAMIC_SSL_CERTIFICATE, "MOCKSERVER_CERTIFICATE_DIRECTORY_TO_SAVE_DYNAMIC_SSL_CERTIFICATE", ".");
-    }
-
-    /**
-     * Directory used to save the dynamically generated Certificate Authority X.509 Certificate and Private Key.
-     *
-     * @param directoryToSaveDynamicSSLCertificate directory to save Certificate Authority X.509 Certificate and Private Key
-     */
-    public static void directoryToSaveDynamicSSLCertificate(String directoryToSaveDynamicSSLCertificate) {
-        fileExists(directoryToSaveDynamicSSLCertificate);
-        setProperty(MOCKSERVER_CERTIFICATE_DIRECTORY_TO_SAVE_DYNAMIC_SSL_CERTIFICATE, directoryToSaveDynamicSSLCertificate);
-    }
-
-    /**
-     * Prevent certificates from dynamically updating when domain list changes
-     *
-     * @param prevent prevent certificates from dynamically updating when domain list changes
-     */
-    public static void preventCertificateDynamicUpdate(boolean prevent) {
-        setProperty(MOCKSERVER_PREVENT_CERTIFICATE_DYNAMIC_UPDATE, "" + prevent);
-    }
-
-    public static boolean preventCertificateDynamicUpdate() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_PREVENT_CERTIFICATE_DYNAMIC_UPDATE, "MOCKSERVER_PREVENT_CERTIFICATE_DYNAMIC_UPDATE", "false"));
-    }
-
-    public static String sslCertificateDomainName() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_SSL_CERTIFICATE_DOMAIN_NAME, "MOCKSERVER_SSL_CERTIFICATE_DOMAIN_NAME", KeyAndCertificateFactory.CERTIFICATE_DOMAIN);
-    }
-
-    /**
-     * The domain name for auto-generate TLS certificates
-     * <p>
-     * The default is "localhost"
-     *
-     * @param domainName domain name for auto-generate TLS certificates
-     */
-    public static void sslCertificateDomainName(String domainName) {
-        setProperty(MOCKSERVER_SSL_CERTIFICATE_DOMAIN_NAME, domainName);
-    }
-
-    /**
-     * The Subject Alternative Name (SAN) domain names for auto-generate TLS certificates as a comma separated list
-     * <p>
-     * The default is "localhost"
-     *
-     * @param sslSubjectAlternativeNameDomains Subject Alternative Name (SAN) domain names for auto-generate TLS certificates
-     */
-    public static void sslSubjectAlternativeNameDomains(Set<String> sslSubjectAlternativeNameDomains) {
-        setProperty(MOCKSERVER_SSL_SUBJECT_ALTERNATIVE_NAME_DOMAINS, Joiner.on(",").join(sslSubjectAlternativeNameDomains));
-    }
-
-    public static Set<String> sslSubjectAlternativeNameDomains() {
-        return Sets.newConcurrentHashSet(Arrays.asList(readPropertyHierarchically(PROPERTIES, MOCKSERVER_SSL_SUBJECT_ALTERNATIVE_NAME_DOMAINS, "MOCKSERVER_SSL_SUBJECT_ALTERNATIVE_NAME_DOMAINS", "localhost").split(",")));
-    }
-
-    /**
-     * <p>The Subject Alternative Name (SAN) IP addresses for auto-generate TLS certificates as a comma separated list</p>
-     *
-     * <p>The default is "127.0.0.1,0.0.0.0"</p>
-     *
-     * @param sslSubjectAlternativeNameIps Subject Alternative Name (SAN) IP addresses for auto-generate TLS certificates
-     */
-    public static void sslSubjectAlternativeNameIps(Set<String> sslSubjectAlternativeNameIps) {
-        setProperty(MOCKSERVER_SSL_SUBJECT_ALTERNATIVE_NAME_IPS, Joiner.on(",").join(sslSubjectAlternativeNameIps));
-    }
-
-    public static Set<String> sslSubjectAlternativeNameIps() {
-        return Sets.newConcurrentHashSet(Arrays.asList(readPropertyHierarchically(PROPERTIES, MOCKSERVER_SSL_SUBJECT_ALTERNATIVE_NAME_IPS, "MOCKSERVER_SSL_SUBJECT_ALTERNATIVE_NAME_IPS", "127.0.0.1,0.0.0.0").split(",")));
-    }
-
-    public static String certificateAuthorityPrivateKey() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CERTIFICATE_AUTHORITY_PRIVATE_KEY, "MOCKSERVER_CERTIFICATE_AUTHORITY_PRIVATE_KEY", DEFAULT_CERTIFICATE_AUTHORITY_PRIVATE_KEY);
-    }
-
-    /**
-     * File system path or classpath location of custom Private Key for Certificate Authority for TLS, the private key must be a PKCS#8 or PKCS#1 PEM file and must match the certificateAuthorityCertificate
-     * To convert a PKCS#1 (i.e. default for Bouncy Castle) to a PKCS#8 the following command can be used: openssl pkcs8 -topk8 -inform PEM -in private_key_PKCS_1.pem -out private_key_PKCS_8.pem -nocrypt
-     *
-     * @param certificateAuthorityPrivateKey location of the PEM file containing the certificate authority private key
-     */
-    public static void certificateAuthorityPrivateKey(String certificateAuthorityPrivateKey) {
-        setProperty(MOCKSERVER_CERTIFICATE_AUTHORITY_PRIVATE_KEY, certificateAuthorityPrivateKey);
-    }
-
-    public static String certificateAuthorityCertificate() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CERTIFICATE_AUTHORITY_X509_CERTIFICATE, "MOCKSERVER_CERTIFICATE_AUTHORITY_X509_CERTIFICATE", DEFAULT_CERTIFICATE_AUTHORITY_X509_CERTIFICATE);
-    }
-
-    /**
-     * File system path or classpath location of custom X.509 Certificate for Certificate Authority for TLS, the certificate must be a X509 PEM file and must match the certificateAuthorityPrivateKey
-     *
-     * @param certificateAuthorityCertificate location of the PEM file containing the certificate authority X509 certificate
-     */
-    public static void certificateAuthorityCertificate(String certificateAuthorityCertificate) {
-        fileExists(certificateAuthorityCertificate);
-        setProperty(MOCKSERVER_CERTIFICATE_AUTHORITY_X509_CERTIFICATE, certificateAuthorityCertificate);
-    }
-
-    public static String privateKeyPath() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_TLS_PRIVATE_KEY_PATH, "MOCKSERVER_TLS_PRIVATE_KEY_PATH", "");
-    }
-
-    /**
-     * File system path or classpath location of a fixed custom private key for TLS connections into MockServer.
-     * <p>
-     * The private key must be a PKCS#8 or PKCS#1 PEM file and must be the private key corresponding to the x509CertificatePath X509 (public key) configuration.
-     * The certificateAuthorityCertificate configuration must be the Certificate Authority for the corresponding X509 certificate (i.e. able to valid its signature), see: x509CertificatePath.
-     * <p>
-     * To convert a PKCS#1 (i.e. default for Bouncy Castle) to a PKCS#8 the following command can be used: openssl pkcs8 -topk8 -inform PEM -in private_key_PKCS_1.pem -out private_key_PKCS_8.pem -nocrypt
-     * <p>
-     * This configuration will be ignored unless x509CertificatePath is also set.
-     *
-     * @param privateKeyPath location of the PKCS#8 PEM file containing the private key
-     */
-    public static void privateKeyPath(String privateKeyPath) {
-        fileExists(privateKeyPath);
-        setProperty(MOCKSERVER_TLS_PRIVATE_KEY_PATH, privateKeyPath);
-    }
-
-
-    public static String x509CertificatePath() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_TLS_X509_CERTIFICATE_PATH, "MOCKSERVER_TLS_X509_CERTIFICATE_PATH", "");
-    }
-
-    /**
-     * File system path or classpath location of a fixed custom X.509 Certificate for TLS connections into MockServer.
-     * <p>
-     * The certificate must be a X509 PEM file and must be the public key corresponding to the privateKeyPath private key configuration.
-     * The certificateAuthorityCertificate configuration must be the Certificate Authority for this certificate (i.e. able to valid its signature).
-     * <p>
-     * This configuration will be ignored unless privateKeyPath is also set.
-     *
-     * @param x509CertificatePath location of the PEM file containing the X509 certificate
-     */
-    public static void x509CertificatePath(String x509CertificatePath) {
-        fileExists(x509CertificatePath);
-        setProperty(MOCKSERVER_TLS_X509_CERTIFICATE_PATH, x509CertificatePath);
-    }
-
-    public static boolean tlsMutualAuthenticationRequired() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_TLS_MUTUAL_AUTHENTICATION_REQUIRED, "MOCKSERVER_TLS_MUTUAL_AUTHENTICATION_REQUIRED", "false"));
-    }
-
-    /**
-     * Require mTLS (also called client authentication and two-way TLS) for all TLS connections / HTTPS requests to MockServer
-     *
-     * @param enable TLS mutual authentication
-     */
-    public static void tlsMutualAuthenticationRequired(boolean enable) {
-        setProperty(MOCKSERVER_TLS_MUTUAL_AUTHENTICATION_REQUIRED, "" + enable);
-    }
-
-    public static String tlsMutualAuthenticationCertificateChain() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_TLS_MUTUAL_AUTHENTICATION_CERTIFICATE_CHAIN, "MOCKSERVER_TLS_MUTUAL_AUTHENTICATION_CERTIFICATE_CHAIN", "");
-    }
-
-    /**
-     * File system path or classpath location of custom mTLS (TLS client authentication) X.509 Certificate Chain for trusting (i.e. signature verification of) Client X.509 Certificates, the certificate chain must be a X509 PEM file.
-     * <p>
-     * This certificate chain will be used if MockServer performs mTLS (client authentication) for inbound TLS connections because tlsMutualAuthenticationRequired is enabled
-     *
-     * @param trustCertificateChain File system path or classpath location of custom mTLS (TLS client authentication) X.509 Certificate Chain for Trusting (i.e. signature verification of) Client X.509 Certificates
-     */
-    public static void tlsMutualAuthenticationCertificateChain(String trustCertificateChain) {
-        setProperty(MOCKSERVER_TLS_MUTUAL_AUTHENTICATION_CERTIFICATE_CHAIN, "" + trustCertificateChain);
-    }
-
-    public static ForwardProxyTLSX509CertificatesTrustManager forwardProxyTLSX509CertificatesTrustManagerType() {
-        String forwardProxyTlsX509CertificatesTrustManagerType = readPropertyHierarchically(PROPERTIES, MOCKSERVER_FORWARD_PROXY_TLS_X509_CERTIFICATES_TRUST_MANAGER_TYPE, "MOCKSERVER_FORWARD_PROXY_TLS_X509_CERTIFICATES_TRUST_MANAGER_TYPE", "ANY");
-        try {
-            return ForwardProxyTLSX509CertificatesTrustManager.valueOf(forwardProxyTlsX509CertificatesTrustManagerType);
-        } catch (Throwable ignore) {
-            throw new IllegalArgumentException("Invalid value for ForwardProxyTLSX509CertificatesTrustManager \"" + forwardProxyTlsX509CertificatesTrustManagerType + "\" the only supported values are: " + Arrays.stream(ForwardProxyTLSX509CertificatesTrustManager.values()).map(Enum::name).collect(Collectors.toList()));
-        }
-    }
-
-    /**
-     * Configure trusted set of certificates for forwarded or proxied requests.
-     * <p>
-     * MockServer will only be able to establish a TLS connection to endpoints that have a trusted X509 certificate according to the trust manager type, as follows:
-     * <p>
-     * <p>
-     * ALL - Insecure will trust all X509 certificates and not perform host name verification.
-     * JVM - Will trust all X509 certificates trust by the JVM.
-     * CUSTOM - Will trust all X509 certificates specified in forwardProxyTLSCustomTrustX509Certificates configuration value.
-     *
-     * @param trustManagerType trusted set of certificates for forwarded or proxied requests, allowed values: ALL, JVM, CUSTOM.
-     */
-    public static void forwardProxyTLSX509CertificatesTrustManagerType(ForwardProxyTLSX509CertificatesTrustManager trustManagerType) {
-        setProperty(MOCKSERVER_FORWARD_PROXY_TLS_X509_CERTIFICATES_TRUST_MANAGER_TYPE, trustManagerType.name());
-    }
-
-    public static String forwardProxyTLSCustomTrustX509Certificates() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_FORWARD_PROXY_TLS_CUSTOM_TRUST_X509_CERTIFICATES, "MOCKSERVER_FORWARD_PROXY_TLS_CUSTOM_TRUST_X509_CERTIFICATES", "");
-    }
-
-    /**
-     * File system path or classpath location of custom file for trusted X509 Certificate Authority roots for forwarded or proxied requests, the certificate chain must be a X509 PEM file.
-     * <p>
-     * MockServer will only be able to establish a TLS connection to endpoints that have an X509 certificate chain that is signed by one of the provided custom
-     * certificates, i.e. where a path can be established from the endpoints X509 certificate to one or more of the custom X509 certificates provided.
-     *
-     * @param customX509Certificates custom set of trusted X509 certificate authority roots for forwarded or proxied requests in PEM format.
-     */
-    public static void forwardProxyTLSCustomTrustX509Certificates(String customX509Certificates) {
-        fileExists(customX509Certificates);
-        setProperty(MOCKSERVER_FORWARD_PROXY_TLS_CUSTOM_TRUST_X509_CERTIFICATES, customX509Certificates);
-    }
-
-    public static String forwardProxyPrivateKey() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_FORWARD_PROXY_TLS_PRIVATE_KEY, "MOCKSERVER_FORWARD_PROXY_TLS_PRIVATE_KEY", "");
-    }
-
-    /**
-     * File system path or classpath location of custom Private Key for proxied TLS connections out of MockServer, the private key must be a PKCS#8 or PKCS#1 PEM file
-     * <p>
-     * To convert a PKCS#1 (i.e. default for Bouncy Castle) to a PKCS#8 the following command can be used: openssl pkcs8 -topk8 -inform PEM -in private_key_PKCS_1.pem -out private_key_PKCS_8.pem -nocrypt
-     * <p>
-     * This private key will be used if MockServer needs to perform mTLS (client authentication) for outbound TLS connections.
-     *
-     * @param privateKey location of the PEM file containing the private key
-     */
-    public static void forwardProxyPrivateKey(String privateKey) {
-        fileExists(privateKey);
-        setProperty(MOCKSERVER_FORWARD_PROXY_TLS_PRIVATE_KEY, privateKey);
-    }
-
-    public static String forwardProxyCertificateChain() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_FORWARD_PROXY_TLS_X509_CERTIFICATE_CHAIN, "MOCKSERVER_FORWARD_PROXY_TLS_X509_CERTIFICATE_CHAIN", "");
-    }
-
-    /**
-     * File system path or classpath location of custom mTLS (TLS client authentication) X.509 Certificate Chain for Trusting (i.e. signature verification of) Client X.509 Certificates, the certificate chain must be a X509 PEM file.
-     * <p>
-     * This certificate chain will be used if MockServer needs to perform mTLS (client authentication) for outbound TLS connections.
-     *
-     * @param certificateChain location of the PEM file containing the certificate chain
-     */
-    public static void forwardProxyCertificateChain(String certificateChain) {
-        fileExists(certificateChain);
-        setProperty(MOCKSERVER_FORWARD_PROXY_TLS_X509_CERTIFICATE_CHAIN, certificateChain);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    static void fileExists(String file) {
-        try {
-            if (isNotBlank(file) && FileReader.openStreamToFileFromClassPathOrPath(file) == null) {
-                throw new RuntimeException(file + " does not exist or is not accessible");
-            }
-        } catch (FileNotFoundException e) {
-            if (!new File(file).exists()) {
-                throw new RuntimeException(file + " does not exist or is not accessible");
-            }
-        }
-    }
-
     private static void validateHostAndPortAndSetProperty(String hostAndPort, String mockserverSocksProxy) {
         if (isNotBlank(hostAndPort)) {
             if (hostAndPort.startsWith("/")) {
@@ -1462,12 +900,7 @@ public class ConfigurationProperties {
                 try {
                     inetSocketAddress = new InetSocketAddress(proxyParts[0], Integer.parseInt(proxyParts[1]));
                 } catch (NumberFormatException nfe) {
-                    MOCK_SERVER_LOGGER.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("NumberFormatException converting value \"" + proxyParts[1] + "\" into an integer")
-                            .setThrowable(nfe)
-                    );
+                    LOG.error("NumberFormatException converting value \"{}\" into an integer", proxyParts[1], nfe);
                 }
             }
         }
@@ -1478,12 +911,10 @@ public class ConfigurationProperties {
         try {
             return Integer.parseInt(readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue));
         } catch (NumberFormatException nfe) {
-            MOCK_SERVER_LOGGER.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("NumberFormatException converting " + key + " with value [" + readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue) + "]")
-                    .setThrowable(nfe)
-            );
+            LOG.error("NumberFormatException converting {} with value [{}]", 
+                key, 
+                readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue), 
+                nfe);
             return defaultValue;
         }
     }
@@ -1492,12 +923,10 @@ public class ConfigurationProperties {
         try {
             return Long.parseLong(readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue));
         } catch (NumberFormatException nfe) {
-            MOCK_SERVER_LOGGER.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("NumberFormatException converting " + key + " with value [" + readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue) + "]")
-                    .setThrowable(nfe)
-            );
+            LOG.error("NumberFormatException converting {} with value [{}]", 
+                key, 
+                readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue), 
+                nfe);
             return defaultValue;
         }
     }
@@ -1512,48 +941,20 @@ public class ConfigurationProperties {
                 try {
                     properties.load(inputStream);
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    if (MOCK_SERVER_LOGGER != null) {
-                        MOCK_SERVER_LOGGER.logEvent(
-                            new LogEntry()
-                                .setAlwaysLog(true)
-                                .setLogLevel(Level.ERROR)
-                                .setMessageFormat("exception loading property file [" + propertyFile() + "]")
-                                .setThrowable(e)
-                        );
-                    }
+                    LOG.error("Exception loading property file [{}]", propertyFile(), e);
                 }
             } else {
-                if (MOCK_SERVER_LOGGER != null && MockServerLogger.isEnabled(DEBUG)) {
-                    MOCK_SERVER_LOGGER.logEvent(
-                        new LogEntry()
-                            .setType(SERVER_CONFIGURATION)
-                            .setLogLevel(DEBUG)
-                            .setMessageFormat("property file not found on classpath using path [" + propertyFile() + "]")
-                    );
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Property file not found on classpath using path [{}]", propertyFile());
                 }
                 try {
                     properties.load(new FileInputStream(propertyFile()));
                 } catch (FileNotFoundException e) {
-                    if (MOCK_SERVER_LOGGER != null && MockServerLogger.isEnabled(DEBUG)) {
-                        MOCK_SERVER_LOGGER.logEvent(
-                            new LogEntry()
-                                .setType(SERVER_CONFIGURATION)
-                                .setLogLevel(DEBUG)
-                                .setMessageFormat("property file not found using path [" + propertyFile() + "]")
-                        );
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Property file not found using path [{}]", propertyFile(), e);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    if (MOCK_SERVER_LOGGER != null) {
-                        MOCK_SERVER_LOGGER.logEvent(
-                            new LogEntry()
-                                .setAlwaysLog(true)
-                                .setLogLevel(Level.ERROR)
-                                .setMessageFormat("exception loading property file [" + propertyFile() + "]")
-                                .setThrowable(e)
-                        );
-                    }
+                    LOG.error("Exception loading property file [{}]", propertyFile(), e);
                 }
             }
         } catch (IOException ioe) {
@@ -1571,14 +972,8 @@ public class ConfigurationProperties {
             }
 
             Level logLevel = Level.valueOf(getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(readPropertyHierarchically(properties, MOCKSERVER_LOG_LEVEL, "MOCKSERVER_LOG_LEVEL", DEFAULT_LOG_LEVEL).toUpperCase()));
-            if (MOCK_SERVER_LOGGER != null && MockServerLogger.isEnabled(Level.INFO, logLevel)) {
-                MOCK_SERVER_LOGGER.logEvent(
-                    new LogEntry()
-                        .setAlwaysLog(true)
-                        .setType(SERVER_CONFIGURATION)
-                        .setLogLevel(Level.INFO)
-                        .setMessageFormat(propertiesLogDump.toString())
-                );
+            if (LOG.isEnabledForLevel(logLevel)) {
+                LOG.info(propertiesLogDump.toString());
             }
         }
 

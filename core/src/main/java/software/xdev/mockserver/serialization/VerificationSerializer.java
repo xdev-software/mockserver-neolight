@@ -17,54 +17,33 @@ package software.xdev.mockserver.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.serialization.model.VerificationDTO;
 import software.xdev.mockserver.verify.Verification;
-import org.slf4j.event.Level;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class VerificationSerializer implements Serializer<Verification> {
-    private final MockServerLogger mockServerLogger;
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 
-    public VerificationSerializer(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
-    }
 
     public String serialize(Verification verification) {
         try {
             return objectWriter.writeValueAsString(new VerificationDTO(verification));
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing verification to JSON with value " + verification)
-                    .setThrowable(e)
-            );
-            throw new RuntimeException("Exception while serializing verification to JSON with value " + verification, e);
+            throw new IllegalStateException("Exception while serializing verification to JSON with value " + verification, e);
         }
     }
 
     public Verification deserialize(String jsonVerification) {
-        Verification verification = null;
         try {
             VerificationDTO verificationDTO = objectMapper.readValue(jsonVerification, VerificationDTO.class);
             if (verificationDTO != null) {
-                verification = verificationDTO.buildObject();
+                return verificationDTO.buildObject();
             }
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while parsing{}for Verification " + throwable.getMessage())
-                    .setArguments(jsonVerification)
-                    .setThrowable(throwable)
-            );
-            throw new IllegalArgumentException("exception while parsing [" + jsonVerification + "] for Verification", throwable);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("exception while parsing [" + jsonVerification + "] for Verification", ex);
         }
-        return verification;
+        return null;
     }
 
     @Override

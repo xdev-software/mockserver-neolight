@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.collections;
 
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.matchers.MatchDifference;
 import software.xdev.mockserver.matchers.RegexStringMatcher;
 import software.xdev.mockserver.model.KeyAndValue;
@@ -32,15 +31,15 @@ public class NottableStringHashMap {
     private final Map<NottableString, NottableString> backingMap = new LinkedHashMap<>();
     private final RegexStringMatcher regexStringMatcher;
 
-    public NottableStringHashMap(MockServerLogger mockServerLogger, boolean controlPlaneMatcher, List<? extends KeyAndValue> entries) {
-        regexStringMatcher = new RegexStringMatcher(mockServerLogger, controlPlaneMatcher);
+    public NottableStringHashMap(boolean controlPlaneMatcher, List<? extends KeyAndValue> entries) {
+        regexStringMatcher = new RegexStringMatcher(controlPlaneMatcher);
         for (KeyAndValue keyToMultiValue : entries) {
             put(keyToMultiValue.getName(), keyToMultiValue.getValue());
         }
     }
 
-    public NottableStringHashMap(MockServerLogger mockServerLogger, boolean controlPlaneMatcher, NottableString[]... keyAndValues) {
-        regexStringMatcher = new RegexStringMatcher(mockServerLogger, controlPlaneMatcher);
+    public NottableStringHashMap(boolean controlPlaneMatcher, NottableString[]... keyAndValues) {
+        regexStringMatcher = new RegexStringMatcher(controlPlaneMatcher);
         for (NottableString[] keyAndValue : keyAndValues) {
             if (keyAndValue.length >= 2) {
                 put(keyAndValue[0], keyAndValue[1]);
@@ -48,8 +47,8 @@ public class NottableStringHashMap {
         }
     }
 
-    public boolean containsAll(MockServerLogger mockServerLogger, MatchDifference context, NottableStringHashMap subset) {
-        return containsSubset(mockServerLogger, context, regexStringMatcher, subset.entryList(), entryList());
+    public boolean containsAll(MatchDifference context, NottableStringHashMap subset) {
+        return containsSubset(context, regexStringMatcher, subset.entryList(), entryList());
     }
 
     public boolean allKeysNotted() {

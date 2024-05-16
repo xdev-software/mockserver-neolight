@@ -21,18 +21,14 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import software.xdev.mockserver.authentication.ChainedAuthenticationHandler;
-import software.xdev.mockserver.authentication.jwt.JWTAuthenticationHandler;
-import software.xdev.mockserver.authentication.mtls.MTLSAuthenticationHandler;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.ExpectationsListener;
 import software.xdev.mockserver.lifecycle.LifeCycle;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
-import software.xdev.mockserver.socket.tls.NettySslContextFactory;
-import org.slf4j.event.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
@@ -41,13 +37,14 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static software.xdev.mockserver.configuration.Configuration.configuration;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.SERVER_CONFIGURATION;
 import static software.xdev.mockserver.mock.action.http.HttpActionHandler.REMOTE_SOCKET;
 import static software.xdev.mockserver.netty.HttpRequestHandler.PROXYING;
 import static software.xdev.mockserver.proxyconfiguration.ProxyConfiguration.proxyConfiguration;
 
 public class MockServer extends LifeCycle {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(MockServer.class);
+    
     private InetSocketAddress remoteSocket;
 
     /**
@@ -142,14 +139,8 @@ public class MockServer extends LifeCycle {
         }
 
         remoteSocket = new InetSocketAddress(remoteHost, remotePort);
-        if (proxyConfigurations != null && MockServerLogger.isEnabled(Level.INFO)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setType(SERVER_CONFIGURATION)
-                    .setLogLevel(Level.INFO)
-                    .setMessageFormat("using proxy configuration for forwarded requests:{}")
-                    .setArguments(proxyConfigurations)
-            );
+        if (proxyConfigurations != null && LOG.isInfoEnabled()) {
+            LOG.info("Using proxy configuration for forwarded requests: {}", proxyConfigurations);
         }
         createServerBootstrap(configuration, proxyConfigurations, localPorts);
 
@@ -166,31 +157,7 @@ public class MockServer extends LifeCycle {
         if (localPorts != null && localPorts.length > 0) {
             portBindings = Arrays.asList(localPorts);
         }
-
-        final NettySslContextFactory nettyServerSslContextFactory = new NettySslContextFactory(configuration, mockServerLogger, true);
-        final NettySslContextFactory nettyClientSslContextFactory = new NettySslContextFactory(configuration, mockServerLogger, false);
-        if (configuration.controlPlaneTLSMutualAuthenticationRequired() && configuration.controlPlaneJWTAuthenticationRequired()) {
-            httpState.setControlPlaneAuthenticationHandler(
-                new ChainedAuthenticationHandler(
-                    new MTLSAuthenticationHandler(mockServerLogger, nettyServerSslContextFactory.trustCertificateChain(configuration.controlPlaneTLSMutualAuthenticationCAChain())),
-                    new JWTAuthenticationHandler(mockServerLogger, configuration.controlPlaneJWTAuthenticationJWKSource())
-                        .withExpectedAudience(configuration.controlPlaneJWTAuthenticationExpectedAudience())
-                        .withMatchingClaims(configuration.controlPlaneJWTAuthenticationMatchingClaims())
-                        .withRequiredClaims(configuration.controlPlaneJWTAuthenticationRequiredClaims())
-                )
-            );
-        } else if (configuration.controlPlaneTLSMutualAuthenticationRequired()) {
-            httpState.setControlPlaneAuthenticationHandler(
-                new MTLSAuthenticationHandler(mockServerLogger, nettyServerSslContextFactory.trustCertificateChain(configuration.controlPlaneTLSMutualAuthenticationCAChain()))
-            );
-        } else if (configuration.controlPlaneJWTAuthenticationRequired()) {
-            httpState.setControlPlaneAuthenticationHandler(
-                new JWTAuthenticationHandler(mockServerLogger, configuration.controlPlaneJWTAuthenticationJWKSource())
-                    .withExpectedAudience(configuration.controlPlaneJWTAuthenticationExpectedAudience())
-                    .withMatchingClaims(configuration.controlPlaneJWTAuthenticationMatchingClaims())
-                    .withRequiredClaims(configuration.controlPlaneJWTAuthenticationRequiredClaims())
-            );
-        }
+        
         serverServerBootstrap = new ServerBootstrap()
             .group(bossGroup, workerGroup)
             .option(ChannelOption.SO_BACKLOG, 1024)
@@ -198,22 +165,21 @@ public class MockServer extends LifeCycle {
             .childOption(ChannelOption.AUTO_READ, true)
             .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
             .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(8 * 1024, 32 * 1024))
-            .childHandler(new MockServerUnificationInitializer(configuration, MockServer.this, httpState, new HttpActionHandler(configuration, getEventLoopGroup(), httpState, proxyConfigurations, nettyClientSslContextFactory), nettyServerSslContextFactory))
+            .childHandler(
+                new MockServerUnificationInitializer(
+                    configuration,
+                    MockServer.this,
+                    httpState,
+                    new HttpActionHandler(configuration, getEventLoopGroup(), httpState, proxyConfigurations)))
             .childAttr(REMOTE_SOCKET, remoteSocket)
             .childAttr(PROXYING, remoteSocket != null);
 
         try {
             bindServerPorts(portBindings);
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setType(SERVER_CONFIGURATION)
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception binding to port(s) " + portBindings)
-                    .setThrowable(throwable)
-            );
+        } catch (Exception ex) {
+            LOG.error("Exception binding to port(s) {}", portBindings);
             stop();
-            throw throwable;
+            throw ex;
         }
         startedServer(getLocalPorts());
     }

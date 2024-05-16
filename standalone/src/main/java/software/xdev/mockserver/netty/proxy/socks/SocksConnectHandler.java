@@ -24,14 +24,13 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.netty.proxy.relay.RelayConnectHandler;
 
 @ChannelHandler.Sharable
 public abstract class SocksConnectHandler<T> extends RelayConnectHandler<T> {
 
-    public SocksConnectHandler(Configuration configuration, MockServerLogger mockServerLogger, LifeCycle server, String host, int port) {
-        super(configuration, server, mockServerLogger, host, port);
+    protected SocksConnectHandler(Configuration configuration, LifeCycle server, String host, int port) {
+        super(configuration, server, host, port);
     }
 
     protected void removeCodecSupport(ChannelHandlerContext ctx) {

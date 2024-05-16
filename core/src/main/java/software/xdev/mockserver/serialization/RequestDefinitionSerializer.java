@@ -19,15 +19,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Joiner;
-import org.apache.commons.lang3.StringUtils;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.RequestDefinition;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestPrettyPrintedDTO;
 import software.xdev.mockserver.serialization.model.RequestDefinitionDTO;
-import org.slf4j.event.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,14 +37,12 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class RequestDefinitionSerializer implements Serializer<RequestDefinition> {
-    private final MockServerLogger mockServerLogger;
+    
+    private static final Logger LOG = LoggerFactory.getLogger(RequestDefinitionSerializer.class);
+    
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
     private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-
-    public RequestDefinitionSerializer(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
-    }
 
     public String serialize(RequestDefinition requestDefinition) {
         return serialize(false, requestDefinition);
@@ -53,19 +50,14 @@ public class RequestDefinitionSerializer implements Serializer<RequestDefinition
 
     public String serialize(boolean prettyPrint, RequestDefinition requestDefinition) {
         try {
-            if (requestDefinition instanceof HttpRequest) {
-                return objectWriter.writeValueAsString(prettyPrint ? new HttpRequestPrettyPrintedDTO((HttpRequest) requestDefinition) : new HttpRequestDTO((HttpRequest) requestDefinition));
-            } else {
-                return "";
+            if (requestDefinition instanceof HttpRequest request) {
+                return objectWriter.writeValueAsString(prettyPrint
+                    ? new HttpRequestPrettyPrintedDTO(request)
+                    : new HttpRequestDTO(request));
             }
+            return "";
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing RequestDefinition to JSON with value " + requestDefinition)
-                    .setThrowable(e)
-            );
-            throw new RuntimeException("Exception while serializing RequestDefinition to JSON with value " + requestDefinition, e);
+            throw new IllegalStateException("Exception while serializing RequestDefinition to JSON with value " + requestDefinition, e);
         }
     }
 
@@ -86,8 +78,10 @@ public class RequestDefinitionSerializer implements Serializer<RequestDefinition
             if (requestDefinitions != null && requestDefinitions.length > 0) {
                 Object[] requestDefinitionDTOs = new Object[requestDefinitions.length];
                 for (int i = 0; i < requestDefinitions.length; i++) {
-                    if (requestDefinitions[i] instanceof HttpRequest) {
-                        requestDefinitionDTOs[i] = prettyPrint ? new HttpRequestPrettyPrintedDTO((HttpRequest) requestDefinitions[i]) : new HttpRequestDTO((HttpRequest) requestDefinitions[i]);
+                    if (requestDefinitions[i] instanceof HttpRequest request) {
+                        requestDefinitionDTOs[i] = prettyPrint
+                            ? new HttpRequestPrettyPrintedDTO(request)
+                            : new HttpRequestDTO(request);
                     }
                 }
                 return objectWriter.writeValueAsString(requestDefinitionDTOs);
@@ -95,67 +89,31 @@ public class RequestDefinitionSerializer implements Serializer<RequestDefinition
                 return "[]";
             }
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing RequestDefinition to JSON with value " + Arrays.asList(requestDefinitions))
-                    .setThrowable(e)
-            );
-            throw new RuntimeException("Exception while serializing RequestDefinition to JSON with value " + Arrays.asList(requestDefinitions), e);
+            throw new IllegalStateException("Exception while serializing RequestDefinition to JSON with value " + Arrays.asList(requestDefinitions), e);
         }
     }
 
     public RequestDefinition deserialize(String jsonRequestDefinition) {
-        if (jsonRequestDefinition.contains("\"httpRequest\"")) {
-            try {
+        try {
+            if (jsonRequestDefinition.contains("\"httpRequest\"")) {
                 JsonNode jsonNode = objectMapper.readTree(jsonRequestDefinition);
                 if (jsonNode.has("httpRequest")) {
                     jsonRequestDefinition = jsonNode.get("httpRequest").toString();
                 }
-            } catch (Throwable throwable) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception while parsing{}for RequestDefinition " + throwable.getMessage())
-                        .setArguments(jsonRequestDefinition)
-                        .setThrowable(throwable)
-                );
-                throw new IllegalArgumentException("exception while parsing [" + jsonRequestDefinition + "] for RequestDefinition", throwable);
-            }
-        } else if (jsonRequestDefinition.contains("\"openAPIDefinition\"")) {
-            try {
+            } else if (jsonRequestDefinition.contains("\"openAPIDefinition\"")) {
                 JsonNode jsonNode = objectMapper.readTree(jsonRequestDefinition);
                 if (jsonNode.has("openAPIDefinition")) {
                     jsonRequestDefinition = jsonNode.get("openAPIDefinition").toString();
                 }
-            } catch (Throwable throwable) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception while parsing{}for RequestDefinition " + throwable.getMessage())
-                        .setArguments(jsonRequestDefinition)
-                        .setThrowable(throwable)
-                );
-                throw new IllegalArgumentException("exception while parsing [" + jsonRequestDefinition + "] for RequestDefinition", throwable);
             }
-        }
-        RequestDefinition requestDefinition = null;
-        try {
             RequestDefinitionDTO requestDefinitionDTO = objectMapper.readValue(jsonRequestDefinition, RequestDefinitionDTO.class);
             if (requestDefinitionDTO != null) {
-                requestDefinition = requestDefinitionDTO.buildObject();
+                return requestDefinitionDTO.buildObject();
             }
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while parsing{}for RequestDefinition " + throwable.getMessage())
-                    .setArguments(jsonRequestDefinition)
-                    .setThrowable(throwable)
-            );
-            throw new IllegalArgumentException("exception while parsing [" + jsonRequestDefinition + "] for RequestDefinition", throwable);
+            return null;
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("exception while parsing [" + jsonRequestDefinition + "] for RequestDefinition", ex);
         }
-        return requestDefinition;
     }
 
     @Override

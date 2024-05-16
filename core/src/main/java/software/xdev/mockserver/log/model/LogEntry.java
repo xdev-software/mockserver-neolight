@@ -41,9 +41,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
 import static software.xdev.mockserver.model.HttpRequest.request;
 
+@Deprecated
 public class LogEntry implements EventTranslator<LogEntry> {
 
-    private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.createObjectMapper();
     private static final RequestDefinition[] EMPTY_REQUEST_DEFINITIONS = new RequestDefinition[0];
     private static final RequestDefinition[] DEFAULT_REQUESTS_DEFINITIONS = {request()};
     public static final DateFormat LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");

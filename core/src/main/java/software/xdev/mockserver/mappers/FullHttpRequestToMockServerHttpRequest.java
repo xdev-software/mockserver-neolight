@@ -25,9 +25,11 @@ import software.xdev.mockserver.codec.BodyDecoderEncoder;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.url.URLParser;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
@@ -41,64 +43,44 @@ import static io.netty.handler.codec.http.HttpHeaderNames.COOKIE;
 import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
 
 public class FullHttpRequestToMockServerHttpRequest {
-
-    private final MockServerLogger mockServerLogger;
+    
+    private static final Logger LOG = LoggerFactory.getLogger(FullHttpRequestToMockServerHttpRequest.class);
     private final BodyDecoderEncoder bodyDecoderEncoder;
     private final ExpandedParameterDecoder formParameterParser;
-    private final boolean isSecure;
-    private final Certificate[] clientCertificates;
     private final Integer port;
-    private final JDKCertificateToMockServerX509Certificate jdkCertificateToMockServerX509Certificate;
 
-    public FullHttpRequestToMockServerHttpRequest(Configuration configuration, MockServerLogger mockServerLogger, boolean isSecure, Certificate[] clientCertificates, Integer port) {
-        this.mockServerLogger = mockServerLogger;
+    public FullHttpRequestToMockServerHttpRequest(Configuration configuration, Integer port) {
         this.bodyDecoderEncoder = new BodyDecoderEncoder();
-        this.formParameterParser = new ExpandedParameterDecoder(configuration, mockServerLogger);
-        this.isSecure = isSecure;
-        this.clientCertificates = clientCertificates;
+        this.formParameterParser = new ExpandedParameterDecoder(configuration);
         this.port = port;
-        this.jdkCertificateToMockServerX509Certificate = new JDKCertificateToMockServerX509Certificate(mockServerLogger);
     }
 
-    public HttpRequest mapFullHttpRequestToMockServerRequest(FullHttpRequest fullHttpRequest, List<Header> preservedHeaders, SocketAddress localAddress, SocketAddress remoteAddress, Protocol protocol) {
+    public HttpRequest mapFullHttpRequestToMockServerRequest(FullHttpRequest fullHttpRequest, List<Header> preservedHeaders, SocketAddress localAddress, SocketAddress remoteAddress) {
         HttpRequest httpRequest = new HttpRequest();
         try {
             if (fullHttpRequest != null) {
                 if (fullHttpRequest.decoderResult().isFailure()) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception decoding request " + fullHttpRequest.decoderResult().cause().getMessage())
-                            .setThrowable(fullHttpRequest.decoderResult().cause())
-                    );
+                    LOG.error("Exception decoding request", fullHttpRequest.decoderResult().cause());
                 }
                 setMethod(httpRequest, fullHttpRequest);
                 httpRequest.withKeepAlive(isKeepAlive(fullHttpRequest));
-                httpRequest.withSecure(isSecure);
-                httpRequest.withProtocol(protocol == null ? Protocol.HTTP_1_1 : protocol);
+                httpRequest.withProtocol(Protocol.HTTP_1_1);
 
                 setPath(httpRequest, fullHttpRequest);
                 setQueryString(httpRequest, fullHttpRequest);
                 setHeaders(httpRequest, fullHttpRequest, preservedHeaders);
                 setCookies(httpRequest, fullHttpRequest);
                 setBody(httpRequest, fullHttpRequest);
-                setSocketAddress(httpRequest, fullHttpRequest, isSecure, port, localAddress, remoteAddress);
-                jdkCertificateToMockServerX509Certificate.setClientCertificates(httpRequest, clientCertificates);
+                setSocketAddress(httpRequest, fullHttpRequest, port, localAddress, remoteAddress);
             }
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception decoding request{}")
-                    .setArguments(fullHttpRequest)
-                    .setThrowable(throwable)
-            );
+        } catch (Exception ex) {
+            LOG.error("Exception decoding request {}", fullHttpRequest, ex);
         }
         return httpRequest;
     }
 
-    private void setSocketAddress(HttpRequest httpRequest, FullHttpRequest fullHttpRequest, boolean isSecure, Integer port, SocketAddress localAddress, SocketAddress remoteAddress) {
-        httpRequest.withSocketAddress(isSecure, fullHttpRequest.headers().get("host"), port);
+    private void setSocketAddress(HttpRequest httpRequest, FullHttpRequest fullHttpRequest, Integer port, SocketAddress localAddress, SocketAddress remoteAddress) {
+        httpRequest.withSocketAddress(fullHttpRequest.headers().get("host"), port);
         if (remoteAddress instanceof InetSocketAddress) {
             httpRequest.withRemoteAddress(StringUtils.removeStart(remoteAddress.toString(), "/"));
         }

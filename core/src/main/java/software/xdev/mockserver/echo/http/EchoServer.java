@@ -29,11 +29,13 @@ import io.netty.util.AttributeKey;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.MockServerEventLog;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.scheduler.Scheduler;
 import software.xdev.mockserver.stop.Stoppable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
@@ -49,15 +51,16 @@ import static software.xdev.mockserver.configuration.Configuration.configuration
 
 
 public class EchoServer implements Stoppable {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(EchoServer.class);
+    
     static final AttributeKey<MockServerEventLog> LOG_FILTER = AttributeKey.valueOf("SERVER_LOG_FILTER");
     static final AttributeKey<NextResponse> NEXT_RESPONSE = AttributeKey.valueOf("NEXT_RESPONSE");
     static final AttributeKey<LastRequest> LAST_REQUEST = AttributeKey.valueOf("LAST_REQUEST");
-    private static final MockServerLogger mockServerLogger = new MockServerLogger(EchoServer.class);
-
+    
     private final Configuration configuration = configuration();
-    private final Scheduler scheduler = new Scheduler(configuration, mockServerLogger);
-    private final MockServerEventLog mockServerEventLog = new MockServerEventLog(configuration, mockServerLogger, scheduler, true);
+    private final Scheduler scheduler = new Scheduler(configuration);
+    private final MockServerEventLog mockServerEventLog = new MockServerEventLog(configuration, scheduler, true);
     private final NextResponse nextResponse = new NextResponse();
     private final LastRequest lastRequest = new LastRequest();
     private final CompletableFuture<Integer> boundPort = new CompletableFuture<>();
@@ -67,19 +70,11 @@ public class EchoServer implements Stoppable {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    public EchoServer(final boolean secure) {
-        this(secure, null, null);
+    public EchoServer() {
+        this(null);
     }
 
-    public EchoServer(final SslContext sslContext) {
-        this(true, sslContext, null);
-    }
-
-    public EchoServer(final boolean secure, final Error error) {
-        this(secure, null, error);
-    }
-
-    public EchoServer(final boolean secure, final SslContext sslContext, final Error error) {
+    public EchoServer(final Error error) {
         registeredClients = new ArrayList<>();
         websocketChannels = new ArrayList<>();
         textWebSocketFrames = new ArrayList<>();
@@ -90,7 +85,7 @@ public class EchoServer implements Stoppable {
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_BACKLOG, 100)
                 .handler(new LoggingHandler(EchoServer.class))
-                .childHandler(new EchoServerInitializer(configuration, mockServerLogger, secure, sslContext, error, registeredClients, websocketChannels, textWebSocketFrames))
+                .childHandler(new EchoServerInitializer(configuration, error, registeredClients, websocketChannels, textWebSocketFrames))
                 .childAttr(LOG_FILTER, mockServerEventLog)
                 .childAttr(NEXT_RESPONSE, nextResponse)
                 .childAttr(LAST_REQUEST, lastRequest)
@@ -109,12 +104,7 @@ public class EchoServer implements Stoppable {
             boundPort.get(configuration.maxFutureTimeoutInMillis(), MILLISECONDS);
             TimeUnit.MILLISECONDS.sleep(5);
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while waiting for proxy to complete starting up")
-                    .setThrowable(e)
-            );
+            LOG.error("Exception while waiting for proxy to complete starting up", e);
         }
     }
 
@@ -158,12 +148,7 @@ public class EchoServer implements Stoppable {
             lastRequest.httpRequest.set(new CompletableFuture<>());
             return httpRequest;
         } catch (TimeoutException | InterruptedException | ExecutionException e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while waiting to receive request - " + e.getMessage())
-                    .setThrowable(e)
-            );
+            LOG.error("Exception while waiting to receive request", e);
             return null;
         }
     }

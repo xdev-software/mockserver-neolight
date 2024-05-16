@@ -19,7 +19,9 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.FullHttpResponse;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.nio.channels.ClosedChannelException;
@@ -29,14 +31,13 @@ import static software.xdev.mockserver.exception.ExceptionHandling.closeOnFlush;
 import static software.xdev.mockserver.exception.ExceptionHandling.connectionClosedException;
 
 public class DownstreamProxyRelayHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
-
-    private final MockServerLogger mockServerLogger;
+    
+    private static final Logger LOG = LoggerFactory.getLogger(DownstreamProxyRelayHandler.class);
     private final Channel upstreamChannel;
 
-    public DownstreamProxyRelayHandler(MockServerLogger mockServerLogger, Channel upstreamChannel) {
+    public DownstreamProxyRelayHandler(Channel upstreamChannel) {
         super(false);
         this.upstreamChannel = upstreamChannel;
-        this.mockServerLogger = mockServerLogger;
     }
 
     @Override
@@ -52,12 +53,7 @@ public class DownstreamProxyRelayHandler extends SimpleChannelInboundHandler<Ful
                 ctx.read();
             } else {
                 if (isNotSocketClosedException(future.cause())) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception while returning writing " + response)
-                            .setThrowable(future.cause())
-                    );
+                    LOG.error("Exception while returning writing {}", response, future.cause());
                 }
                 future.channel().close();
             }
@@ -76,12 +72,7 @@ public class DownstreamProxyRelayHandler extends SimpleChannelInboundHandler<Ful
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (connectionClosedException(cause)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception caught by downstream relay handler -> closing pipeline " + ctx.channel())
-                    .setThrowable(cause)
-            );
+            LOG.error("Exception caught by downstream relay handler -> closing pipeline {}", ctx.channel(), cause);
         }
         closeOnFlush(ctx.channel());
     }

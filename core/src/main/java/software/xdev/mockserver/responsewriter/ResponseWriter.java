@@ -18,32 +18,31 @@ package software.xdev.mockserver.responsewriter;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.cors.CORSHeaders;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
-import org.slf4j.event.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpHeaderValues.CLOSE;
 import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.INFO;
 import static software.xdev.mockserver.mock.HttpState.PATH_PREFIX;
 import static software.xdev.mockserver.model.Header.header;
 import static software.xdev.mockserver.model.HttpResponse.notFoundResponse;
 import static software.xdev.mockserver.model.HttpResponse.response;
 
 public abstract class ResponseWriter {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(ResponseWriter.class);
+    
     protected final Configuration configuration;
-    protected final MockServerLogger mockServerLogger;
     private final CORSHeaders corsHeaders;
 
-    protected ResponseWriter(Configuration configuration, MockServerLogger mockServerLogger) {
+    protected ResponseWriter(Configuration configuration) {
         this.configuration = configuration;
-        this.mockServerLogger = mockServerLogger;
         corsHeaders = new CORSHeaders(configuration);
     }
 
@@ -76,15 +75,11 @@ public abstract class ResponseWriter {
             try {
                 int contentLength = Integer.parseInt(contentLengthHeader);
                 if (response.getBodyAsRawBytes().length > contentLength) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setType(INFO)
-                            .setLogLevel(Level.INFO)
-                            .setCorrelationId(request.getLogCorrelationId())
-                            .setHttpRequest(request)
-                            .setHttpResponse(response)
-                            .setMessageFormat("returning response with content-length header " + contentLength + " which is smaller then response body length " + response.getBodyAsRawBytes().length + ", body will likely be truncated by client receiving request")
-                    );
+                    LOG.info("Returning response with content-length header {} "
+                        + "which is smaller then response body length {}, "
+                        + "body will likely be truncated by client receiving request",
+                        contentLength,
+                        response.getBodyAsRawBytes().length);
                 }
             } catch (NumberFormatException ignore) {
                 // ignore exception while parsing invalid content-length header

@@ -20,10 +20,12 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import software.xdev.mockserver.codec.BodyDecoderEncoder;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -37,13 +39,12 @@ import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class MockServerHttpRequestToFullHttpRequest {
-
-    private final MockServerLogger mockServerLogger;
+    
+    private static final Logger LOG = LoggerFactory.getLogger(MockServerHttpRequestToFullHttpRequest.class);
     private final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations;
     private final BodyDecoderEncoder bodyDecoderEncoder;
 
-    public MockServerHttpRequestToFullHttpRequest(MockServerLogger mockServerLogger, Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations) {
-        this.mockServerLogger = mockServerLogger;
+    public MockServerHttpRequestToFullHttpRequest(Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations) {
         this.proxyConfigurations = proxyConfigurations;
         this.bodyDecoderEncoder = new BodyDecoderEncoder();
     }
@@ -62,14 +63,8 @@ public class MockServerHttpRequestToFullHttpRequest {
             setCookies(httpRequest, request);
 
             return request;
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception encoding request{}")
-                    .setArguments(httpRequest)
-                    .setThrowable(throwable)
-            );
+        } catch (Exception ex) {
+            LOG.error("Exception encoding request{}", httpRequest, ex);
             return new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, httpMethod, getURI(httpRequest, proxyConfigurations));
         }
     }
@@ -90,7 +85,7 @@ public class MockServerHttpRequestToFullHttpRequest {
                 uri = queryStringEncoder.toString();
             }
         }
-        if (proxyConfigurations != null && proxyConfigurations.get(ProxyConfiguration.Type.HTTP) != null && !Boolean.TRUE.equals(httpRequest.isSecure())) {
+        if (proxyConfigurations != null && proxyConfigurations.get(ProxyConfiguration.Type.HTTP) != null) {
             if (isNotBlank(httpRequest.getFirstHeader(HOST.toString()))) {
                 uri = "http://" + httpRequest.getFirstHeader(HOST.toString()) + uri;
             } else if (httpRequest.getRemoteAddress() != null) {
@@ -137,8 +132,7 @@ public class MockServerHttpRequestToFullHttpRequest {
         }
         request.headers().set(ACCEPT_ENCODING, GZIP + "," + DEFLATE);
         if (Protocol.HTTP_2.equals(httpRequest.getProtocol())) {
-            HttpScheme scheme = Boolean.TRUE.equals(httpRequest.isSecure()) ? HttpScheme.HTTPS : HttpScheme.HTTP;
-            request.headers().add(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text(), scheme.name());
+            request.headers().add(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text(), HttpScheme.HTTP.name());
             Integer streamId = httpRequest.getStreamId();
             if (streamId != null) {
                 request.headers().add(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text(), streamId);

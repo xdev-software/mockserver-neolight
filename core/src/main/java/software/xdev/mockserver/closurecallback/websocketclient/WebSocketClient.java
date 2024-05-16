@@ -31,7 +31,6 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.util.AttributeKey;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.LoggingHandler;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.action.ExpectationCallback;
 import software.xdev.mockserver.mock.action.ExpectationForwardAndResponseCallback;
 import software.xdev.mockserver.model.HttpMessage;
@@ -41,6 +40,9 @@ import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.serialization.WebSocketMessageSerializer;
 import software.xdev.mockserver.serialization.model.WebSocketClientIdDTO;
 import software.xdev.mockserver.serialization.model.WebSocketErrorDTO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import javax.net.ssl.SSLException;
@@ -55,9 +57,9 @@ import static org.slf4j.event.Level.WARN;
 
 @SuppressWarnings("rawtypes")
 public class WebSocketClient<T extends HttpMessage> {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketClient.class);
     static final AttributeKey<CompletableFuture<String>> REGISTRATION_FUTURE = AttributeKey.valueOf("REGISTRATION_FUTURE");
-    private final MockServerLogger mockServerLogger;
     private Channel channel;
     private final WebSocketMessageSerializer webSocketMessageSerializer;
     private ExpectationCallback<T> expectationCallback;
@@ -67,14 +69,13 @@ public class WebSocketClient<T extends HttpMessage> {
     private final String clientId;
     public static final String CLIENT_REGISTRATION_ID_HEADER = "X-CLIENT-REGISTRATION-ID";
 
-    public WebSocketClient(final EventLoopGroup eventLoopGroup, final String clientId, final MockServerLogger mockServerLogger) {
+    public WebSocketClient(final EventLoopGroup eventLoopGroup, final String clientId) {
         this.eventLoopGroup = eventLoopGroup;
         this.clientId = clientId;
-        this.mockServerLogger = mockServerLogger;
-        this.webSocketMessageSerializer = new WebSocketMessageSerializer(mockServerLogger);
+        this.webSocketMessageSerializer = new WebSocketMessageSerializer();
     }
 
-    private Future<String> register(final InetSocketAddress serverAddress, final String contextPath, final boolean isSecure, int reconnectAttempts) {
+    private Future<String> register(final InetSocketAddress serverAddress, final String contextPath, int reconnectAttempts) {
         CompletableFuture<String> registrationFuture = new CompletableFuture<>();
         try {
             new Bootstrap()
@@ -84,26 +85,11 @@ public class WebSocketClient<T extends HttpMessage> {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws URISyntaxException {
-                        if (isSecure) {
-                            try {
-                                ch.pipeline().addLast(
-                                    SslContextBuilder
-                                        .forClient()
-                                        .sslProvider(SslProvider.JDK)
-                                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                                        .build()
-                                        .newHandler(ch.alloc(), serverAddress.getHostName(), serverAddress.getPort())
-                                );
-                            } catch (SSLException e) {
-                                throw new WebSocketException("Exception when configuring SSL Handler", e);
-                            }
-                        }
-
                         ch.pipeline().addLast(new HttpClientCodec());
                         ch.pipeline().addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-                        ch.pipeline().addLast(new WebSocketClientHandler(mockServerLogger, clientId, serverAddress, contextPath, WebSocketClient.this, isSecure));
+                        ch.pipeline().addLast(new WebSocketClientHandler(clientId, serverAddress, contextPath, WebSocketClient.this));
                         // add logging
-                        if (MockServerLogger.isEnabled(TRACE)) {
+                        if (LOG.isTraceEnabled()) {
                             ch.pipeline().addLast(new LoggingHandler(WebSocketClient.class.getName() + "-last"));
                         }
                     }
@@ -114,7 +100,7 @@ public class WebSocketClient<T extends HttpMessage> {
                     channel.closeFuture().addListener((ChannelFutureListener) closeChannelFuture -> {
                         if (!isStopped && reconnectAttempts > 0) {
                             // attempt to re-connect
-                            register(serverAddress, contextPath, isSecure, reconnectAttempts - 1);
+                            register(serverAddress, contextPath, reconnectAttempts - 1);
                         }
                     });
                 });
@@ -130,107 +116,72 @@ public class WebSocketClient<T extends HttpMessage> {
     void receivedTextWebSocketFrame(TextWebSocketFrame textWebSocketFrame) {
         try {
             Object deserializedMessage = webSocketMessageSerializer.deserialize(textWebSocketFrame.text());
-            if (deserializedMessage instanceof HttpRequest) {
-                HttpRequest request = (HttpRequest) deserializedMessage;
+            if (deserializedMessage instanceof HttpRequest request) {
                 String webSocketCorrelationId = request.getFirstHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME);
-                if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(TRACE)
-                            .setHttpRequest(request)
-                            .setMessageFormat("received request{}over websocket for client " + clientId + " for correlationId " + webSocketCorrelationId)
-                            .setArguments(request)
-                    );
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Received request {} over websocket for client {} for correlationId {}", request, clientId, webSocketCorrelationId);
                 }
                 if (expectationCallback != null) {
                     try {
                         T result = expectationCallback.handle(request);
-                        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                            mockServerLogger.logEvent(
-                                new LogEntry()
-                                    .setLogLevel(TRACE)
-                                    .setHttpRequest(request)
-                                    .setMessageFormat("returning{}for request{}over websocket for client " + clientId + " for correlationId " + webSocketCorrelationId)
-                                    .setArguments(result, request)
-                            );
+                        if (LOG.isTraceEnabled()) {
+                            LOG.trace("Returning response {} for request {} "
+                                    + "over websocket for client {} for correlationId {}",
+                                result,
+                                request,
+                                clientId,
+                                webSocketCorrelationId);
                         }
                         result.withHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME, webSocketCorrelationId);
                         channel.writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(result)));
-                    } catch (Throwable throwable) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setLogLevel(Level.ERROR)
-                                .setHttpRequest(request)
-                                .setMessageFormat("exception thrown while handling callback for request - " + throwable.getMessage())
-                                .setThrowable(throwable)
-                        );
+                    } catch (Exception ex) {
+                        LOG.error("Exception thrown while handling callback for request", ex);
                         channel.writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(
                             new WebSocketErrorDTO()
-                                .setMessage(throwable.getMessage())
+                                .setMessage(ex.getMessage())
                                 .setWebSocketCorrelationId(webSocketCorrelationId)
                         )));
                     }
                 }
-            } else if (deserializedMessage instanceof HttpRequestAndHttpResponse) {
-                HttpRequestAndHttpResponse httpRequestAndHttpResponse = (HttpRequestAndHttpResponse) deserializedMessage;
+            } else if (deserializedMessage instanceof HttpRequestAndHttpResponse httpRequestAndHttpResponse) {
                 HttpRequest httpRequest = httpRequestAndHttpResponse.getHttpRequest();
                 HttpResponse httpResponse = httpRequestAndHttpResponse.getHttpResponse();
                 String webSocketCorrelationId = httpRequest.getFirstHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME);
-                if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(TRACE)
-                            .setHttpRequest(httpRequestAndHttpResponse.getHttpRequest())
-                            .setMessageFormat("received request and response{}over websocket for client " + clientId + " for correlationId " + webSocketCorrelationId)
-                            .setArguments(httpRequestAndHttpResponse)
-                    );
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Received request and response {} over websocket for client {} for correlationId {}", httpResponse, clientId, webSocketCorrelationId);
                 }
                 if (expectationForwardResponseCallback != null) {
                     try {
                         HttpResponse response = expectationForwardResponseCallback.handle(httpRequest, httpResponse);
-                        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                            mockServerLogger.logEvent(
-                                new LogEntry()
-                                    .setLogLevel(TRACE)
-                                    .setHttpRequest(httpRequestAndHttpResponse.getHttpRequest())
-                                    .setMessageFormat("returning response{}for request and response{}over websocket for client " + clientId + " for correlationId " + webSocketCorrelationId)
-                                    .setArguments(response, httpRequestAndHttpResponse)
-                            );
+                        if (LOG.isTraceEnabled()) {
+                            LOG.trace("Returning response {} for request and response {} "
+                                + "over websocket for client {} for correlationId {}",
+                                response,
+                                httpRequestAndHttpResponse,
+                                clientId,
+                                webSocketCorrelationId);
                         }
                         response.withHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME, webSocketCorrelationId);
                         channel.writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(response)));
-                    } catch (Throwable throwable) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setLogLevel(Level.ERROR)
-                                .setHttpRequest(httpRequest)
-                                .setMessageFormat("exception thrown while handling callback for request and response - " + throwable.getMessage())
-                                .setThrowable(throwable)
-                        );
+                    } catch (Exception ex) {
+                        LOG.error("Exception thrown while handling callback for request and response", ex);
                         channel.writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(
                             new WebSocketErrorDTO()
-                                .setMessage(throwable.getMessage())
+                                .setMessage(ex.getMessage())
                                 .setWebSocketCorrelationId(webSocketCorrelationId)
                         )));
                     }
                 }
             } else if (deserializedMessage instanceof WebSocketClientIdDTO) {
-                if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(TRACE)
-                            .setMessageFormat("received client id{}")
-                            .setArguments(deserializedMessage)
-                    );
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Received client id {}", deserializedMessage);
                 }
             } else {
-                if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(WARN)
-                            .setMessageFormat("web socket client received a message that isn't HttpRequest or HttpRequestAndHttpResponse{} which has been deserialized as{}")
-                            .setArguments(textWebSocketFrame.text(), deserializedMessage)
-                    );
+                if (LOG.isWarnEnabled()) {
+                    LOG.trace("Web socket client received a message that isn't "
+                        + "HttpRequest or HttpRequestAndHttpResponse {} which has been deserialized as {}",
+                        textWebSocketFrame.text(),
+                        deserializedMessage);
                 }
                 throw new WebSocketException("Unsupported web socket message " + textWebSocketFrame.text());
             }
@@ -254,11 +205,15 @@ public class WebSocketClient<T extends HttpMessage> {
         }
     }
 
-    public Future<String> registerExpectationCallback(final ExpectationCallback<T> expectationCallback, ExpectationForwardAndResponseCallback expectationForwardResponseCallback, final InetSocketAddress serverAddress, final String contextPath, final boolean isSecure) {
+    public Future<String> registerExpectationCallback(
+        final ExpectationCallback<T> expectationCallback,
+        ExpectationForwardAndResponseCallback expectationForwardResponseCallback,
+        final InetSocketAddress serverAddress,
+        final String contextPath) {
         if (this.expectationCallback == null) {
             this.expectationCallback = expectationCallback;
             this.expectationForwardResponseCallback = expectationForwardResponseCallback;
-            return register(serverAddress, contextPath, isSecure, 3);
+            return register(serverAddress, contextPath, 3);
         } else {
             throw new IllegalArgumentException("It is not possible to set response callback once a forward callback has been set");
         }

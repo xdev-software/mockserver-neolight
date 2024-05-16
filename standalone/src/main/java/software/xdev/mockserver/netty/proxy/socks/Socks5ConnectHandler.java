@@ -20,13 +20,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.socksx.v5.*;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
-import software.xdev.mockserver.logging.MockServerLogger;
 
 @ChannelHandler.Sharable
 public final class Socks5ConnectHandler extends SocksConnectHandler<Socks5CommandRequest> {
 
-    public Socks5ConnectHandler(Configuration configuration, MockServerLogger mockServerLogger, LifeCycle server, String host, int port) {
-        super(configuration, mockServerLogger, server, host, port);
+    public Socks5ConnectHandler(Configuration configuration, LifeCycle server, String host, int port) {
+        super(configuration, server, host, port);
     }
 
     protected void removeCodecSupport(ChannelHandlerContext ctx) {

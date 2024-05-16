@@ -42,12 +42,6 @@ public class ClientConfiguration {
         clientNioEventLoopThreadCount(serverConfiguration.clientNioEventLoopThreadCount());
         maxSocketTimeoutInMillis(serverConfiguration.maxSocketTimeoutInMillis());
         maxFutureTimeoutInMillis(serverConfiguration.maxFutureTimeoutInMillis());
-        controlPlaneTLSMutualAuthenticationRequired(serverConfiguration.controlPlaneTLSMutualAuthenticationRequired());
-        controlPlaneTLSMutualAuthenticationCAChain(serverConfiguration.controlPlaneTLSMutualAuthenticationCAChain());
-        controlPlanePrivateKeyPath(serverConfiguration.controlPlanePrivateKeyPath());
-        controlPlaneX509CertificatePath(serverConfiguration.controlPlaneX509CertificatePath());
-        controlPlaneJWTAuthenticationRequired(serverConfiguration.controlPlaneJWTAuthenticationRequired());
-        controlPlaneJWTAuthenticationJWKSource(serverConfiguration.controlPlaneJWTAuthenticationJWKSource());
     }
 
     public Configuration toServerConfiguration() {
@@ -58,12 +52,6 @@ public class ClientConfiguration {
         serverConfiguration.clientNioEventLoopThreadCount(this.clientNioEventLoopThreadCount);
         serverConfiguration.maxSocketTimeoutInMillis(this.maxSocketTimeoutInMillis);
         serverConfiguration.maxFutureTimeoutInMillis(this.maxFutureTimeoutInMillis);
-        serverConfiguration.controlPlaneTLSMutualAuthenticationRequired(this.controlPlaneTLSMutualAuthenticationRequired);
-        serverConfiguration.controlPlaneTLSMutualAuthenticationCAChain(this.controlPlaneTLSMutualAuthenticationCAChain);
-        serverConfiguration.controlPlanePrivateKeyPath(this.controlPlanePrivateKeyPath);
-        serverConfiguration.controlPlaneX509CertificatePath(this.controlPlaneX509CertificatePath);
-        serverConfiguration.controlPlaneJWTAuthenticationRequired(this.controlPlaneJWTAuthenticationRequired);
-        serverConfiguration.controlPlaneJWTAuthenticationJWKSource(this.controlPlaneJWTAuthenticationJWKSource);
         return serverConfiguration;
     }
 
@@ -77,14 +65,6 @@ public class ClientConfiguration {
     // socket
     private Long maxSocketTimeoutInMillis;
     private Long maxFutureTimeoutInMillis;
-
-    // control plane authentication
-    private Boolean controlPlaneTLSMutualAuthenticationRequired;
-    private String controlPlaneTLSMutualAuthenticationCAChain;
-    private String controlPlanePrivateKeyPath;
-    private String controlPlaneX509CertificatePath;
-    private Boolean controlPlaneJWTAuthenticationRequired;
-    private String controlPlaneJWTAuthenticationJWKSource;
 
     public Integer maxWebSocketExpectations() {
         if (maxWebSocketExpectations == null) {
@@ -181,78 +161,6 @@ public class ClientConfiguration {
      */
     public ClientConfiguration maxFutureTimeoutInMillis(Long maxFutureTimeoutInMillis) {
         this.maxFutureTimeoutInMillis = maxFutureTimeoutInMillis;
-        return this;
-    }
-
-    public Boolean controlPlaneTLSMutualAuthenticationRequired() {
-        if (controlPlaneTLSMutualAuthenticationRequired == null) {
-            controlPlaneTLSMutualAuthenticationRequired = ConfigurationProperties.controlPlaneTLSMutualAuthenticationRequired();
-        }
-        return controlPlaneTLSMutualAuthenticationRequired;
-    }
-
-    public ClientConfiguration controlPlaneTLSMutualAuthenticationRequired(Boolean controlPlaneTLSMutualAuthenticationRequired) {
-        this.controlPlaneTLSMutualAuthenticationRequired = controlPlaneTLSMutualAuthenticationRequired;
-        return this;
-    }
-
-    public String controlPlaneTLSMutualAuthenticationCAChain() {
-        if (controlPlaneTLSMutualAuthenticationCAChain == null) {
-            controlPlaneTLSMutualAuthenticationCAChain = ConfigurationProperties.controlPlaneTLSMutualAuthenticationCAChain();
-        }
-        return controlPlaneTLSMutualAuthenticationCAChain;
-    }
-
-    public ClientConfiguration controlPlaneTLSMutualAuthenticationCAChain(String controlPlaneTLSMutualAuthenticationCAChain) {
-        this.controlPlaneTLSMutualAuthenticationCAChain = controlPlaneTLSMutualAuthenticationCAChain;
-        return this;
-    }
-
-    public String controlPlanePrivateKeyPath() {
-        if (controlPlanePrivateKeyPath == null) {
-            controlPlanePrivateKeyPath = ConfigurationProperties.controlPlanePrivateKeyPath();
-        }
-        return controlPlanePrivateKeyPath;
-    }
-
-    public ClientConfiguration controlPlanePrivateKeyPath(String controlPlanePrivateKeyPath) {
-        this.controlPlanePrivateKeyPath = controlPlanePrivateKeyPath;
-        return this;
-    }
-
-    public String controlPlaneX509CertificatePath() {
-        if (controlPlaneX509CertificatePath == null) {
-            controlPlaneX509CertificatePath = ConfigurationProperties.controlPlaneX509CertificatePath();
-        }
-        return controlPlaneX509CertificatePath;
-    }
-
-    public ClientConfiguration controlPlaneX509CertificatePath(String controlPlaneX509CertificatePath) {
-        this.controlPlaneX509CertificatePath = controlPlaneX509CertificatePath;
-        return this;
-    }
-
-    public Boolean controlPlaneJWTAuthenticationRequired() {
-        if (controlPlaneJWTAuthenticationRequired == null) {
-            controlPlaneJWTAuthenticationRequired = ConfigurationProperties.controlPlaneJWTAuthenticationRequired();
-        }
-        return controlPlaneJWTAuthenticationRequired;
-    }
-
-    public ClientConfiguration controlPlaneJWTAuthenticationRequired(Boolean controlPlaneJWTAuthenticationRequired) {
-        this.controlPlaneJWTAuthenticationRequired = controlPlaneJWTAuthenticationRequired;
-        return this;
-    }
-
-    public String controlPlaneJWTAuthenticationJWKSource() {
-        if (controlPlaneJWTAuthenticationJWKSource == null) {
-            controlPlaneJWTAuthenticationJWKSource = ConfigurationProperties.controlPlaneJWTAuthenticationJWKSource();
-        }
-        return controlPlaneJWTAuthenticationJWKSource;
-    }
-
-    public ClientConfiguration controlPlaneJWTAuthenticationJWKSource(String controlPlaneJWTAuthenticationJWKSource) {
-        this.controlPlaneJWTAuthenticationJWKSource = controlPlaneJWTAuthenticationJWKSource;
         return this;
     }
 }

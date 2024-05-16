@@ -17,17 +17,13 @@ package software.xdev.mockserver.matchers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import software.xdev.mockserver.logging.BinaryArrayFormatter;
-import software.xdev.mockserver.logging.MockServerLogger;
 
 import java.util.Arrays;
 
 public class BinaryMatcher extends BodyMatcher<byte[]> {
-    private static final String[] excludedFields = {"mockServerLogger"};
-    private final MockServerLogger mockServerLogger;
     private final byte[] matcher;
 
-    BinaryMatcher(MockServerLogger mockServerLogger, byte[] matcher) {
-        this.mockServerLogger = mockServerLogger;
+    BinaryMatcher(byte[] matcher) {
         this.matcher = matcher;
     }
 
@@ -39,7 +35,7 @@ public class BinaryMatcher extends BodyMatcher<byte[]> {
         }
 
         if (!result && context != null) {
-            context.addDifference(mockServerLogger, "binary match failed expected:{}found:{}", BinaryArrayFormatter.byteArrayToString(this.matcher), BinaryArrayFormatter.byteArrayToString(matched));
+            context.addDifference("binary match failed expected:{}found:{}", BinaryArrayFormatter.byteArrayToString(this.matcher), BinaryArrayFormatter.byteArrayToString(matched));
         }
 
         return not != result;
@@ -47,11 +43,5 @@ public class BinaryMatcher extends BodyMatcher<byte[]> {
 
     public boolean isBlank() {
         return matcher == null || matcher.length == 0;
-    }
-
-    @Override
-    @JsonIgnore
-    public String[] fieldsExcludedFromEqualsAndHashCode() {
-        return excludedFields;
     }
 }

@@ -18,7 +18,6 @@ package software.xdev.mockserver.mock.action.http;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
 import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.model.HttpObjectCallback;
 import software.xdev.mockserver.model.HttpRequest;
@@ -31,13 +30,17 @@ import static software.xdev.mockserver.model.HttpResponse.notFoundResponse;
 import static org.slf4j.event.Level.TRACE;
 import static org.slf4j.event.Level.WARN;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @SuppressWarnings("FieldMayBeFinal")
 public class HttpResponseObjectCallbackActionHandler {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(HttpResponseObjectCallbackActionHandler.class);
     private WebSocketClientRegistry webSocketClientRegistry;
-    private final MockServerLogger mockServerLogger;
 
     public HttpResponseObjectCallbackActionHandler(HttpState httpStateHandler) {
-        this.mockServerLogger = httpStateHandler.getMockServerLogger();
         this.webSocketClientRegistry = httpStateHandler.getWebSocketClientRegistry();
     }
 
@@ -51,28 +54,16 @@ public class HttpResponseObjectCallbackActionHandler {
     }
 
     private void handleLocally(HttpActionHandler actionHandler, HttpObjectCallback httpObjectCallback, HttpRequest request, ResponseWriter responseWriter, boolean synchronous, String clientId) {
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setHttpRequest(request)
-                    .setMessageFormat("locally sending request{}to client " + clientId)
-                    .setArguments(request)
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Locally sending request {} to client {}", request, clientId);
         }
         try {
             HttpResponse callbackResponse = LocalCallbackRegistry.retrieveResponseCallback(clientId).handle(request);
             actionHandler.writeResponseActionResponse(callbackResponse, responseWriter, request, httpObjectCallback, synchronous);
-        } catch (Throwable throwable) {
-            if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(WARN)
-                        .setHttpRequest(request)
-                        .setMessageFormat("returning{}because client " + clientId + " response callback throw an exception")
-                        .setArguments(notFoundResponse())
-                        .setThrowable(throwable)
-                );
+        } catch (Exception ex) {
+            if(LOG.isWarnEnabled()) {
+                LOG.warn("Returning {} because client {} response callback throw an exception",
+                    notFoundResponse(), clientId, ex);
             }
             actionHandler.writeResponseActionResponse(notFoundResponse(), responseWriter, request, httpObjectCallback, synchronous);
         }
@@ -81,14 +72,9 @@ public class HttpResponseObjectCallbackActionHandler {
     private void handleViaWebSocket(HttpActionHandler actionHandler, HttpObjectCallback httpObjectCallback, HttpRequest request, ResponseWriter responseWriter, boolean synchronous, Runnable expectationPostProcessor, String clientId) {
         final String webSocketCorrelationId = UUIDService.getUUID();
         webSocketClientRegistry.registerResponseCallbackHandler(webSocketCorrelationId, response -> {
-            if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(TRACE)
-                        .setHttpRequest(request)
-                        .setMessageFormat("received response over websocket{}for request{}from client " + clientId + " for correlationId " + webSocketCorrelationId)
-                        .setArguments(response, request)
-                );
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Received response over websocket {} for request {} from client {} for correlationId {}",
+                    response, request, clientId,webSocketCorrelationId);
             }
             webSocketClientRegistry.unregisterResponseCallbackHandler(webSocketCorrelationId);
             if (expectationPostProcessor != null) {
@@ -97,24 +83,14 @@ public class HttpResponseObjectCallbackActionHandler {
             actionHandler.writeResponseActionResponse(response.removeHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME), responseWriter, request, httpObjectCallback, synchronous);
         });
         if (!webSocketClientRegistry.sendClientMessage(clientId, request.clone().withHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME, webSocketCorrelationId), null)) {
-            if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(WARN)
-                        .setHttpRequest(request)
-                        .setMessageFormat("returning{}because client " + clientId + " has closed web socket connection")
-                        .setArguments(notFoundResponse())
-                );
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("Returning {} because client {} has closed web socket connection",
+                    notFoundResponse(), clientId);
             }
             actionHandler.writeResponseActionResponse(notFoundResponse(), responseWriter, request, httpObjectCallback, synchronous);
-        } else if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setHttpRequest(request)
-                    .setMessageFormat("sending request over websocket{}to client " + clientId + " for correlationId " + webSocketCorrelationId)
-                    .setArguments(request)
-            );
+        } else if (LOG.isTraceEnabled()) {
+            LOG.trace("Sending request over websocket {} to client {} for correlationId {}",
+                request, clientId, webSocketCorrelationId);
         }
     }
 

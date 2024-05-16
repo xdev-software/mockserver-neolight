@@ -18,7 +18,6 @@ package software.xdev.mockserver.model;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 
 import java.nio.charset.Charset;
@@ -33,9 +32,15 @@ import static org.apache.commons.lang3.StringUtils.*;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.WARN;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @SuppressWarnings("unused")
 public class MediaType extends ObjectWithJsonToString {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(MediaType.class);
+    
     /**
      * The default character set for an HTTP message, if none is specified in the Content-Type header. From the HTTP 1.1 specification
      * section 3.7.1 (http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.7.1):
@@ -52,7 +57,6 @@ public class MediaType extends ObjectWithJsonToString {
      * (https://datatracker.ietf.org/doc/html/rfc8259#section-8.1)
      */
     public static final Charset DEFAULT_JSON_HTTP_CHARACTER_SET = StandardCharsets.UTF_8;
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(ObjectMapperFactory.class);
     private static final char TYPE_SEPARATOR = '/';
     private static final char PARAMETER_START = ';';
     private final String type;
@@ -64,30 +68,30 @@ public class MediaType extends ObjectWithJsonToString {
 
     private static final String CHARSET_PARAMETER = "charset";
     private static final String MEDIA_TYPE_WILDCARD = "*";
-    public final static MediaType WILDCARD = new MediaType(MEDIA_TYPE_WILDCARD, MEDIA_TYPE_WILDCARD);
-    public final static MediaType APPLICATION_ATOM_XML = new MediaType("application", "atom+xml");
-    public final static MediaType APPLICATION_XHTML_XML = new MediaType("application", "xhtml+xml");
-    public final static MediaType APPLICATION_SVG_XML = new MediaType("application", "svg+xml");
-    public final static MediaType APPLICATION_XML = new MediaType("application", "xml");
-    public final static MediaType APPLICATION_XML_UTF_8 = new MediaType("application", "xml", "utf-8", null);
-    public final static MediaType APPLICATION_JSON = new MediaType("application", "json");
-    public final static MediaType APPLICATION_JSON_UTF_8 = new MediaType("application", "json", "utf-8", null);
-    public final static MediaType JSON_UTF_8 = APPLICATION_JSON_UTF_8;
-    public final static MediaType APPLICATION_FORM_URLENCODED = new MediaType("application", "x-www-form-urlencoded");
-    public final static MediaType FORM_DATA = new MediaType("application", "x-www-form-urlencoded");
-    public final static MediaType MULTIPART_FORM_DATA = new MediaType("multipart", "form-data");
-    public final static MediaType APPLICATION_OCTET_STREAM = new MediaType("application", "octet-stream");
+    public static final MediaType WILDCARD = new MediaType(MEDIA_TYPE_WILDCARD, MEDIA_TYPE_WILDCARD);
+    public static final MediaType APPLICATION_ATOM_XML = new MediaType("application", "atom+xml");
+    public static final MediaType APPLICATION_XHTML_XML = new MediaType("application", "xhtml+xml");
+    public static final MediaType APPLICATION_SVG_XML = new MediaType("application", "svg+xml");
+    public static final MediaType APPLICATION_XML = new MediaType("application", "xml");
+    public static final MediaType APPLICATION_XML_UTF_8 = new MediaType("application", "xml", "utf-8", null);
+    public static final MediaType APPLICATION_JSON = new MediaType("application", "json");
+    public static final MediaType APPLICATION_JSON_UTF_8 = new MediaType("application", "json", "utf-8", null);
+    public static final MediaType JSON_UTF_8 = APPLICATION_JSON_UTF_8;
+    public static final MediaType APPLICATION_FORM_URLENCODED = new MediaType("application", "x-www-form-urlencoded");
+    public static final MediaType FORM_DATA = new MediaType("application", "x-www-form-urlencoded");
+    public static final MediaType MULTIPART_FORM_DATA = new MediaType("multipart", "form-data");
+    public static final MediaType APPLICATION_OCTET_STREAM = new MediaType("application", "octet-stream");
     public static final MediaType APPLICATION_BINARY = new MediaType("application", "binary");
     public static final MediaType PDF = new MediaType("application", "pdf");
     public static final MediaType ATOM_UTF_8 = new MediaType("application", "atom+xml", "utf-8", null);
-    public final static MediaType TEXT_PLAIN = new MediaType("text", "plain");
-    public final static MediaType PLAIN_TEXT_UTF_8 = new MediaType("text", "plain", "utf-8", null);
-    public final static MediaType TEXT_XML = new MediaType("text", "xml");
-    public final static MediaType TEXT_XML_UTF_8 = new MediaType("text", "xml", "utf-8", null);
-    public final static MediaType XML_UTF_8 = TEXT_XML_UTF_8;
-    public final static MediaType TEXT_HTML = new MediaType("text", "html");
-    public final static MediaType TEXT_HTML_UTF_8 = new MediaType("text", "html", "utf-8", null);
-    public final static MediaType HTML_UTF_8 = TEXT_HTML_UTF_8;
+    public static final MediaType TEXT_PLAIN = new MediaType("text", "plain");
+    public static final MediaType PLAIN_TEXT_UTF_8 = new MediaType("text", "plain", "utf-8", null);
+    public static final MediaType TEXT_XML = new MediaType("text", "xml");
+    public static final MediaType TEXT_XML_UTF_8 = new MediaType("text", "xml", "utf-8", null);
+    public static final MediaType XML_UTF_8 = TEXT_XML_UTF_8;
+    public static final MediaType TEXT_HTML = new MediaType("text", "html");
+    public static final MediaType TEXT_HTML_UTF_8 = new MediaType("text", "html", "utf-8", null);
+    public static final MediaType HTML_UTF_8 = TEXT_HTML_UTF_8;
     public static final MediaType SERVER_SENT_EVENTS = new MediaType("text", "event-stream");
     public static final MediaType APPLICATION_JSON_PATCH_JSON = new MediaType("application", "json-patch+json");
     public static final MediaType ANY_VIDEO_TYPE = new MediaType("video", MEDIA_TYPE_WILDCARD);
@@ -141,14 +145,12 @@ public class MediaType extends ObjectWithJsonToString {
                                 (oldValue, newValue) -> oldValue, LinkedHashMap::new
                             ));
                     }
-                } catch (Throwable throwable) {
-                    MOCK_SERVER_LOGGER.logEvent(
-                        new LogEntry()
-                            .setLogLevel(WARN)
-                            .setMessageFormat("invalid parameters format \"" + parameters + "\", expected{}see:{}")
-                            .setArguments("Content-Type := type \"/\" subtype *[\";\" parameter]\nparameter := attribute \"=\" value", "https://www.w3.org/Protocols/rfc1341/4_Content-Type.html")
-                            .setThrowable(throwable)
-                    );
+                } catch (Exception ex) {
+                    LOG.warn("Invalid parameters format \"{}\", expected {} see: {}",
+                        parameters,
+                        "Content-Type := type \"/\" subtype *[\";\" parameter]\nparameter := attribute \"=\" value",
+                        "https://www.w3.org/Protocols/rfc1341/4_Content-Type.html",
+                        ex);
                 }
             }
             return new MediaType(type, subType, parameterMap);
@@ -185,37 +187,24 @@ public class MediaType extends ObjectWithJsonToString {
         Charset parsedCharset = null;
         if (isNotBlank(charset)) {
             this.parameters.put(CHARSET_PARAMETER, charset);
-            try {
-                parsedCharset = Charset.forName(charset);
-            } catch (Throwable throwable) {
-                if (MockServerLogger.isEnabled(DEBUG)) {
-                    MOCK_SERVER_LOGGER.logEvent(
-                        new LogEntry()
-                            .setLogLevel(DEBUG)
-                            .setMessageFormat("ignoring unsupported charset with value \"" + charset + "\"")
-                            .setThrowable(throwable)
-                    );
-                }
-            }
+            parsedCharset = charsetForName(charset);
         } else {
-            try {
-                if (parameters.containsKey(CHARSET_PARAMETER)) {
-                    parsedCharset = Charset.forName(parameters.get(CHARSET_PARAMETER));
-                }
-            } catch (Throwable throwable) {
-                if (MockServerLogger.isEnabled(DEBUG)) {
-                    MOCK_SERVER_LOGGER.logEvent(
-                        new LogEntry()
-                            .setLogLevel(DEBUG)
-                            .setMessageFormat("ignoring unsupported charset with value \"" + charset + "\"")
-                            .setThrowable(throwable)
-                    );
-                }
+            if (parameters.containsKey(CHARSET_PARAMETER)) {
+                parsedCharset = charsetForName(parameters.get(CHARSET_PARAMETER));
             }
         }
         this.charset = parsedCharset;
         this.toString = initialiseToString();
         this.isBlank = isBlank(this.toString);
+    }
+    
+    private static Charset charsetForName(String name) {
+        try {
+            return Charset.forName(name);
+        } catch(Exception ex) {
+            LOG.debug("Ignoring unsupported charset with value \"{}\"", name);
+            return null;
+        }
     }
 
     private String initialiseToString() {

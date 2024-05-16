@@ -21,11 +21,13 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultHttpObject;
 import software.xdev.mockserver.log.MockServerEventLog;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mappers.MockServerHttpResponseToFullHttpResponse;
 import software.xdev.mockserver.model.BodyWithContentType;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
@@ -37,16 +39,16 @@ import static org.slf4j.event.Level.INFO;
 
 @ChannelHandler.Sharable
 public class EchoServerHandler extends SimpleChannelInboundHandler<HttpRequest> {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(EchoServerHandler.class);
+    
     private final EchoServer.Error error;
-    private final MockServerLogger mockServerLogger;
     private final MockServerEventLog mockServerEventLog;
     private final EchoServer.NextResponse nextResponse;
     private final EchoServer.LastRequest lastRequest;
 
-    EchoServerHandler(EchoServer.Error error, MockServerLogger mockServerLogger, MockServerEventLog mockServerEventLog, EchoServer.NextResponse nextResponse, EchoServer.LastRequest lastRequest) {
+    EchoServerHandler(EchoServer.Error error, MockServerEventLog mockServerEventLog, EchoServer.NextResponse nextResponse, EchoServer.LastRequest lastRequest) {
         this.error = error;
-        this.mockServerLogger = mockServerLogger;
         this.mockServerEventLog = mockServerEventLog;
         this.nextResponse = nextResponse;
         this.lastRequest = lastRequest;
@@ -69,7 +71,7 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 
         if (!nextResponse.httpResponse.isEmpty()) {
             // WARNING: this logic is only for unit tests that run in series and is NOT thread safe!!!
-            DefaultHttpObject httpResponse = new MockServerHttpResponseToFullHttpResponse(mockServerLogger).mapMockServerResponseToNettyResponse(nextResponse.httpResponse.remove()).get(0);
+            DefaultHttpObject httpResponse = new MockServerHttpResponseToFullHttpResponse().mapMockServerResponseToNettyResponse(nextResponse.httpResponse.remove()).get(0);
             ctx.writeAndFlush(httpResponse);
         } else {
             HttpResponse httpResponse =
@@ -93,7 +95,7 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
                 httpResponse.replaceHeader(CONTENT_LENGTH.toString(), String.valueOf(length));
             }
 
-            if (MockServerLogger.isEnabled(INFO) && mockServerLogger != null) {
+            if (LOG.isInfoEnabled()) {
                 mockServerEventLog.add(
                     new LogEntry()
                         .setLogLevel(INFO)
@@ -115,12 +117,7 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        mockServerLogger.logEvent(
-            new LogEntry()
-                .setLogLevel(Level.ERROR)
-                .setMessageFormat("echo server caught exception")
-                .setThrowable(cause)
-        );
+        LOG.error("Echo server caught exception", cause);
         if (!lastRequest.httpRequest.get().isDone()) {
             lastRequest.httpRequest.get().completeExceptionally(cause);
         }

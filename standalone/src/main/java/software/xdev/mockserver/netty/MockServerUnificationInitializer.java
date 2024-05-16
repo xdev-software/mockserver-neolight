@@ -23,7 +23,6 @@ import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
 import software.xdev.mockserver.netty.unification.PortUnificationHandler;
-import software.xdev.mockserver.socket.tls.NettySslContextFactory;
 
 @ChannelHandler.Sharable
 public class MockServerUnificationInitializer extends ChannelHandlerAdapter {
@@ -31,18 +30,16 @@ public class MockServerUnificationInitializer extends ChannelHandlerAdapter {
     private final LifeCycle server;
     private final HttpState httpState;
     private final HttpActionHandler actionHandler;
-    private final NettySslContextFactory nettySslContextFactory;
 
-    public MockServerUnificationInitializer(Configuration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler, NettySslContextFactory nettySslContextFactory) {
+    public MockServerUnificationInitializer(Configuration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler) {
         this.configuration = configuration;
         this.server = server;
         this.httpState = httpState;
         this.actionHandler = actionHandler;
-        this.nettySslContextFactory = nettySslContextFactory;
     }
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) {
-        ctx.pipeline().replace(this, null, new PortUnificationHandler(configuration, server, httpState, actionHandler, nettySslContextFactory));
+        ctx.pipeline().replace(this, null, new PortUnificationHandler(configuration, server, httpState, actionHandler));
     }
 }

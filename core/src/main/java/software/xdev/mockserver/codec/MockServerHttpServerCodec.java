@@ -17,7 +17,6 @@ package software.xdev.mockserver.codec;
 
 import io.netty.channel.CombinedChannelDuplexHandler;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.logging.MockServerLogger;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -25,12 +24,14 @@ import java.security.cert.Certificate;
 
 public class MockServerHttpServerCodec extends CombinedChannelDuplexHandler<NettyHttpToMockServerHttpRequestDecoder, MockServerHttpToNettyHttpResponseEncoder> {
 
-    public MockServerHttpServerCodec(Configuration configuration, MockServerLogger mockServerLogger, boolean isSecure, Certificate[] clientCertificates, SocketAddress socketAddress) {
-        this(configuration, mockServerLogger, isSecure, clientCertificates, socketAddress instanceof InetSocketAddress ? ((InetSocketAddress) socketAddress).getPort() : null);
+    public MockServerHttpServerCodec(Configuration configuration, SocketAddress socketAddress) {
+        this(configuration, socketAddress instanceof InetSocketAddress isa ? isa.getPort() : null);
     }
 
-    public MockServerHttpServerCodec(Configuration configuration, MockServerLogger mockServerLogger, boolean isSecure, Certificate[] clientCertificates, Integer port) {
-        init(new NettyHttpToMockServerHttpRequestDecoder(configuration, mockServerLogger, isSecure, clientCertificates, port), new MockServerHttpToNettyHttpResponseEncoder(mockServerLogger));
+    public MockServerHttpServerCodec(Configuration configuration, Integer port) {
+        init(
+            new NettyHttpToMockServerHttpRequestDecoder(configuration, port),
+            new MockServerHttpToNettyHttpResponseEncoder());
     }
 
 }

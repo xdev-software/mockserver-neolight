@@ -17,26 +17,22 @@ package software.xdev.mockserver.matchers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import software.xdev.mockserver.collections.NottableStringHashMap;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.KeyAndValue;
 import software.xdev.mockserver.model.KeysAndValues;
 
 @SuppressWarnings("rawtypes")
 public class HashMapMatcher extends NotMatcher<KeysAndValues<? extends KeyAndValue, ? extends KeysAndValues>> {
-    private static final String[] EXCLUDED_FIELDS = {"mockServerLogger"};
-    private final MockServerLogger mockServerLogger;
     private final NottableStringHashMap matcher;
     private final KeysAndValues keysAndValues;
     private final boolean controlPlaneMatcher;
     private Boolean allKeysNotted;
     private Boolean allKeysOptional;
 
-    HashMapMatcher(MockServerLogger mockServerLogger, KeysAndValues<? extends KeyAndValue, ? extends KeysAndValues> keysAndValues, boolean controlPlaneMatcher) {
-        this.mockServerLogger = mockServerLogger;
+    HashMapMatcher(KeysAndValues<? extends KeyAndValue, ? extends KeysAndValues> keysAndValues, boolean controlPlaneMatcher) {
         this.keysAndValues = keysAndValues;
         this.controlPlaneMatcher = controlPlaneMatcher;
         if (keysAndValues != null) {
-            this.matcher = new NottableStringHashMap(this.mockServerLogger, this.controlPlaneMatcher, keysAndValues.getEntries());
+            this.matcher = new NottableStringHashMap(this.controlPlaneMatcher, keysAndValues.getEntries());
         } else {
             this.matcher = null;
         }
@@ -56,11 +52,11 @@ public class HashMapMatcher extends NotMatcher<KeysAndValues<? extends KeyAndVal
             }
             result = allKeysNotted || allKeysOptional;
         } else {
-            result = new NottableStringHashMap(mockServerLogger, controlPlaneMatcher, matched.getEntries()).containsAll(mockServerLogger, context, matcher);
+            result = new NottableStringHashMap(controlPlaneMatcher, matched.getEntries()).containsAll(context, matcher);
         }
 
         if (!result && context != null) {
-            context.addDifference(mockServerLogger, "map subset match failed expected:{}found:{}failed because:{}", keysAndValues, matched != null ? matched : "none", matched != null ? "map is not a subset" : "none is not a subset");
+            context.addDifference("map subset match failed expected:{}found:{}failed because:{}", keysAndValues, matched != null ? matched : "none", matched != null ? "map is not a subset" : "none is not a subset");
         }
 
         return not != result;
@@ -68,11 +64,5 @@ public class HashMapMatcher extends NotMatcher<KeysAndValues<? extends KeyAndVal
 
     public boolean isBlank() {
         return matcher == null || matcher.isEmpty();
-    }
-
-    @Override
-    @JsonIgnore
-    protected String[] fieldsExcludedFromEqualsAndHashCode() {
-        return EXCLUDED_FIELDS;
     }
 }

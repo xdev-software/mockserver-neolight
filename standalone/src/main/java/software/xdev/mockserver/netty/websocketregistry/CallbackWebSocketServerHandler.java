@@ -27,10 +27,12 @@ import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackR
 import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.netty.HttpRequestHandler;
 import software.xdev.mockserver.uuid.UUIDService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import static com.google.common.net.HttpHeaders.HOST;
@@ -40,29 +42,29 @@ import static software.xdev.mockserver.netty.unification.PortUnificationHandler.
 
 @ChannelHandler.Sharable
 public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(CallbackWebSocketServerHandler.class);
+    
     private static final AttributeKey<Boolean> CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET = AttributeKey.valueOf("CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET");
     private static final String UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI = "/_mockserver_callback_websocket";
-    private final MockServerLogger mockServerLogger;
     private WebSocketServerHandshaker handshaker;
     private final WebSocketClientRegistry webSocketClientRegistry;
 
     public CallbackWebSocketServerHandler(HttpState httpStateHandler) {
         webSocketClientRegistry = httpStateHandler.getWebSocketClientRegistry();
-        mockServerLogger = httpStateHandler.getMockServerLogger();
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         boolean release = true;
         try {
-            if (msg instanceof FullHttpRequest && ((FullHttpRequest) msg).uri().equals(UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI)) {
-                upgradeChannel(ctx, (FullHttpRequest) msg);
+            if (msg instanceof FullHttpRequest fullHttpRequest && fullHttpRequest.uri().equals(UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI)) {
+                upgradeChannel(ctx, fullHttpRequest);
                 ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).set(true);
             } else if (ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).get() != null &&
                 ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).get() &&
-                msg instanceof WebSocketFrame) {
-                handleWebSocketFrame(ctx, (WebSocketFrame) msg);
+                msg instanceof WebSocketFrame webSocketFrame) {
+                handleWebSocketFrame(ctx, webSocketFrame);
             } else {
                 release = false;
                 ctx.fireChannelRead(msg);
@@ -107,21 +109,13 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
                     .addListener((ChannelFutureListener) future -> {
                         ctx.pipeline().remove(MockServerHttpServerCodec.class);
                         ctx.pipeline().remove(HttpRequestHandler.class);
-                        if (MockServerLogger.isEnabled(Level.TRACE)) {
-                            mockServerLogger.logEvent(
-                                new LogEntry()
-                                    .setLogLevel(Level.TRACE)
-                                    .setMessageFormat("registering client " + clientId)
-                            );
+                        if (LOG.isTraceEnabled()) {
+                            LOG.trace("Registering client {}", clientId);
                         }
                         webSocketClientRegistry.registerClient(clientId, ctx);
                         future.channel().closeFuture().addListener((ChannelFutureListener) closeFuture -> {
-                            if (MockServerLogger.isEnabled(Level.TRACE)) {
-                                mockServerLogger.logEvent(
-                                    new LogEntry()
-                                        .setLogLevel(Level.TRACE)
-                                        .setMessageFormat("unregistering callback for client " + clientId)
-                                );
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace("Unregistering callback for client {}", clientId);
                             }
                             webSocketClientRegistry.unregisterClient(clientId);
                         });
@@ -133,8 +127,8 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
     private void handleWebSocketFrame(final ChannelHandlerContext ctx, WebSocketFrame frame) {
         if (frame instanceof CloseWebSocketFrame) {
             handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
-        } else if (frame instanceof TextWebSocketFrame) {
-            webSocketClientRegistry.receivedTextWebSocketFrame(((TextWebSocketFrame) frame));
+        } else if (frame instanceof TextWebSocketFrame txtWebSocketFrame) {
+            webSocketClientRegistry.receivedTextWebSocketFrame(txtWebSocketFrame);
         } else if (frame instanceof PingWebSocketFrame) {
             ctx.write(new PongWebSocketFrame(frame.content().retain()));
         } else {
@@ -145,12 +139,7 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (connectionClosedException(cause)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("web socket server caught exception")
-                    .setThrowable(cause)
-            );
+            LOG.error("Web socket server caught exception", cause);
         }
         ctx.close();
     }

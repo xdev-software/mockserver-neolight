@@ -19,10 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Joiner;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.ExpectationId;
-import org.slf4j.event.Level;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,107 +30,50 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class ExpectationIdSerializer implements Serializer<ExpectationId> {
-    private final MockServerLogger mockServerLogger;
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
     private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-
-    public ExpectationIdSerializer(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
-    }
 
     public String serialize(ExpectationId expectationId) {
         try {
             return objectWriter.writeValueAsString(expectationId);
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing ExpectationId to JSON with value " + expectationId)
-                    .setThrowable(e)
-            );
-            throw new RuntimeException("Exception while serializing ExpectationId to JSON with value " + expectationId, e);
+            throw new IllegalStateException("Exception while serializing ExpectationId to JSON with value " + expectationId, e);
         }
     }
 
     public String serialize(List<? extends ExpectationId> expectationIds) {
-        return serialize(false, expectationIds);
-    }
-
-    public String serialize(boolean prettyPrint, List<? extends ExpectationId> expectationIds) {
-        return serialize(prettyPrint, expectationIds.toArray(new ExpectationId[0]));
+        return serialize(expectationIds.toArray(new ExpectationId[0]));
     }
 
     public String serialize(ExpectationId... expectationIds) {
-        return serialize(false, expectationIds);
-    }
-
-    public String serialize(boolean prettyPrint, ExpectationId... expectationIds) {
         try {
             if (expectationIds != null && expectationIds.length > 0) {
                 return objectWriter.writeValueAsString(expectationIds);
-            } else {
-                return "[]";
             }
+            return "[]";
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while serializing ExpectationId to JSON with value " + Arrays.asList(expectationIds))
-                    .setThrowable(e)
-            );
-            throw new RuntimeException("Exception while serializing ExpectationId to JSON with value " + Arrays.asList(expectationIds), e);
+            throw new IllegalStateException("Exception while serializing ExpectationId to JSON with value " + Arrays.asList(expectationIds), e);
         }
     }
 
     public ExpectationId deserialize(String jsonExpectationId) {
-        if (jsonExpectationId.contains("\"httpRequest\"")) {
-            try {
+        try {
+            if (jsonExpectationId.contains("\"httpRequest\"")) {
                 JsonNode jsonNode = objectMapper.readTree(jsonExpectationId);
                 if (jsonNode.has("httpRequest")) {
                     jsonExpectationId = jsonNode.get("httpRequest").toString();
                 }
-            } catch (Throwable throwable) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
-                        .setArguments(jsonExpectationId)
-                        .setThrowable(throwable)
-                );
-                throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
-            }
-        } else if (jsonExpectationId.contains("\"openAPIDefinition\"")) {
-            try {
+            } else if (jsonExpectationId.contains("\"openAPIDefinition\"")) {
                 JsonNode jsonNode = objectMapper.readTree(jsonExpectationId);
                 if (jsonNode.has("openAPIDefinition")) {
                     jsonExpectationId = jsonNode.get("openAPIDefinition").toString();
                 }
-            } catch (Throwable throwable) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
-                        .setArguments(jsonExpectationId)
-                        .setThrowable(throwable)
-                );
-                throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
             }
+            return objectMapper.readValue(jsonExpectationId, ExpectationId.class);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", ex);
         }
-        ExpectationId expectationId;
-        try {
-            expectationId = objectMapper.readValue(jsonExpectationId, ExpectationId.class);
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception while parsing{}for ExpectationId " + throwable.getMessage())
-                    .setArguments(jsonExpectationId)
-                    .setThrowable(throwable)
-            );
-            throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", throwable);
-        }
-        return expectationId;
     }
 
     @Override

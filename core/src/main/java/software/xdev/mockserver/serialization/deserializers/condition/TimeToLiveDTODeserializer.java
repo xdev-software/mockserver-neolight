@@ -20,18 +20,20 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.matchers.TimeToLive;
 import software.xdev.mockserver.serialization.model.TimeToLiveDTO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO> {
-
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger();
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(TimeToLiveDTODeserializer.class);
+    
     public TimeToLiveDTODeserializer() {
         super(TimeToLiveDTO.class);
     }
@@ -61,13 +63,8 @@ public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO> {
                     timeUnit = Enum.valueOf(TimeUnit.class, timeUnitNode.asText());
                     timeToLive = TimeToLive.exactly(timeUnit, ttl);
                 } catch (IllegalArgumentException iae) {
-                    if (MockServerLogger.isEnabled(Level.TRACE)) {
-                        MOCK_SERVER_LOGGER.logEvent(
-                            new LogEntry()
-                                .setLogLevel(Level.TRACE)
-                                .setMessageFormat("exception parsing TimeToLiveDTO timeUnit")
-                                .setThrowable(iae)
-                        );
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Exception parsing TimeToLiveDTO timeUnit", iae);
                     }
                 }
             }

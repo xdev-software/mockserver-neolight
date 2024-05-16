@@ -24,11 +24,13 @@ import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.codec.PathParametersDecoder;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 import software.xdev.mockserver.serialization.deserializers.body.StrictBodyDTODeserializer;
 import software.xdev.mockserver.serialization.model.BodyDTO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.Collections;
@@ -37,15 +39,15 @@ import java.util.Objects;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.EXPECTATION_MATCHED;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.EXPECTATION_NOT_MATCHED;
 import static software.xdev.mockserver.matchers.MatchDifference.Field.*;
 import static software.xdev.mockserver.model.NottableString.string;
 
 @SuppressWarnings("rawtypes")
 public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
-
-    private static final String[] excludedFields = {"mockServerLogger", "methodMatcher", "pathMatcher", "pathParameterMatcher", "queryStringParameterMatcher", "bodyMatcher", "headerMatcher", "cookieMatcher", "keepAliveMatcher", "bodyDTOMatcher", "sslMatcher", "controlPlaneMatcher", "responseInProgress", "objectMapper"};
+    
+    private static final Logger LOG = LoggerFactory.getLogger(HttpRequestPropertiesMatcher.class);
+    
+    private static final String[] excludedFields = {"methodMatcher", "pathMatcher", "pathParameterMatcher", "queryStringParameterMatcher", "bodyMatcher", "headerMatcher", "cookieMatcher", "keepAliveMatcher", "bodyDTOMatcher", "sslMatcher", "controlPlaneMatcher", "responseInProgress", "objectMapper"};
     private static final String COMMA = ",";
     private static final String REQUEST_NOT_OPERATOR_IS_ENABLED = COMMA + NEW_LINE + "request 'not' operator is enabled";
     private static final String EXPECTATION_REQUEST_NOT_OPERATOR_IS_ENABLED = COMMA + NEW_LINE + "expectation's request 'not' operator is enabled";
@@ -64,13 +66,12 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
     private MultiValueMapMatcher headerMatcher = null;
     private HashMapMatcher cookieMatcher = null;
     private BooleanMatcher keepAliveMatcher = null;
-    private BooleanMatcher sslMatcher = null;
     private ExactStringMatcher protocolMatcher = null;
     private ObjectMapper objectMapperWithStrictBodyDTODeserializer;
 
-    public HttpRequestPropertiesMatcher(Configuration configuration, MockServerLogger mockServerLogger) {
-        super(configuration, mockServerLogger);
-        this.expandedParameterDecoder = new ExpandedParameterDecoder(configuration, mockServerLogger);
+    public HttpRequestPropertiesMatcher(Configuration configuration) {
+        super(configuration);
+        this.expandedParameterDecoder = new ExpandedParameterDecoder(configuration);
     }
 
     public HttpRequest getHttpRequest() {
@@ -84,7 +85,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
 
     @Override
     public boolean apply(RequestDefinition requestDefinition) {
-        HttpRequest httpRequest = requestDefinition instanceof HttpRequest ? (HttpRequest) requestDefinition : null;
+        HttpRequest httpRequest = requestDefinition instanceof HttpRequest r ? r : null;
         if (this.httpRequest == null || !this.httpRequest.equals(httpRequest)) {
             this.hashCode = 0;
             this.httpRequest = httpRequest;
@@ -98,13 +99,11 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                 withHeaders(httpRequest.getHeaders());
                 withCookies(httpRequest.getCookies());
                 withKeepAlive(httpRequest.isKeepAlive());
-                withSsl(httpRequest.isSecure());
                 withProtocol(httpRequest.getProtocol());
             }
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public HttpRequestPropertiesMatcher withControlPlaneMatcher(boolean controlPlaneMatcher) {
@@ -113,19 +112,19 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
     }
 
     private void withMethod(NottableString method) {
-        this.methodMatcher = new RegexStringMatcher(mockServerLogger, method, controlPlaneMatcher);
+        this.methodMatcher = new RegexStringMatcher(method, controlPlaneMatcher);
     }
 
     private void withPath(HttpRequest httpRequest) {
-        this.pathMatcher = new RegexStringMatcher(mockServerLogger, pathParametersParser.normalisePathWithParametersForMatching(httpRequest), controlPlaneMatcher);
+        this.pathMatcher = new RegexStringMatcher(pathParametersParser.normalisePathWithParametersForMatching(httpRequest), controlPlaneMatcher);
     }
 
     private void withPathParameters(Parameters parameters) {
-        this.pathParameterMatcher = new MultiValueMapMatcher(mockServerLogger, parameters, controlPlaneMatcher);
+        this.pathParameterMatcher = new MultiValueMapMatcher(parameters, controlPlaneMatcher);
     }
 
     private void withQueryStringParameters(Parameters parameters) {
-        this.queryStringParameterMatcher = new MultiValueMapMatcher(mockServerLogger, parameters, controlPlaneMatcher);
+        this.queryStringParameterMatcher = new MultiValueMapMatcher(parameters, controlPlaneMatcher);
     }
 
     private void withBody(Body body) {
@@ -139,22 +138,22 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                 case STRING:
                     StringBody stringBody = (StringBody) body;
                     if (stringBody.isSubString()) {
-                        bodyMatcher = new SubStringMatcher(mockServerLogger, string(stringBody.getValue()));
+                        bodyMatcher = new SubStringMatcher(string(stringBody.getValue()));
                     } else {
-                        bodyMatcher = new ExactStringMatcher(mockServerLogger, string(stringBody.getValue()));
+                        bodyMatcher = new ExactStringMatcher(string(stringBody.getValue()));
                     }
                     break;
                 case REGEX:
                     RegexBody regexBody = (RegexBody) body;
-                    bodyMatcher = new RegexStringMatcher(mockServerLogger, string(regexBody.getValue()), controlPlaneMatcher);
+                    bodyMatcher = new RegexStringMatcher(string(regexBody.getValue()), controlPlaneMatcher);
                     break;
                 case PARAMETERS:
                     ParameterBody parameterBody = (ParameterBody) body;
-                    bodyMatcher = new ParameterStringMatcher(configuration, mockServerLogger, parameterBody.getValue(), controlPlaneMatcher);
+                    bodyMatcher = new ParameterStringMatcher(configuration, parameterBody.getValue(), controlPlaneMatcher);
                     break;
                 case BINARY:
                     BinaryBody binaryBody = (BinaryBody) body;
-                    bodyMatcher = new BinaryMatcher(mockServerLogger, binaryBody.getValue());
+                    bodyMatcher = new BinaryMatcher(binaryBody.getValue());
                     break;
             }
             if (body.isNot()) {
@@ -166,59 +165,43 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
     }
 
     private void withHeaders(Headers headers) {
-        this.headerMatcher = new MultiValueMapMatcher(mockServerLogger, headers, controlPlaneMatcher);
+        this.headerMatcher = new MultiValueMapMatcher(headers, controlPlaneMatcher);
     }
 
     private void withCookies(Cookies cookies) {
-        this.cookieMatcher = new HashMapMatcher(mockServerLogger, cookies, controlPlaneMatcher);
+        this.cookieMatcher = new HashMapMatcher(cookies, controlPlaneMatcher);
     }
 
     private void withKeepAlive(Boolean keepAlive) {
-        this.keepAliveMatcher = new BooleanMatcher(mockServerLogger, keepAlive);
-    }
-
-    private void withSsl(Boolean isSsl) {
-        this.sslMatcher = new BooleanMatcher(mockServerLogger, isSsl);
+        this.keepAliveMatcher = new BooleanMatcher(keepAlive);
     }
 
     private void withProtocol(Protocol protocol) {
-        this.protocolMatcher = new ExactStringMatcher(mockServerLogger, protocol != null ? string(protocol.name()) : null);
+        this.protocolMatcher = new ExactStringMatcher(protocol != null ? string(protocol.name()) : null);
     }
 
     public boolean matches(final MatchDifference context, final RequestDefinition requestDefinition) {
-        if (requestDefinition instanceof HttpRequest) {
-            HttpRequest request = (HttpRequest) requestDefinition;
+        if (requestDefinition instanceof HttpRequest request) {
             StringBuilder becauseBuilder = new StringBuilder();
             boolean overallMatch = matches(context, request, becauseBuilder);
             if (!controlPlaneMatcher) {
                 if (overallMatch) {
-                    if (MockServerLogger.isEnabled(Level.INFO)) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setType(EXPECTATION_MATCHED)
-                                .setLogLevel(Level.INFO)
-                                .setCorrelationId(requestDefinition.getLogCorrelationId())
-                                .setHttpRequest(request)
-                                .setExpectation(this.expectation)
-                                .setMessageFormat(this.expectation == null ? REQUEST_DID_MATCH : EXPECTATION_DID_MATCH)
-                                .setArguments(request, (this.expectation == null ? this : this.expectation.clone()))
-                        );
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info(
+                            this.expectation == null ? REQUEST_DID_MATCH : EXPECTATION_DID_MATCH,
+                            request,
+                            this.expectation == null ? this : this.expectation.clone());
                     }
                 } else {
                     becauseBuilder.replace(0, 1, "");
                     String because = becauseBuilder.toString();
-                    if (MockServerLogger.isEnabled(Level.INFO)) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setType(EXPECTATION_NOT_MATCHED)
-                                .setLogLevel(Level.INFO)
-                                .setCorrelationId(requestDefinition.getLogCorrelationId())
-                                .setHttpRequest(request)
-                                .setExpectation(this.expectation)
-                                .setMessageFormat(this.expectation == null ? didNotMatchRequestBecause : becauseBuilder.length() > 0 ? didNotMatchExpectationBecause : didNotMatchExpectationWithoutBecause)
-                                .setArguments(request, (this.expectation == null ? this : this.expectation.clone()), because)
-                                .setBecause(because)
-                        );
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info(
+                            this.expectation == null ? didNotMatchRequestBecause :
+								!becauseBuilder.isEmpty() ? didNotMatchExpectationBecause : didNotMatchExpectationWithoutBecause,
+                            request,
+                            this.expectation == null ? this : this.expectation.clone(),
+                            because);
                     }
                 }
             }
@@ -250,7 +233,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                         if (!httpRequest.getPath().isBlank()) {
                             if (context != null) {
                                 context.currentField(PATH);
-                                context.addDifference(mockServerLogger, iae.getMessage());
+                                context.addDifference(iae.getMessage());
                             }
                             pathMatches = false;
                         }
@@ -287,7 +270,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                             } catch (IllegalArgumentException iae) {
                                 controlPlaneParameters = new Parameters();
                             }
-                            pathParameterMatcher = new MultiValueMapMatcher(mockServerLogger, controlPlaneParameters, controlPlaneMatcher);
+                            pathParameterMatcher = new MultiValueMapMatcher(controlPlaneParameters, controlPlaneMatcher);
 
                         }
                         pathParametersMatches = matches(PATH_PARAMETERS, context, pathParameterMatcher, pathParameters);
@@ -306,11 +289,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
 
                     boolean keepAliveMatches = matches(KEEP_ALIVE, context, keepAliveMatcher, request.isKeepAlive());
                     if (failFast(keepAliveMatcher, context, matchDifferenceCount, becauseBuilder, keepAliveMatches, KEEP_ALIVE)) {
-                        return false;
-                    }
-
-                    boolean sslMatches = matches(SECURE, context, sslMatcher, request.isSecure());
-                    if (failFast(sslMatcher, context, matchDifferenceCount, becauseBuilder, sslMatches, SECURE)) {
                         return false;
                     }
 
@@ -404,7 +382,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
                             } else {
                                 bodyMatches = false;
                             }
-                        } catch (Throwable ignore) {
+                        } catch (Exception ignore) {
                             // ignore this exception as this exception would typically get thrown for "normal" HTTP requests (i.e. not clear or retrieve)
                             bodyMatches = false;
                         }
@@ -445,22 +423,13 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
         if (context != null) {
             context.currentField(field);
         }
-        boolean result = false;
-
-        if (matcher == null) {
-            result = true;
-        } else if (matcher.matches(context, t)) {
-            result = true;
-        }
-
-        return result;
+        return matcher == null || matcher.matches(context, t);
     }
 
     @Override
     public String toString() {
         try {
-            return TO_STRING_OBJECT_WRITER
-                .writeValueAsString(httpRequest);
+            return TO_STRING_OBJECT_WRITER.writeValueAsString(httpRequest);
         } catch (Exception e) {
             return super.toString();
         }

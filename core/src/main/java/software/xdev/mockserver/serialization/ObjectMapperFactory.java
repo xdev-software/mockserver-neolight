@@ -46,8 +46,6 @@ import software.xdev.mockserver.serialization.serializers.string.NottableStringS
 
 import java.util.*;
 
-import static software.xdev.mockserver.exception.ExceptionHandling.handleThrowable;
-
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ObjectMapperFactory {
 

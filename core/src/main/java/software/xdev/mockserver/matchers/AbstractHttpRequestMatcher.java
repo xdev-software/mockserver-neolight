@@ -16,7 +16,6 @@
 package software.xdev.mockserver.matchers;
 
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.model.RequestDefinition;
@@ -27,18 +26,17 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 public abstract class AbstractHttpRequestMatcher extends NotMatcher<RequestDefinition> implements HttpRequestMatcher {
 
-    protected static final String REQUEST_DID_NOT_MATCH = "request:{}didn't match";
+    protected static final String REQUEST_DID_NOT_MATCH = "request:{} didn't match";
     protected static final String REQUEST_MATCHER = " request matcher";
     protected static final String EXPECTATION = " expectation";
     protected static final String BECAUSE = ":{}because:{}";
-    protected static final String REQUEST_DID_MATCH = "request:{}matched request:{}";
-    protected static final String EXPECTATION_DID_MATCH = "request:{}matched" + EXPECTATION + ":{}";
+    protected static final String REQUEST_DID_MATCH = "request: {} matched request: {}";
+    protected static final String EXPECTATION_DID_MATCH = "request: {} matched" + EXPECTATION + ": {}";
     protected static final String DID_NOT_MATCH = " didn't match";
     protected static final String MATCHED = " matched";
     protected static final String COLON_NEW_LINES = ": " + NEW_LINE + NEW_LINE;
 
     protected final Configuration configuration;
-    protected final MockServerLogger mockServerLogger;
     private int hashCode;
     private boolean isBlank = false;
     private boolean responseInProgress = false;
@@ -49,9 +47,8 @@ public abstract class AbstractHttpRequestMatcher extends NotMatcher<RequestDefin
     protected String didNotMatchExpectationBecause = REQUEST_DID_NOT_MATCH + EXPECTATION + BECAUSE;
     protected String didNotMatchExpectationWithoutBecause = REQUEST_DID_NOT_MATCH + EXPECTATION;
 
-    protected AbstractHttpRequestMatcher(Configuration configuration, MockServerLogger mockServerLogger) {
+    protected AbstractHttpRequestMatcher(Configuration configuration) {
         this.configuration = configuration;
-        this.mockServerLogger = mockServerLogger;
     }
 
     public void setDescription(String description) {

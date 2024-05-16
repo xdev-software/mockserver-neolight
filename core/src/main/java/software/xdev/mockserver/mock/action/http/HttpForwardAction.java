@@ -18,10 +18,12 @@ package software.xdev.mockserver.mock.action.http;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
 import software.xdev.mockserver.filters.HopByHopHeaderFilter;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.model.Protocol;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.net.InetSocketAddress;
@@ -32,28 +34,21 @@ import static software.xdev.mockserver.model.HttpResponse.notFoundResponse;
 
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class HttpForwardAction {
-
-    protected final MockServerLogger mockServerLogger;
+    
+    private static final Logger LOG = LoggerFactory.getLogger(HttpForwardAction.class);
+    
     private final NettyHttpClient httpClient;
     private HopByHopHeaderFilter hopByHopHeaderFilter = new HopByHopHeaderFilter();
 
-    HttpForwardAction(MockServerLogger mockServerLogger, NettyHttpClient httpClient) {
-        this.mockServerLogger = mockServerLogger;
+    HttpForwardAction(NettyHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
     protected HttpForwardActionResult sendRequest(HttpRequest request, InetSocketAddress remoteAddress, Function<HttpResponse, HttpResponse> overrideHttpResponse) {
         try {
-            // TODO(jamesdbloom) support proxying via HTTP2, for now always force into HTTP1
             return new HttpForwardActionResult(request, httpClient.sendRequest(hopByHopHeaderFilter.onRequest(request).withProtocol(null), remoteAddress), overrideHttpResponse, remoteAddress);
         } catch (Exception e) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setHttpRequest(request)
-                    .setMessageFormat("exception forwarding request " + request)
-                    .setThrowable(e)
-            );
+            LOG.error("Exception forwarding request {}", request, e);
         }
         return notFoundFuture(request);
     }

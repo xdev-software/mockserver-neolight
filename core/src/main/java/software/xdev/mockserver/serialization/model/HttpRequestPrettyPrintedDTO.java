@@ -32,7 +32,6 @@ public class HttpRequestPrettyPrintedDTO extends RequestDefinition {
     private final Map<String, String> cookies = new HashMap<>();
     private final Map<String, List<String>> headers = new HashMap<>();
     private Boolean keepAlive = null;
-    private Boolean secure = null;
 
     public HttpRequestPrettyPrintedDTO(HttpRequest httpRequest) {
         if (httpRequest != null) {
@@ -49,7 +48,6 @@ public class HttpRequestPrettyPrintedDTO extends RequestDefinition {
             }
             body = BodyDTO.createDTO(httpRequest.getBody());
             keepAlive = httpRequest.isKeepAlive();
-            secure = httpRequest.isSecure();
             setNot(httpRequest.getNot());
         }
     }
@@ -82,10 +80,6 @@ public class HttpRequestPrettyPrintedDTO extends RequestDefinition {
         return keepAlive;
     }
 
-    public Boolean getSecure() {
-        return secure;
-    }
-
     public HttpRequestPrettyPrintedDTO shallowClone() {
         return this;
     }
@@ -105,20 +99,19 @@ public class HttpRequestPrettyPrintedDTO extends RequestDefinition {
             return false;
         }
         HttpRequestPrettyPrintedDTO that = (HttpRequestPrettyPrintedDTO) o;
-        return Objects.equals(method, that.method) &&
-            Objects.equals(path, that.path) &&
-            Objects.equals(queryStringParameters, that.queryStringParameters) &&
-            Objects.equals(body, that.body) &&
-            Objects.equals(cookies, that.cookies) &&
-            Objects.equals(headers, that.headers) &&
-            Objects.equals(keepAlive, that.keepAlive) &&
-            Objects.equals(secure, that.secure);
+        return Objects.equals(method, that.method)
+            && Objects.equals(path, that.path)
+            && Objects.equals(queryStringParameters, that.queryStringParameters)
+            && Objects.equals(body, that.body)
+            && Objects.equals(cookies, that.cookies)
+            && Objects.equals(headers, that.headers)
+            && Objects.equals(keepAlive, that.keepAlive);
     }
 
     @Override
     public int hashCode() {
         if (hashCode == 0) {
-            hashCode = Objects.hash(super.hashCode(), method, path, queryStringParameters, body, cookies, headers, keepAlive, secure);
+            hashCode = Objects.hash(super.hashCode(), method, path, queryStringParameters, body, cookies, headers, keepAlive);
         }
         return hashCode;
     }

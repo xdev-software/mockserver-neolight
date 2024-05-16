@@ -17,7 +17,6 @@ package software.xdev.mockserver.codec;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mappers.MockServerHttpResponseToFullHttpResponse;
 import software.xdev.mockserver.model.HttpResponse;
 
@@ -27,8 +26,8 @@ public class MockServerHttpToNettyHttpResponseEncoder extends MessageToMessageEn
 
     private final MockServerHttpResponseToFullHttpResponse mockServerHttpResponseToFullHttpResponse;
 
-    public MockServerHttpToNettyHttpResponseEncoder(MockServerLogger mockServerLogger) {
-        mockServerHttpResponseToFullHttpResponse = new MockServerHttpResponseToFullHttpResponse(mockServerLogger);
+    public MockServerHttpToNettyHttpResponseEncoder() {
+        mockServerHttpResponseToFullHttpResponse = new MockServerHttpResponseToFullHttpResponse();
     }
 
     @Override

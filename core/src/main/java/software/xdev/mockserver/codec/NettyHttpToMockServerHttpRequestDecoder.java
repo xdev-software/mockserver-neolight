@@ -19,7 +19,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.FullHttpRequest;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mappers.FullHttpRequestToMockServerHttpRequest;
 import software.xdev.mockserver.model.Header;
 
@@ -27,16 +26,12 @@ import java.net.SocketAddress;
 import java.security.cert.Certificate;
 import java.util.List;
 
-import static software.xdev.mockserver.socket.tls.SniHandler.getALPNProtocol;
-
 public class NettyHttpToMockServerHttpRequestDecoder extends MessageToMessageDecoder<FullHttpRequest> {
 
     private final FullHttpRequestToMockServerHttpRequest fullHttpRequestToMockServerRequest;
-    private final MockServerLogger mockServerLogger;
 
-    public NettyHttpToMockServerHttpRequestDecoder(Configuration configuration, MockServerLogger mockServerLogger, boolean isSecure, Certificate[] clientCertificates, Integer port) {
-        this.mockServerLogger = mockServerLogger;
-        this.fullHttpRequestToMockServerRequest = new FullHttpRequestToMockServerHttpRequest(configuration, mockServerLogger, isSecure, clientCertificates, port);
+    public NettyHttpToMockServerHttpRequestDecoder(Configuration configuration, Integer port) {
+        this.fullHttpRequestToMockServerRequest = new FullHttpRequestToMockServerHttpRequest(configuration, port);
     }
 
     @Override
@@ -49,7 +44,8 @@ public class NettyHttpToMockServerHttpRequestDecoder extends MessageToMessageDec
             localAddress = ctx.channel().localAddress();
             remoteAddress = ctx.channel().remoteAddress();
         }
-        out.add(fullHttpRequestToMockServerRequest.mapFullHttpRequestToMockServerRequest(fullHttpRequest, preservedHeaders, localAddress, remoteAddress, getALPNProtocol(mockServerLogger, ctx)));
+        out.add(fullHttpRequestToMockServerRequest.mapFullHttpRequestToMockServerRequest(
+            fullHttpRequest, preservedHeaders, localAddress, remoteAddress));
     }
 
 }

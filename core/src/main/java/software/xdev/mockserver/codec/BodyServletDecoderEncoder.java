@@ -17,10 +17,12 @@ package software.xdev.mockserver.codec;
 
 import com.google.common.io.ByteStreams;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.Body;
 import software.xdev.mockserver.model.BodyWithContentType;
 import software.xdev.mockserver.streams.IOStreamUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,14 +32,12 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 @SuppressWarnings("rawtypes")
 public class BodyServletDecoderEncoder {
-
-    private final MockServerLogger mockServerLogger;
+    
     private final IOStreamUtils ioStreamUtils;
     private final BodyDecoderEncoder bodyDecoderEncoder = new BodyDecoderEncoder();
 
-    public BodyServletDecoderEncoder(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
-        this.ioStreamUtils = new IOStreamUtils(mockServerLogger);
+    public BodyServletDecoderEncoder() {
+        this.ioStreamUtils = new IOStreamUtils();
     }
 
     public void bodyToServletResponse(HttpServletResponse httpServletResponse, Body body, String contentTypeHeader) {
@@ -54,12 +54,6 @@ public class BodyServletDecoderEncoder {
                 byte[] bodyBytes = ByteStreams.toByteArray(servletRequest.getInputStream());
                 return bodyDecoderEncoder.bytesToBody(bodyBytes, contentTypeHeader);
             } catch (Throwable throwable) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception while reading HttpServletRequest input stream")
-                        .setThrowable(throwable)
-                );
                 throw new RuntimeException("IOException while reading HttpServletRequest input stream", throwable);
             }
         }

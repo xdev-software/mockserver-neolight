@@ -21,11 +21,13 @@ import org.apache.commons.lang3.StringUtils;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.NottableString;
 import software.xdev.mockserver.model.Parameter;
 import software.xdev.mockserver.model.ParameterStyle;
 import software.xdev.mockserver.model.Parameters;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -40,16 +42,16 @@ import static software.xdev.mockserver.model.NottableOptionalString.optional;
 import static software.xdev.mockserver.model.NottableString.string;
 
 public class ExpandedParameterDecoder {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(ExpandedParameterDecoder.class);
+    
     private static final Pattern QUOTED_PARAMETER_VALUE = Pattern.compile("\\s*^[\"']+(.*)[\"']+\\s*$");
     private static final Pattern JSON_VALUE = Pattern.compile("(?s)^\\s*[{\\[].*[}\\]]\\s*$");
-
+    
     private final Configuration configuration;
-    private final MockServerLogger mockServerLogger;
 
-    public ExpandedParameterDecoder(Configuration configuration, MockServerLogger mockServerLogger) {
+    public ExpandedParameterDecoder(Configuration configuration) {
         this.configuration = configuration;
-        this.mockServerLogger = mockServerLogger;
     }
 
     public Parameters retrieveFormParameters(String parameterString, boolean hasPath) {
@@ -60,13 +62,7 @@ public class ExpandedParameterDecoder {
                 hasPath = parameterString.startsWith("/") || parameterString.contains("?") || hasPath;
                 parameterMap.putAll(new QueryStringDecoder(parameterString, HttpConstants.DEFAULT_CHARSET, hasPath, Integer.MAX_VALUE, !configuration.useSemicolonAsQueryParameterSeparator()).parameters());
             } catch (IllegalArgumentException iae) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception{}while parsing query string{}")
-                        .setArguments(parameterString, iae.getMessage())
-                        .setThrowable(iae)
-                );
+                LOG.error("Exception while parsing query string {}", parameterString, iae);
             }
         }
         return parameters.withEntries(parameterMap);
@@ -80,13 +76,7 @@ public class ExpandedParameterDecoder {
                 hasPath = parameterString.startsWith("/") || parameterString.contains("?") || hasPath;
                 parameterMap.putAll(new QueryStringDecoder(parameterString, HttpConstants.DEFAULT_CHARSET, parameterString.contains("/") || hasPath, Integer.MAX_VALUE, true).parameters());
             } catch (IllegalArgumentException iae) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("exception{}while parsing query string{}")
-                        .setArguments(parameterString, iae.getMessage())
-                        .setThrowable(iae)
-                );
+                LOG.error("Exception while parsing query string {}", parameterString, iae);
             }
             return new Parameters().withEntries(parameterMap).withRawParameterString(rawParameterString);
         }
@@ -99,7 +89,7 @@ public class ExpandedParameterDecoder {
                 if (matcherEntry.getName().getParameterStyle() != null && matcherEntry.getName().getParameterStyle().isExploded()) {
                     for (Parameter matchedEntry : matched.getEntries()) {
                         if (matcherEntry.getName().getValue().equals(matchedEntry.getName().getValue()) || matchedEntry.getName().getValue().matches(matcherEntry.getName().getValue())) {
-                            matchedEntry.replaceValues(new ExpandedParameterDecoder(configuration, mockServerLogger).splitOnDelimiter(matcherEntry.getName().getParameterStyle(), matcherEntry.getName().getValue(), matchedEntry.getValues()));
+                            matchedEntry.replaceValues(new ExpandedParameterDecoder(configuration).splitOnDelimiter(matcherEntry.getName().getParameterStyle(), matcherEntry.getName().getValue(), matchedEntry.getValues()));
                             matched.replaceEntry(matchedEntry);
                         }
                     }

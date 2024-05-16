@@ -21,8 +21,10 @@ import io.netty.handler.codec.http.cookie.ClientCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import software.xdev.mockserver.codec.BodyDecoderEncoder;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.Set;
@@ -30,12 +32,11 @@ import java.util.Set;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 public class FullHttpResponseToMockServerHttpResponse {
-
-    private final MockServerLogger mockServerLogger;
+    
+    private static final Logger LOG = LoggerFactory.getLogger(FullHttpResponseToMockServerHttpResponse.class);
     private final BodyDecoderEncoder bodyDecoderEncoder;
 
-    public FullHttpResponseToMockServerHttpResponse(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
+    public FullHttpResponseToMockServerHttpResponse() {
         this.bodyDecoderEncoder = new BodyDecoderEncoder();
     }
 
@@ -44,26 +45,15 @@ public class FullHttpResponseToMockServerHttpResponse {
         try {
             if (fullHttpResponse != null) {
                 if (fullHttpResponse.decoderResult().isFailure()) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.ERROR)
-                            .setMessageFormat("exception decoding response " + fullHttpResponse.decoderResult().cause().getMessage())
-                            .setThrowable(fullHttpResponse.decoderResult().cause())
-                    );
+                    LOG.error("Exception decoding response {}", fullHttpResponse.decoderResult().cause().getMessage());
                 }
                 setStatusCode(httpResponse, fullHttpResponse);
                 setHeaders(httpResponse, fullHttpResponse);
                 setCookies(httpResponse);
                 setBody(httpResponse, fullHttpResponse);
             }
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception decoding response{}")
-                    .setArguments(fullHttpResponse)
-                    .setThrowable(throwable)
-            );
+        } catch (Exception ex) {
+            LOG.error("Exception decoding response", ex);
         }
         return httpResponse;
     }

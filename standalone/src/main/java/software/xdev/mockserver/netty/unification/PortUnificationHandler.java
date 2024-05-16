@@ -37,7 +37,6 @@ import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.logging.LoggingHandler;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mappers.MockServerHttpResponseToFullHttpResponse;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
@@ -48,8 +47,9 @@ import software.xdev.mockserver.netty.proxy.socks.Socks4ProxyHandler;
 import software.xdev.mockserver.netty.proxy.socks.Socks5ProxyHandler;
 import software.xdev.mockserver.netty.proxy.socks.SocksDetector;
 import software.xdev.mockserver.netty.websocketregistry.CallbackWebSocketServerHandler;
-import software.xdev.mockserver.socket.tls.NettySslContextFactory;
-import software.xdev.mockserver.socket.tls.SniHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.net.InetAddress;
@@ -60,29 +60,20 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.unmodifiableSet;
-import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.exception.ExceptionHandling.*;
-import static software.xdev.mockserver.logging.MockServerLogger.isEnabled;
 import static software.xdev.mockserver.mock.action.http.HttpActionHandler.setRemoteAddress;
-import static software.xdev.mockserver.model.HttpResponse.response;
-import static software.xdev.mockserver.model.Protocol.HTTP_2;
 import static software.xdev.mockserver.netty.HttpRequestHandler.LOCAL_HOST_HEADERS;
 import static software.xdev.mockserver.netty.HttpRequestHandler.setProxyingRequest;
 import static software.xdev.mockserver.netty.proxy.relay.RelayConnectHandler.*;
-import static software.xdev.mockserver.socket.tls.SniHandler.getALPNProtocol;
-import static org.slf4j.event.Level.TRACE;
-import static org.slf4j.event.Level.WARN;
 
 public class PortUnificationHandler extends ReplayingDecoder<Void> {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(PortUnificationHandler.class);
+    
     private static final AttributeKey<Boolean> TLS_ENABLED_UPSTREAM = AttributeKey.valueOf("TLS_ENABLED_UPSTREAM");
-    private static final AttributeKey<Boolean> TLS_ENABLED_DOWNSTREAM = AttributeKey.valueOf("TLS_ENABLED_DOWNSTREAM");
-    private static final AttributeKey<NettySslContextFactory> NETTY_SSL_CONTEXT_FACTORY = AttributeKey.valueOf("NETTY_SSL_CONTEXT_FACTORY");
     private static final AttributeKey<Boolean> HTTP_ENABLED = AttributeKey.valueOf("HTTP_ENABLED");
-    private static final AttributeKey<Boolean> HTTP2_ENABLED = AttributeKey.valueOf("HTTP2_ENABLED");
     private static final Map<PortBinding, Set<String>> localAddressesCache = new ConcurrentHashMap<>();
-
-    protected final MockServerLogger mockServerLogger;
+    
     private final LoggingHandler loggingHandler = new LoggingHandler(PortUnificationHandler.class.getName() + "-first");
     private final HttpContentLengthRemover httpContentLengthRemover = new HttpContentLengthRemover();
     private final PreserveHeadersNettyRemoves preserveHeadersNettyRemoves = new PreserveHeadersNettyRemoves();
@@ -90,30 +81,16 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
     private final LifeCycle server;
     private final HttpState httpState;
     private final HttpActionHandler actionHandler;
-    private final NettySslContextFactory nettySslContextFactory;
-    private final MockServerHttpResponseToFullHttpResponse mockServerHttpResponseToFullHttpResponse;
 
-    public PortUnificationHandler(Configuration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler, NettySslContextFactory nettySslContextFactory) {
+    public PortUnificationHandler(Configuration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler) {
         this.configuration = configuration;
         this.server = server;
-        this.mockServerLogger = httpState.getMockServerLogger();
         this.httpState = httpState;
         this.actionHandler = actionHandler;
-        this.nettySslContextFactory = nettySslContextFactory;
-        this.mockServerHttpResponseToFullHttpResponse = new MockServerHttpResponseToFullHttpResponse(mockServerLogger);
-    }
-
-    public static NettySslContextFactory nettySslContextFactory(Channel channel) {
-        if (channel.attr(NETTY_SSL_CONTEXT_FACTORY).get() != null) {
-            return channel.attr(NETTY_SSL_CONTEXT_FACTORY).get();
-        } else {
-            throw new RuntimeException("NettySslContextFactory not yet initialised for channel " + channel);
-        }
     }
 
     public static void enableSslUpstreamAndDownstream(Channel channel) {
         channel.attr(TLS_ENABLED_UPSTREAM).set(Boolean.TRUE);
-        channel.attr(TLS_ENABLED_DOWNSTREAM).set(Boolean.TRUE);
     }
 
     public static boolean isSslEnabledUpstream(Channel channel) {
@@ -124,21 +101,6 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
         }
     }
 
-    public static void enableSslDownstream(Channel channel) {
-        channel.attr(TLS_ENABLED_DOWNSTREAM).set(Boolean.TRUE);
-    }
-
-    public static void disableSslDownstream(Channel channel) {
-        channel.attr(TLS_ENABLED_DOWNSTREAM).set(Boolean.FALSE);
-    }
-
-    public static boolean isSslEnabledDownstream(Channel channel) {
-        if (channel.attr(TLS_ENABLED_DOWNSTREAM).get() != null) {
-            return channel.attr(TLS_ENABLED_DOWNSTREAM).get();
-        } else {
-            return false;
-        }
-    }
 
     public static void httpEnabled(Channel channel) {
         channel.attr(HTTP_ENABLED).set(Boolean.TRUE);
@@ -152,21 +114,8 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
         }
     }
 
-    public static void http2Enabled(Channel channel) {
-        channel.attr(HTTP2_ENABLED).set(Boolean.TRUE);
-    }
-
-    public static boolean isHttp2Enabled(Channel channel) {
-        if (channel.attr(HTTP2_ENABLED).get() != null) {
-            return channel.attr(HTTP2_ENABLED).get();
-        } else {
-            return false;
-        }
-    }
-
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
-        ctx.channel().attr(NETTY_SSL_CONTEXT_FACTORY).set(nettySslContextFactory);
         if (SocksDetector.isSocks4(msg, actualReadableBytes())) {
             logStage(ctx, "adding SOCKS4 decoders");
             enableSocks4(ctx, msg);
@@ -176,9 +125,6 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
         } else if (isTls(msg)) {
             logStage(ctx, "adding TLS decoders");
             enableTls(ctx, msg);
-        } else if (HTTP_2.equals(getALPNProtocol(mockServerLogger, ctx))) {
-            logStage(ctx, "adding HTTP2 decoders");
-            switchToHttp2(ctx, msg);
         } else if (isHttp(msg)) {
             logStage(ctx, "adding HTTP decoders");
             switchToHttp(ctx, msg);
@@ -193,28 +139,23 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
             switchToBinaryRequestProxying(ctx, msg);
         }
 
-        if (isEnabled(TRACE)) {
+        if (LOG.isTraceEnabled()) {
             loggingHandler.addLoggingHandler(ctx);
         }
     }
 
     private void logStage(ChannelHandlerContext ctx, String message) {
-        if (isEnabled(TRACE)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.TRACE)
-                    .setMessageFormat(message + " for channel:{}pipeline:{}")
-                    .setArguments(ctx.channel().toString(), ctx.pipeline().names())
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace( "{} for channel: {} pipeline: {}", message, ctx.channel().toString(), ctx.pipeline().names());
         }
     }
 
     private void enableSocks4(ChannelHandlerContext ctx, ByteBuf msg) {
-        enableSocks(ctx, msg, new Socks4ServerDecoder(), new Socks4ProxyHandler(configuration, mockServerLogger, server), Socks4ServerEncoder.INSTANCE);
+        enableSocks(ctx, msg, new Socks4ServerDecoder(), new Socks4ProxyHandler(configuration, server), Socks4ServerEncoder.INSTANCE);
     }
 
     private void enableSocks5(ChannelHandlerContext ctx, ByteBuf msg) {
-        enableSocks(ctx, msg, new Socks5InitialRequestDecoder(), new Socks5ProxyHandler(configuration, mockServerLogger, server), Socks5ServerEncoder.DEFAULT);
+        enableSocks(ctx, msg, new Socks5InitialRequestDecoder(), new Socks5ProxyHandler(configuration, server), Socks5ServerEncoder.DEFAULT);
     }
 
     private void enableSocks(ChannelHandlerContext ctx, ByteBuf msg, ReplayingDecoder<?> socksInitialRequestDecoder, ChannelHandler... channelHandlers) {
@@ -239,8 +180,6 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
     }
 
     private void enableTls(ChannelHandlerContext ctx, ByteBuf msg) {
-        ChannelPipeline pipeline = ctx.pipeline();
-        pipeline.addFirst(new SniHandler(configuration, nettySslContextFactory));
         enableSslUpstreamAndDownstream(ctx.channel());
 
         // re-unify (with SSL enabled)
@@ -260,41 +199,6 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
             method.startsWith("CONNECT ");
     }
 
-    private void switchToHttp2(ChannelHandlerContext ctx, ByteBuf msg) {
-        if (!isHttp2Enabled(ctx.channel())) {
-            http2Enabled(ctx.channel());
-
-            ChannelPipeline pipeline = ctx.pipeline();
-
-            final Http2Connection connection = new DefaultHttp2Connection(true);
-            final HttpToHttp2ConnectionHandlerBuilder http2ConnectionHandlerBuilder = new HttpToHttp2ConnectionHandlerBuilder()
-                .frameListener(
-                    new DelegatingDecompressorFrameListener(
-                        connection,
-                        new InboundHttp2ToHttpAdapterBuilder(connection)
-                            .maxContentLength(Integer.MAX_VALUE)
-                            .propagateSettings(true)
-                            .validateHttpHeaders(false)
-                            .build()
-                    )
-                );
-            if (isEnabled(TRACE)) {
-                http2ConnectionHandlerBuilder.frameLogger(new Http2FrameLogger(LogLevel.TRACE, PortUnificationHandler.class.getName()));
-            }
-            addLastIfNotPresent(pipeline, http2ConnectionHandlerBuilder.connection(connection).build());
-            // TODO(jamesdbloom) consider Http2MultiplexHandler and test behaviour when multiple requests sent over the same connection
-            addLastIfNotPresent(pipeline, new CallbackWebSocketServerHandler(httpState));
-            addLastIfNotPresent(pipeline, new MockServerHttpServerCodec(configuration, mockServerLogger, isSslEnabledUpstream(ctx.channel()), SniHandler.retrieveClientCertificates(mockServerLogger, ctx), ctx.channel().localAddress()));
-            addLastIfNotPresent(pipeline, new HttpRequestHandler(configuration, server, httpState, actionHandler));
-            pipeline.remove(this);
-
-            ctx.channel().attr(LOCAL_HOST_HEADERS).set(getLocalAddresses(ctx));
-
-            // fire message back through pipeline
-            ctx.fireChannelRead(msg.readBytes(actualReadableBytes()));
-        }
-    }
-
     private void switchToHttp(ChannelHandlerContext ctx, ByteBuf msg) {
         if (!isHttpEnabled(ctx.channel())) {
             httpEnabled(ctx.channel());
@@ -310,39 +214,15 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
             addLastIfNotPresent(pipeline, new HttpContentDecompressor());
             addLastIfNotPresent(pipeline, httpContentLengthRemover);
             addLastIfNotPresent(pipeline, new HttpObjectAggregator(Integer.MAX_VALUE));
-            if (configuration.tlsMutualAuthenticationRequired() && !isSslEnabledUpstream(ctx.channel())) {
-                HttpResponse httpResponse = response()
-                    .withStatusCode(426)
-                    .withHeader("Upgrade", "TLS/1.2, HTTP/1.1")
-                    .withHeader("Connection", "Upgrade");
-                if (MockServerLogger.isEnabled(Level.INFO)) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.INFO)
-                            .setMessageFormat("no tls for connection:{}returning response:{}")
-                            .setArguments(ctx.channel().localAddress(), httpResponse)
-                    );
-                }
-                ctx
-                    .channel()
-                    .writeAndFlush(mockServerHttpResponseToFullHttpResponse
-                        .mapMockServerResponseToNettyResponse(
-                            // Upgrade Required
-                            httpResponse
-                        ).get(0)
-                    )
-                    .addListener((ChannelFuture future) -> future.channel().disconnect().awaitUninterruptibly());
-            } else {
-                addLastIfNotPresent(pipeline, new CallbackWebSocketServerHandler(httpState));
-                addLastIfNotPresent(pipeline, new MockServerHttpServerCodec(configuration, mockServerLogger, isSslEnabledUpstream(ctx.channel()), SniHandler.retrieveClientCertificates(mockServerLogger, ctx), ctx.channel().localAddress()));
-                addLastIfNotPresent(pipeline, new HttpRequestHandler(configuration, server, httpState, actionHandler));
-                pipeline.remove(this);
+            addLastIfNotPresent(pipeline, new CallbackWebSocketServerHandler(httpState));
+            addLastIfNotPresent(pipeline, new MockServerHttpServerCodec(configuration, ctx.channel().localAddress()));
+            addLastIfNotPresent(pipeline, new HttpRequestHandler(configuration, server, httpState, actionHandler));
+            pipeline.remove(this);
 
-                ctx.channel().attr(LOCAL_HOST_HEADERS).set(getLocalAddresses(ctx));
+            ctx.channel().attr(LOCAL_HOST_HEADERS).set(getLocalAddresses(ctx));
 
-                // fire message back through pipeline
-                ctx.fireChannelRead(msg.readBytes(actualReadableBytes()));
-            }
+            // fire message back through pipeline
+            ctx.fireChannelRead(msg.readBytes(actualReadableBytes()));
         }
     }
 
@@ -374,7 +254,7 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
     }
 
     private void switchToBinaryRequestProxying(ChannelHandlerContext ctx, ByteBuf msg) {
-        addLastIfNotPresent(ctx.pipeline(), new BinaryRequestProxyingHandler(configuration, httpState.getMockServerLogger(), httpState.getScheduler(), actionHandler.getHttpClient()));
+        addLastIfNotPresent(ctx.pipeline(), new BinaryRequestProxyingHandler(configuration,  httpState.getScheduler(), actionHandler.getHttpClient()));
 
         // fire message back through pipeline
         ctx.fireChannelRead(msg.readBytes(actualReadableBytes()));
@@ -383,8 +263,7 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
     private Set<String> getLocalAddresses(ChannelHandlerContext ctx) {
         SocketAddress localAddress = ctx.channel().localAddress();
         Set<String> localAddresses = null;
-        if (localAddress instanceof InetSocketAddress) {
-            InetSocketAddress inetSocketAddress = (InetSocketAddress) localAddress;
+        if (localAddress instanceof InetSocketAddress inetSocketAddress) {
             String portExtension = calculatePortExtension(inetSocketAddress, isSslEnabledUpstream(ctx.channel()));
             PortBinding cacheKey = new PortBinding(inetSocketAddress, portExtension);
             localAddresses = localAddressesCache.get(cacheKey);
@@ -427,30 +306,19 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable throwable) {
         if (connectionClosedException(throwable)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception caught by port unification handler -> closing pipeline " + ctx.channel())
-                    .setThrowable(throwable)
-            );
+            LOG.error("Exception caught by port unification handler -> closing pipeline {}",
+                ctx.channel(), throwable);
         } else if (sslHandshakeException(throwable)) {
-            if (throwable.getMessage().contains("certificate_unknown") || throwable.getMessage().toLowerCase().contains("unknown_ca")) {
-                if (MockServerLogger.isEnabled(WARN) && mockServerLogger != null) {
-                    mockServerLogger.logEvent(
-                        new LogEntry()
-                            .setLogLevel(Level.WARN)
-                            .setMessageFormat("TLS handshake failure:" + NEW_LINE + NEW_LINE + " Client does not trust MockServer Certificate Authority for:{}See http://mock-server.com/mock_server/HTTPS_TLS.html to enable the client to trust MocksServer Certificate Authority." + NEW_LINE)
-                            .setArguments(ctx.channel())
-                            .setThrowable(throwable)
-                    );
+            if (throwable.getMessage().contains("certificate_unknown")
+                || throwable.getMessage().toLowerCase().contains("unknown_ca")) {
+                if(LOG.isWarnEnabled()) {
+                    LOG.warn("TLS handshake failure: Client does not trust MockServer Certificate Authority for: {} "
+                            + "See http://mock-server.com/mock_server/HTTPS_TLS.html to enable the client to trust "
+                            + "MocksServer Certificate Authority.",
+                        ctx.channel(), throwable);
                 }
             } else if (!throwable.getMessage().contains("close_notify during handshake")) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setLogLevel(Level.ERROR)
-                        .setMessageFormat("TLS handshake failure while a client attempted to connect to " + ctx.channel())
-                        .setThrowable(throwable)
-                );
+                LOG.error("TLS handshake failure while a client attempted to connect to {}", ctx.channel(), throwable);
             }
         }
         closeOnFlush(ctx.channel());

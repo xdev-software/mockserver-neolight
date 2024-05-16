@@ -19,7 +19,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.FullHttpResponse;
 import software.xdev.mockserver.mappers.FullHttpResponseToMockServerHttpResponse;
-import software.xdev.mockserver.logging.MockServerLogger;
 
 import java.util.List;
 
@@ -27,8 +26,8 @@ public class NettyHttpToMockServerHttpResponseDecoder extends MessageToMessageDe
 
     private final FullHttpResponseToMockServerHttpResponse fullHttpResponseToMockServerResponse;
 
-    NettyHttpToMockServerHttpResponseDecoder(MockServerLogger mockServerLogger) {
-        fullHttpResponseToMockServerResponse = new FullHttpResponseToMockServerHttpResponse(mockServerLogger);
+    NettyHttpToMockServerHttpResponseDecoder() {
+        fullHttpResponseToMockServerResponse = new FullHttpResponseToMockServerHttpResponse();
     }
 
     @Override

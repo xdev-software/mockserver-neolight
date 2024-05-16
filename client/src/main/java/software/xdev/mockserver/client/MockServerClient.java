@@ -27,8 +27,6 @@ import software.xdev.mockserver.configuration.ClientConfiguration;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
 import software.xdev.mockserver.httpclient.SocketConnectionException;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.matchers.TimeToLive;
 import software.xdev.mockserver.matchers.Times;
 import software.xdev.mockserver.mock.Expectation;
@@ -36,16 +34,13 @@ import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
 import software.xdev.mockserver.scheduler.Scheduler;
 import software.xdev.mockserver.serialization.*;
-import software.xdev.mockserver.socket.tls.NettySslContextFactory;
 import software.xdev.mockserver.stop.Stoppable;
 import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
 import software.xdev.mockserver.verify.VerificationTimes;
 
 import javax.net.ssl.SSLException;
-import java.awt.*;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -69,36 +64,37 @@ import static software.xdev.mockserver.model.ExpectationId.expectationId;
 import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.model.MediaType.APPLICATION_JSON_UTF_8;
 import static software.xdev.mockserver.model.PortBinding.portBinding;
-import static software.xdev.mockserver.socket.tls.PEMToFile.privateKeyFromPEMFile;
-import static software.xdev.mockserver.socket.tls.PEMToFile.x509ChainFromPEMFile;
 import static software.xdev.mockserver.verify.Verification.verification;
 import static software.xdev.mockserver.verify.VerificationTimes.exactly;
-import static org.slf4j.event.Level.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @SuppressWarnings({"UnusedReturnValue", "FieldMayBeFinal"})
 public class MockServerClient implements Stoppable {
-
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(MockServerClient.class);
+    
+    private static final Logger LOG = LoggerFactory.getLogger(MockServerClient.class);
+    
     private static final Map<Integer, MockServerEventBus> EVENT_BUS_MAP = new ConcurrentHashMap<>();
     private final EventLoopGroup eventLoopGroup;
     private final String host;
     private final String contextPath;
     private final Class<MockServerClient> clientClass;
     protected CompletableFuture<Integer> portFuture;
-    private Boolean secure;
     private Integer port;
     private HttpRequest requestOverride;
     private ClientConfiguration configuration;
     private ProxyConfiguration proxyConfiguration;
     private Supplier<String> controlPlaneJWTSupplier;
     private NettyHttpClient nettyHttpClient;
-    private RequestDefinitionSerializer requestDefinitionSerializer = new RequestDefinitionSerializer(MOCK_SERVER_LOGGER);
-    private ExpectationIdSerializer expectationIdSerializer = new ExpectationIdSerializer(MOCK_SERVER_LOGGER);
-    private LogEventRequestAndResponseSerializer httpRequestResponseSerializer = new LogEventRequestAndResponseSerializer(MOCK_SERVER_LOGGER);
-    private PortBindingSerializer portBindingSerializer = new PortBindingSerializer(MOCK_SERVER_LOGGER);
-    private ExpectationSerializer expectationSerializer = new ExpectationSerializer(MOCK_SERVER_LOGGER);
-    private VerificationSerializer verificationSerializer = new VerificationSerializer(MOCK_SERVER_LOGGER);
-    private VerificationSequenceSerializer verificationSequenceSerializer = new VerificationSequenceSerializer(MOCK_SERVER_LOGGER);
+    private RequestDefinitionSerializer requestDefinitionSerializer = new RequestDefinitionSerializer();
+    private ExpectationIdSerializer expectationIdSerializer = new ExpectationIdSerializer();
+    private LogEventRequestAndResponseSerializer httpRequestResponseSerializer = new LogEventRequestAndResponseSerializer();
+    private PortBindingSerializer portBindingSerializer = new PortBindingSerializer();
+    private ExpectationSerializer expectationSerializer = new ExpectationSerializer();
+    private VerificationSerializer verificationSerializer = new VerificationSerializer();
+    private VerificationSequenceSerializer verificationSequenceSerializer = new VerificationSequenceSerializer();
     private final CompletableFuture<MockServerClient> stopFuture = new CompletableFuture<>();
 
     /**
@@ -300,15 +296,6 @@ public class MockServerClient implements Stoppable {
         EVENT_BUS_MAP.remove(this.port());
     }
 
-    public boolean isSecure() {
-        return secure != null ? secure : false;
-    }
-
-    public MockServerClient withSecure(boolean secure) {
-        this.secure = secure;
-        return this;
-    }
-
     private int port() {
         if (this.port == null) {
             try {
@@ -347,38 +334,11 @@ public class MockServerClient implements Stoppable {
 
     private NettyHttpClient getNettyHttpClient() {
         if (nettyHttpClient == null) {
-            NettySslContextFactory nettySslContextFactory = new NettySslContextFactory(configuration.toServerConfiguration(), MOCK_SERVER_LOGGER, false);
-            Function<SslContextBuilder, SslContext> clientSslContextBuilderFunction = NettySslContextFactory.clientSslContextBuilderFunction;
-            if (configuration.controlPlaneTLSMutualAuthenticationRequired()) {
-                if (isBlank(configuration.controlPlanePrivateKeyPath()) || isBlank(configuration.controlPlaneX509CertificatePath()) || isBlank(configuration.controlPlaneTLSMutualAuthenticationCAChain())) {
-                    throw new IllegalArgumentException(
-                        "when 'controlPlaneTLSMutualAuthenticationRequired' is enabled 'controlPlanePrivateKeyPath', 'controlPlaneX509CertificatePath' and 'controlPlaneTLSMutualAuthenticationCAChain' must all be specified,\n\tfound controlPlanePrivateKeyPath: \"" + configuration.controlPlanePrivateKeyPath() + "\"\n\tand controlPlaneX509CertificatePath: \"" + configuration.controlPlaneX509CertificatePath() + "\"\n\tand controlPlaneTLSMutualAuthenticationCAChain: \"" + configuration.controlPlaneTLSMutualAuthenticationCAChain() + "\"");
-                }
-                clientSslContextBuilderFunction =
-                    sslContextBuilder -> {
-                        try {
-                            PrivateKey key = privateKeyFromPEMFile(configuration.controlPlanePrivateKeyPath());
-                            X509Certificate[] keyCertChain = x509ChainFromPEMFile(configuration.controlPlaneX509CertificatePath()).toArray(new X509Certificate[0]);
-                            X509Certificate[] trustCertCollection = nettySslContextFactory.trustCertificateChain(configuration.controlPlaneTLSMutualAuthenticationCAChain());
-                            sslContextBuilder
-                                .keyManager(
-                                    key,
-                                    keyCertChain
-                                )
-                                .trustManager(trustCertCollection);
-                            return sslContextBuilder.build();
-                        } catch (SSLException e) {
-                            throw new RuntimeException(e);
-                        }
-                    };
-            }
             this.nettyHttpClient = new NettyHttpClient(
                 configuration.toServerConfiguration(),
-                MOCK_SERVER_LOGGER,
                 eventLoopGroup,
                 proxyConfiguration != null ? ImmutableList.of(proxyConfiguration) : null,
-                false,
-                nettySslContextFactory.withClientSslContextBuilderFunction(clientSslContextBuilderFunction)
+                false
             );
         }
         return nettyHttpClient;
@@ -391,9 +351,6 @@ public class MockServerClient implements Stoppable {
                     && request.getBody() != null
                     && isNotBlank(request.getBody().getContentType())) {
                     request.withHeader(CONTENT_TYPE.toString(), request.getBody().getContentType());
-                }
-                if (secure != null) {
-                    request.withSecure(secure);
                 }
                 if (requestOverride != null) {
                     request = request.update(requestOverride, null);
@@ -442,109 +399,6 @@ public class MockServerClient implements Stoppable {
 
     private HttpResponse sendRequest(HttpRequest request, boolean throwClientException) {
         return sendRequest(request, false, throwClientException);
-    }
-
-    /**
-     * Launch UI and wait the default period to allow the UI to launch and start collecting logs,
-     * this ensures that the log are visible in the UI even if MockServer is shutdown by a test
-     * shutdown function, such as After, AfterClass, AfterAll, etc
-     */
-    public MockServerClient openUI() {
-        return openUI(SECONDS, 1);
-    }
-
-    /**
-     * Launch UI and wait a specified period to allow the UI to launch and start collecting logs,
-     * this ensures that the log are visible in the UI even if MockServer is shutdown by a test
-     * shutdown function, such as After, AfterClass, AfterAll, etc
-     *
-     * @param timeUnit TimeUnit the time unit, for example TimeUnit.SECONDS
-     * @param pause    the number of time units to delay before the function returns to ensure the UI is receiving logs
-     */
-    public MockServerClient openUI(TimeUnit timeUnit, long pause) {
-        try {
-            Desktop desktop = Desktop.getDesktop();
-            if (desktop != null) {
-                if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    desktop.browse(new URI("http://" + host + ":" + port() + "/mockserver/dashboard"));
-                    timeUnit.sleep(pause);
-                } else {
-                    if (MockServerLogger.isEnabled(WARN)) {
-                        MOCK_SERVER_LOGGER.logEvent(
-                            new LogEntry()
-                                .setLogLevel(WARN)
-                                .setMessageFormat("browse to URL not supported by the desktop instance from JVM")
-                        );
-                    }
-                }
-            } else {
-                if (MockServerLogger.isEnabled(WARN)) {
-                    MOCK_SERVER_LOGGER.logEvent(
-                        new LogEntry()
-                            .setLogLevel(WARN)
-                            .setMessageFormat("unable to obtain the desktop instance from JVM")
-                    );
-                }
-            }
-        } catch (Throwable throwable) {
-            MOCK_SERVER_LOGGER.logEvent(
-                new LogEntry()
-                    .setLogLevel(ERROR)
-                    .setMessageFormat("exception while attempting to launch UI" + (isNotBlank(throwable.getMessage()) ? " " + throwable.getMessage() : ""))
-                    .setThrowable(throwable)
-            );
-            throw new ClientException("exception while attempting to launch UI" + (isNotBlank(throwable.getMessage()) ? " " + throwable.getMessage() : ""));
-        }
-        return this;
-    }
-
-    /**
-     * Returns whether MockServer is running, if called too quickly after starting MockServer
-     * this may return false because MockServer has not yet started, to ensure MockServer has
-     * started use hasStarted()
-     *
-     * @deprecated use hasStopped() or hasStarted() instead
-     */
-    @Deprecated
-    @SuppressWarnings({"DeprecatedIsStillUsed", "RedundantSuppression"})
-    public boolean isRunning() {
-        return isRunning(10, 500, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Returns whether server MockServer is running, by polling the MockServer a configurable
-     * amount of times.  If called too quickly after starting MockServer this may return false
-     * because MockServer has not yet started, to ensure MockServer has started use hasStarted()
-     *
-     * @deprecated use hasStopped() or hasStarted() instead
-     */
-    @Deprecated
-    public boolean isRunning(int attempts, long timeout, TimeUnit timeUnit) {
-        try {
-            HttpResponse httpResponse = sendRequest(request().withMethod("PUT").withPath(calculatePath("status")), true, false);
-            if (httpResponse != null && httpResponse.getStatusCode() == HttpStatusCode.OK_200.code()) {
-                return true;
-            } else if (attempts <= 0) {
-                return false;
-            } else {
-                try {
-                    timeUnit.sleep(timeout);
-                } catch (InterruptedException e) {
-                    // ignore interrupted exception
-                }
-                return isRunning(attempts - 1, timeout, timeUnit);
-            }
-        } catch (SocketConnectionException | IllegalStateException sce) {
-            if (MockServerLogger.isEnabled(TRACE)) {
-                MOCK_SERVER_LOGGER.logEvent(
-                    new LogEntry()
-                        .setLogLevel(TRACE)
-                        .setMessageFormat("exception while checking if MockServer is running - " + sce.getMessage() + " if MockServer was stopped this exception is expected")
-                        .setThrowable(sce)
-                );
-            }
-            return false;
-        }
     }
 
     /**
@@ -611,13 +465,8 @@ public class MockServerClient implements Stoppable {
             }
         } catch (SocketConnectionException | IllegalStateException sce) {
             if (attempts <= 0) {
-                if (MockServerLogger.isEnabled(DEBUG)) {
-                    MOCK_SERVER_LOGGER.logEvent(
-                        new LogEntry()
-                            .setLogLevel(DEBUG)
-                            .setMessageFormat("exception while checking if MockServer has started - " + sce.getMessage())
-                            .setThrowable(sce)
-                    );
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Exception while checking if MockServer has started", sce);
                 }
                 return false;
             } else {
@@ -658,14 +507,9 @@ public class MockServerClient implements Stoppable {
     public void stop() {
         try {
             stopAsync().get(10, SECONDS);
-        } catch (Throwable throwable) {
-            if (MockServerLogger.isEnabled(DEBUG)) {
-                MOCK_SERVER_LOGGER.logEvent(
-                    new LogEntry()
-                        .setLogLevel(DEBUG)
-                        .setMessageFormat("exception while stopping - " + throwable.getMessage())
-                        .setThrowable(throwable)
-                );
+        } catch (Exception ex) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception while stopping", ex);
             }
         }
     }
@@ -686,21 +530,12 @@ public class MockServerClient implements Stoppable {
                         }
                     }
                 } catch (RejectedExecutionException ree) {
-                    if (!ignoreFailure && MockServerLogger.isEnabled(TRACE)) {
-                        MOCK_SERVER_LOGGER.logEvent(
-                            new LogEntry()
-                                .setLogLevel(TRACE)
-                                .setMessageFormat("request rejected while closing down, logging in case due other error " + ree)
-                                .setThrowable(ree)
-                        );
+                    if (!ignoreFailure && LOG.isTraceEnabled()) {
+                        LOG.trace("Request rejected while closing down, logging in case due other error", ree);
                     }
                 } catch (Exception e) {
-                    if (!ignoreFailure && MockServerLogger.isEnabled(WARN)) {
-                        MOCK_SERVER_LOGGER.logEvent(
-                            new LogEntry()
-                                .setLogLevel(WARN)
-                                .setMessageFormat("failed to send stop request to MockServer " + e.getMessage())
-                        );
+                    if (!ignoreFailure) {
+                        LOG.trace("Failed to send stop request to MockServer", e);
                     }
                 }
                 if (!eventLoopGroup.isShuttingDown()) {
@@ -1383,7 +1218,7 @@ public class MockServerClient implements Stoppable {
      * @return an Expectation object that can be used to specify the response
      */
     public ForwardChainExpectation when(RequestDefinition requestDefinition, Times times) {
-        return new ForwardChainExpectation(configuration, MOCK_SERVER_LOGGER, getMockServerEventBus(), this, new Expectation(requestDefinition, times, TimeToLive.unlimited(), 0));
+        return new ForwardChainExpectation(configuration, getMockServerEventBus(), this, new Expectation(requestDefinition, times, TimeToLive.unlimited(), 0));
     }
 
     /**
@@ -1412,7 +1247,7 @@ public class MockServerClient implements Stoppable {
      * @return an Expectation object that can be used to specify the response
      */
     public ForwardChainExpectation when(RequestDefinition requestDefinition, Times times, TimeToLive timeToLive) {
-        return new ForwardChainExpectation(configuration, MOCK_SERVER_LOGGER, getMockServerEventBus(), this, new Expectation(requestDefinition, times, timeToLive, 0));
+        return new ForwardChainExpectation(configuration, getMockServerEventBus(), this, new Expectation(requestDefinition, times, timeToLive, 0));
     }
 
     /**
@@ -1447,7 +1282,7 @@ public class MockServerClient implements Stoppable {
      * @return an Expectation object that can be used to specify the response
      */
     public ForwardChainExpectation when(RequestDefinition requestDefinition, Times times, TimeToLive timeToLive, Integer priority) {
-        return new ForwardChainExpectation(configuration, MOCK_SERVER_LOGGER, getMockServerEventBus(), this, new Expectation(requestDefinition, times, timeToLive, priority));
+        return new ForwardChainExpectation(configuration, getMockServerEventBus(), this, new Expectation(requestDefinition, times, timeToLive, priority));
     }
 
     /**

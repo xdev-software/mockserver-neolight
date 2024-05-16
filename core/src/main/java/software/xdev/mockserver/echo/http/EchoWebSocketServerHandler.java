@@ -23,8 +23,10 @@ import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.uuid.UUIDService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.List;
@@ -34,22 +36,20 @@ import static software.xdev.mockserver.closurecallback.websocketclient.WebSocket
 
 @ChannelHandler.Sharable
 public class EchoWebSocketServerHandler extends ChannelInboundHandlerAdapter {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(EchoWebSocketServerHandler.class);
+    
     private static final AttributeKey<Boolean> CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET = AttributeKey.valueOf("CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET");
     private static final String UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI = "/_mockserver_callback_websocket";
-    private final MockServerLogger mockServerLogger;
     private final List<String> registeredClients;
     private final List<Channel> websocketChannels;
     private final List<TextWebSocketFrame> textWebSocketFrames;
-    private final boolean isSecure;
     private WebSocketServerHandshaker handshaker;
 
-    EchoWebSocketServerHandler(MockServerLogger mockServerLogger, List<String> registeredClients, List<Channel> websocketChannels, List<TextWebSocketFrame> textWebSocketFrames, boolean isSecure) {
-        this.mockServerLogger = mockServerLogger;
+    EchoWebSocketServerHandler(List<String> registeredClients, List<Channel> websocketChannels, List<TextWebSocketFrame> textWebSocketFrames) {
         this.registeredClients = registeredClients;
         this.websocketChannels = websocketChannels;
         this.textWebSocketFrames = textWebSocketFrames;
-        this.isSecure = isSecure;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class EchoWebSocketServerHandler extends ChannelInboundHandlerAdapter {
 
     private void upgradeChannel(final ChannelHandlerContext ctx, FullHttpRequest httpRequest) {
         handshaker = new WebSocketServerHandshakerFactory(
-            (isSecure ? "wss" : "ws") + "://" + httpRequest.headers().get(HOST) + UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI,
+            "ws://" + httpRequest.headers().get(HOST) + UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI,
             null,
             true,
             Integer.MAX_VALUE
@@ -99,22 +99,14 @@ public class EchoWebSocketServerHandler extends ChannelInboundHandlerAdapter {
                 )
                 .addListener((ChannelFutureListener) future -> {
                     ctx.pipeline().remove(MockServerHttpServerCodec.class);
-                    if (MockServerLogger.isEnabled(Level.TRACE)) {
-                        mockServerLogger.logEvent(
-                            new LogEntry()
-                                .setLogLevel(Level.TRACE)
-                                .setMessageFormat("registering client " + clientId)
-                        );
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Registering client {}", clientId);
                     }
                     registeredClients.add(clientId);
                     websocketChannels.add(future.channel());
                     future.channel().closeFuture().addListener((ChannelFutureListener) closeFuture -> {
-                        if (MockServerLogger.isEnabled(Level.TRACE)) {
-                            mockServerLogger.logEvent(
-                                new LogEntry()
-                                    .setLogLevel(Level.TRACE)
-                                    .setMessageFormat("unregistering callback for client " + clientId)
-                            );
+                        if (LOG.isTraceEnabled()) {
+                            LOG.trace("Unregistering callback for client {}", clientId);
                         }
                         registeredClients.remove(clientId);
                         websocketChannels.remove(future.channel());
@@ -137,12 +129,7 @@ public class EchoWebSocketServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        mockServerLogger.logEvent(
-            new LogEntry()
-                .setLogLevel(Level.ERROR)
-                .setMessageFormat("echo server caught exception")
-                .setThrowable(cause)
-        );
+        LOG.error("Echo server caught exception", cause);
         ctx.close();
     }
 

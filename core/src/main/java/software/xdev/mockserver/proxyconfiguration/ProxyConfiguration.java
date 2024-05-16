@@ -54,11 +54,6 @@ public class ProxyConfiguration extends ObjectWithJsonToString {
             proxyConfigurations.add(proxyConfiguration(Type.HTTP, httpProxySocketAddress, username, password));
         }
 
-        InetSocketAddress httpsProxySocketAddress = configuration.forwardHttpsProxy();
-        if (httpsProxySocketAddress != null) {
-            proxyConfigurations.add(proxyConfiguration(Type.HTTPS, httpsProxySocketAddress, username, password));
-        }
-
         InetSocketAddress socksProxySocketAddress = configuration.forwardSocksProxy();
         if (socksProxySocketAddress != null) {
             if (proxyConfigurations.isEmpty()) {
@@ -125,7 +120,6 @@ public class ProxyConfiguration extends ObjectWithJsonToString {
 
     public enum Type {
         HTTP,
-        HTTPS,
         SOCKS5
     }
 }

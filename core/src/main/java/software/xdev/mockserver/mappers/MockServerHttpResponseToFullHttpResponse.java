@@ -21,10 +21,12 @@ import io.netty.handler.codec.http.cookie.DefaultCookie;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import software.xdev.mockserver.codec.BodyDecoderEncoder;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.model.NottableString;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import java.util.ArrayList;
@@ -37,12 +39,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class MockServerHttpResponseToFullHttpResponse {
-
-    private final MockServerLogger mockServerLogger;
+    
+    private static final Logger LOG = LoggerFactory.getLogger(MockServerHttpResponseToFullHttpResponse.class);
     private final BodyDecoderEncoder bodyDecoderEncoder;
 
-    public MockServerHttpResponseToFullHttpResponse(MockServerLogger mockServerLogger) {
-        this.mockServerLogger = mockServerLogger;
+    public MockServerHttpResponseToFullHttpResponse() {
         this.bodyDecoderEncoder = new BodyDecoderEncoder();
     }
 
@@ -79,14 +80,8 @@ public class MockServerHttpResponseToFullHttpResponse {
                 setCookies(httpResponse, defaultFullHttpResponse);
                 return Collections.singletonList(defaultFullHttpResponse);
             }
-        } catch (Throwable throwable) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(Level.ERROR)
-                    .setMessageFormat("exception encoding response{}")
-                    .setArguments(httpResponse)
-                    .setThrowable(throwable)
-            );
+        } catch (Exception ex) {
+            LOG.error("Exception encoding response {}", httpResponse, ex);
             return Collections.singletonList(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, getStatus(httpResponse)));
         }
     }

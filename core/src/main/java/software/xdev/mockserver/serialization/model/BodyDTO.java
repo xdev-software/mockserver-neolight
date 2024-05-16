@@ -17,7 +17,6 @@ package software.xdev.mockserver.serialization.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 
@@ -26,10 +25,14 @@ import static org.slf4j.event.Level.ERROR;
 
 import java.util.Base64;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
-
-    private static final MockServerLogger MOCK_SERVER_LOGGER = new MockServerLogger(BodyDTO.class);
+    
+    private static final Logger LOG = LoggerFactory.getLogger(BodyDTO.class);
+    
     private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.createObjectMapper();
     private final Body.Type type;
     private Boolean optional;
@@ -65,14 +68,10 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
         } else if (body instanceof ParameterBodyDTO typedDTO) {
             try {
                 return OBJECT_MAPPER.writeValueAsString(typedDTO.getParameters().getMultimap().asMap());
-            } catch (Throwable throwable) {
-                MOCK_SERVER_LOGGER
-                    .logEvent(
-                        new LogEntry()
-                            .setLogLevel(ERROR)
-                            .setMessageFormat("serialising parameter body into json string for javascript template " + (isNotBlank(throwable.getMessage()) ? " " + throwable.getMessage() : ""))
-                            .setThrowable(throwable)
-                    );
+            } catch (Exception ex) {
+                LOG.error("Serialising parameter body into json string for javascript template {}",
+                    (isNotBlank(ex.getMessage()) ? " " + ex.getMessage() : ""),
+                    ex);
                 return "";
             }
         } else if (body instanceof RegexBodyDTO typedDTO) {

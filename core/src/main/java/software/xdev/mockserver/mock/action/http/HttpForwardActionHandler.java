@@ -16,7 +16,6 @@
 package software.xdev.mockserver.mock.action.http;
 
 import software.xdev.mockserver.httpclient.NettyHttpClient;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpForward;
 import software.xdev.mockserver.model.HttpRequest;
 
@@ -24,12 +23,11 @@ import java.net.InetSocketAddress;
 
 public class HttpForwardActionHandler extends HttpForwardAction {
 
-    public HttpForwardActionHandler(MockServerLogger logFormatter, NettyHttpClient httpClient) {
-        super(logFormatter, httpClient);
+    public HttpForwardActionHandler(NettyHttpClient httpClient) {
+        super(httpClient);
     }
 
     public HttpForwardActionResult handle(HttpForward httpForward, HttpRequest httpRequest) {
-        httpRequest.withSecure(HttpForward.Scheme.HTTPS.equals(httpForward.getScheme()));
         return sendRequest(httpRequest, new InetSocketAddress(httpForward.getHost(), httpForward.getPort()), null);
     }
 

@@ -19,8 +19,6 @@ import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClien
 import software.xdev.mockserver.collections.CircularHashMap;
 import software.xdev.mockserver.collections.CircularPriorityQueue;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.matchers.HttpRequestMatcher;
 import software.xdev.mockserver.matchers.MatchDifference;
 import software.xdev.mockserver.matchers.MatcherBuilder;
@@ -28,7 +26,9 @@ import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.scheduler.Scheduler;
 import software.xdev.mockserver.uuid.UUIDService;
-import org.slf4j.event.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,30 +37,28 @@ import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.*;
 import static software.xdev.mockserver.log.model.LogEntryMessages.*;
 import static software.xdev.mockserver.mock.SortableExpectationId.EXPECTATION_SORTABLE_PRIORITY_COMPARATOR;
 import static software.xdev.mockserver.mock.SortableExpectationId.NULL;
 import static org.slf4j.event.Level.DEBUG;
-import static org.slf4j.event.Level.TRACE;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class RequestMatchers extends MockServerMatcherNotifier {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(RequestMatchers.class);
+    
     final CircularPriorityQueue<String, HttpRequestMatcher, SortableExpectationId> httpRequestMatchers;
     final CircularHashMap<String, RequestDefinition> expectationRequestDefinitions;
-    private final MockServerLogger mockServerLogger;
     private final Configuration configuration;
     private final Scheduler scheduler;
     private WebSocketClientRegistry webSocketClientRegistry;
     private MatcherBuilder matcherBuilder;
 
-    public RequestMatchers(Configuration configuration, MockServerLogger mockServerLogger, Scheduler scheduler, WebSocketClientRegistry webSocketClientRegistry) {
+    public RequestMatchers(Configuration configuration, Scheduler scheduler, WebSocketClientRegistry webSocketClientRegistry) {
         super(scheduler);
         this.configuration = configuration;
         this.scheduler = scheduler;
-        this.matcherBuilder = new MatcherBuilder(configuration, mockServerLogger);
-        this.mockServerLogger = mockServerLogger;
+        this.matcherBuilder = new MatcherBuilder(configuration);
         this.webSocketClientRegistry = webSocketClientRegistry;
         httpRequestMatchers = new CircularPriorityQueue<>(
             configuration.maxExpectations(),
@@ -69,12 +67,8 @@ public class RequestMatchers extends MockServerMatcherNotifier {
             httpRequestMatcher -> httpRequestMatcher.getExpectation() != null ? httpRequestMatcher.getExpectation().getId() : ""
         );
         expectationRequestDefinitions = new CircularHashMap<>(configuration.maxExpectations());
-        if (MockServerLogger.isEnabled(TRACE) && mockServerLogger != null) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setLogLevel(TRACE)
-                    .setMessageFormat("expectation circular priority queue created, with size " + configuration.maxExpectations())
-            );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Expectation circular priority queue created, with size {}", configuration.maxExpectations());
         }
     }
 
@@ -92,15 +86,8 @@ public class RequestMatchers extends MockServerMatcherNotifier {
                     httpRequestMatchers.removePriorityKey(httpRequestMatcher);
                     if (httpRequestMatcher.update(expectation)) {
                         httpRequestMatchers.addPriorityKey(httpRequestMatcher);
-                        if (MockServerLogger.isEnabled(Level.INFO)) {
-                            mockServerLogger.logEvent(
-                                new LogEntry()
-                                    .setType(UPDATED_EXPECTATION)
-                                    .setLogLevel(Level.INFO)
-                                    .setHttpRequest(expectation.getHttpRequest())
-                                    .setMessageFormat(UPDATED_EXPECTATION_MESSAGE_FORMAT)
-                                    .setArguments(expectation.clone(), expectation.getId())
-                            );
+                        if (LOG.isInfoEnabled()) {
+                            LOG.info(UPDATED_EXPECTATION_MESSAGE_FORMAT, expectation.clone(), expectation.getId());
                         }
                     } else {
                         httpRequestMatchers.addPriorityKey(httpRequestMatcher);
@@ -145,15 +132,8 @@ public class RequestMatchers extends MockServerMatcherNotifier {
                             if (httpRequestMatcher.update(expectation)) {
                                 httpRequestMatchers.addPriorityKey(httpRequestMatcher);
                                 numberOfChanges.getAndIncrement();
-                                if (MockServerLogger.isEnabled(Level.INFO)) {
-                                    mockServerLogger.logEvent(
-                                        new LogEntry()
-                                            .setType(UPDATED_EXPECTATION)
-                                            .setLogLevel(Level.INFO)
-                                            .setHttpRequest(expectation.getHttpRequest())
-                                            .setMessageFormat(UPDATED_EXPECTATION_MESSAGE_FORMAT)
-                                            .setArguments(expectation.clone(), expectation.getId())
-                                    );
+                                if (LOG.isInfoEnabled()) {
+                                    LOG.info(UPDATED_EXPECTATION_MESSAGE_FORMAT, expectation.clone(), expectation.getId());
                                 }
                             } else {
                                 httpRequestMatchers.addPriorityKey(httpRequestMatcher);
@@ -180,15 +160,8 @@ public class RequestMatchers extends MockServerMatcherNotifier {
         HttpRequestMatcher httpRequestMatcher = matcherBuilder.transformsToMatcher(expectation);
         httpRequestMatchers.add(httpRequestMatcher);
         httpRequestMatcher.withSource(cause);
-        if (MockServerLogger.isEnabled(Level.INFO)) {
-            mockServerLogger.logEvent(
-                new LogEntry()
-                    .setType(CREATED_EXPECTATION)
-                    .setLogLevel(Level.INFO)
-                    .setHttpRequest(expectation.getHttpRequest())
-                    .setMessageFormat(CREATED_EXPECTATION_MESSAGE_FORMAT)
-                    .setArguments(expectation.clone(), expectation.getId())
-            );
+        if (LOG.isInfoEnabled()) {
+            LOG.info(CREATED_EXPECTATION_MESSAGE_FORMAT, expectation.clone(), expectation.getId());
         }
         return httpRequestMatcher;
     }
@@ -212,7 +185,7 @@ public class RequestMatchers extends MockServerMatcherNotifier {
             .map(httpRequestMatcher -> {
                 Expectation matchingExpectation = null;
                 boolean remainingMatchesDecremented = false;
-                if (httpRequestMatcher.matches(MockServerLogger.isEnabled(DEBUG) ? new MatchDifference(configuration.detailedMatchFailures(), httpRequest) : null, httpRequest)) {
+                if (httpRequestMatcher.matches(LOG.isDebugEnabled() ? new MatchDifference(configuration.detailedMatchFailures(), httpRequest) : null, httpRequest)) {
                     matchingExpectation = httpRequestMatcher.getExpectation();
                     httpRequestMatcher.setResponseInProgress(true);
                     if (matchingExpectation.decrementRemainingMatches()) {
@@ -247,16 +220,8 @@ public class RequestMatchers extends MockServerMatcherNotifier {
                     removeHttpRequestMatcher(httpRequestMatcher, requestDefinition.getLogCorrelationId());
                 }
             });
-            if (MockServerLogger.isEnabled(Level.INFO)) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setType(CLEARED)
-                        .setLogLevel(Level.INFO)
-                        .setCorrelationId(requestDefinition.getLogCorrelationId())
-                        .setHttpRequest(requestDefinition)
-                        .setMessageFormat("cleared expectations that match:{}")
-                        .setArguments(requestDefinition)
-                );
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Cleared expectations that match: {}", requestDefinition);
             }
         } else {
             reset();
@@ -268,15 +233,8 @@ public class RequestMatchers extends MockServerMatcherNotifier {
             httpRequestMatchers
                 .getByKey(expectationId.getId())
                 .ifPresent(httpRequestMatcher -> removeHttpRequestMatcher(httpRequestMatcher, logCorrelationId));
-            if (MockServerLogger.isEnabled(Level.INFO)) {
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setType(CLEARED)
-                        .setLogLevel(Level.INFO)
-                        .setCorrelationId(logCorrelationId)
-                        .setMessageFormat("cleared expectations that have id:{}")
-                        .setArguments(expectationId.getId())
-                );
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Cleared expectations that have id: {}", expectationId.getId());
             }
         } else {
             reset();
@@ -305,22 +263,14 @@ public class RequestMatchers extends MockServerMatcherNotifier {
     @SuppressWarnings("rawtypes")
     private void removeHttpRequestMatcher(HttpRequestMatcher httpRequestMatcher, Cause cause, boolean notifyAndUpdateMetrics, String logCorrelationId) {
         if (httpRequestMatchers.remove(httpRequestMatcher)) {
-            if (httpRequestMatcher.getExpectation() != null && MockServerLogger.isEnabled(Level.INFO)) {
+            if (httpRequestMatcher.getExpectation() != null && LOG.isInfoEnabled()) {
                 Expectation expectation = httpRequestMatcher.getExpectation().clone();
-                mockServerLogger.logEvent(
-                    new LogEntry()
-                        .setType(REMOVED_EXPECTATION)
-                        .setLogLevel(Level.INFO)
-                        .setCorrelationId(logCorrelationId)
-                        .setHttpRequest(httpRequestMatcher.getExpectation().getHttpRequest())
-                        .setMessageFormat(REMOVED_EXPECTATION_MESSAGE_FORMAT)
-                        .setArguments(expectation, expectation.getId())
-                );
+                LOG.info(REMOVED_EXPECTATION_MESSAGE_FORMAT, expectation, expectation.getId());
             }
             if (httpRequestMatcher.getExpectation() != null) {
                 final Action action = httpRequestMatcher.getExpectation().getAction();
-                if (action instanceof HttpObjectCallback) {
-                    webSocketClientRegistry.unregisterClient(((HttpObjectCallback) action).getClientId());
+                if (action instanceof HttpObjectCallback callback) {
+                    webSocketClientRegistry.unregisterClient(callback.getClientId());
                 }
             }
             if (notifyAndUpdateMetrics) {

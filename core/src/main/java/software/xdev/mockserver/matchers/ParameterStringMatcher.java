@@ -18,21 +18,19 @@ package software.xdev.mockserver.matchers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.Parameters;
 
 public class ParameterStringMatcher extends BodyMatcher<String> {
-    private static final String[] EXCLUDED_FIELDS = {"mockServerLogger"};
     private final MultiValueMapMatcher matcher;
     private final ExpandedParameterDecoder formParameterParser;
     private final Parameters matcherParameters;
     private final ExpandedParameterDecoder expandedParameterDecoder;
 
-    ParameterStringMatcher(Configuration configuration, MockServerLogger mockServerLogger, Parameters matcherParameters, boolean controlPlaneMatcher) {
+    ParameterStringMatcher(Configuration configuration, Parameters matcherParameters, boolean controlPlaneMatcher) {
         this.matcherParameters = matcherParameters;
-        this.matcher = new MultiValueMapMatcher(mockServerLogger, matcherParameters, controlPlaneMatcher);
-        this.formParameterParser = new ExpandedParameterDecoder(configuration, mockServerLogger);
-        this.expandedParameterDecoder = new ExpandedParameterDecoder(configuration, mockServerLogger);
+        this.matcher = new MultiValueMapMatcher(matcherParameters, controlPlaneMatcher);
+        this.formParameterParser = new ExpandedParameterDecoder(configuration);
+        this.expandedParameterDecoder = new ExpandedParameterDecoder(configuration);
     }
 
     public boolean matches(final MatchDifference context, String matched) {
@@ -49,11 +47,5 @@ public class ParameterStringMatcher extends BodyMatcher<String> {
 
     public boolean isBlank() {
         return matcher.isBlank();
-    }
-
-    @Override
-    @JsonIgnore
-    protected String[] fieldsExcludedFromEqualsAndHashCode() {
-        return EXCLUDED_FIELDS;
     }
 }

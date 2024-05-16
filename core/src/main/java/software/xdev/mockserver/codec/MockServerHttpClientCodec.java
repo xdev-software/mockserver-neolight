@@ -16,15 +16,14 @@
 package software.xdev.mockserver.codec;
 
 import io.netty.channel.CombinedChannelDuplexHandler;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
 
 import java.util.Map;
 
 public class MockServerHttpClientCodec extends CombinedChannelDuplexHandler<NettyHttpToMockServerHttpResponseDecoder, MockServerHttpToNettyHttpRequestEncoder> {
 
-    public MockServerHttpClientCodec(MockServerLogger mockServerLogger, Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations) {
-        init(new NettyHttpToMockServerHttpResponseDecoder(mockServerLogger), new MockServerHttpToNettyHttpRequestEncoder(mockServerLogger, proxyConfigurations));
+    public MockServerHttpClientCodec(Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations) {
+        init(new NettyHttpToMockServerHttpResponseDecoder(), new MockServerHttpToNettyHttpRequestEncoder(proxyConfigurations));
     }
 
 }

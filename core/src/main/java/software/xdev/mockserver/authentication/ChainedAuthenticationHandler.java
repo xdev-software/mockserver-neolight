@@ -17,6 +17,7 @@ package software.xdev.mockserver.authentication;
 
 import software.xdev.mockserver.model.HttpRequest;
 
+@Deprecated
 public class ChainedAuthenticationHandler implements AuthenticationHandler {
 
     private final AuthenticationHandler[] authenticationHandlers;

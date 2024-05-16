@@ -17,7 +17,6 @@ package software.xdev.mockserver.matchers;
 
 import software.xdev.mockserver.cache.LRUCache;
 import software.xdev.mockserver.configuration.Configuration;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.model.RequestDefinition;
 
@@ -26,19 +25,17 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class MatcherBuilder {
 
     private final Configuration configuration;
-    private final MockServerLogger mockServerLogger;
     private final LRUCache<RequestDefinition, HttpRequestMatcher> requestMatcherLRUCache;
 
-    public MatcherBuilder(Configuration configuration, MockServerLogger mockServerLogger) {
+    public MatcherBuilder(Configuration configuration) {
         this.configuration = configuration;
-        this.mockServerLogger = mockServerLogger;
-        this.requestMatcherLRUCache = new LRUCache<>(mockServerLogger, 250, MINUTES.toMillis(10));
+        this.requestMatcherLRUCache = new LRUCache<>(250, MINUTES.toMillis(10));
     }
 
     public HttpRequestMatcher transformsToMatcher(RequestDefinition requestDefinition) {
         HttpRequestMatcher httpRequestMatcher = requestMatcherLRUCache.get(requestDefinition);
         if (httpRequestMatcher == null) {
-            httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration, mockServerLogger);
+            httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration);
             httpRequestMatcher.update(requestDefinition);
             requestMatcherLRUCache.put(requestDefinition, httpRequestMatcher);
         }
@@ -46,7 +43,7 @@ public class MatcherBuilder {
     }
 
     public HttpRequestMatcher transformsToMatcher(Expectation expectation) {
-        HttpRequestMatcher httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration, mockServerLogger);
+        HttpRequestMatcher httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration);
         httpRequestMatcher.update(expectation);
         return httpRequestMatcher;
     }

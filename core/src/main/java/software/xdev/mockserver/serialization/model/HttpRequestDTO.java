@@ -31,7 +31,6 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
     private Cookies cookies;
     private Headers headers;
     private Boolean keepAlive;
-    private Boolean secure;
     private Protocol protocol;
     private List<X509Certificate> clientCertificateChain;
     private SocketAddress socketAddress;
@@ -53,7 +52,6 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
             queryStringParameters = httpRequest.getQueryStringParameters();
             body = BodyDTO.createDTO(httpRequest.getBody());
             keepAlive = httpRequest.isKeepAlive();
-            secure = httpRequest.isSecure();
             protocol = httpRequest.getProtocol();
             clientCertificateChain = httpRequest.getClientCertificateChain();
             socketAddress = httpRequest.getSocketAddress();
@@ -71,7 +69,6 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
             .withBody((body != null ? Not.not(body.buildObject(), body.getNot()) : null))
             .withHeaders(headers)
             .withCookies(cookies)
-            .withSecure(secure)
             .withProtocol(protocol)
             .withKeepAlive(keepAlive)
             .withClientCertificateChain(clientCertificateChain)
@@ -150,15 +147,6 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
 
     public HttpRequestDTO setKeepAlive(Boolean keepAlive) {
         this.keepAlive = keepAlive;
-        return this;
-    }
-
-    public Boolean getSecure() {
-        return secure;
-    }
-
-    public HttpRequestDTO setSecure(Boolean secure) {
-        this.secure = secure;
         return this;
     }
 

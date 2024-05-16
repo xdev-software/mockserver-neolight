@@ -24,7 +24,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpServerCodec;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.netty.proxy.relay.RelayConnectHandler;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
@@ -34,8 +33,8 @@ import static software.xdev.mockserver.model.HttpResponse.response;
 @ChannelHandler.Sharable
 public final class HttpConnectHandler extends RelayConnectHandler<HttpRequest> {
 
-    public HttpConnectHandler(Configuration configuration, LifeCycle server, MockServerLogger mockServerLogger, String host, int port) {
-        super(configuration, server, mockServerLogger, host, port);
+    public HttpConnectHandler(Configuration configuration, LifeCycle server, String host, int port) {
+        super(configuration, server, host, port);
     }
 
     protected void removeCodecSupport(ChannelHandlerContext ctx) {

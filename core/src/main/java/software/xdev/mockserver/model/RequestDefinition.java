@@ -16,13 +16,16 @@
 package software.xdev.mockserver.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import software.xdev.mockserver.logging.MockServerLogger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public abstract class RequestDefinition extends Not {
-
+    
+    private static final Logger LOG = LoggerFactory.getLogger(RequestDefinition.class);
     private String logCorrelationId;
 
     @JsonIgnore
@@ -38,7 +41,9 @@ public abstract class RequestDefinition extends Not {
     public abstract RequestDefinition shallowClone();
 
     public RequestDefinition cloneWithLogCorrelationId() {
-        return MockServerLogger.isEnabled(Level.TRACE) && isNotBlank(getLogCorrelationId()) ? shallowClone().withLogCorrelationId(getLogCorrelationId()) : this;
+        return LOG.isTraceEnabled() && isNotBlank(getLogCorrelationId())
+            ? shallowClone().withLogCorrelationId(getLogCorrelationId())
+            : this;
     }
 
     @Override

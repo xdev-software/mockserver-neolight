@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.collections;
 
-import software.xdev.mockserver.logging.MockServerLogger;
 import software.xdev.mockserver.matchers.MatchDifference;
 import software.xdev.mockserver.matchers.RegexStringMatcher;
 import software.xdev.mockserver.model.*;
@@ -31,17 +30,17 @@ public class NottableStringMultiMap extends ObjectWithReflectiveEqualsHashCodeTo
     private final RegexStringMatcher regexStringMatcher;
     private final KeyMatchStyle keyMatchStyle;
 
-    public NottableStringMultiMap(MockServerLogger mockServerLogger, boolean controlPlaneMatcher, KeyMatchStyle keyMatchStyle, List<? extends KeyToMultiValue> entries) {
+    public NottableStringMultiMap(boolean controlPlaneMatcher, KeyMatchStyle keyMatchStyle, List<? extends KeyToMultiValue> entries) {
         this.keyMatchStyle = keyMatchStyle;
-        regexStringMatcher = new RegexStringMatcher(mockServerLogger, controlPlaneMatcher);
+        regexStringMatcher = new RegexStringMatcher(controlPlaneMatcher);
         for (KeyToMultiValue keyToMultiValue : entries) {
             backingMap.put(keyToMultiValue.getName(), keyToMultiValue.getValues());
         }
     }
 
-    public NottableStringMultiMap(MockServerLogger mockServerLogger, boolean controlPlaneMatcher, KeyMatchStyle keyMatchStyle, NottableString[]... keyAndValues) {
+    public NottableStringMultiMap(boolean controlPlaneMatcher, KeyMatchStyle keyMatchStyle, NottableString[]... keyAndValues) {
         this.keyMatchStyle = keyMatchStyle;
-        regexStringMatcher = new RegexStringMatcher(mockServerLogger, controlPlaneMatcher);
+        regexStringMatcher = new RegexStringMatcher(controlPlaneMatcher);
         for (NottableString[] keyAndValue : keyAndValues) {
             if (keyAndValue.length > 0) {
                 backingMap.put(keyAndValue[0], keyAndValue.length > 1 ? Arrays.asList(keyAndValue).subList(1, keyAndValue.length) : Collections.emptyList());
@@ -53,12 +52,12 @@ public class NottableStringMultiMap extends ObjectWithReflectiveEqualsHashCodeTo
         return keyMatchStyle;
     }
 
-    public boolean containsAll(MockServerLogger mockServerLogger, MatchDifference context, NottableStringMultiMap subset) {
+    public boolean containsAll(MatchDifference context, NottableStringMultiMap subset) {
         switch (subset.keyMatchStyle) {
             case SUB_SET: {
-                boolean isSubset = containsSubset(mockServerLogger, context, regexStringMatcher, subset.entryList(), entryList());
+                boolean isSubset = containsSubset(context, regexStringMatcher, subset.entryList(), entryList());
                 if (!isSubset && context != null) {
-                    context.addDifference(mockServerLogger, "multimap subset match failed subset:{}was not a subset of:{}", subset.entryList(), entryList());
+                    context.addDifference("multimap subset match failed subset:{}was not a subset of:{}", subset.entryList(), entryList());
                 }
                 return isSubset;
             }
@@ -67,7 +66,7 @@ public class NottableStringMultiMap extends ObjectWithReflectiveEqualsHashCodeTo
                     List<NottableString> matchedValuesForKey = getAll(matcherKey);
                     if (matchedValuesForKey.isEmpty() && !matcherKey.isOptional()) {
                         if (context != null) {
-                            context.addDifference(mockServerLogger, "multimap subset match failed subset:{}did not have expected key:{}", subset, matcherKey);
+                            context.addDifference("multimap subset match failed subset:{}did not have expected key:{}", subset, matcherKey);
                         }
                         return false;
                     }
@@ -77,12 +76,12 @@ public class NottableStringMultiMap extends ObjectWithReflectiveEqualsHashCodeTo
                         boolean matchesValue = false;
                         for (NottableString matcherValue : matcherValuesForKey) {
                             // match item by item
-                            if (regexStringMatcher.matches(mockServerLogger, context, matcherValue, matchedValue)) {
+                            if (regexStringMatcher.matches(context, matcherValue, matchedValue)) {
                                 matchesValue = true;
                                 break;
                             } else {
                                 if (context != null) {
-                                    context.addDifference(mockServerLogger, "multimap matching key match failed for key:{}", matcherKey);
+                                    context.addDifference("multimap matching key match failed for key:{}", matcherKey);
                                 }
                             }
                         }
