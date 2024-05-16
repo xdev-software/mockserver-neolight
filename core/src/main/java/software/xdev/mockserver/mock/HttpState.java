@@ -15,8 +15,6 @@
  */
 package software.xdev.mockserver.mock;
 
-import software.xdev.mockserver.authentication.AuthenticationException;
-import software.xdev.mockserver.authentication.AuthenticationHandler;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
 import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry;
 import software.xdev.mockserver.configuration.Configuration;
@@ -34,7 +32,6 @@ import software.xdev.mockserver.verify.VerificationSequence;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,19 +44,14 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.HOST;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.*;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.CLEARED;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.RETRIEVED;
 import static software.xdev.mockserver.log.model.LogEntryMessages.RECEIVED_REQUEST_MESSAGE_FORMAT;
 import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.model.HttpResponse.response;
-import static org.slf4j.event.Level.TRACE;
 
 public class HttpState {
     
@@ -84,7 +76,6 @@ public class HttpState {
     private ExpectationToJavaSerializer expectationToJavaSerializer;
     private VerificationSerializer verificationSerializer;
     private VerificationSequenceSerializer verificationSequenceSerializer;
-    private AuthenticationHandler controlPlaneAuthenticationHandler;
 
     public static void setPort(final HttpRequest request) {
         if (request != null && request.getSocketAddress() != null) {
@@ -123,10 +114,6 @@ public class HttpState {
         if(LOG.isTraceEnabled()) {
             LOG.trace("Log ring buffer created, with size {}", configuration.ringBufferSize());
         }
-    }
-
-    public void setControlPlaneAuthenticationHandler(AuthenticationHandler controlPlaneAuthenticationHandler) {
-        this.controlPlaneAuthenticationHandler = controlPlaneAuthenticationHandler;
     }
 
     public void clear(HttpRequest request) {
@@ -538,16 +525,7 @@ public class HttpState {
     }
 
     private boolean controlPlaneRequestAuthenticated(HttpRequest request, ResponseWriter responseWriter) {
-        try {
-            if (controlPlaneAuthenticationHandler == null || controlPlaneAuthenticationHandler.controlPlaneRequestAuthenticated(request)) {
-                return true;
-            }
-        } catch (AuthenticationException authenticationException) {
-            responseWriter.writeResponse(request, UNAUTHORIZED, "Unauthorized for control plane - " + authenticationException.getMessage(), MediaType.create("text", "plain").toString());
-            return false;
-        }
-        responseWriter.writeResponse(request, UNAUTHORIZED, "Unauthorized for control plane", MediaType.create("text", "plain").toString());
-        return false;
+        return true;
     }
 
     @SuppressWarnings("rawtypes")

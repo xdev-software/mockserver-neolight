@@ -257,7 +257,7 @@ public class Main {
         proxyRemotePort("PROXY_REMOTE_PORT"),
         logLevel("LOG_LEVEL");
 
-        final static CaseInsensitiveList names = new CaseInsensitiveList();
+        static final CaseInsensitiveList names = new CaseInsensitiveList();
 
         static {
             for (Arguments arguments : values()) {
