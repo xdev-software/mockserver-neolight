@@ -17,7 +17,10 @@ package software.xdev.mockserver.cli;
 
 import software.xdev.mockserver.configuration.ConfigurationProperties;
 import software.xdev.mockserver.configuration.IntegerStringListParser;
+import software.xdev.mockserver.configuration.ServerConfigurationProperties;
 import software.xdev.mockserver.log.model.LogEntry;
+import software.xdev.mockserver.logging.MockServerLogger;
+import software.xdev.mockserver.logging.MockServerLoggerConfiguration;
 import software.xdev.mockserver.netty.MockServer;
 
 import java.io.PrintStream;
@@ -117,7 +120,9 @@ public class Main {
                             environmentVariableArguments.remove(parsedArgument.shortEnvironmentVariableName());
                             parsedArguments.put(parsedArgument.name(), environmentVariableArguments.get(parsedArgument.longEnvironmentVariableName()));
                         } else if (isNotBlank(System.getenv(parsedArgument.shortEnvironmentVariableName()))) {
-                            if (!(parsedArgument == serverPort && "1080".equals(System.getenv(serverPort.shortEnvironmentVariableName())) && ConfigurationProperties.PROPERTIES.containsKey(serverPort.systemPropertyName()))) {
+                            if (!(parsedArgument == serverPort
+                                && "1080".equals(System.getenv(serverPort.shortEnvironmentVariableName()))
+                                && ServerConfigurationProperties.PROPERTIES.containsKey(serverPort.systemPropertyName()))) {
                                 environmentVariableArguments.put(parsedArgument.shortEnvironmentVariableName(), System.getenv(parsedArgument.shortEnvironmentVariableName()));
                                 parsedArguments.put(parsedArgument.name(), environmentVariableArguments.get(parsedArgument.shortEnvironmentVariableName()));
                             }
@@ -128,8 +133,11 @@ public class Main {
                     environmentVariableArguments.remove(parsedArgument.longEnvironmentVariableName());
                     environmentVariableArguments.remove(parsedArgument.shortEnvironmentVariableName());
                 }
-                if (!parsedArguments.containsKey(parsedArgument.name()) && ConfigurationProperties.PROPERTIES.containsKey(parsedArgument.systemPropertyName())) {
-                    parsedArguments.put(parsedArgument.name(), String.valueOf(ConfigurationProperties.PROPERTIES.get(parsedArgument.systemPropertyName())));
+                if (!parsedArguments.containsKey(parsedArgument.name())
+                    && ServerConfigurationProperties.PROPERTIES.containsKey(parsedArgument.systemPropertyName())) {
+                    parsedArguments.put(
+                        parsedArgument.name(),
+                        String.valueOf(ServerConfigurationProperties.PROPERTIES.get(parsedArgument.systemPropertyName())));
                 }
             }
 
@@ -142,8 +150,9 @@ public class Main {
 
             if (!parsedArguments.isEmpty() && parsedArguments.containsKey(serverPort.name())) {
                 if (parsedArguments.containsKey(logLevel.name())) {
-                    ConfigurationProperties.logLevel(parsedArguments.get(logLevel.name()));
+                    ServerConfigurationProperties.logLevel(parsedArguments.get(logLevel.name()));
                 }
+                MockServerLoggerConfiguration.configureLogger();
                 Integer[] localPorts = INTEGER_STRING_LIST_PARSER.toArray(parsedArguments.get(serverPort.name()));
                 if (parsedArguments.containsKey(proxyRemotePort.name())) {
                     String remoteHost = parsedArguments.get(proxyRemoteHost.name());
@@ -162,7 +171,7 @@ public class Main {
         } catch (Exception ex) {
             LOG.error("Exception while starting", ex);
             showUsage(null);
-            if (ConfigurationProperties.disableSystemOut()) {
+            if (ServerConfigurationProperties.disableSystemOut()) {
                 new RuntimeException("exception while starting: " + ex.getMessage()).printStackTrace(System.err);
             }
         }

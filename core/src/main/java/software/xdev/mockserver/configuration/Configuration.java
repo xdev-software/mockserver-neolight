@@ -28,9 +28,6 @@ public class Configuration {
     }
 
     // logging
-    private Level logLevel;
-    private Boolean disableSystemOut;
-    private Boolean disableLogging;
     private Boolean detailedMatchFailures;
     
     private Integer maxExpectations;
@@ -87,71 +84,6 @@ public class Configuration {
 
     // liveness
     private String livenessHttpGetPath;
-
-    public Level logLevel() {
-        if (logLevel == null) {
-            return ConfigurationProperties.logLevel();
-        }
-        return logLevel;
-    }
-
-    /**
-     * Override the default logging level of INFO
-     *
-     * @param level the log level, which can be TRACE, DEBUG, INFO, WARN, ERROR, OFF, FINEST, FINE, INFO, WARNING, SEVERE
-     */
-    public Configuration logLevel(Level level) {
-        this.logLevel = level;
-        ConfigurationProperties.logLevel(this.logLevel.name());
-        return this;
-    }
-
-    /**
-     * Override the default logging level of INFO
-     *
-     * @param level the log level, which can be TRACE, DEBUG, INFO, WARN, ERROR, OFF, FINEST, FINE, INFO, WARNING, SEVERE
-     */
-    public Configuration logLevel(String level) {
-        this.logLevel = Level.valueOf(level);
-        ConfigurationProperties.logLevel(this.logLevel.name());
-        return this;
-    }
-
-    public Boolean disableSystemOut() {
-        if (disableSystemOut == null) {
-            return ConfigurationProperties.disableSystemOut();
-        }
-        return disableSystemOut;
-    }
-
-    /**
-     * Disable printing log to system out for JVM, default is enabled
-     *
-     * @param disableSystemOut printing log to system out for JVM
-     */
-    public Configuration disableSystemOut(Boolean disableSystemOut) {
-        this.disableSystemOut = disableSystemOut;
-        return this;
-    }
-
-    public Boolean disableLogging() {
-        if (disableLogging == null) {
-            return ConfigurationProperties.disableLogging();
-        }
-        return disableLogging;
-    }
-
-    /**
-     * Disable all logging and processing of log events
-     * <p>
-     * The default is false
-     *
-     * @param disableLogging disable all logging
-     */
-    public Configuration disableLogging(Boolean disableLogging) {
-        this.disableLogging = disableLogging;
-        return this;
-    }
 
     public Boolean detailedMatchFailures() {
         if (detailedMatchFailures == null) {

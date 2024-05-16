@@ -15,30 +15,42 @@
  */
 package software.xdev.mockserver.configuration;
 
-import software.xdev.mockserver.util.StringUtils;
+import static software.xdev.mockserver.character.Character.NEW_LINE;
+import static software.xdev.mockserver.logging.MockServerLogger.configureLogger;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
-import java.io.*;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import software.xdev.mockserver.util.StringUtils;
 
-import static software.xdev.mockserver.util.StringUtils.isBlank;
-import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.logging.MockServerLogger.configureLogger;
 
-public class ConfigurationProperties {
+public class ServerConfigurationProperties
+{
 
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigurationProperties.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServerConfigurationProperties.class);
     
+    private static final String DEFAULT_LOG_LEVEL = "INFO";
+
+    // logging
+    private static final String MOCKSERVER_LOG_LEVEL = "mockserver.logLevel";
+    private static final String MOCKSERVER_DISABLE_SYSTEM_OUT = "mockserver.disableSystemOut";
+    private static final String MOCKSERVER_DISABLE_LOGGING = "mockserver.disableLogging";
     private static final String MOCKSERVER_DETAILED_MATCH_FAILURES = "mockserver.detailedMatchFailures";
 
     // memory usage
@@ -100,6 +112,45 @@ public class ConfigurationProperties {
     private static final String MOCKSERVER_PROPERTY_FILE = "mockserver.propertyFile";
     public static final Properties PROPERTIES = readPropertyFile();
 
+    private static Map<String, String> slf4jOrJavaLoggerToJavaLoggerLevelMapping;
+
+    private static Map<String, String> slf4jOrJavaLoggerToSLF4JLevelMapping;
+
+    private static Map<String, String> getSLF4JOrJavaLoggerToJavaLoggerLevelMapping() {
+        if (slf4jOrJavaLoggerToJavaLoggerLevelMapping == null) {
+            slf4jOrJavaLoggerToJavaLoggerLevelMapping = Map.ofEntries(
+                Map.entry("TRACE", "FINEST"),
+                Map.entry("DEBUG", "FINE"),
+                Map.entry("INFO", "INFO"),
+                Map.entry("WARN", "WARNING"),
+                Map.entry("ERROR", "SEVERE"),
+                Map.entry("FINEST", "FINEST"),
+                Map.entry("FINE", "FINE"),
+                Map.entry("WARNING", "WARNING"),
+                Map.entry("SEVERE", "SEVERE"),
+                Map.entry("OFF", "OFF")
+            );
+        }
+        return slf4jOrJavaLoggerToJavaLoggerLevelMapping;
+    }
+
+    private static Map<String, String> getSLF4JOrJavaLoggerToSLF4JLevelMapping() {
+        if (slf4jOrJavaLoggerToSLF4JLevelMapping == null) {
+            slf4jOrJavaLoggerToSLF4JLevelMapping = Map.ofEntries(
+                Map.entry("FINEST", "TRACE"),
+                Map.entry("FINE", "DEBUG"),
+                Map.entry("INFO", "INFO"),
+                Map.entry("WARNING", "WARN"),
+                Map.entry("SEVERE", "ERROR"),
+                Map.entry("TRACE", "TRACE"),
+                Map.entry("DEBUG", "DEBUG"),
+                Map.entry("WARN", "WARN"),
+                Map.entry("ERROR", "ERROR"),
+                Map.entry("OFF", "ERROR")
+            );
+        }
+        return slf4jOrJavaLoggerToSLF4JLevelMapping;
+    }
 
     private static String propertyFile() {
         if (isNotBlank(System.getProperty(MOCKSERVER_PROPERTY_FILE)) && System.getProperty(MOCKSERVER_PROPERTY_FILE).equals("/config/mockserver.properties")) {
@@ -107,6 +158,91 @@ public class ConfigurationProperties {
         } else {
             return System.getProperty(MOCKSERVER_PROPERTY_FILE, isBlank(System.getenv("MOCKSERVER_PROPERTY_FILE")) ? "mockserver.properties" : System.getenv("MOCKSERVER_PROPERTY_FILE"));
         }
+    }
+
+    // logging
+
+    public static Level logLevel() {
+        String logLevel = readPropertyHierarchically(PROPERTIES, MOCKSERVER_LOG_LEVEL, "MOCKSERVER_LOG_LEVEL", DEFAULT_LOG_LEVEL).toUpperCase();
+        if (isNotBlank(logLevel)) {
+            if (getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(logLevel).equals("OFF")) {
+                return null;
+            } else {
+                return Level.valueOf(getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(logLevel));
+            }
+        } else {
+            return Level.INFO;
+        }
+    }
+
+    public static String javaLoggerLogLevel() {
+        String logLevel = readPropertyHierarchically(PROPERTIES, MOCKSERVER_LOG_LEVEL, "MOCKSERVER_LOG_LEVEL", DEFAULT_LOG_LEVEL).toUpperCase();
+        if (isNotBlank(logLevel)) {
+            if (getSLF4JOrJavaLoggerToJavaLoggerLevelMapping().get(logLevel).equals("OFF")) {
+                return "OFF";
+            } else {
+                return getSLF4JOrJavaLoggerToJavaLoggerLevelMapping().get(logLevel);
+            }
+        } else {
+            return "INFO";
+        }
+    }
+
+    /**
+     * Override the default logging level of INFO
+     *
+     * @param level the log level, which can be TRACE, DEBUG, INFO, WARN, ERROR, OFF, FINEST, FINE, INFO, WARNING, SEVERE
+     */
+    public static void logLevel(String level) {
+        if (isNotBlank(level)) {
+            if (!getSLF4JOrJavaLoggerToSLF4JLevelMapping().containsKey(level)) {
+                throw new IllegalArgumentException("log level \"" + level + "\" is not legal it must be one of SL4J levels: \"TRACE\", \"DEBUG\", \"INFO\", \"WARN\", \"ERROR\", \"OFF\", or the Java Logger levels: \"FINEST\", \"FINE\", \"INFO\", \"WARNING\", \"SEVERE\", \"OFF\"");
+            }
+            setProperty(MOCKSERVER_LOG_LEVEL, level);
+        }
+        configureLogger();
+    }
+
+    public static void temporaryLogLevel(String level, Runnable runnable) {
+        Level originalLogLevel = logLevel();
+        try {
+            logLevel(level);
+            runnable.run();
+        } finally {
+            if (originalLogLevel != null) {
+                logLevel(originalLogLevel.name());
+            }
+        }
+    }
+
+    public static boolean disableSystemOut() {
+        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_DISABLE_SYSTEM_OUT, "MOCKSERVER_DISABLE_SYSTEM_OUT", "" + false));
+    }
+
+    /**
+     * Disable printing log to system out for JVM, default is enabled
+     *
+     * @param disable printing log to system out for JVM
+     */
+    public static void disableSystemOut(boolean disable) {
+        setProperty(MOCKSERVER_DISABLE_SYSTEM_OUT, "" + disable);
+        configureLogger();
+    }
+
+    public static boolean disableLogging() {
+        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_DISABLE_LOGGING, "MOCKSERVER_DISABLE_LOGGING", "" + false));
+    }
+
+    /**
+     * Disable all logging and processing of log events
+     * <p>
+     * The default is false
+     *
+     * @param disable disable all logging
+     */
+    public static void disableLogging(boolean disable) {
+        setProperty(MOCKSERVER_DISABLE_LOGGING, "" + disable);
+        configureLogger();
     }
 
     public static boolean detailedMatchFailures() {
@@ -803,7 +939,7 @@ public class ConfigurationProperties {
 
         Properties properties = new Properties();
 
-        try (InputStream inputStream = ConfigurationProperties.class.getClassLoader().getResourceAsStream(propertyFile())) {
+        try (InputStream inputStream = ServerConfigurationProperties.class.getClassLoader().getResourceAsStream(propertyFile())) {
             if (inputStream != null) {
                 try {
                     properties.load(inputStream);
@@ -838,7 +974,8 @@ public class ConfigurationProperties {
                 propertiesLogDump.append("  ").append(propertyName).append(" = ").append(properties.getProperty(propertyName)).append(NEW_LINE);
             }
 
-            if (LOG.isInfoEnabled()) {
+            Level logLevel = Level.valueOf(getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(readPropertyHierarchically(properties, MOCKSERVER_LOG_LEVEL, "MOCKSERVER_LOG_LEVEL", DEFAULT_LOG_LEVEL).toUpperCase()));
+            if (LOG.isEnabledForLevel(logLevel)) {
                 LOG.info(propertiesLogDump.toString());
             }
         }

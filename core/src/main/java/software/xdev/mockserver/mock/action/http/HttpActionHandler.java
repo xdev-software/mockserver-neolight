@@ -52,7 +52,6 @@ import static software.xdev.mockserver.exception.ExceptionHandling.*;
 import static software.xdev.mockserver.log.model.LogEntryMessages.*;
 import static software.xdev.mockserver.model.HttpResponse.notFoundResponse;
 import static software.xdev.mockserver.model.HttpResponse.response;
-import static org.slf4j.event.Level.TRACE;
 
 @SuppressWarnings({"rawtypes", "FieldMayBeFinal"})
 public class HttpActionHandler {

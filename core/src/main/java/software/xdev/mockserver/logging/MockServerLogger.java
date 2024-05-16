@@ -36,86 +36,11 @@ import static org.slf4j.event.Level.ERROR;
 public class MockServerLogger {
 
     public static void configureLogger() {
-        try {
-            if (System.getProperty("java.util.logging.config.file") == null && System.getProperty("java.util.logging.config.class") == null) {
-                LogManager.getLogManager().readConfiguration(new ByteArrayInputStream(("" +
-                    "handlers=software.xdev.mockserver.logging.StandardOutConsoleHandler" + NEW_LINE +
-                    "software.xdev.mockserver.logging.StandardOutConsoleHandler.level=ALL" + NEW_LINE +
-                    "software.xdev.mockserver.logging.StandardOutConsoleHandler.formatter=java.util.logging.SimpleFormatter" + NEW_LINE +
-                    "java.util.logging.SimpleFormatter.format=%1$tF %1$tT %4$s %5$s %6$s%n" + NEW_LINE +
-                    "software.xdev.mockserver.level=INFO" + NEW_LINE +
-                    "io.netty.level=WARNING").getBytes(UTF_8)));
-                if (isNotBlank(ConfigurationProperties.javaLoggerLogLevel())) {
-                    String loggingConfiguration = "" +
-                        (!ConfigurationProperties.disableSystemOut() ? "handlers=software.xdev.mockserver.logging.StandardOutConsoleHandler" + NEW_LINE +
-                            "software.xdev.mockserver.logging.StandardOutConsoleHandler.level=ALL" + NEW_LINE +
-                            "software.xdev.mockserver.logging.StandardOutConsoleHandler.formatter=java.util.logging.SimpleFormatter" + NEW_LINE : "") +
-                        "java.util.logging.SimpleFormatter.format=%1$tF %1$tT %4$s %5$s %6$s%n" + NEW_LINE +
-                        "software.xdev.mockserver.level=" + ConfigurationProperties.javaLoggerLogLevel() + NEW_LINE +
-                        "io.netty.level=" + (Arrays.asList("TRACE", "FINEST").contains(ConfigurationProperties.javaLoggerLogLevel()) ? "FINE" : "WARNING");
-                    LogManager.getLogManager().readConfiguration(new ByteArrayInputStream(loggingConfiguration.getBytes(UTF_8)));
-                }
-            }
-        } catch (Throwable throwable) {
-            new MockServerLogger().logEvent(
-                new LogEntry()
-                    .setType(SERVER_CONFIGURATION)
-                    .setLogLevel(ERROR)
-                    .setMessageFormat("exception while configuring Java logging - " + throwable.getMessage())
-                    .setThrowable(throwable)
-            );
-        }
     }
 
-    private final Logger logger;
-    private HttpState httpStateHandler;
-
-    public MockServerLogger() {
-        this(MockServerLogger.class);
-    }
-
-    public MockServerLogger(final Class<?> loggerClass) {
-        this.logger = LoggerFactory.getLogger(loggerClass);
-        this.httpStateHandler = null;
-    }
-
-    public void logEvent(LogEntry logEntry) {
-        if (logEntry.getType() == RECEIVED_REQUEST
-            || logEntry.getType() == FORWARDED_REQUEST
-            || logEntry.getType() == EXPECTATION_RESPONSE
-            || logEntry.isAlwaysLog()
-            || isEnabled(logEntry.getLogLevel())) {
-            if (httpStateHandler != null) {
-                httpStateHandler.log(logEntry);
-            } else {
-                writeToSystemOut(logger, logEntry);
-            }
-        }
-    }
 
     public static void writeToSystemOut(Logger logger, LogEntry logEntry) {
-        if (!ConfigurationProperties.disableLogging()) {
-            if ((logEntry.isAlwaysLog() || isEnabled(logEntry.getLogLevel())) &&
-                isNotBlank(logEntry.getMessage())) {
-                switch (logEntry.getLogLevel()) {
-                    case ERROR:
-                        logger.error(portInformation(logEntry) + logEntry.getMessage(), logEntry.getThrowable());
-                        break;
-                    case WARN:
-                        logger.warn(portInformation(logEntry) + logEntry.getMessage(), logEntry.getThrowable());
-                        break;
-                    case INFO:
-                        logger.info(portInformation(logEntry) + logEntry.getMessage(), logEntry.getThrowable());
-                        break;
-                    case DEBUG:
-                        logger.debug(portInformation(logEntry) + logEntry.getMessage(), logEntry.getThrowable());
-                        break;
-                    case TRACE:
-                        logger.trace(portInformation(logEntry) + logEntry.getMessage(), logEntry.getThrowable());
-                        break;
-                }
-            }
-        }
+        // NOOP
     }
 
     private static String portInformation(LogEntry logEntry) {
@@ -129,11 +54,11 @@ public class MockServerLogger {
 
     @Deprecated
     public static boolean isEnabled(final Level level) {
-        return isEnabled(level, ConfigurationProperties.logLevel());
+        return false;
     }
 
     @Deprecated
     public static boolean isEnabled(final Level level, final Level configuredLevel) {
-        return configuredLevel != null && level.toInt() >= configuredLevel.toInt();
+        return false;
     }
 }
