@@ -61,7 +61,6 @@ import static software.xdev.mockserver.logging.MockServerLogger.writeToSystemOut
 import static software.xdev.mockserver.mock.HttpState.getPort;
 import static software.xdev.mockserver.model.HttpRequest.request;
 
-@SuppressWarnings("FieldMayBeFinal")
 public class MockServerEventLog extends MockServerEventLogNotifier {
     
     private static final Logger LOG = LoggerFactory.getLogger(MockServerEventLog.class);

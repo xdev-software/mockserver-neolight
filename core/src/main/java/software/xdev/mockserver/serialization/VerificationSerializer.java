@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import software.xdev.mockserver.serialization.model.VerificationDTO;
 import software.xdev.mockserver.verify.Verification;
 
-@SuppressWarnings("FieldMayBeFinal")
 public class VerificationSerializer implements Serializer<Verification> {
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();

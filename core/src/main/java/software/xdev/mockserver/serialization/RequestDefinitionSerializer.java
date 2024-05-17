@@ -34,7 +34,6 @@ import java.util.List;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 
-@SuppressWarnings("FieldMayBeFinal")
 public class RequestDefinitionSerializer implements Serializer<RequestDefinition> {
     
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);

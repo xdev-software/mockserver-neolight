@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import software.xdev.mockserver.model.PortBinding;
 
-@SuppressWarnings("FieldMayBeFinal")
 public class PortBindingSerializer implements Serializer<PortBinding> {
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();

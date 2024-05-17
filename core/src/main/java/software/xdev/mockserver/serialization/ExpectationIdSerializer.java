@@ -27,7 +27,6 @@ import java.util.List;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 
-@SuppressWarnings("FieldMayBeFinal")
 public class ExpectationIdSerializer implements Serializer<ExpectationId> {
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();

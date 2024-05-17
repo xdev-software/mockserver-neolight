@@ -56,7 +56,6 @@ import static software.xdev.mockserver.netty.unification.PortUnificationHandler.
 import static software.xdev.mockserver.netty.unification.PortUnificationHandler.isSslEnabledUpstream;
 
 @ChannelHandler.Sharable
-@SuppressWarnings("FieldMayBeFinal")
 public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest> {
     
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);

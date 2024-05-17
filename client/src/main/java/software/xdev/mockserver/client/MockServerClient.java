@@ -257,8 +257,7 @@ public class MockServerClient implements Stoppable {
         return port();
     }
 
-    @SuppressWarnings("DuplicatedCode")
-    private String calculatePath(String path) {
+        private String calculatePath(String path) {
         String cleanedPath = "/mockserver/" + path;
         if (isNotBlank(contextPath)) {
             cleanedPath =
@@ -751,7 +750,6 @@ public class MockServerClient implements Stoppable {
      * @param times             the number of times this request must be matched
      * @throws AssertionError if the request has not been found
      */
-    @SuppressWarnings("DuplicatedCode")
     public MockServerClient verify(RequestDefinition requestDefinition, VerificationTimes times) throws AssertionError {
         return verify(requestDefinition, times, null);
     }
@@ -778,7 +776,6 @@ public class MockServerClient implements Stoppable {
      * @param maximumNumberOfRequestToReturnInVerificationFailure the maximum number requests return in the error response when the verification fails
      * @throws AssertionError if the request has not been found
      */
-    @SuppressWarnings("DuplicatedCode")
     public MockServerClient verify(RequestDefinition requestDefinition, VerificationTimes times, Integer maximumNumberOfRequestToReturnInVerificationFailure) throws AssertionError {
         if (requestDefinition == null) {
             throw new IllegalArgumentException("verify(RequestDefinition, VerificationTimes) requires a non null RequestDefinition object");
@@ -827,7 +824,6 @@ public class MockServerClient implements Stoppable {
      * @param times         the number of times this request must be matched
      * @throws AssertionError if the request has not been found
      */
-    @SuppressWarnings("DuplicatedCode")
     public MockServerClient verify(String expectationId, VerificationTimes times) throws AssertionError {
         return verify(expectationId(expectationId), times);
     }
@@ -853,7 +849,6 @@ public class MockServerClient implements Stoppable {
      * @param times         the number of times this request must be matched
      * @throws AssertionError if the request has not been found
      */
-    @SuppressWarnings("DuplicatedCode")
     public MockServerClient verify(ExpectationId expectationId, VerificationTimes times) throws AssertionError {
         return verify(expectationId, times, null);
     }
@@ -880,7 +875,6 @@ public class MockServerClient implements Stoppable {
      * @param maximumNumberOfRequestToReturnInVerificationFailure the maximum number requests return in the error response when the verification fails
      * @throws AssertionError if the request has not been found
      */
-    @SuppressWarnings("DuplicatedCode")
     public MockServerClient verify(ExpectationId expectationId, VerificationTimes times, Integer maximumNumberOfRequestToReturnInVerificationFailure) throws AssertionError {
         if (expectationId == null) {
             throw new IllegalArgumentException("verify(ExpectationId, VerificationTimes) requires a non null ExpectationId object");

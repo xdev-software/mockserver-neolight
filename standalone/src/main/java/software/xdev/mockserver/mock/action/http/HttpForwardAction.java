@@ -29,7 +29,6 @@ import java.util.function.Function;
 
 import static software.xdev.mockserver.model.HttpResponse.notFoundResponse;
 
-@SuppressWarnings("FieldMayBeFinal")
 public abstract class HttpForwardAction {
     
     private static final Logger LOG = LoggerFactory.getLogger(HttpForwardAction.class);

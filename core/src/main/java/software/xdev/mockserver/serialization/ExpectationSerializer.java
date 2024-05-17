@@ -33,7 +33,6 @@ import java.util.function.BiFunction;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 
-@SuppressWarnings("FieldMayBeFinal")
 public class ExpectationSerializer implements Serializer<Expectation> {
     
     private static final Logger LOG = LoggerFactory.getLogger(ExpectationSerializer.class);

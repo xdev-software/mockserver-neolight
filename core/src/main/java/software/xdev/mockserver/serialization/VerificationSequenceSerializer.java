@@ -21,7 +21,6 @@ import software.xdev.mockserver.serialization.model.VerificationSequenceDTO;
 import software.xdev.mockserver.verify.VerificationSequence;
 
 
-@SuppressWarnings("FieldMayBeFinal")
 public class VerificationSequenceSerializer implements Serializer<VerificationSequence> {
     private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
     private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();

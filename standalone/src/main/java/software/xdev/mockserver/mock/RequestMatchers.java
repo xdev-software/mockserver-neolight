@@ -42,7 +42,6 @@ import static software.xdev.mockserver.mock.SortableExpectationId.EXPECTATION_SO
 import static software.xdev.mockserver.mock.SortableExpectationId.NULL;
 
 
-@SuppressWarnings("FieldMayBeFinal")
 public class RequestMatchers extends MockServerMatcherNotifier {
     
     private static final Logger LOG = LoggerFactory.getLogger(RequestMatchers.class);
