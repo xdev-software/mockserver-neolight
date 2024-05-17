@@ -15,12 +15,13 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.Cookies;
 import software.xdev.mockserver.model.Headers;
 import software.xdev.mockserver.model.HttpResponse;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 
-public class HttpResponseDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<HttpResponse> {
+public class HttpResponseDTO implements DTO<HttpResponse> {
     private Integer statusCode;
     private String reasonPhrase;
     private BodyWithContentTypeDTO body;
@@ -116,5 +117,39 @@ public class HttpResponseDTO extends ObjectWithReflectiveEqualsHashCodeToString 
     public HttpResponseDTO setConnectionOptions(ConnectionOptionsDTO connectionOptions) {
         this.connectionOptions = connectionOptions;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HttpResponseDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getStatusCode(), that.getStatusCode())
+            && Objects.equals(getReasonPhrase(), that.getReasonPhrase()) && Objects.equals(
+            getBody(),
+            that.getBody()) && Objects.equals(getCookies(), that.getCookies()) && Objects.equals(
+            getHeaders(),
+            that.getHeaders()) && Objects.equals(getDelay(), that.getDelay()) && Objects.equals(
+            getConnectionOptions(),
+            that.getConnectionOptions());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            getStatusCode(),
+            getReasonPhrase(),
+            getBody(),
+            getCookies(),
+            getHeaders(),
+            getDelay(),
+            getConnectionOptions());
     }
 }

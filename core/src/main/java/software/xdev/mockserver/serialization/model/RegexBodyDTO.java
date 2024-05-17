@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.Body;
 import software.xdev.mockserver.model.RegexBody;
 
@@ -38,5 +40,29 @@ public class RegexBodyDTO extends BodyDTO {
 
     public RegexBody buildObject() {
         return (RegexBody) new RegexBody(getRegex()).withOptional(getOptional());
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final RegexBodyDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(getRegex(), that.getRegex());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getRegex());
     }
 }

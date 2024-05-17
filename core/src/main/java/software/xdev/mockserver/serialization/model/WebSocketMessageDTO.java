@@ -15,12 +15,11 @@
  */
 package software.xdev.mockserver.serialization.model;
 
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Objects;
 
-public class WebSocketMessageDTO extends ObjectWithReflectiveEqualsHashCodeToString {
+public class WebSocketMessageDTO {
 
     private String type;
-
     private String value;
 
     public String getType() {
@@ -39,5 +38,29 @@ public class WebSocketMessageDTO extends ObjectWithReflectiveEqualsHashCodeToStr
     public WebSocketMessageDTO setValue(String value) {
         this.value = value;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final WebSocketMessageDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(getType(), that.getType()) && Objects.equals(getValue(), that.getValue());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getType(), getValue());
     }
 }

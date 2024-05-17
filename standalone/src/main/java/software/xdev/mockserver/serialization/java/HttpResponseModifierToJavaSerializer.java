@@ -18,7 +18,7 @@ package software.xdev.mockserver.serialization.java;
 import software.xdev.mockserver.model.Cookies;
 import software.xdev.mockserver.model.Headers;
 import software.xdev.mockserver.model.HttpResponseModifier;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import software.xdev.mockserver.model.ObjectWithJsonToString;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,7 +94,11 @@ public class HttpResponseModifierToJavaSerializer implements ToJavaSerializer<Ht
         }
     }
 
-    private <T extends ObjectWithReflectiveEqualsHashCodeToString> void appendObject(int numberOfSpacesToIndent, StringBuffer output, MultiValueToJavaSerializer<T> toJavaSerializer, List<T> objects) {
+    private <T extends ObjectWithJsonToString> void appendObject(
+        int numberOfSpacesToIndent,
+        StringBuffer output,
+        MultiValueToJavaSerializer<T> toJavaSerializer,
+        List<T> objects) {
         output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
     }
 

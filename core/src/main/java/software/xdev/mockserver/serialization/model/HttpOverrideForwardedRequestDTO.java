@@ -15,11 +15,13 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 import software.xdev.mockserver.model.*;
 
 @SuppressWarnings("UnusedReturnValue")
-public class HttpOverrideForwardedRequestDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<HttpOverrideForwardedRequest> {
+public class HttpOverrideForwardedRequestDTO implements DTO<HttpOverrideForwardedRequest> {
 
     @JsonAlias("httpRequest")
     private HttpRequestDTO requestOverride;
@@ -122,6 +124,35 @@ public class HttpOverrideForwardedRequestDTO extends ObjectWithReflectiveEqualsH
     public HttpOverrideForwardedRequestDTO setDelay(DelayDTO delay) {
         this.delay = delay;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HttpOverrideForwardedRequestDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getRequestOverride(), that.getRequestOverride())
+            && Objects.equals(getRequestModifier(), that.getRequestModifier())
+            && Objects.equals(getResponseOverride(), that.getResponseOverride())
+            && Objects.equals(getResponseModifier(), that.getResponseModifier())
+            && Objects.equals(getDelay(), that.getDelay());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            getRequestOverride(),
+            getRequestModifier(),
+            getResponseOverride(),
+            getResponseModifier(),
+            getDelay());
     }
 }
 

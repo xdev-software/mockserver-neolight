@@ -15,9 +15,10 @@
  */
 package software.xdev.mockserver.matchers;
 
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Objects;
 
-public abstract class NotMatcher<MatchedType> extends ObjectWithReflectiveEqualsHashCodeToString implements Matcher<MatchedType> {
+
+public abstract class NotMatcher<MatchedType> implements Matcher<MatchedType> {
 
     boolean not = false;
 
@@ -25,5 +26,24 @@ public abstract class NotMatcher<MatchedType> extends ObjectWithReflectiveEquals
         matcher.not = true;
         return matcher;
     }
-
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final NotMatcher<?> that))
+        {
+            return false;
+        }
+		return not == that.not;
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(not);
+    }
 }

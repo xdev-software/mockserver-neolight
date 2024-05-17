@@ -15,9 +15,9 @@
  */
 package software.xdev.mockserver.serialization.model;
 
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Objects;
 
-public class WebSocketClientIdDTO extends ObjectWithReflectiveEqualsHashCodeToString {
+public class WebSocketClientIdDTO {
 
     private String clientId;
 
@@ -28,5 +28,29 @@ public class WebSocketClientIdDTO extends ObjectWithReflectiveEqualsHashCodeToSt
     public WebSocketClientIdDTO setClientId(String clientId) {
         this.clientId = clientId;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final WebSocketClientIdDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(getClientId(), that.getClientId());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getClientId());
     }
 }

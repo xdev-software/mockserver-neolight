@@ -63,7 +63,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
     
     public static final AttributeKey<Boolean> PROXYING = AttributeKey.valueOf("PROXYING");
     public static final AttributeKey<Set<String>> LOCAL_HOST_HEADERS = AttributeKey.valueOf("LOCAL_HOST_HEADERS");
-    private static final Base64Converter BASE_64_CONVERTER = new Base64Converter();
     private final Configuration configuration;
     private LifeCycle server;
     private HttpState httpState;
@@ -138,8 +137,13 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 
                     String username = configuration.proxyAuthenticationUsername();
                     String password = configuration.proxyAuthenticationPassword();
-                    if (isNotBlank(username) && isNotBlank(password) &&
-                        !request.containsHeader(PROXY_AUTHORIZATION.toString(), "Basic " + BASE_64_CONVERTER.bytesToBase64String((username + ':' + password).getBytes(StandardCharsets.UTF_8), StandardCharsets.US_ASCII))) {
+                    if (isNotBlank(username)
+                        && isNotBlank(password)
+                        && !request.containsHeader(
+                            PROXY_AUTHORIZATION.toString(),
+                            "Basic " + Base64Converter.bytesToBase64String(
+                                (username + ':' + password).getBytes(StandardCharsets.UTF_8),
+                                StandardCharsets.US_ASCII))) {
                         HttpResponse response = response()
                             .withStatusCode(PROXY_AUTHENTICATION_REQUIRED.code())
                             .withHeader(PROXY_AUTHENTICATE.toString(), "Basic realm=\"" + StringEscapeUtils.escapeJava(configuration.proxyAuthenticationRealm()) + "\", charset=\"UTF-8\"");

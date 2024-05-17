@@ -91,9 +91,6 @@ public class PathModifier extends ObjectWithJsonToString {
         if (hashCode() != o.hashCode()) {
             return false;
         }
-        if (!super.equals(o)) {
-            return false;
-        }
         PathModifier that = (PathModifier) o;
         return Objects.equals(regex, that.regex) &&
             Objects.equals(substitution, that.substitution);
@@ -102,7 +99,7 @@ public class PathModifier extends ObjectWithJsonToString {
     @Override
     public int hashCode() {
         if (hashCode == 0) {
-            hashCode = Objects.hash(super.hashCode(), regex, substitution);
+            hashCode = Objects.hash(regex, substitution);
         }
         return hashCode;
     }

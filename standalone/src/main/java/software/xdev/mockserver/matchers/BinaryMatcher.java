@@ -18,6 +18,8 @@ package software.xdev.mockserver.matchers;
 import software.xdev.mockserver.logging.BinaryArrayFormatter;
 
 import java.util.Arrays;
+import java.util.Objects;
+
 
 public class BinaryMatcher extends BodyMatcher<byte[]> {
     private final byte[] matcher;
@@ -42,5 +44,29 @@ public class BinaryMatcher extends BodyMatcher<byte[]> {
 
     public boolean isBlank() {
         return matcher == null || matcher.length == 0;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final BinaryMatcher that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.deepEquals(matcher, that.matcher);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), Arrays.hashCode(matcher));
     }
 }

@@ -18,21 +18,27 @@ package software.xdev.mockserver.serialization.model;
 import software.xdev.mockserver.model.KeyToMultiValue;
 import software.xdev.mockserver.model.KeysToMultiValues;
 import software.xdev.mockserver.model.KeysToMultiValuesModifier;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 
 import java.util.List;
+import java.util.Objects;
+
 
 @SuppressWarnings("unchecked")
-public abstract class KeysToMultiValuesModifierDTO<T extends KeysToMultiValues<I, T>, K extends KeysToMultiValuesModifier<T, K, I>, I extends KeyToMultiValue, D extends DTO<K>> extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<K> {
+public abstract class KeysToMultiValuesModifierDTO<
+    T extends KeysToMultiValues<I, T>,
+    K extends KeysToMultiValuesModifier<T, K, I>,
+    I extends KeyToMultiValue,
+    D extends DTO<K>>
+    implements DTO<K> {
 
     private T add;
     private T replace;
     private List<String> remove;
 
-    public KeysToMultiValuesModifierDTO() {
+    protected KeysToMultiValuesModifierDTO() {
     }
-
-    public KeysToMultiValuesModifierDTO(K keysToMultiValuesModifier) {
+    
+    protected KeysToMultiValuesModifierDTO(K keysToMultiValuesModifier) {
         if (keysToMultiValuesModifier != null) {
             add = keysToMultiValuesModifier.getAdd();
             replace = keysToMultiValuesModifier.getReplace();
@@ -74,5 +80,27 @@ public abstract class KeysToMultiValuesModifierDTO<T extends KeysToMultiValues<I
     public D setRemove(List<String> remove) {
         this.remove = remove;
         return (D) this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final KeysToMultiValuesModifierDTO<?, ?, ?, ?> that))
+        {
+            return false;
+        }
+		return Objects.equals(getAdd(), that.getAdd())
+            && Objects.equals(getReplace(), that.getReplace())
+            && Objects.equals(getRemove(), that.getRemove());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getAdd(), getReplace(), getRemove());
     }
 }

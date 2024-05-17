@@ -17,13 +17,12 @@ package software.xdev.mockserver.serialization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import software.xdev.mockserver.matchers.TimeToLive;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class TimeToLiveDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<TimeToLive> {
+public class TimeToLiveDTO implements DTO<TimeToLive> {
 
-    private static final String[] EXCLUDED_FIELDS = {"endDate"};
     private TimeUnit timeUnit;
     private Long timeToLive;
     private Long endDate;
@@ -69,8 +68,24 @@ public class TimeToLiveDTO extends ObjectWithReflectiveEqualsHashCodeToString im
     }
 
     @Override
-    @JsonIgnore
-    protected String[] fieldsExcludedFromEqualsAndHashCode() {
-        return EXCLUDED_FIELDS;
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final TimeToLiveDTO that))
+        {
+            return false;
+        }
+		return isUnlimited() == that.isUnlimited() && getTimeUnit() == that.getTimeUnit() && Objects.equals(
+            getTimeToLive(),
+            that.getTimeToLive());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getTimeUnit(), getTimeToLive(), isUnlimited());
     }
 }

@@ -15,11 +15,12 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpForward;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 
-public class HttpForwardDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<HttpForward> {
+public class HttpForwardDTO implements DTO<HttpForward> {
     private String host;
     private Integer port;
     private HttpForward.Scheme scheme;
@@ -84,6 +85,29 @@ public class HttpForwardDTO extends ObjectWithReflectiveEqualsHashCodeToString i
 
     public void setDelay(DelayDTO delay) {
         this.delay = delay;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HttpForwardDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getHost(), that.getHost())
+            && Objects.equals(getPort(), that.getPort())
+            && getScheme() == that.getScheme()
+            && Objects.equals(getDelay(), that.getDelay());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getHost(), getPort(), getScheme(), getDelay());
     }
 }
 

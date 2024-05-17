@@ -15,10 +15,11 @@
  */
 package software.xdev.mockserver.serialization.model;
 
-import software.xdev.mockserver.matchers.Times;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Objects;
 
-public class TimesDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<Times> {
+import software.xdev.mockserver.matchers.Times;
+
+public class TimesDTO implements DTO<Times> {
 
     private int remainingTimes;
     private boolean unlimited;
@@ -45,5 +46,29 @@ public class TimesDTO extends ObjectWithReflectiveEqualsHashCodeToString impleme
 
     public boolean isUnlimited() {
         return unlimited;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final TimesDTO timesDTO))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return getRemainingTimes() == timesDTO.getRemainingTimes() && isUnlimited() == timesDTO.isUnlimited();
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getRemainingTimes(), isUnlimited());
     }
 }

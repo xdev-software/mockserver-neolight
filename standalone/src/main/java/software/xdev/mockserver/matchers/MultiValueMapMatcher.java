@@ -22,6 +22,9 @@ import software.xdev.mockserver.model.KeysToMultiValues;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
+import java.util.Objects;
+
+
 @SuppressWarnings("rawtypes")
 public class MultiValueMapMatcher extends NotMatcher<KeysToMultiValues<? extends KeyToMultiValue, ? extends KeysToMultiValues>> {
     private final NottableStringMultiMap matcher;
@@ -66,5 +69,39 @@ public class MultiValueMapMatcher extends NotMatcher<KeysToMultiValues<? extends
 
     public boolean isBlank() {
         return matcher == null || matcher.isEmpty();
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final MultiValueMapMatcher that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return controlPlaneMatcher == that.controlPlaneMatcher
+            && Objects.equals(matcher, that.matcher)
+            && Objects.equals(keysToMultiValues, that.keysToMultiValues)
+            && Objects.equals(allKeysNotted, that.allKeysNotted)
+            && Objects.equals(allKeysOptional, that.allKeysOptional);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            super.hashCode(),
+            matcher,
+            keysToMultiValues,
+            controlPlaneMatcher,
+            allKeysNotted,
+            allKeysOptional);
     }
 }

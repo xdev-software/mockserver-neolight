@@ -15,11 +15,12 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.HttpRequestModifier;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 import software.xdev.mockserver.model.PathModifier;
 
-public class HttpRequestModifierDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<HttpRequestModifier> {
+public class HttpRequestModifierDTO implements DTO<HttpRequestModifier> {
 
     private PathModifier path;
     private QueryParametersModifierDTO queryStringParameters;
@@ -80,5 +81,28 @@ public class HttpRequestModifierDTO extends ObjectWithReflectiveEqualsHashCodeTo
     public HttpRequestModifierDTO setCookies(CookiesModifierDTO cookies) {
         this.cookies = cookies;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HttpRequestModifierDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getPath(), that.getPath())
+            && Objects.equals(getQueryStringParameters(), that.getQueryStringParameters())
+            && Objects.equals(getHeaders(), that.getHeaders())
+            && Objects.equals(getCookies(), that.getCookies());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getPath(), getQueryStringParameters(), getHeaders(), getCookies());
     }
 }

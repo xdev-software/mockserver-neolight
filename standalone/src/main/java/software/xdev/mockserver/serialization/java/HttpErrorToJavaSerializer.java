@@ -23,21 +23,27 @@ import static software.xdev.mockserver.serialization.java.ExpectationToJavaSeria
 
 public class HttpErrorToJavaSerializer implements ToJavaSerializer<HttpError> {
 
-    private final Base64Converter base64Converter = new Base64Converter();
-
     @Override
     public String serialize(int numberOfSpacesToIndent, HttpError httpError) {
         StringBuffer output = new StringBuffer();
         if (httpError != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("error()");
             if (httpError.getDelay() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDelay(").append(new DelayToJavaSerializer().serialize(0, httpError.getDelay())).append(")");
+                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
+                    .append(".withDelay(")
+                    .append(new DelayToJavaSerializer().serialize(0, httpError.getDelay()))
+                    .append(")");
             }
             if (httpError.getDropConnection() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDropConnection(").append(httpError.getDropConnection()).append(")");
+                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
+                    .append(".withDropConnection(").append(httpError.getDropConnection())
+                    .append(")");
             }
             if (httpError.getResponseBytes() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withResponseBytes(new Base64Converter().base64StringToBytes(\"").append(base64Converter.bytesToBase64String(httpError.getResponseBytes())).append("\"))");
+                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
+                    .append(".withResponseBytes(Base64Converter().base64StringToBytes(\"")
+                    .append(Base64Converter.bytesToBase64String(httpError.getResponseBytes()))
+                    .append("\"))");
             }
         }
         return output.toString();

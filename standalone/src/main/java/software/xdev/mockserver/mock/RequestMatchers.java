@@ -336,4 +336,40 @@ public class RequestMatchers extends MockServerMatcherNotifier {
     private Stream<HttpRequestMatcher> getHttpRequestMatchersCopy() {
         return httpRequestMatchers.stream();
     }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final RequestMatchers that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(httpRequestMatchers, that.httpRequestMatchers)
+            && Objects.equals(expectationRequestDefinitions, that.expectationRequestDefinitions)
+            && Objects.equals(configuration, that.configuration)
+            && Objects.equals(scheduler, that.scheduler)
+            && Objects.equals(webSocketClientRegistry, that.webSocketClientRegistry)
+            && Objects.equals(matcherBuilder, that.matcherBuilder);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            super.hashCode(),
+            httpRequestMatchers,
+            expectationRequestDefinitions,
+            configuration,
+            scheduler,
+            webSocketClientRegistry,
+            matcherBuilder);
+    }
 }

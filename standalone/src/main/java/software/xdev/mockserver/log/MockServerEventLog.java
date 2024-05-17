@@ -91,7 +91,6 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
             .withHttpRequest(logEntry.getHttpRequest())
             .withHttpResponse(logEntry.getHttpResponse())
             .withTimestamp(logEntry.getTimestamp());
-    private static final String[] EXCLUDED_FIELDS = {"id", "disruptor"};
     private final Configuration configuration;
     private CircularConcurrentLinkedDeque<LogEntry> eventLog;
     private MatcherBuilder matcherBuilder;
@@ -624,8 +623,37 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         resultConsumer.accept(s2 + (isNotBlank(ex.getMessage()) ? " " + ex.getMessage() : ""));
     }
 
-    protected String[] fieldsExcludedFromEqualsAndHashCode() {
-        return EXCLUDED_FIELDS;
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final MockServerEventLog that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return asynchronousEventProcessing == that.asynchronousEventProcessing
+            && Objects.equals(configuration, that.configuration)
+            && Objects.equals(eventLog, that.eventLog)
+            && Objects.equals(matcherBuilder, that.matcherBuilder)
+            && Objects.equals(requestDefinitionSerializer, that.requestDefinitionSerializer);
     }
-
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            super.hashCode(),
+            configuration,
+            eventLog,
+            matcherBuilder,
+            requestDefinitionSerializer,
+            asynchronousEventProcessing);
+    }
 }

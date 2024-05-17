@@ -15,9 +15,9 @@
  */
 package software.xdev.mockserver.serialization.model;
 
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Objects;
 
-public class WebSocketErrorDTO extends ObjectWithReflectiveEqualsHashCodeToString {
+public class WebSocketErrorDTO {
 
     private String message;
     private String webSocketCorrelationId;
@@ -38,5 +38,31 @@ public class WebSocketErrorDTO extends ObjectWithReflectiveEqualsHashCodeToStrin
     public WebSocketErrorDTO setWebSocketCorrelationId(String webSocketCorrelationId) {
         this.webSocketCorrelationId = webSocketCorrelationId;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final WebSocketErrorDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(getMessage(), that.getMessage()) && Objects.equals(
+            getWebSocketCorrelationId(),
+            that.getWebSocketCorrelationId());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getMessage(), getWebSocketCorrelationId());
     }
 }

@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.ObjectWithJsonToString;
 import software.xdev.mockserver.verify.VerificationTimes;
 
@@ -41,5 +43,25 @@ public class VerificationTimesDTO extends ObjectWithJsonToString implements DTO<
 
     public int getAtMost() {
         return atMost;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final VerificationTimesDTO that))
+        {
+            return false;
+        }
+		return getAtLeast() == that.getAtLeast() && getAtMost() == that.getAtMost();
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getAtLeast(), getAtMost());
     }
 }

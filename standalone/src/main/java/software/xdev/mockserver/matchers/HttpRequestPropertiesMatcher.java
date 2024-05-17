@@ -44,7 +44,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
     
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestPropertiesMatcher.class);
     
-    private static final String[] excludedFields = {"methodMatcher", "pathMatcher", "pathParameterMatcher", "queryStringParameterMatcher", "bodyMatcher", "headerMatcher", "cookieMatcher", "keepAliveMatcher", "bodyDTOMatcher", "sslMatcher", "controlPlaneMatcher", "responseInProgress", "objectMapper"};
     private static final String COMMA = ",";
     private static final String REQUEST_NOT_OPERATOR_IS_ENABLED = COMMA + NEW_LINE + "request 'not' operator is enabled";
     private static final String EXPECTATION_REQUEST_NOT_OPERATOR_IS_ENABLED = COMMA + NEW_LINE + "expectation's request 'not' operator is enabled";
@@ -430,12 +429,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
         } catch (Exception e) {
             return super.toString();
         }
-    }
-
-    @Override
-    @JsonIgnore
-    public String[] fieldsExcludedFromEqualsAndHashCode() {
-        return excludedFields;
     }
 
     @Override

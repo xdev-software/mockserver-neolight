@@ -15,10 +15,12 @@
  */
 package software.xdev.mockserver.serialization.model;
 
-import software.xdev.mockserver.model.HttpError;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Arrays;
+import java.util.Objects;
 
-public class HttpErrorDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<HttpError> {
+import software.xdev.mockserver.model.HttpError;
+
+public class HttpErrorDTO implements DTO<HttpError> {
     private DelayDTO delay;
     private Boolean dropConnection;
     private byte[] responseBytes;
@@ -68,6 +70,28 @@ public class HttpErrorDTO extends ObjectWithReflectiveEqualsHashCodeToString imp
     public HttpErrorDTO setResponseBytes(byte[] scheme) {
         this.responseBytes = scheme;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HttpErrorDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getDelay(), that.getDelay()) && Objects.equals(
+            getDropConnection(),
+            that.getDropConnection()) && Objects.deepEquals(getResponseBytes(), that.getResponseBytes());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getDelay(), getDropConnection(), Arrays.hashCode(getResponseBytes()));
     }
 }
 

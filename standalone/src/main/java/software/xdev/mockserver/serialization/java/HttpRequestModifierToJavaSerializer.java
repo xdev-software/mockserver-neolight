@@ -112,7 +112,11 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
         }
     }
 
-    private <T extends ObjectWithReflectiveEqualsHashCodeToString> void appendObject(int numberOfSpacesToIndent, StringBuffer output, MultiValueToJavaSerializer<T> toJavaSerializer, List<T> objects) {
+    private <T extends ObjectWithJsonToString> void appendObject(
+        int numberOfSpacesToIndent,
+        StringBuffer output,
+        MultiValueToJavaSerializer<T> toJavaSerializer,
+        List<T> objects) {
         output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
     }
 

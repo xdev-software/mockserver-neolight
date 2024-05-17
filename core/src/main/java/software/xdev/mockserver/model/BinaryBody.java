@@ -18,14 +18,12 @@ package software.xdev.mockserver.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import software.xdev.mockserver.serialization.Base64Converter;
 
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Objects;
 
 public class BinaryBody extends BodyWithContentType<byte[]> {
     private int hashCode;
     private final byte[] bytes;
-    private final Base64Converter base64Converter = new Base64Converter();
 
     public BinaryBody(byte[] bytes) {
         this(bytes, null);
@@ -55,7 +53,7 @@ public class BinaryBody extends BodyWithContentType<byte[]> {
 
     @Override
     public String toString() {
-        return bytes != null ? base64Converter.bytesToBase64String(bytes) : null;
+        return bytes != null ? Base64Converter.bytesToBase64String(bytes) : null;
     }
 
     @Override
@@ -73,14 +71,13 @@ public class BinaryBody extends BodyWithContentType<byte[]> {
             return false;
         }
         BinaryBody that = (BinaryBody) o;
-        return Arrays.equals(bytes, that.bytes) &&
-            Objects.equals(base64Converter, that.base64Converter);
+        return Arrays.equals(bytes, that.bytes);
     }
 
     @Override
     public int hashCode() {
         if (hashCode == 0) {
-            int result = Objects.hash(super.hashCode(), base64Converter);
+            int result = Objects.hash(super.hashCode());
             hashCode = 31 * result + Arrays.hashCode(bytes);
         }
         return hashCode;

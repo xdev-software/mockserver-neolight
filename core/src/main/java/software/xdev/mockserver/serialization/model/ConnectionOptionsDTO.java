@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.ObjectWithJsonToString;
@@ -119,5 +121,38 @@ public class ConnectionOptionsDTO extends ObjectWithJsonToString implements DTO<
     public ConnectionOptionsDTO setCloseSocketDelay(DelayDTO closeSocketDelay) {
         this.closeSocketDelay = closeSocketDelay;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final ConnectionOptionsDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getSuppressContentLengthHeader(), that.getSuppressContentLengthHeader())
+            && Objects.equals(getContentLengthHeaderOverride(), that.getContentLengthHeaderOverride())
+            && Objects.equals(getSuppressConnectionHeader(), that.getSuppressConnectionHeader())
+            && Objects.equals(getChunkSize(), that.getChunkSize()) && Objects.equals(
+            getKeepAliveOverride(),
+            that.getKeepAliveOverride()) && Objects.equals(getCloseSocket(), that.getCloseSocket())
+            && Objects.equals(getCloseSocketDelay(), that.getCloseSocketDelay());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            getSuppressContentLengthHeader(),
+            getContentLengthHeaderOverride(),
+            getSuppressConnectionHeader(),
+            getChunkSize(),
+            getKeepAliveOverride(),
+            getCloseSocket(),
+            getCloseSocketDelay());
     }
 }

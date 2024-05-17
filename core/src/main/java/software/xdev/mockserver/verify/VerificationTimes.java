@@ -15,9 +15,9 @@
  */
 package software.xdev.mockserver.verify;
 
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Objects;
 
-public class VerificationTimes extends ObjectWithReflectiveEqualsHashCodeToString {
+public class VerificationTimes {
 
     private final int atLeast;
     private final int atMost;
@@ -94,5 +94,25 @@ public class VerificationTimes extends ObjectWithReflectiveEqualsHashCodeToStrin
             string += "between " + atLeast + " and " + atMost + " times";
         }
         return string;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final VerificationTimes that))
+        {
+            return false;
+        }
+		return getAtLeast() == that.getAtLeast() && getAtMost() == that.getAtMost();
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getAtLeast(), getAtMost());
     }
 }

@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import software.xdev.mockserver.model.*;
 
@@ -56,5 +58,28 @@ public abstract class BodyWithContentTypeDTO extends BodyDTO {
     }
 
     public abstract BodyWithContentType<?> buildObject();
-
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final BodyWithContentTypeDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(getContentType(), that.getContentType());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getContentType());
+    }
 }

@@ -41,5 +41,28 @@ public class ParameterBodyDTO extends BodyDTO {
     public ParameterBody buildObject() {
         return (ParameterBody) new ParameterBody(parameters).withOptional(getOptional());
     }
-
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final ParameterBodyDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(getParameters(), that.getParameters());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getParameters());
+    }
 }

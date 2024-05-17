@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.matchers;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.collections.NottableStringHashMap;
 import software.xdev.mockserver.model.KeyAndValue;
 import software.xdev.mockserver.model.KeysAndValues;
@@ -63,5 +65,38 @@ public class HashMapMatcher extends NotMatcher<KeysAndValues<? extends KeyAndVal
 
     public boolean isBlank() {
         return matcher == null || matcher.isEmpty();
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HashMapMatcher that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return controlPlaneMatcher == that.controlPlaneMatcher && Objects.equals(matcher, that.matcher)
+            && Objects.equals(keysAndValues, that.keysAndValues) && Objects.equals(
+            allKeysNotted,
+            that.allKeysNotted) && Objects.equals(allKeysOptional, that.allKeysOptional);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            super.hashCode(),
+            matcher,
+            keysAndValues,
+            controlPlaneMatcher,
+            allKeysNotted,
+            allKeysOptional);
     }
 }

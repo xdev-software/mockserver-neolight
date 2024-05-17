@@ -16,7 +16,6 @@
 package software.xdev.mockserver.mock.listeners;
 
 import software.xdev.mockserver.mock.RequestMatchers;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 import software.xdev.mockserver.scheduler.Scheduler;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class MockServerMatcherNotifier extends ObjectWithReflectiveEqualsHashCodeToString {
+public class MockServerMatcherNotifier {
 
     private boolean listenerAdded = false;
     private final List<MockServerMatcherListener> listeners = Collections.synchronizedList(new ArrayList<>());
@@ -50,7 +49,29 @@ public class MockServerMatcherNotifier extends ObjectWithReflectiveEqualsHashCod
     public void unregisterListener(MockServerMatcherListener listener) {
         listeners.remove(listener);
     }
-
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final MockServerMatcherNotifier that))
+        {
+            return false;
+        }
+		return listenerAdded == that.listenerAdded
+            && Objects.equals(listeners, that.listeners)
+            && Objects.equals(scheduler, that.scheduler);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(listenerAdded, listeners, scheduler);
+    }
+    
     public static class Cause {
         public Cause(String source, Type type) {
             this.source = source;

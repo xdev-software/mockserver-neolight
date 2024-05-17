@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.*;
 
 public class LogEventRequestAndResponseDTO extends ObjectWithJsonToString implements DTO<LogEventRequestAndResponse> {
@@ -78,5 +80,27 @@ public class LogEventRequestAndResponseDTO extends ObjectWithJsonToString implem
 
     public void setHttpResponse(HttpResponseDTO httpResponse) {
         this.httpResponse = httpResponse;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final LogEventRequestAndResponseDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getTimestamp(), that.getTimestamp())
+            && Objects.equals(getHttpRequest(), that.getHttpRequest())
+            && Objects.equals(getHttpResponse(), that.getHttpResponse());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getTimestamp(), getHttpRequest(), getHttpResponse());
     }
 }

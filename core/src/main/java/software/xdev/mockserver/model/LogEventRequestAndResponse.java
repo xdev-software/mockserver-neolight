@@ -15,6 +15,9 @@
  */
 package software.xdev.mockserver.model;
 
+import java.util.Objects;
+
+
 public class LogEventRequestAndResponse extends ObjectWithJsonToString {
 
     private String timestamp;
@@ -46,5 +49,27 @@ public class LogEventRequestAndResponse extends ObjectWithJsonToString {
     public LogEventRequestAndResponse withHttpResponse(HttpResponse httpResponse) {
         this.httpResponse = httpResponse;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final LogEventRequestAndResponse that))
+        {
+            return false;
+        }
+		return Objects.equals(getTimestamp(), that.getTimestamp()) && Objects.equals(
+            getHttpRequest(),
+            that.getHttpRequest()) && Objects.equals(getHttpResponse(), that.getHttpResponse());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getTimestamp(), getHttpRequest(), getHttpResponse());
     }
 }

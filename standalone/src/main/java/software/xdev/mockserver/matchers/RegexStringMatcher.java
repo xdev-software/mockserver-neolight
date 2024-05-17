@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import software.xdev.mockserver.model.NottableString;
 
+import java.util.Objects;
 import java.util.regex.PatternSyntaxException;
 
 import static software.xdev.mockserver.model.NottableString.string;
@@ -121,5 +122,29 @@ public class RegexStringMatcher extends BodyMatcher<NottableString> {
 
     public boolean isBlank() {
         return matcher == null || StringUtils.isBlank(matcher.getValue());
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final RegexStringMatcher that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return controlPlaneMatcher == that.controlPlaneMatcher && Objects.equals(matcher, that.matcher);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), matcher, controlPlaneMatcher);
     }
 }

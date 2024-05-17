@@ -17,7 +17,7 @@ package software.xdev.mockserver.model;
 
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 
-public abstract class ObjectWithJsonToString extends ObjectWithReflectiveEqualsHashCodeToString {
+public abstract class ObjectWithJsonToString {
 
     private static final String ESCAPED_QUOTE = "\"";
 

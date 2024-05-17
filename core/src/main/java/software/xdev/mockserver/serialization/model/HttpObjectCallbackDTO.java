@@ -15,11 +15,12 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpObjectCallback;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 
-public class HttpObjectCallbackDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<HttpObjectCallback> {
+public class HttpObjectCallbackDTO implements DTO<HttpObjectCallback> {
 
     private String clientId;
     private Boolean responseCallback;
@@ -73,6 +74,29 @@ public class HttpObjectCallbackDTO extends ObjectWithReflectiveEqualsHashCodeToS
 
     public void setDelay(DelayDTO delay) {
         this.delay = delay;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HttpObjectCallbackDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getClientId(), that.getClientId())
+            && Objects.equals(getResponseCallback(), that.getResponseCallback()) && Objects.equals(
+            getDelay(),
+            that.getDelay());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getClientId(), getResponseCallback(), getDelay());
     }
 }
 

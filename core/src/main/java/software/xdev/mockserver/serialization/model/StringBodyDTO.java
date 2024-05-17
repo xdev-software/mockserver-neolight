@@ -15,6 +15,9 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import software.xdev.mockserver.model.StringBody;
 
 public class StringBodyDTO extends BodyWithContentTypeDTO {
@@ -48,5 +51,30 @@ public class StringBodyDTO extends BodyWithContentTypeDTO {
 
     public StringBody buildObject() {
         return (StringBody) new StringBody(getString(), getRawBytes(), isSubString(), getMediaType()).withOptional(getOptional());
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final StringBodyDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return isSubString() == that.isSubString() && Objects.equals(getString(), that.getString())
+            && Objects.deepEquals(getRawBytes(), that.getRawBytes());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getString(), isSubString(), Arrays.hashCode(getRawBytes()));
     }
 }

@@ -27,8 +27,6 @@ import static software.xdev.mockserver.serialization.java.ExpectationToJavaSeria
 
 public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest> {
 
-    private final Base64Converter base64Converter = new Base64Converter();
-
     public String serialize(List<HttpRequest> httpRequests) {
         StringBuilder output = new StringBuilder();
         for (HttpRequest httpRequest : httpRequests) {
@@ -72,16 +70,14 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
                 output.append(")");
             }
             if (request.getBody() != null) {
-                if (request.getBody() instanceof RegexBody) {
+                if (request.getBody() instanceof RegexBody regexBody) {
                     appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
                     output.append(".withBody(");
-                    RegexBody regexBody = (RegexBody) request.getBody();
                     output.append("new RegexBody(\"").append(StringEscapeUtils.escapeJava(regexBody.getValue())).append("\")");
                     output.append(")");
-                } else if (request.getBody() instanceof StringBody) {
+                } else if (request.getBody() instanceof StringBody stringBody) {
                     appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
                     output.append(".withBody(");
-                    StringBody stringBody = (StringBody) request.getBody();
                     output.append("new StringBody(\"").append(StringEscapeUtils.escapeJava(stringBody.getValue())).append("\")");
                     output.append(")");
                 } else if (request.getBody() instanceof ParameterBody) {
@@ -95,10 +91,11 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
                     output.append(")");
                     appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
                     output.append(")");
-                } else if (request.getBody() instanceof BinaryBody) {
+                } else if (request.getBody() instanceof BinaryBody body) {
                     appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    BinaryBody body = (BinaryBody) request.getBody();
-                    output.append(".withBody(new Base64Converter().base64StringToBytes(\"").append(base64Converter.bytesToBase64String(body.getRawBytes())).append("\"))");
+                    output.append(".withBody(Base64Converter.base64StringToBytes(\"")
+                        .append(Base64Converter.bytesToBase64String(body.getRawBytes()))
+                        .append("\"))");
                 }
             }
         }
@@ -130,7 +127,11 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
         }
     }
 
-    private <T extends ObjectWithReflectiveEqualsHashCodeToString> void appendObject(int numberOfSpacesToIndent, StringBuffer output, MultiValueToJavaSerializer<T> toJavaSerializer, List<T> objects) {
+    private <T extends ObjectWithJsonToString> void appendObject(
+        int numberOfSpacesToIndent,
+        StringBuffer output,
+        MultiValueToJavaSerializer<T> toJavaSerializer,
+        List<T> objects) {
         output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
     }
 

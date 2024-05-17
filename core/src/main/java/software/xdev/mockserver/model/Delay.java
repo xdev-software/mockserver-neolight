@@ -15,9 +15,10 @@
  */
 package software.xdev.mockserver.model;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class Delay extends ObjectWithReflectiveEqualsHashCodeToString {
+public class Delay {
 
     private final TimeUnit timeUnit;
     private final long value;
@@ -59,5 +60,25 @@ public class Delay extends ObjectWithReflectiveEqualsHashCodeToString {
                 throw new RuntimeException("InterruptedException while apply delay to response", ie);
             }
         }
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final Delay delay))
+        {
+            return false;
+        }
+		return getValue() == delay.getValue() && getTimeUnit() == delay.getTimeUnit();
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getTimeUnit(), getValue());
     }
 }

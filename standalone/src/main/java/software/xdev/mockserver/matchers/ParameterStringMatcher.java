@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.matchers;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.model.Parameters;
@@ -46,5 +48,37 @@ public class ParameterStringMatcher extends BodyMatcher<String> {
 
     public boolean isBlank() {
         return matcher.isBlank();
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final ParameterStringMatcher that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(matcher, that.matcher)
+            && Objects.equals(formParameterParser, that.formParameterParser)
+            && Objects.equals(matcherParameters, that.matcherParameters)
+            && Objects.equals(expandedParameterDecoder, that.expandedParameterDecoder);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            super.hashCode(),
+            matcher,
+            formParameterParser,
+            matcherParameters,
+            expandedParameterDecoder);
     }
 }

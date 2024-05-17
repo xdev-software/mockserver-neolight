@@ -15,6 +15,9 @@
  */
 package software.xdev.mockserver.model;
 
+import java.util.Objects;
+
+
 public class SocketAddress extends ObjectWithJsonToString {
     private String host;
     private Integer port = 80;
@@ -72,5 +75,27 @@ public class SocketAddress extends ObjectWithJsonToString {
     public enum Scheme {
         HTTP,
         HTTPS
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final SocketAddress that))
+        {
+            return false;
+        }
+		return Objects.equals(getHost(), that.getHost())
+            && Objects.equals(getPort(), that.getPort())
+            && getScheme() == that.getScheme();
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getHost(), getPort(), getScheme());
     }
 }

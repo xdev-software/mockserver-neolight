@@ -23,6 +23,9 @@ import software.xdev.mockserver.verify.Verification;
 import static software.xdev.mockserver.verify.Verification.verification;
 import static software.xdev.mockserver.verify.VerificationTimes.once;
 
+import java.util.Objects;
+
+
 public class VerificationDTO extends ObjectWithJsonToString implements DTO<Verification> {
     private RequestDefinitionDTO httpRequest;
     private ExpectationId expectationId;
@@ -85,5 +88,33 @@ public class VerificationDTO extends ObjectWithJsonToString implements DTO<Verif
     public VerificationDTO setMaximumNumberOfRequestToReturnInVerificationFailure(Integer maximumNumberOfRequestToReturnInVerificationFailure) {
         this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final VerificationDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getHttpRequest(), that.getHttpRequest()) && Objects.equals(
+            getExpectationId(),
+            that.getExpectationId()) && Objects.equals(getTimes(), that.getTimes()) && Objects.equals(
+            getMaximumNumberOfRequestToReturnInVerificationFailure(),
+            that.getMaximumNumberOfRequestToReturnInVerificationFailure());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            getHttpRequest(),
+            getExpectationId(),
+            getTimes(),
+            getMaximumNumberOfRequestToReturnInVerificationFailure());
     }
 }

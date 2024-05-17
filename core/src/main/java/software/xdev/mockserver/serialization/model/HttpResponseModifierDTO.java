@@ -15,10 +15,11 @@
  */
 package software.xdev.mockserver.serialization.model;
 
-import software.xdev.mockserver.model.HttpResponseModifier;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Objects;
 
-public class HttpResponseModifierDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<HttpResponseModifier> {
+import software.xdev.mockserver.model.HttpResponseModifier;
+
+public class HttpResponseModifierDTO implements DTO<HttpResponseModifier> {
 
     private HeadersModifierDTO headers;
     private CookiesModifierDTO cookies;
@@ -55,5 +56,31 @@ public class HttpResponseModifierDTO extends ObjectWithReflectiveEqualsHashCodeT
     public HttpResponseModifierDTO setCookies(CookiesModifierDTO cookies) {
         this.cookies = cookies;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HttpResponseModifierDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(getHeaders(), that.getHeaders()) && Objects.equals(
+            getCookies(),
+            that.getCookies());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getHeaders(), getCookies());
     }
 }

@@ -22,6 +22,7 @@ import software.xdev.mockserver.serialization.ObjectMapperFactory;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 import java.util.Base64;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,5 +96,28 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>> {
     }
 
     public abstract Body<?> buildObject();
-
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final BodyDTO bodyDTO))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return getType() == bodyDTO.getType() && Objects.equals(getOptional(), bodyDTO.getOptional());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getType(), getOptional());
+    }
 }

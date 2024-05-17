@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import software.xdev.mockserver.matchers.TimeToLive;
 import software.xdev.mockserver.matchers.Times;
@@ -23,7 +25,6 @@ import software.xdev.mockserver.model.*;
 
 public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expectation> {
 
-    private static final String[] excludedFields = {"id"};
     private String id;
     private Integer priority;
     private RequestDefinitionDTO httpRequest;
@@ -280,8 +281,45 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
     }
 
     @Override
-    @JsonIgnore
-    public String[] fieldsExcludedFromEqualsAndHashCode() {
-        return excludedFields;
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final ExpectationDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getPriority(), that.getPriority())
+            && Objects.equals(getHttpRequest(), that.getHttpRequest())
+            && Objects.equals(getHttpResponse(), that.getHttpResponse())
+            && Objects.equals(getHttpResponseClassCallback(), that.getHttpResponseClassCallback())
+            && Objects.equals(getHttpResponseObjectCallback(), that.getHttpResponseObjectCallback())
+            && Objects.equals(getHttpForward(), that.getHttpForward())
+            && Objects.equals(getHttpForwardClassCallback(), that.getHttpForwardClassCallback())
+            && Objects.equals(getHttpForwardObjectCallback(), that.getHttpForwardObjectCallback())
+            && Objects.equals(getHttpOverrideForwardedRequest(), that.getHttpOverrideForwardedRequest())
+            && Objects.equals(getHttpError(), that.getHttpError())
+            && Objects.equals(getTimes(), that.getTimes())
+            && Objects.equals(getTimeToLive(), that.getTimeToLive());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            getPriority(),
+            getHttpRequest(),
+            getHttpResponse(),
+            getHttpResponseClassCallback(),
+            getHttpResponseObjectCallback(),
+            getHttpForward(),
+            getHttpForwardClassCallback(),
+            getHttpForwardObjectCallback(),
+            getHttpOverrideForwardedRequest(),
+            getHttpError(),
+            getTimes(),
+            getTimeToLive());
     }
 }

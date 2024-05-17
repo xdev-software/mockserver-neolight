@@ -24,7 +24,7 @@ import java.util.*;
 import static software.xdev.mockserver.collections.ImmutableEntry.entry;
 import static software.xdev.mockserver.collections.SubSetMatcher.containsSubset;
 
-public class NottableStringMultiMap extends ObjectWithReflectiveEqualsHashCodeToString {
+public class NottableStringMultiMap {
 
     private final Map<NottableString, List<NottableString>> backingMap = new LinkedHashMap<>();
     private final RegexStringMatcher regexStringMatcher;
@@ -148,6 +148,32 @@ public class NottableStringMultiMap extends ObjectWithReflectiveEqualsHashCodeTo
         } else {
             return Collections.emptyList();
         }
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final NottableStringMultiMap that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(backingMap, that.backingMap)
+            && Objects.equals(regexStringMatcher, that.regexStringMatcher)
+            && getKeyMatchStyle() == that.getKeyMatchStyle();
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), backingMap, regexStringMatcher, getKeyMatchStyle());
     }
 }
 

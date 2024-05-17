@@ -16,11 +16,11 @@
 package software.xdev.mockserver.serialization.model;
 
 import software.xdev.mockserver.model.Delay;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class DelayDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<Delay> {
+public class DelayDTO implements DTO<Delay> {
 
     private TimeUnit timeUnit;
     private long value;
@@ -55,5 +55,29 @@ public class DelayDTO extends ObjectWithReflectiveEqualsHashCodeToString impleme
     public DelayDTO setValue(long value) {
         this.value = value;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final DelayDTO delayDTO))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return getValue() == delayDTO.getValue() && getTimeUnit() == delayDTO.getTimeUnit();
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), getTimeUnit(), getValue());
     }
 }

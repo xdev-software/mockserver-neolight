@@ -18,6 +18,8 @@ package software.xdev.mockserver.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
 
 public class PortBinding extends ObjectWithJsonToString {
 
@@ -38,5 +40,25 @@ public class PortBinding extends ObjectWithJsonToString {
     public PortBinding setPorts(List<Integer> ports) {
         this.ports = ports;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final PortBinding that))
+        {
+            return false;
+        }
+		return Objects.equals(getPorts(), that.getPorts());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(getPorts());
     }
 }

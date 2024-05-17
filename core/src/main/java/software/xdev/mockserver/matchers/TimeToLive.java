@@ -16,14 +16,12 @@
 package software.xdev.mockserver.matchers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class TimeToLive extends ObjectWithReflectiveEqualsHashCodeToString {
+public class TimeToLive {
 
-    private static final String[] EXCLUDED_FIELDS = {"endDate"};
     private static final TimeToLive TIME_TO_LIVE_UNLIMITED = new TimeToLive(null, null, true) {
         public boolean stillAlive() {
             return true;
@@ -81,12 +79,6 @@ public class TimeToLive extends ObjectWithReflectiveEqualsHashCodeToString {
 
     private boolean isAfterNow(long date) {
         return date > System.currentTimeMillis();
-    }
-
-    @Override
-    @JsonIgnore
-    protected String[] fieldsExcludedFromEqualsAndHashCode() {
-        return EXCLUDED_FIELDS;
     }
 
     @Override

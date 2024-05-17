@@ -20,8 +20,10 @@ import software.xdev.mockserver.verify.VerificationSequence;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class VerificationSequenceDTO extends ObjectWithReflectiveEqualsHashCodeToString implements DTO<VerificationSequence> {
+
+public class VerificationSequenceDTO implements DTO<VerificationSequence> {
     private List<RequestDefinitionDTO> httpRequests = new ArrayList<>();
     private List<ExpectationId> expectationIds = new ArrayList<>();
     private Integer maximumNumberOfRequestToReturnInVerificationFailure;
@@ -77,5 +79,37 @@ public class VerificationSequenceDTO extends ObjectWithReflectiveEqualsHashCodeT
     public VerificationSequenceDTO setMaximumNumberOfRequestToReturnInVerificationFailure(Integer maximumNumberOfRequestToReturnInVerificationFailure) {
         this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final VerificationSequenceDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(getHttpRequests(), that.getHttpRequests()) && Objects.equals(
+            getExpectationIds(),
+            that.getExpectationIds()) && Objects.equals(
+            getMaximumNumberOfRequestToReturnInVerificationFailure(),
+            that.getMaximumNumberOfRequestToReturnInVerificationFailure());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            super.hashCode(),
+            getHttpRequests(),
+            getExpectationIds(),
+            getMaximumNumberOfRequestToReturnInVerificationFailure());
     }
 }

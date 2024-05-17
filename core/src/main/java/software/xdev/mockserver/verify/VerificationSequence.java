@@ -22,6 +22,8 @@ import software.xdev.mockserver.model.RequestDefinition;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 
 public class VerificationSequence extends ObjectWithJsonToString {
     private List<RequestDefinition> httpRequests = new ArrayList<>();
@@ -67,5 +69,32 @@ public class VerificationSequence extends ObjectWithJsonToString {
     public VerificationSequence withMaximumNumberOfRequestToReturnInVerificationFailure(Integer maximumNumberOfRequestToReturnInVerificationFailure) {
         this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final VerificationSequence that))
+        {
+            return false;
+        }
+		return Objects.equals(getHttpRequests(), that.getHttpRequests())
+            && Objects.equals(getExpectationIds(), that.getExpectationIds())
+            && Objects.equals(
+            getMaximumNumberOfRequestToReturnInVerificationFailure(),
+            that.getMaximumNumberOfRequestToReturnInVerificationFailure());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(
+            getHttpRequests(),
+            getExpectationIds(),
+            getMaximumNumberOfRequestToReturnInVerificationFailure());
     }
 }

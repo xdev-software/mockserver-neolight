@@ -15,9 +15,10 @@
  */
 package software.xdev.mockserver.matchers;
 
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
+import java.util.Objects;
 
-public class BooleanMatcher extends ObjectWithReflectiveEqualsHashCodeToString implements Matcher<Boolean> {
+
+public class BooleanMatcher implements Matcher<Boolean> {
     private final Boolean matcher;
 
     BooleanMatcher(Boolean matcher) {
@@ -43,5 +44,25 @@ public class BooleanMatcher extends ObjectWithReflectiveEqualsHashCodeToString i
 
     public boolean isBlank() {
         return matcher == null;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final BooleanMatcher that))
+        {
+            return false;
+        }
+		return Objects.equals(matcher, that.matcher);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(matcher);
     }
 }

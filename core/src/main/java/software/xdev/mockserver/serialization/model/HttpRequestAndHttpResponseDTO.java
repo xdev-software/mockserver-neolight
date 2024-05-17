@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
 import software.xdev.mockserver.model.HttpResponse;
@@ -72,5 +74,26 @@ public class HttpRequestAndHttpResponseDTO extends ObjectWithJsonToString implem
     public HttpRequestAndHttpResponseDTO setHttpResponse(HttpResponseDTO httpResponse) {
         this.httpResponse = httpResponse;
         return this;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final HttpRequestAndHttpResponseDTO that))
+        {
+            return false;
+        }
+		return Objects.equals(getHttpRequest(), that.getHttpRequest())
+            && Objects.equals(getHttpResponse(), that.getHttpResponse());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getHttpRequest(), getHttpResponse());
     }
 }

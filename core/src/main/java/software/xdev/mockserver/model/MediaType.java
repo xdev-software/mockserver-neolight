@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("unused")
-public class MediaType extends ObjectWithJsonToString {
+public class MediaType {
     
     private static final Logger LOG = LoggerFactory.getLogger(MediaType.class);
     
@@ -316,5 +317,29 @@ public class MediaType extends ObjectWithJsonToString {
     @Override
     public String toString() {
         return toString;
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final MediaType mediaType))
+        {
+            return false;
+        }
+		return isBlank == mediaType.isBlank && Objects.equals(getType(), mediaType.getType())
+            && Objects.equals(getSubtype(), mediaType.getSubtype()) && Objects.equals(
+            getParameters(),
+            mediaType.getParameters()) && Objects.equals(getCharset(), mediaType.getCharset())
+            && Objects.equals(toString, mediaType.toString);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getType(), getSubtype(), getParameters(), getCharset(), toString, isBlank);
     }
 }

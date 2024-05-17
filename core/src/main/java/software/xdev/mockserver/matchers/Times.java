@@ -15,11 +15,9 @@
  */
 package software.xdev.mockserver.matchers;
 
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
-
 import java.util.Objects;
 
-public class Times extends ObjectWithReflectiveEqualsHashCodeToString {
+public class Times {
 
     private static final Times TIMES_UNLIMITED = new Times(-1, true) {
         public int getRemainingTimes() {

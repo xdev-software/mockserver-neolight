@@ -20,6 +20,9 @@ import software.xdev.mockserver.model.NottableString;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
+import java.util.Objects;
+
+
 public class ExactStringMatcher extends BodyMatcher<NottableString> {
     private final NottableString matcher;
 
@@ -72,5 +75,29 @@ public class ExactStringMatcher extends BodyMatcher<NottableString> {
 
     public boolean isBlank() {
         return matcher == null || StringUtils.isBlank(matcher.getValue());
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final ExactStringMatcher that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.equals(matcher, that.matcher);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), matcher);
     }
 }

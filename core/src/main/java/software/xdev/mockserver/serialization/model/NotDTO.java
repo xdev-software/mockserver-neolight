@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.ObjectWithJsonToString;
 
 public class NotDTO extends ObjectWithJsonToString {
@@ -33,5 +35,24 @@ public class NotDTO extends ObjectWithJsonToString {
     public Boolean getNot() {
         return not;
     }
-
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final NotDTO notDTO))
+        {
+            return false;
+        }
+		return Objects.equals(getNot(), notDTO.getNot());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(getNot());
+    }
 }

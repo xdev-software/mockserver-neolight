@@ -15,9 +15,7 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
-
-public interface ToJavaSerializer<T extends ObjectWithReflectiveEqualsHashCodeToString> {
+public interface ToJavaSerializer<T> {
 
     String serialize(int numberOfSpacesToIndent, T object);
 

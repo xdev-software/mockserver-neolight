@@ -16,14 +16,15 @@
 package software.xdev.mockserver.mock.listeners;
 
 import software.xdev.mockserver.log.MockServerEventLog;
-import software.xdev.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 import software.xdev.mockserver.scheduler.Scheduler;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-public class MockServerEventLogNotifier extends ObjectWithReflectiveEqualsHashCodeToString {
+
+public class MockServerEventLogNotifier {
 
     private boolean listenerAdded = false;
     private final List<MockServerLogListener> listeners = Collections.synchronizedList(new ArrayList<>());
@@ -50,5 +51,26 @@ public class MockServerEventLogNotifier extends ObjectWithReflectiveEqualsHashCo
 
     public void unregisterListener(MockServerLogListener listener) {
         listeners.remove(listener);
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final MockServerEventLogNotifier that))
+        {
+            return false;
+        }
+		return listenerAdded == that.listenerAdded && Objects.equals(listeners, that.listeners)
+            && Objects.equals(scheduler, that.scheduler);
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(listenerAdded, listeners, scheduler);
     }
 }

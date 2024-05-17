@@ -110,4 +110,24 @@ public abstract class KeysAndValues<T extends KeyAndValue, K extends KeysAndValu
     }
 
     public abstract K clone();
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final KeysAndValues<?, ?> that))
+        {
+            return false;
+        }
+		return Objects.equals(getMap(), that.getMap());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(getMap());
+    }
 }

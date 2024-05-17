@@ -15,6 +15,9 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import software.xdev.mockserver.model.BinaryBody;
 
 public class BinaryBodyDTO extends BodyWithContentTypeDTO {
@@ -40,5 +43,29 @@ public class BinaryBodyDTO extends BodyWithContentTypeDTO {
 
     public BinaryBody buildObject() {
         return (BinaryBody) new BinaryBody(getBase64Bytes(), getMediaType()).withOptional(getOptional());
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final BinaryBodyDTO that))
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
+		return Objects.deepEquals(getBase64Bytes(), that.getBase64Bytes());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), Arrays.hashCode(getBase64Bytes()));
     }
 }

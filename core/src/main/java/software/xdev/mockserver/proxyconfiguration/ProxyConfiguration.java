@@ -26,6 +26,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.PROXY_AUTHORIZATION;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
@@ -121,5 +122,28 @@ public class ProxyConfiguration extends ObjectWithJsonToString {
     public enum Type {
         HTTP,
         SOCKS5
+    }
+    
+    @Override
+    public boolean equals(final Object o)
+    {
+        if(this == o)
+        {
+            return true;
+        }
+        if(!(o instanceof final ProxyConfiguration that))
+        {
+            return false;
+        }
+		return getType() == that.getType() && Objects.equals(getProxyAddress(), that.getProxyAddress())
+            && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(
+            getPassword(),
+            that.getPassword());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getType(), getProxyAddress(), getUsername(), getPassword());
     }
 }

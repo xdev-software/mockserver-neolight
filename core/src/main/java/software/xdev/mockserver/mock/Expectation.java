@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings("rawtypes")
 public class Expectation extends ObjectWithJsonToString {
 
-    private static final String[] excludedFields = {"id", "created", "sortableExpectationId"};
     private static final AtomicInteger EXPECTATION_COUNTER = new AtomicInteger(0);
     private static final long START_TIME = System.currentTimeMillis();
     private int hashCode;
@@ -441,12 +440,6 @@ public class Expectation extends ObjectWithJsonToString {
             .thenForward(httpForwardObjectCallback)
             .thenForward(httpOverrideForwardedRequest)
             .thenError(httpError);
-    }
-
-    @Override
-    @JsonIgnore
-    public String[] fieldsExcludedFromEqualsAndHashCode() {
-        return excludedFields;
     }
 
     @Override
