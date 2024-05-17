@@ -24,7 +24,7 @@ public class SocketAddressToJavaSerializer implements ToJavaSerializer<SocketAdd
 
     @Override
     public String serialize(int numberOfSpacesToIndent, SocketAddress socketAddress) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (socketAddress != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("new SocketAddress()");
             if (socketAddress.getHost() != null) {
@@ -40,7 +40,7 @@ public class SocketAddressToJavaSerializer implements ToJavaSerializer<SocketAdd
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

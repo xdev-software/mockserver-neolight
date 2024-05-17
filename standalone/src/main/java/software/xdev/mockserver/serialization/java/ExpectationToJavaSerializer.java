@@ -39,7 +39,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 
     @Override
     public String serialize(int numberOfSpacesToIndent, Expectation expectation) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (expectation != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("new MockServerClient(\"localhost\", 1080)");
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".when(");
@@ -103,7 +103,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE)
             .append(" ".repeat(numberOfSpacesToIndent));
     }

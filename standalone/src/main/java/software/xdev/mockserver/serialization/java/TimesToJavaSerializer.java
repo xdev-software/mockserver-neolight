@@ -24,7 +24,7 @@ public class TimesToJavaSerializer implements ToJavaSerializer<Times> {
 
     @Override
     public String serialize(int numberOfSpacesToIndent, Times times) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (times != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
             if (times.isUnlimited()) {
@@ -39,7 +39,7 @@ public class TimesToJavaSerializer implements ToJavaSerializer<Times> {
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

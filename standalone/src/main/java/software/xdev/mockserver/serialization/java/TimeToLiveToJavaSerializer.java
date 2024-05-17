@@ -24,7 +24,7 @@ public class TimeToLiveToJavaSerializer implements ToJavaSerializer<TimeToLive> 
 
     @Override
     public String serialize(int numberOfSpacesToIndent, TimeToLive timeToLive) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (timeToLive != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
             if (timeToLive.isUnlimited()) {
@@ -37,7 +37,7 @@ public class TimeToLiveToJavaSerializer implements ToJavaSerializer<TimeToLive> 
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

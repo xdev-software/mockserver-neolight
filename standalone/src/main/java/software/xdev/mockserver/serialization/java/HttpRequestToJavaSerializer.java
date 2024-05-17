@@ -39,7 +39,7 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
 
     @Override
     public String serialize(int numberOfSpacesToIndent, HttpRequest request) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (request != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
             output.append("request()");
@@ -103,7 +103,7 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
         return output.toString();
     }
 
-    private void outputQueryStringParameter(int numberOfSpacesToIndent, StringBuffer output, List<Parameter> parameters) {
+    private void outputQueryStringParameter(int numberOfSpacesToIndent, StringBuilder output, List<Parameter> parameters) {
         if (!parameters.isEmpty()) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withQueryStringParameters(");
             appendObject(numberOfSpacesToIndent, output, new ParameterToJavaSerializer(), parameters);
@@ -111,7 +111,7 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
         }
     }
 
-    private void outputCookies(int numberOfSpacesToIndent, StringBuffer output, List<Cookie> cookies) {
+    private void outputCookies(int numberOfSpacesToIndent, StringBuilder output, List<Cookie> cookies) {
         if (!cookies.isEmpty()) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withCookies(");
             appendObject(numberOfSpacesToIndent, output, new CookieToJavaSerializer(), cookies);
@@ -119,7 +119,7 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
         }
     }
 
-    private void outputHeaders(int numberOfSpacesToIndent, StringBuffer output, List<Header> headers) {
+    private void outputHeaders(int numberOfSpacesToIndent, StringBuilder output, List<Header> headers) {
         if (!headers.isEmpty()) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withHeaders(");
             appendObject(numberOfSpacesToIndent, output, new HeaderToJavaSerializer(), headers);
@@ -129,13 +129,13 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
 
     private <T extends ObjectWithJsonToString> void appendObject(
         int numberOfSpacesToIndent,
-        StringBuffer output,
+        StringBuilder output,
         MultiValueToJavaSerializer<T> toJavaSerializer,
         List<T> objects) {
         output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

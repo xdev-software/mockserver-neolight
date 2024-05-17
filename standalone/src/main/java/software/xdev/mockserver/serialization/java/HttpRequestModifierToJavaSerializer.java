@@ -37,7 +37,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 
     @Override
     public String serialize(int numberOfSpacesToIndent, HttpRequestModifier request) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (request != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
             output.append("requestModifier()");
@@ -71,7 +71,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
         return output.toString();
     }
 
-    private void outputQueryStringParameters(int numberOfSpacesToIndent, StringBuffer output, Parameters parameters) {
+    private void outputQueryStringParameters(int numberOfSpacesToIndent, StringBuilder output, Parameters parameters) {
         if (parameters != null && !parameters.isEmpty()) {
             appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("parameters(");
             appendObject((numberOfSpacesToIndent + 2), output, new ParameterToJavaSerializer(), parameters.getEntries());
@@ -81,7 +81,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
         }
     }
 
-    private void outputHeaders(int numberOfSpacesToIndent, StringBuffer output, Headers headers) {
+    private void outputHeaders(int numberOfSpacesToIndent, StringBuilder output, Headers headers) {
         if (headers != null && !headers.isEmpty()) {
             appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("headers(");
             appendObject((numberOfSpacesToIndent + 2), output, new HeaderToJavaSerializer(), headers.getEntries());
@@ -91,7 +91,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
         }
     }
 
-    private void outputCookies(int numberOfSpacesToIndent, StringBuffer output, Cookies cookies) {
+    private void outputCookies(int numberOfSpacesToIndent, StringBuilder output, Cookies cookies) {
         if (cookies != null && !cookies.isEmpty()) {
             appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("cookies(");
             appendObject((numberOfSpacesToIndent + 2), output, new CookieToJavaSerializer(), cookies.getEntries());
@@ -101,7 +101,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
         }
     }
 
-    private void outputList(int numberOfSpacesToIndent, StringBuffer output, List<String> add) {
+    private void outputList(int numberOfSpacesToIndent, StringBuilder output, List<String> add) {
         if (add != null && !add.isEmpty()) {
             appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output)
                 .append("List.of(")
@@ -114,13 +114,13 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 
     private <T extends ObjectWithJsonToString> void appendObject(
         int numberOfSpacesToIndent,
-        StringBuffer output,
+        StringBuilder output,
         MultiValueToJavaSerializer<T> toJavaSerializer,
         List<T> objects) {
         output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

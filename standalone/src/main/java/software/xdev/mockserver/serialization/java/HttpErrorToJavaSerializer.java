@@ -25,7 +25,7 @@ public class HttpErrorToJavaSerializer implements ToJavaSerializer<HttpError> {
 
     @Override
     public String serialize(int numberOfSpacesToIndent, HttpError httpError) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (httpError != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("error()");
             if (httpError.getDelay() != null) {
@@ -49,7 +49,7 @@ public class HttpErrorToJavaSerializer implements ToJavaSerializer<HttpError> {
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

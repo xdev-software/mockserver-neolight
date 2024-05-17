@@ -24,7 +24,7 @@ public class HttpForwardToJavaSerializer implements ToJavaSerializer<HttpForward
 
     @Override
     public String serialize(int numberOfSpacesToIndent, HttpForward httpForward) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (httpForward != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("forward()");
             if (httpForward.getHost() != null) {
@@ -43,7 +43,7 @@ public class HttpForwardToJavaSerializer implements ToJavaSerializer<HttpForward
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

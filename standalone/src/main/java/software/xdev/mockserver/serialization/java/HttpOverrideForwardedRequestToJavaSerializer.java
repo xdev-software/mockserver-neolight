@@ -24,7 +24,7 @@ public class HttpOverrideForwardedRequestToJavaSerializer implements ToJavaSeria
 
     @Override
     public String serialize(int numberOfSpacesToIndent, HttpOverrideForwardedRequest httpForward) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (httpForward != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("forwardOverriddenRequest()");
             if (httpForward.getRequestOverride() != null) {
@@ -56,7 +56,7 @@ public class HttpOverrideForwardedRequestToJavaSerializer implements ToJavaSeria
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

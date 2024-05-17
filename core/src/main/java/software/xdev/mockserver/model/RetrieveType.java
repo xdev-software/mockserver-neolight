@@ -16,8 +16,6 @@
 package software.xdev.mockserver.model;
 
 public enum RetrieveType {
-    @Deprecated
-    LOGS,
     REQUESTS,
     REQUEST_RESPONSES,
     RECORDED_EXPECTATIONS,

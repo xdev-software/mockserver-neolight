@@ -24,7 +24,7 @@ public class HttpClassCallbackToJavaSerializer implements ToJavaSerializer<HttpC
 
     @Override
     public String serialize(int numberOfSpacesToIndent, HttpClassCallback httpClassCallback) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (httpClassCallback != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("callback()");
             if (httpClassCallback.getCallbackClass() != null) {
@@ -38,7 +38,7 @@ public class HttpClassCallbackToJavaSerializer implements ToJavaSerializer<HttpC
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
     }
 }

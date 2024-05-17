@@ -24,7 +24,7 @@ public class ConnectionOptionsToJavaSerializer implements ToJavaSerializer<Conne
 
     @Override
     public String serialize(int numberOfSpacesToIndent, ConnectionOptions connectionOptions) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         if (connectionOptions != null) {
             appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("connectionOptions()");
             if (connectionOptions.getSuppressContentLengthHeader() != null) {
@@ -52,7 +52,7 @@ public class ConnectionOptionsToJavaSerializer implements ToJavaSerializer<Conne
         return output.toString();
     }
 
-    private StringBuffer appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuffer output) {
+    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
         return output.append(NEW_LINE).append("".repeat(numberOfSpacesToIndent));
     }
 }

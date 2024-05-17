@@ -229,30 +229,6 @@ public class HttpState {
                 Format format = Format.valueOf(defaultIfEmpty(request.getFirstQueryStringParameter("format").toUpperCase(), "JSON"));
                 RetrieveType type = RetrieveType.valueOf(defaultIfEmpty(request.getFirstQueryStringParameter("type").toUpperCase(), "REQUESTS"));
                 switch (type) {
-                    case LOGS: {
-                        mockServerLog.retrieveMessageLogEntries(requestDefinition, (List<LogEntry> logEntries) -> {
-                            StringBuilder stringBuffer = new StringBuilder();
-                            for (int i = 0; i < logEntries.size(); i++) {
-                                LogEntry messageLogEntry = logEntries.get(i);
-                                stringBuffer
-                                    .append(messageLogEntry.getTimestamp())
-                                    .append(" - ")
-                                    .append(messageLogEntry.getMessage());
-                                if (i < logEntries.size() - 1) {
-                                    stringBuffer.append(LOG_SEPARATOR);
-                                }
-                            }
-                            stringBuffer.append(NEW_LINE);
-                            response.withBody(stringBuffer.toString(), MediaType.PLAIN_TEXT_UTF_8);
-                            if (LOG.isInfoEnabled()) {
-                                LOG.info(
-                                    "Retrieved logs that match: {}",
-                                    requestDefinition);
-                            }
-                            httpResponseFuture.complete(response);
-                        });
-                        break;
-                    }
                     case REQUESTS: {
                         if (LOG.isInfoEnabled()) {
                             LOG.info(
