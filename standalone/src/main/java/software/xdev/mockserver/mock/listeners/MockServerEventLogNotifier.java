@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.mock.listeners;
 
-import software.xdev.mockserver.log.MockServerEventLog;
+import software.xdev.mockserver.event.EventBus;
 import software.xdev.mockserver.scheduler.Scheduler;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class MockServerEventLogNotifier {
         this.scheduler = scheduler;
     }
 
-    protected void notifyListeners(final MockServerEventLog notifier, boolean synchronous) {
+    protected void notifyListeners(final EventBus notifier, boolean synchronous) {
         if (listenerAdded && !listeners.isEmpty()) {
             scheduler.submit(() -> {
                 for (MockServerLogListener listener : listeners.toArray(new MockServerLogListener[0])) {

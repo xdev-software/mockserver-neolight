@@ -19,8 +19,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultHttpObject;
-import software.xdev.mockserver.log.MockServerEventLog;
-import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.mappers.MockServerHttpResponseToFullHttpResponse;
 import software.xdev.mockserver.model.BodyWithContentType;
 import software.xdev.mockserver.model.HttpRequest;
@@ -32,9 +30,8 @@ import org.slf4j.LoggerFactory;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.RECEIVED_REQUEST;
 import static software.xdev.mockserver.model.HttpResponse.response;
-import static org.slf4j.event.Level.INFO;
+
 
 @ChannelHandler.Sharable
 public class EchoServerHandler extends SimpleChannelInboundHandler<HttpRequest> {

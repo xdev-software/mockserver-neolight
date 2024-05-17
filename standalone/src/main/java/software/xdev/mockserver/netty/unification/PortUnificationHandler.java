@@ -248,7 +248,12 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
     }
 
     private void switchToBinaryRequestProxying(ChannelHandlerContext ctx, ByteBuf msg) {
-        addLastIfNotPresent(ctx.pipeline(), new BinaryRequestProxyingHandler(configuration,  httpState.getScheduler(), actionHandler.getHttpClient()));
+        addLastIfNotPresent(ctx.pipeline(), new BinaryRequestProxyingHandler(
+            configuration,
+            httpState.getScheduler(),
+            actionHandler.getHttpClient(),
+            httpState.getEventBus())
+        );
 
         // fire message back through pipeline
         ctx.fireChannelRead(msg.readBytes(actualReadableBytes()));

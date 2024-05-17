@@ -23,6 +23,7 @@ import io.netty.util.AttributeKey;
 import org.apache.commons.text.StringEscapeUtils;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.cors.CORSHeaders;
+import software.xdev.mockserver.event.model.EventEntry;
 import software.xdev.mockserver.filters.HopByHopHeaderFilter;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
 import software.xdev.mockserver.httpclient.SocketCommunicationException;
@@ -46,7 +47,7 @@ import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpResponseStatus.PROXY_AUTHENTICATION_REQUIRED;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static software.xdev.mockserver.log.model.LogEntryMessages.*;
+import static software.xdev.mockserver.logging.LoggingMessages.*;
 import static software.xdev.mockserver.util.StringUtils.isEmpty;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.exception.ExceptionHandling.*;
@@ -88,6 +89,11 @@ public class HttpActionHandler {
             || !request.getHeaders().containsEntry(
                 httpStateHandler.getUniqueLoopPreventionHeaderName(),
                 httpStateHandler.getUniqueLoopPreventionHeaderValue())) {
+            logEvent(new EventEntry()
+                .setType(EventEntry.EventType.RECEIVED_REQUEST)
+                .setCorrelationId(request.getLogCorrelationId())
+                .setHttpRequest(request)
+            );
             LOG.info(RECEIVED_REQUEST_MESSAGE_FORMAT, request);
         }
         final Expectation expectation = httpStateHandler.firstMatchingExpectation(request);
@@ -153,6 +159,12 @@ public class HttpActionHandler {
                 case ERROR: {
                     scheduler.schedule(() -> handleAnyException(request, responseWriter, synchronous, action, () -> {
                         getHttpErrorActionHandler().handle((HttpError) action, ctx);
+                        logEvent(new EventEntry()
+                            .setType(EventEntry.EventType.EXPECTATION_RESPONSE)
+                            .setCorrelationId(request.getLogCorrelationId())
+                            .setHttpRequest(request)
+                            .setHttpError((HttpError) action)
+                            .setExpectationId(action.getExpectationId()));
                         LOG.info("Returning error: {} for request: {} for action: {} from expectation: {}",
                             action,
                             request,
@@ -210,10 +222,21 @@ public class HttpActionHandler {
                                 if (response.containsHeader(httpStateHandler.getUniqueLoopPreventionHeaderName(), httpStateHandler.getUniqueLoopPreventionHeaderValue())) {
                                     response.removeHeader(httpStateHandler.getUniqueLoopPreventionHeaderName());
                                     LOG.info(NO_MATCH_RESPONSE_NO_EXPECTATION_MESSAGE_FORMAT, request, response);
+                                    logEvent(new EventEntry()
+                                        .setType(EventEntry.EventType.NO_MATCH_RESPONSE)
+                                        .setCorrelationId(request.getLogCorrelationId())
+                                        .setHttpRequest(request)
+                                        .setHttpResponse(notFoundResponse()));
                                 } else {
                                     LOG.info("Returning response: {} for forwarded request in json:{}",
                                         request,
                                         response);
+                                    logEvent(new EventEntry()
+                                        .setType(EventEntry.EventType.FORWARDED_REQUEST)
+                                        .setCorrelationId(request.getLogCorrelationId())
+                                        .setHttpRequest(request)
+                                        .setHttpResponse(response)
+                                        .setExpectation(request, response));
                                 }
                                 responseWriter.writeResponse(request, response, false);
                             } catch (SocketCommunicationException sce) {
@@ -270,6 +293,13 @@ public class HttpActionHandler {
 
     void writeResponseActionResponse(final HttpResponse response, final ResponseWriter responseWriter, final HttpRequest request, final Action action, boolean synchronous) {
         scheduler.schedule(() -> {
+            logEvent(new EventEntry()
+                .setType(EventEntry.EventType.EXPECTATION_RESPONSE)
+                .setCorrelationId(request.getLogCorrelationId())
+                .setHttpRequest(request)
+                .setHttpResponse(response)
+                .setExpectationId(action.getExpectationId())
+            );
             LOG.info("Returning response: {} for request: {} for action: {} from expectation: {}",
                 response, request, action, action.getExpectationId());
             responseWriter.writeResponse(request, response, false);
@@ -285,6 +315,15 @@ public class HttpActionHandler {
             try {
                 HttpResponse response = responseFuture.getHttpResponse().get(configuration.maxFutureTimeoutInMillis(), MILLISECONDS);
                 responseWriter.writeResponse(request, response, false);
+                
+                logEvent(new EventEntry()
+                    .setType(EventEntry.EventType.FORWARDED_REQUEST)
+                    .setCorrelationId(request.getLogCorrelationId())
+                    .setHttpRequest(request)
+                    .setHttpResponse(response)
+                    .setExpectation(request, response)
+                    .setExpectationId(action.getExpectationId()));
+                
                 LOG.info("Returning response: {} for forwarded request {} for action: {} from expectation: {}",
                     response,
                     responseFuture.getHttpRequest(),
@@ -299,7 +338,16 @@ public class HttpActionHandler {
     void writeForwardActionResponse(final HttpResponse response, final ResponseWriter responseWriter, final HttpRequest request, final Action action) {
         try {
             responseWriter.writeResponse(request, response, false);
-            LOG.info("Returning response: {} for forwarded request in json:{} for action:{} from expectation:{}",
+            
+            logEvent(new EventEntry()
+                .setType(EventEntry.EventType.FORWARDED_REQUEST)
+                .setCorrelationId(request.getLogCorrelationId())
+                .setHttpRequest(request)
+                .setHttpResponse(response)
+                .setExpectation(request, response)
+                .setExpectationId(action.getExpectationId()));
+            
+            LOG.info("Returning response: {} for forwarded request in json: {} for action: {} from expectation: {}",
                 response,
                 response,
                 action,
@@ -335,16 +383,26 @@ public class HttpActionHandler {
             if (LOG.isTraceEnabled()) {
                 LOG.trace(NO_MATCH_RESPONSE_NO_EXPECTATION_MESSAGE_FORMAT, request, notFoundResponse());
             }
-        } else if (isNotBlank(error)) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info(NO_MATCH_RESPONSE_ERROR_MESSAGE_FORMAT, error, request, notFoundResponse());
-            }
         } else {
+            logEvent(new EventEntry()
+                .setType(EventEntry.EventType.NO_MATCH_RESPONSE)
+                .setCorrelationId(request.getLogCorrelationId())
+                .setHttpRequest(request)
+                .setHttpResponse(notFoundResponse()));
             if (LOG.isInfoEnabled()) {
-                LOG.info(NO_MATCH_RESPONSE_NO_EXPECTATION_MESSAGE_FORMAT, request, notFoundResponse());
+                if(isNotBlank(error)) {
+                    LOG.info(NO_MATCH_RESPONSE_ERROR_MESSAGE_FORMAT, error, request, notFoundResponse());
+                } else {
+                    LOG.info(NO_MATCH_RESPONSE_NO_EXPECTATION_MESSAGE_FORMAT, request, notFoundResponse());
+                }
             }
         }
+        
         responseWriter.writeResponse(request, response, false);
+    }
+    
+    private void logEvent(EventEntry entry) {
+        httpStateHandler.logEvent(entry);
     }
 
     private HttpResponseActionHandler getHttpResponseActionHandler() {

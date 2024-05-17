@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package software.xdev.mockserver.log.model;
+package software.xdev.mockserver.event.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lmax.disruptor.EventTranslator;
@@ -37,7 +37,7 @@ import java.util.Objects;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.model.HttpRequest.request;
 
-public class LogEntry implements EventTranslator<LogEntry> {
+public class EventEntry implements EventTranslator<EventEntry> {
 
     private static final RequestDefinition[] EMPTY_REQUEST_DEFINITIONS = new RequestDefinition[0];
     private static final RequestDefinition[] DEFAULT_REQUESTS_DEFINITIONS = {request()};
@@ -47,11 +47,9 @@ public class LogEntry implements EventTranslator<LogEntry> {
     private String correlationId;
     private long epochTime = EpochService.currentTimeMillis();
     private String timestamp;
-    private LogMessageType type;
+    private EventType type;
     private RequestDefinition[] httpRequests;
-    private RequestDefinition[] httpUpdatedRequests;
     private HttpResponse httpResponse;
-    private HttpResponse httpUpdatedResponse;
     private HttpError httpError;
     private Expectation expectation;
     private String expectationId;
@@ -59,11 +57,10 @@ public class LogEntry implements EventTranslator<LogEntry> {
     private Runnable consumer;
     private boolean deleted = false;
 
-    public LogEntry() {
-
+    public EventEntry() {
     }
 
-    private LogEntry setId(String id) {
+    private EventEntry setId(String id) {
         this.id = id;
         return this;
     }
@@ -96,7 +93,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return epochTime;
     }
 
-    public LogEntry setEpochTime(long epochTime) {
+    public EventEntry setEpochTime(long epochTime) {
         this.epochTime = epochTime;
         this.timestamp = null;
         return this;
@@ -109,11 +106,11 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return timestamp;
     }
 
-    public LogMessageType getType() {
+    public EventType getType() {
         return type;
     }
 
-    public LogEntry setType(LogMessageType type) {
+    public EventEntry setType(EventType type) {
         this.type = type;
         return this;
     }
@@ -122,7 +119,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return correlationId;
     }
 
-    public LogEntry setCorrelationId(String correlationId) {
+    public EventEntry setCorrelationId(String correlationId) {
         this.correlationId = correlationId;
         return this;
     }
@@ -131,24 +128,8 @@ public class LogEntry implements EventTranslator<LogEntry> {
     public RequestDefinition[] getHttpRequests() {
         if (httpRequests == null) {
             return EMPTY_REQUEST_DEFINITIONS;
-        } else {
-            return httpRequests;
         }
-    }
-
-    @JsonIgnore
-    public RequestDefinition[] getHttpUpdatedRequests() {
-        if (httpRequests == null) {
-            return EMPTY_REQUEST_DEFINITIONS;
-        } else if (httpUpdatedRequests == null) {
-            httpUpdatedRequests = Arrays
-                .stream(httpRequests)
-                .map(this::updateBody)
-                .toArray(RequestDefinition[]::new);
-            return httpUpdatedRequests;
-        } else {
-            return httpUpdatedRequests;
-        }
+        return httpRequests;
     }
 
     @JsonIgnore
@@ -161,14 +142,14 @@ public class LogEntry implements EventTranslator<LogEntry> {
         }
         for (RequestDefinition httpRequest : httpRequests) {
             RequestDefinition request = httpRequest.cloneWithLogCorrelationId();
-            if (matcher.matches(type == LogMessageType.RECEIVED_REQUEST ? new MatchDifference(false, request) : null, request)) {
+            if (matcher.matches(type == EventType.RECEIVED_REQUEST ? new MatchDifference(false, request) : null, request)) {
                 return true;
             }
         }
         return false;
     }
 
-    public LogEntry setHttpRequests(RequestDefinition[] httpRequests) {
+    public EventEntry setHttpRequests(RequestDefinition[] httpRequests) {
         this.httpRequests = httpRequests;
         return this;
     }
@@ -176,12 +157,11 @@ public class LogEntry implements EventTranslator<LogEntry> {
     public RequestDefinition getHttpRequest() {
         if (httpRequests != null && httpRequests.length > 0) {
             return httpRequests[0];
-        } else {
-            return null;
         }
+        return null;
     }
 
-    public LogEntry setHttpRequest(RequestDefinition httpRequest) {
+    public EventEntry setHttpRequest(RequestDefinition httpRequest) {
         if (httpRequest != null) {
             if (isNotBlank(httpRequest.getLogCorrelationId())) {
                 setCorrelationId(httpRequest.getLogCorrelationId());
@@ -197,18 +177,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return httpResponse;
     }
 
-    public HttpResponse getHttpUpdatedResponse() {
-        if (httpResponse == null) {
-            return null;
-        } else if (httpUpdatedResponse == null) {
-            httpUpdatedResponse = updateBody(httpResponse);
-            return httpUpdatedResponse;
-        } else {
-            return httpUpdatedResponse;
-        }
-    }
-
-    public LogEntry setHttpResponse(HttpResponse httpResponse) {
+    public EventEntry setHttpResponse(HttpResponse httpResponse) {
         this.httpResponse = httpResponse;
         return this;
     }
@@ -217,7 +186,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return httpError;
     }
 
-    public LogEntry setHttpError(HttpError httpError) {
+    public EventEntry setHttpError(HttpError httpError) {
         this.httpError = httpError;
         return this;
     }
@@ -226,12 +195,12 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return expectation;
     }
 
-    public LogEntry setExpectation(Expectation expectation) {
+    public EventEntry setExpectation(Expectation expectation) {
         this.expectation = expectation;
         return this;
     }
 
-    public LogEntry setExpectation(RequestDefinition httpRequest, HttpResponse httpResponse) {
+    public EventEntry setExpectation(RequestDefinition httpRequest, HttpResponse httpResponse) {
         this.expectation = new Expectation(httpRequest, Times.once(), TimeToLive.unlimited(), 0).thenRespond(httpResponse);
         return this;
     }
@@ -240,7 +209,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return expectationId;
     }
 
-    public LogEntry setExpectationId(String expectationId) {
+    public EventEntry setExpectationId(String expectationId) {
         this.expectationId = expectationId;
         return this;
     }
@@ -256,7 +225,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return exception;
     }
 
-    public LogEntry setException(Exception ex) {
+    public EventEntry setException(Exception ex) {
         this.exception = ex;
         return this;
     }
@@ -265,7 +234,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return consumer;
     }
 
-    public LogEntry setConsumer(Runnable consumer) {
+    public EventEntry setConsumer(Runnable consumer) {
         this.consumer = consumer;
         return this;
     }
@@ -274,37 +243,20 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return deleted;
     }
 
-    public LogEntry setDeleted(boolean deleted) {
+    public EventEntry setDeleted(boolean deleted) {
         this.deleted = deleted;
         return this;
     }
 
-    private RequestDefinition updateBody(RequestDefinition requestDefinition) {
-        if (requestDefinition instanceof HttpRequest) {
-            HttpRequest httpRequest = (HttpRequest) requestDefinition;
-            return httpRequest;
-        } else {
-            return null;
-        }
-    }
-
-    private HttpResponse updateBody(HttpResponse httpResponse) {
-        if (httpResponse != null) {
-            return httpResponse;
-        } else {
-            return null;
-        }
-    }
-
-    public LogEntry cloneAndClear() {
-        LogEntry clone = this.clone();
+    public EventEntry cloneAndClear() {
+        EventEntry clone = this.clone();
         clear();
         return clone;
     }
 
     @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public LogEntry clone() {
-        return new LogEntry()
+    public EventEntry clone() {
+        return new EventEntry()
             .setId(id())
             .setType(getType())
             .setEpochTime(getEpochTime())
@@ -320,7 +272,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
     }
 
     @Override
-    public void translateTo(LogEntry event, long sequence) {
+    public void translateTo(EventEntry event, long sequence) {
         event
             .setId(id())
             .setType(getType())
@@ -348,16 +300,16 @@ public class LogEntry implements EventTranslator<LogEntry> {
         if (hashCode() != o.hashCode()) {
             return false;
         }
-        LogEntry logEntry = (LogEntry) o;
-        return epochTime == logEntry.epochTime &&
-            deleted == logEntry.deleted &&
-            type == logEntry.type &&
-            Objects.equals(httpResponse, logEntry.httpResponse) &&
-            Objects.equals(httpError, logEntry.httpError) &&
-            Objects.equals(expectation, logEntry.expectation) &&
-            Objects.equals(expectationId, logEntry.expectationId) &&
-            Objects.equals(consumer, logEntry.consumer) &&
-            Arrays.equals(httpRequests, logEntry.httpRequests);
+        EventEntry eventEntry = (EventEntry) o;
+        return epochTime == eventEntry.epochTime &&
+            deleted == eventEntry.deleted &&
+            type == eventEntry.type &&
+            Objects.equals(httpResponse, eventEntry.httpResponse) &&
+            Objects.equals(httpError, eventEntry.httpError) &&
+            Objects.equals(expectation, eventEntry.expectation) &&
+            Objects.equals(expectationId, eventEntry.expectationId) &&
+            Objects.equals(consumer, eventEntry.consumer) &&
+            Arrays.equals(httpRequests, eventEntry.httpRequests);
     }
 
     @Override
@@ -381,31 +333,13 @@ public class LogEntry implements EventTranslator<LogEntry> {
         }
     }
 
-    public enum LogMessageType {
+    public enum EventType
+    {
         RUNNABLE,
-        TRACE,
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR,
-        EXCEPTION,
-        CLEARED,
         RETRIEVED,
-        UPDATED_EXPECTATION,
-        CREATED_EXPECTATION,
-        REMOVED_EXPECTATION,
         RECEIVED_REQUEST,
         EXPECTATION_RESPONSE,
-        EXPECTATION_MATCHED,
-        EXPECTATION_NOT_MATCHED,
         NO_MATCH_RESPONSE,
-        VERIFICATION,
-        VERIFICATION_FAILED,
-        VERIFICATION_PASSED,
         FORWARDED_REQUEST,
-        TEMPLATE_GENERATED,
-        SERVER_CONFIGURATION,
-        AUTHENTICATION_FAILED,
     }
-
 }

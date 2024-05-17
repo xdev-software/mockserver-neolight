@@ -26,7 +26,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.AttributeKey;
 import software.xdev.mockserver.configuration.ServerConfiguration;
-import software.xdev.mockserver.log.MockServerEventLog;
+import software.xdev.mockserver.event.EventBus;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.scheduler.Scheduler;
@@ -52,13 +52,13 @@ public class EchoServer implements Stoppable {
     
     private static final Logger LOG = LoggerFactory.getLogger(EchoServer.class);
     
-    static final AttributeKey<MockServerEventLog> LOG_FILTER = AttributeKey.valueOf("SERVER_LOG_FILTER");
+    static final AttributeKey<EventBus> LOG_FILTER = AttributeKey.valueOf("SERVER_LOG_FILTER");
     static final AttributeKey<NextResponse> NEXT_RESPONSE = AttributeKey.valueOf("NEXT_RESPONSE");
     static final AttributeKey<LastRequest> LAST_REQUEST = AttributeKey.valueOf("LAST_REQUEST");
     
     private final ServerConfiguration configuration = configuration();
     private final Scheduler scheduler = new Scheduler(configuration);
-    private final MockServerEventLog mockServerEventLog = new MockServerEventLog(configuration, scheduler, true);
+    private final EventBus eventBus = new EventBus(configuration, scheduler, true);
     private final NextResponse nextResponse = new NextResponse();
     private final LastRequest lastRequest = new LastRequest();
     private final CompletableFuture<Integer> boundPort = new CompletableFuture<>();
@@ -84,7 +84,7 @@ public class EchoServer implements Stoppable {
                 .option(ChannelOption.SO_BACKLOG, 100)
                 .handler(new LoggingHandler(EchoServer.class))
                 .childHandler(new EchoServerInitializer(configuration, error, registeredClients, websocketChannels, textWebSocketFrames))
-                .childAttr(LOG_FILTER, mockServerEventLog)
+                .childAttr(LOG_FILTER, eventBus)
                 .childAttr(NEXT_RESPONSE, nextResponse)
                 .childAttr(LAST_REQUEST, lastRequest)
                 .bind(0)
@@ -125,8 +125,8 @@ public class EchoServer implements Stoppable {
         }
     }
 
-    public MockServerEventLog mockServerEventLog() {
-        return mockServerEventLog;
+    public EventBus mockServerEventLog() {
+        return eventBus;
     }
 
     public void withNextResponse(HttpResponse... httpResponses) {

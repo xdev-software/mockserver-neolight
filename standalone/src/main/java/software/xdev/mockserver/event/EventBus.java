@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package software.xdev.mockserver.log;
+package software.xdev.mockserver.event;
 
 import com.lmax.disruptor.ExceptionHandler;
 import com.lmax.disruptor.dsl.Disruptor;
 
 import software.xdev.mockserver.collections.CircularConcurrentLinkedDeque;
 import software.xdev.mockserver.configuration.ServerConfiguration;
-import software.xdev.mockserver.log.model.LogEntry;
-import software.xdev.mockserver.log.model.RequestAndExpectationId;
+import software.xdev.mockserver.event.model.EventEntry;
+import software.xdev.mockserver.event.model.RequestAndExpectationId;
 import software.xdev.mockserver.matchers.HttpRequestMatcher;
 import software.xdev.mockserver.matchers.MatcherBuilder;
 import software.xdev.mockserver.mock.Expectation;
@@ -37,7 +37,6 @@ import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -53,60 +52,61 @@ import java.util.stream.Stream;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.*;
-import static software.xdev.mockserver.log.model.LogEntryMessages.VERIFICATION_REQUESTS_MESSAGE_FORMAT;
-import static software.xdev.mockserver.log.model.LogEntryMessages.VERIFICATION_REQUEST_SEQUENCES_MESSAGE_FORMAT;
+import static software.xdev.mockserver.event.model.EventEntry.EventType.*;
+import static software.xdev.mockserver.logging.LoggingMessages.VERIFICATION_REQUESTS_MESSAGE_FORMAT;
+import static software.xdev.mockserver.logging.LoggingMessages.VERIFICATION_REQUEST_SEQUENCES_MESSAGE_FORMAT;
 import static software.xdev.mockserver.model.HttpRequest.request;
 
-public class MockServerEventLog extends MockServerEventLogNotifier {
+public class EventBus extends MockServerEventLogNotifier {
     
-    private static final Logger LOG = LoggerFactory.getLogger(MockServerEventLog.class);
-    private static final Predicate<LogEntry> requestLogPredicate = input
-        -> !input.isDeleted() && input.getType() == RECEIVED_REQUEST;
-    private static final Predicate<LogEntry> expectationLogPredicate = input
-        -> !input.isDeleted() && (
-        input.getType() == EXPECTATION_RESPONSE
-            || input.getType() == FORWARDED_REQUEST
-    );
-    private static final Predicate<LogEntry> requestResponseLogPredicate = input
-        -> !input.isDeleted() && (
-        input.getType() == EXPECTATION_RESPONSE
+    private static final Logger LOG = LoggerFactory.getLogger(EventBus.class);
+    
+    private static final Predicate<EventEntry> REQUEST_LOG_PREDICATE =
+        input -> !input.isDeleted() && input.getType() == RECEIVED_REQUEST;
+    private static final Predicate<EventEntry> EXPECTATION_LOG_PREDICATE =
+        input -> !input.isDeleted()
+            && (input.getType() == EXPECTATION_RESPONSE || input.getType() == FORWARDED_REQUEST);
+    private static final Predicate<EventEntry> REQUEST_RESPONSE_LOG_PREDICATE =
+        input -> !input.isDeleted()
+            && (input.getType() == EXPECTATION_RESPONSE
             || input.getType() == NO_MATCH_RESPONSE
-            || input.getType() == FORWARDED_REQUEST
-    );
-    private static final Predicate<LogEntry> recordedExpectationLogPredicate = input
-        -> !input.isDeleted() && input.getType() == FORWARDED_REQUEST;
-    private static final Function<LogEntry, RequestDefinition[]> logEntryToRequest = LogEntry::getHttpRequests;
-    private static final Function<LogEntry, Expectation> logEntryToExpectation = LogEntry::getExpectation;
-    private static final Function<LogEntry, LogEventRequestAndResponse> logEntryToHttpRequestAndHttpResponse =
-        logEntry -> new LogEventRequestAndResponse()
-            .withHttpRequest(logEntry.getHttpRequest())
-            .withHttpResponse(logEntry.getHttpResponse())
-            .withTimestamp(logEntry.getTimestamp());
+            || input.getType() == FORWARDED_REQUEST);
+    private static final Predicate<EventEntry> RECORDED_EXPECTATION_LOG_PREDICATE =
+        input -> !input.isDeleted() && input.getType() == FORWARDED_REQUEST;
+    private static final Function<EventEntry, RequestDefinition[]> LOG_ENTRY_TO_REQUEST =
+        EventEntry::getHttpRequests;
+    private static final Function<EventEntry, Expectation> LOG_ENTRY_TO_EXPECTATION =
+        EventEntry::getExpectation;
+    private static final Function<EventEntry, LogEventRequestAndResponse> LOG_ENTRY_TO_HTTP_REQUEST_AND_HTTP_RESPONSE =
+        eventEntry -> new LogEventRequestAndResponse()
+            .withHttpRequest(eventEntry.getHttpRequest())
+            .withHttpResponse(eventEntry.getHttpResponse())
+            .withTimestamp(eventEntry.getTimestamp());
+    
     private final ServerConfiguration configuration;
-    private CircularConcurrentLinkedDeque<LogEntry> eventLog;
+    private CircularConcurrentLinkedDeque<EventEntry> eventLog;
     private MatcherBuilder matcherBuilder;
     private RequestDefinitionSerializer requestDefinitionSerializer;
     private final boolean asynchronousEventProcessing;
-    private Disruptor<LogEntry> disruptor;
+    private Disruptor<EventEntry> disruptor;
 
-    public MockServerEventLog(ServerConfiguration configuration, Scheduler scheduler, boolean asynchronousEventProcessing) {
+    public EventBus(ServerConfiguration configuration, Scheduler scheduler, boolean asynchronousEventProcessing) {
         super(scheduler);
         this.configuration = configuration;
         this.matcherBuilder = new MatcherBuilder(configuration);
         this.requestDefinitionSerializer = new RequestDefinitionSerializer();
         this.asynchronousEventProcessing = asynchronousEventProcessing;
-        this.eventLog = new CircularConcurrentLinkedDeque<>(configuration.maxLogEntries(), LogEntry::clear);
+        this.eventLog = new CircularConcurrentLinkedDeque<>(configuration.maxLogEntries(), EventEntry::clear);
         startRingBuffer();
     }
 
-    public void add(LogEntry logEntry) {
+    public void add(EventEntry eventEntry) {
         if (asynchronousEventProcessing) {
-            if (!disruptor.getRingBuffer().tryPublishEvent(logEntry)) {
-                LOG.warn("Too many log events failed to add log event to ring buffer: {}", logEntry);
+            if (!disruptor.getRingBuffer().tryPublishEvent(eventEntry)) {
+                LOG.warn("Too many log events failed to add log event to ring buffer: {}", eventEntry);
             }
         } else {
-            processLogEntry(logEntry);
+            processLogEntry(eventEntry);
         }
     }
 
@@ -115,12 +115,12 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
     }
 
     private void startRingBuffer() {
-        disruptor = new Disruptor<>(LogEntry::new, configuration.ringBufferSize(), new SchedulerThreadFactory("EventLog"));
+        disruptor = new Disruptor<>(EventEntry::new, configuration.ringBufferSize(), new SchedulerThreadFactory("EventLog"));
 
-        final ExceptionHandler<LogEntry> errorHandler = new ExceptionHandler<LogEntry>() {
+        final ExceptionHandler<EventEntry> errorHandler = new ExceptionHandler<>() {
             @Override
-            public void handleEventException(Throwable ex, long sequence, LogEntry logEntry) {
-                LOG.error("exception handling log entry in log ring buffer, for log entry: " + logEntry, ex);
+            public void handleEventException(Throwable ex, long sequence, EventEntry logEntry) {
+                LOG.error("exception handling log entry in log ring buffer, for log entry: {}", logEntry, ex);
             }
 
             @Override
@@ -135,21 +135,21 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         };
         disruptor.setDefaultExceptionHandler(errorHandler);
 
-        disruptor.handleEventsWith((logEntry, sequence, endOfBatch) -> {
-            if (logEntry.getType() != RUNNABLE) {
-                processLogEntry(logEntry);
+        disruptor.handleEventsWith((eventEntry, sequence, endOfBatch) -> {
+            if (eventEntry.getType() != RUNNABLE) {
+                processLogEntry(eventEntry);
             } else {
-                logEntry.getConsumer().run();
-                logEntry.clear();
+                eventEntry.getConsumer().run();
+                eventEntry.clear();
             }
         });
 
         disruptor.start();
     }
 
-    private void processLogEntry(LogEntry logEntry) {
-        logEntry = logEntry.cloneAndClear();
-        eventLog.add(logEntry);
+    private void processLogEntry(EventEntry eventEntry) {
+        eventEntry = eventEntry.cloneAndClear();
+        eventLog.add(eventEntry);
         notifyListeners(this, false);
     }
 
@@ -159,17 +159,15 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
             eventLog.clear();
             disruptor.shutdown(2, SECONDS);
         } catch (Exception ex) {
-            if (!(ex instanceof com.lmax.disruptor.TimeoutException)) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Exception while shutting down log ring buffer", ex);
-                }
+            if (!(ex instanceof com.lmax.disruptor.TimeoutException) && LOG.isWarnEnabled()) {
+                LOG.warn("Exception while shutting down log ring buffer", ex);
             }
         }
     }
 
     public void reset() {
         CompletableFuture<String> future = new CompletableFuture<>();
-        disruptor.publishEvent(new LogEntry()
+        disruptor.publishEvent(new EventEntry()
             .setType(RUNNABLE)
             .setConsumer(() -> {
                 eventLog.clear();
@@ -186,14 +184,14 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
     public void clear(RequestDefinition requestDefinition) {
         CompletableFuture<String> future = new CompletableFuture<>();
         final boolean markAsDeletedOnly = LOG.isInfoEnabled();
-        disruptor.publishEvent(new LogEntry()
+        disruptor.publishEvent(new EventEntry()
             .setType(RUNNABLE)
             .setConsumer(() -> {
                 String logCorrelationId = UUIDService.getUUID();
                 RequestDefinition matcher = requestDefinition != null ? requestDefinition : request().withLogCorrelationId(logCorrelationId);
                 HttpRequestMatcher requestMatcher = matcherBuilder.transformsToMatcher(matcher);
-                for (LogEntry logEntry : new LinkedList<>(eventLog)) {
-                    RequestDefinition[] requests = logEntry.getHttpRequests();
+                for (EventEntry eventEntry : new LinkedList<>(eventLog)) {
+                    RequestDefinition[] requests = eventEntry.getHttpRequests();
                     boolean matches = false;
                     if (requests != null) {
                         for (RequestDefinition request : requests) {
@@ -206,9 +204,9 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
                     }
                     if (matches) {
                         if (markAsDeletedOnly) {
-                            logEntry.setDeleted(true);
+                            eventEntry.setDeleted(true);
                         } else {
-                            eventLog.removeItem(logEntry);
+                            eventLog.removeItem(eventEntry);
                         }
                     }
                 }
@@ -229,8 +227,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         if (verification.getExpectationId() != null) {
             retrieveLogEntries(
                 Collections.singletonList(verification.getExpectationId().getId()),
-                expectationLogPredicate,
-                logEntryToRequest,
+                EXPECTATION_LOG_PREDICATE,
+                LOG_ENTRY_TO_REQUEST,
                 logEventStream -> listConsumer.accept(
                     logEventStream
                         .filter(Objects::nonNull)
@@ -241,8 +239,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         } else {
             retrieveLogEntries(
                 verification.getHttpRequest().withLogCorrelationId(logCorrelationId),
-                requestLogPredicate,
-                logEntryToRequest,
+                REQUEST_LOG_PREDICATE,
+                LOG_ENTRY_TO_REQUEST,
                 logEventStream -> listConsumer.accept(
                     logEventStream
                         .filter(Objects::nonNull)
@@ -257,8 +255,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         if (matchingExpectationsOnly) {
             retrieveLogEntries(
                 (List<String>) null,
-                expectationLogPredicate,
-                logEntryToRequest,
+                EXPECTATION_LOG_PREDICATE,
+                LOG_ENTRY_TO_REQUEST,
                 logEventStream -> listConsumer.accept(
                     logEventStream
                         .filter(Objects::nonNull)
@@ -269,8 +267,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         } else {
             retrieveLogEntries(
                 (RequestDefinition) null,
-                requestLogPredicate,
-                logEntryToRequest,
+                REQUEST_LOG_PREDICATE,
+                LOG_ENTRY_TO_REQUEST,
                 logEventStream -> listConsumer.accept(
                     logEventStream
                         .filter(Objects::nonNull)
@@ -284,8 +282,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
     public void retrieveAllRequests(List<String> expectationIds, Consumer<List<RequestAndExpectationId>> listConsumer) {
         retrieveLogEntries(
             expectationIds,
-            expectationLogPredicate,
-            logEntry -> new RequestAndExpectationId(logEntry.getHttpRequest(), logEntry.getExpectationId()),
+            EXPECTATION_LOG_PREDICATE,
+            eventEntry -> new RequestAndExpectationId(eventEntry.getHttpRequest(), eventEntry.getExpectationId()),
             logEventStream -> listConsumer.accept(
                 logEventStream
                     .filter(Objects::nonNull)
@@ -297,8 +295,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
     public void retrieveRequests(RequestDefinition requestDefinition, Consumer<List<RequestDefinition>> listConsumer) {
         retrieveLogEntries(
             requestDefinition,
-            requestLogPredicate,
-            logEntryToRequest,
+            REQUEST_LOG_PREDICATE,
+            LOG_ENTRY_TO_REQUEST,
             logEventStream -> listConsumer.accept(
                 logEventStream
                     .filter(Objects::nonNull)
@@ -311,8 +309,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
     public void retrieveRequestResponses(RequestDefinition requestDefinition, Consumer<List<LogEventRequestAndResponse>> listConsumer) {
         retrieveLogEntries(
             requestDefinition,
-            requestResponseLogPredicate,
-            logEntryToHttpRequestAndHttpResponse,
+            REQUEST_RESPONSE_LOG_PREDICATE,
+            LOG_ENTRY_TO_HTTP_REQUEST_AND_HTTP_RESPONSE,
             logEventStream -> listConsumer.accept(logEventStream.filter(Objects::nonNull).collect(Collectors.toList()))
         );
     }
@@ -320,14 +318,14 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
     public void retrieveRecordedExpectations(RequestDefinition requestDefinition, Consumer<List<Expectation>> listConsumer) {
         retrieveLogEntries(
             requestDefinition,
-            recordedExpectationLogPredicate,
-            logEntryToExpectation,
+            RECORDED_EXPECTATION_LOG_PREDICATE,
+            LOG_ENTRY_TO_EXPECTATION,
             logEventStream -> listConsumer.accept(logEventStream.filter(Objects::nonNull).collect(Collectors.toList()))
         );
     }
 
-    private void retrieveLogEntries(RequestDefinition requestDefinition, Predicate<LogEntry> logEntryPredicate, Consumer<Stream<LogEntry>> consumer) {
-        disruptor.publishEvent(new LogEntry()
+    private void retrieveLogEntries(RequestDefinition requestDefinition, Predicate<EventEntry> logEntryPredicate, Consumer<Stream<EventEntry>> consumer) {
+        disruptor.publishEvent(new EventEntry()
             .setType(RUNNABLE)
             .setConsumer(() -> {
                 HttpRequestMatcher httpRequestMatcher = matcherBuilder.transformsToMatcher(requestDefinition);
@@ -340,8 +338,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         );
     }
 
-    private <T> void retrieveLogEntries(RequestDefinition requestDefinition, Predicate<LogEntry> logEntryPredicate, Function<LogEntry, T> logEntryMapper, Consumer<Stream<T>> consumer) {
-        disruptor.publishEvent(new LogEntry()
+    private <T> void retrieveLogEntries(RequestDefinition requestDefinition, Predicate<EventEntry> logEntryPredicate, Function<EventEntry, T> logEntryMapper, Consumer<Stream<T>> consumer) {
+        disruptor.publishEvent(new EventEntry()
             .setType(RUNNABLE)
             .setConsumer(() -> {
                 RequestDefinition requestDefinitionMatcher = requestDefinition != null ? requestDefinition : request().withLogCorrelationId(UUIDService.getUUID());
@@ -357,8 +355,8 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private <T> void retrieveLogEntries(List<String> expectationIds, Predicate<LogEntry> logEntryPredicate, Function<LogEntry, T> logEntryMapper, Consumer<Stream<T>> consumer) {
-        disruptor.publishEvent(new LogEntry()
+    private <T> void retrieveLogEntries(List<String> expectationIds, Predicate<EventEntry> logEntryPredicate, Function<EventEntry, T> logEntryMapper, Consumer<Stream<T>> consumer) {
+        disruptor.publishEvent(new EventEntry()
             .setType(RUNNABLE)
             .setConsumer(() -> consumer.accept(this.eventLog
                 .stream()
@@ -529,7 +527,7 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         {
             return true;
         }
-        if(!(o instanceof final MockServerEventLog that))
+        if(!(o instanceof final EventBus that))
         {
             return false;
         }

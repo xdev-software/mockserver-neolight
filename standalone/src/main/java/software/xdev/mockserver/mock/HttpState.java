@@ -18,8 +18,8 @@ package software.xdev.mockserver.mock;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
 import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry;
 import software.xdev.mockserver.configuration.ServerConfiguration;
-import software.xdev.mockserver.log.MockServerEventLog;
-import software.xdev.mockserver.log.model.LogEntry;
+import software.xdev.mockserver.event.EventBus;
+import software.xdev.mockserver.event.model.EventEntry;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier.Cause;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.responsewriter.ResponseWriter;
@@ -48,8 +48,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static software.xdev.mockserver.util.StringUtils.*;
-import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.log.model.LogEntryMessages.RECEIVED_REQUEST_MESSAGE_FORMAT;
+import static software.xdev.mockserver.logging.LoggingMessages.RECEIVED_REQUEST_MESSAGE_FORMAT;
 import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.model.HttpResponse.response;
 
@@ -57,11 +56,10 @@ public class HttpState {
     
     private static final Logger LOG = LoggerFactory.getLogger(HttpState.class);
     
-    public static final String LOG_SEPARATOR = NEW_LINE + "------------------------------------" + NEW_LINE;
     public static final String PATH_PREFIX = "/mockserver";
     private static final ThreadLocal<Integer> LOCAL_PORT = new ThreadLocal<>();
     private final String uniqueLoopPreventionHeaderValue = "MockServer_" + UUIDService.getUUID();
-    private final MockServerEventLog mockServerLog;
+    private final EventBus eventBus;
     private final Scheduler scheduler;
     // mockserver
     private final RequestMatchers requestMatchers;
@@ -109,7 +107,7 @@ public class HttpState {
         this.scheduler = scheduler;
         this.webSocketClientRegistry = new WebSocketClientRegistry(configuration);
         LocalCallbackRegistry.setMaxWebSocketExpectations(configuration.maxWebSocketExpectations());
-        this.mockServerLog = new MockServerEventLog(configuration, scheduler, true);
+        this.eventBus = new EventBus(configuration, scheduler, true);
         this.requestMatchers = new RequestMatchers(configuration, scheduler, webSocketClientRegistry);
         if(LOG.isTraceEnabled()) {
             LOG.trace("Log ring buffer created, with size {}", configuration.ringBufferSize());
@@ -139,7 +137,7 @@ public class HttpState {
             ClearType type = ClearType.valueOf(defaultIfEmpty(request.getFirstQueryStringParameter("type").toUpperCase(), "ALL"));
             switch (type) {
                 case LOG:
-                    mockServerLog.clear(requestDefinition);
+                    eventBus.clear(requestDefinition);
                     break;
                 case EXPECTATIONS:
                     if (expectationId != null) {
@@ -149,7 +147,7 @@ public class HttpState {
                     }
                     break;
                 case ALL:
-                    mockServerLog.clear(requestDefinition);
+                    eventBus.clear(requestDefinition);
                     if (expectationId != null) {
                         requestMatchers.clear(expectationId, logCorrelationId);
                     } else {
@@ -177,7 +175,7 @@ public class HttpState {
 
     public void reset() {
         requestMatchers.reset();
-        mockServerLog.reset();
+        eventBus.reset();
         webSocketClientRegistry.reset();
         if (LOG.isInfoEnabled()) {
             LOG.info("Resetting all expectations and request logs");
@@ -212,12 +210,6 @@ public class HttpState {
         requestMatchers.postProcess(expectation);
     }
 
-    public void log(LogEntry logEntry) {
-        if (mockServerLog != null) {
-            mockServerLog.add(logEntry);
-        }
-    }
-
     public HttpResponse retrieve(HttpRequest request) {
         final String logCorrelationId = UUIDService.getUUID();
         CompletableFuture<HttpResponse> httpResponseFuture = new CompletableFuture<>();
@@ -228,6 +220,11 @@ public class HttpState {
                 requestDefinition.withLogCorrelationId(logCorrelationId);
                 Format format = Format.valueOf(defaultIfEmpty(request.getFirstQueryStringParameter("format").toUpperCase(), "JSON"));
                 RetrieveType type = RetrieveType.valueOf(defaultIfEmpty(request.getFirstQueryStringParameter("type").toUpperCase(), "REQUESTS"));
+                
+                logEvent(new EventEntry()
+                    .setType(EventEntry.EventType.RETRIEVED)
+                    .setCorrelationId(logCorrelationId)
+                    .setHttpRequest(requestDefinition));
                 switch (type) {
                     case REQUESTS: {
                         if (LOG.isInfoEnabled()) {
@@ -238,7 +235,7 @@ public class HttpState {
                         }
                         switch (format) {
                             case JAVA:
-                                mockServerLog
+                                eventBus
                                     .retrieveRequests(
                                         requestDefinition,
                                         requests -> {
@@ -251,7 +248,7 @@ public class HttpState {
                                     );
                                 break;
                             case JSON:
-                                mockServerLog
+                                eventBus
                                     .retrieveRequests(
                                         requestDefinition,
                                         requests -> {
@@ -279,7 +276,7 @@ public class HttpState {
                                 httpResponseFuture.complete(response);
                                 break;
                             case JSON:
-                                mockServerLog
+                                eventBus
                                     .retrieveRequestResponses(
                                         requestDefinition,
                                         httpRequestAndHttpResponses -> {
@@ -303,7 +300,7 @@ public class HttpState {
                         }
                         switch (format) {
                             case JAVA:
-                                mockServerLog
+                                eventBus
                                     .retrieveRecordedExpectations(
                                         requestDefinition,
                                         requests -> {
@@ -316,7 +313,7 @@ public class HttpState {
                                     );
                                 break;
                             case JSON:
-                                mockServerLog
+                                eventBus
                                     .retrieveRecordedExpectations(
                                         requestDefinition,
                                         requests -> {
@@ -384,7 +381,7 @@ public class HttpState {
             // check valid expectation id and populate for error message
             verification.withRequest(resolveExpectationId(verification.getExpectationId()));
         }
-        mockServerLog.verify(verification, resultConsumer);
+        eventBus.verify(verification, resultConsumer);
     }
 
     public Future<String> verify(VerificationSequence verification) {
@@ -397,7 +394,7 @@ public class HttpState {
         if (verificationSequence.getExpectationIds() != null && !verificationSequence.getExpectationIds().isEmpty()) {
             verificationSequence.withRequests(resolveExpectationIds(verificationSequence.getExpectationIds()));
         }
-        mockServerLog.verify(verificationSequence, resultConsumer);
+        eventBus.verify(verificationSequence, resultConsumer);
     }
 
     public boolean handle(HttpRequest request, ResponseWriter responseWriter, boolean warDeployment) {
@@ -529,9 +526,13 @@ public class HttpState {
     public RequestMatchers getRequestMatchers() {
         return requestMatchers;
     }
-
-    public MockServerEventLog getMockServerLog() {
-        return mockServerLog;
+    
+    public EventBus getEventBus() {
+        return eventBus;
+    }
+    
+    public void logEvent(EventEntry entry) {
+        getEventBus().add(entry);
     }
 
     public Scheduler getScheduler() {
@@ -547,7 +548,7 @@ public class HttpState {
     }
 
     public void stop() {
-        getMockServerLog().stop();
+        eventBus.stop();
     }
 
     private ExpectationIdSerializer getExpectationIdSerializer() {

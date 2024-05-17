@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package software.xdev.mockserver.log.model;
+package software.xdev.mockserver.event.model;
 
 import software.xdev.mockserver.model.ExpectationId;
 import software.xdev.mockserver.model.RequestDefinition;

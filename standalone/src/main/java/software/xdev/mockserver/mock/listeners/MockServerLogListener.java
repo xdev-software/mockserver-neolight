@@ -15,10 +15,10 @@
  */
 package software.xdev.mockserver.mock.listeners;
 
-import software.xdev.mockserver.log.MockServerEventLog;
+import software.xdev.mockserver.event.EventBus;
 
 public interface MockServerLogListener {
 
-    void updated(MockServerEventLog mockServerLog);
+    void updated(EventBus mockServerLog);
 
 }

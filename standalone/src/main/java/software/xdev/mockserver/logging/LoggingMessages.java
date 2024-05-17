@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package software.xdev.mockserver.log.model;
+package software.xdev.mockserver.logging;
 
-public class LogEntryMessages {
-
+public final class LoggingMessages
+{
     public static final String RECEIVED_REQUEST_MESSAGE_FORMAT = "received request:{}";
     public static final String UPDATED_EXPECTATION_MESSAGE_FORMAT = "updated expectation: {} with id: {}";
     public static final String CREATED_EXPECTATION_MESSAGE_FORMAT = "creating expectation: {} with id: {}";
@@ -26,4 +26,6 @@ public class LogEntryMessages {
     public static final String VERIFICATION_REQUESTS_MESSAGE_FORMAT = "verifying requests that match: {}";
     public static final String VERIFICATION_REQUEST_SEQUENCES_MESSAGE_FORMAT = "verifying sequence that match: {}";
 
+    private LoggingMessages() {
+    }
 }

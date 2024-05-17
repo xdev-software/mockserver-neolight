@@ -22,10 +22,13 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import software.xdev.mockserver.configuration.ServerConfiguration;
+import software.xdev.mockserver.event.EventBus;
+import software.xdev.mockserver.event.model.EventEntry;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
 import software.xdev.mockserver.model.BinaryMessage;
 import software.xdev.mockserver.model.BinaryProxyListener;
 import software.xdev.mockserver.scheduler.Scheduler;
+import software.xdev.mockserver.uuid.UUIDService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,17 +53,27 @@ public class BinaryRequestProxyingHandler extends SimpleChannelInboundHandler<By
     private final Scheduler scheduler;
     private final NettyHttpClient httpClient;
     private final BinaryProxyListener binaryExchangeCallback;
+    private EventBus eventBus;
 
-    public BinaryRequestProxyingHandler(final ServerConfiguration configuration,final Scheduler scheduler, final NettyHttpClient httpClient) {
+    public BinaryRequestProxyingHandler(
+        final ServerConfiguration configuration,
+        final Scheduler scheduler,
+        final NettyHttpClient httpClient,
+        final EventBus eventBus) {
         super(true);
         this.configuration = configuration;
         this.scheduler = scheduler;
         this.httpClient = httpClient;
         this.binaryExchangeCallback = configuration.binaryProxyListener();
+        this.eventBus = eventBus;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) {
+        eventBus.add(new EventEntry()
+            .setType(EventEntry.EventType.RECEIVED_REQUEST)
+            .setCorrelationId(UUIDService.getUUID()));
+        
         BinaryMessage binaryRequest = bytes(ByteBufUtil.getBytes(byteBuf));
         LOG.info("Received binary request: {}", ByteBufUtil.hexDump(binaryRequest.getBytes()));
         final InetSocketAddress remoteAddress = getRemoteAddress(ctx);
