@@ -70,6 +70,7 @@ public class Scheduler
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public synchronized void shutdown()
 	{
 		if(!this.scheduler.isShutdown())

@@ -179,10 +179,9 @@ public class EventBus extends MockServerEventLogNotifier
 		this.disruptor.start();
 	}
 	
-	private void processLogEntry(EventEntry eventEntry)
+	private void processLogEntry(final EventEntry eventEntry)
 	{
-		eventEntry = eventEntry.cloneAndClear();
-		this.eventLog.add(eventEntry);
+		this.eventLog.add(eventEntry.cloneAndClear());
 		this.notifyListeners(this, false);
 	}
 	
@@ -220,6 +219,7 @@ public class EventBus extends MockServerEventLogNotifier
 		}
 		catch(final ExecutionException | InterruptedException | TimeoutException ignore)
 		{
+			// Not present in upstream
 		}
 	}
 	
@@ -278,6 +278,7 @@ public class EventBus extends MockServerEventLogNotifier
 		}
 		catch(final ExecutionException | InterruptedException | TimeoutException ignore)
 		{
+			// Not present in upstream
 		}
 	}
 	
@@ -435,9 +436,9 @@ public class EventBus extends MockServerEventLogNotifier
 		this.disruptor.publishEvent(new EventEntry()
 			.setType(RUNNABLE)
 			.setConsumer(() -> {
-				final RequestDefinition requestDefinitionMatcher = requestDefinition != null ?
-					requestDefinition :
-					request().withLogCorrelationId(UUIDService.getUUID());
+				final RequestDefinition requestDefinitionMatcher = requestDefinition != null
+					? requestDefinition
+					: request().withLogCorrelationId(UUIDService.getUUID());
 				final HttpRequestMatcher httpRequestMatcher =
 					this.matcherBuilder.transformsToMatcher(requestDefinitionMatcher);
 				consumer.accept(this.eventLog
@@ -495,14 +496,14 @@ public class EventBus extends MockServerEventLogNotifier
 							final String serializedRequestToBeVerified =
 								this.requestDefinitionSerializer.serialize(true, verification.getHttpRequest());
 							final Integer maximumNumberOfRequestToReturnInVerificationFailure =
-								verification.getMaximumNumberOfRequestToReturnInVerificationFailure() != null ?
-									verification.getMaximumNumberOfRequestToReturnInVerificationFailure() :
-									this.configuration.maximumNumberOfRequestToReturnInVerificationFailure();
+								verification.getMaximumNumberOfRequestToReturnInVerificationFailure() != null
+									? verification.getMaximumNumberOfRequestToReturnInVerificationFailure()
+									: this.configuration.maximumNumberOfRequestToReturnInVerificationFailure();
 							if(allRequests.size() < maximumNumberOfRequestToReturnInVerificationFailure)
 							{
-								final String serializedAllRequestInLog = allRequests.size() == 1 ?
-									this.requestDefinitionSerializer.serialize(true, allRequests.get(0)) :
-									this.requestDefinitionSerializer.serialize(true, allRequests);
+								final String serializedAllRequestInLog = allRequests.size() == 1
+									? this.requestDefinitionSerializer.serialize(true, allRequests.get(0))
+									: this.requestDefinitionSerializer.serialize(true, allRequests);
 								failureMessage = "Request not found " + verification.getTimes() + ", expected:<"
 									+ serializedRequestToBeVerified + "> but was:<" + serializedAllRequestInLog + ">";
 							}
@@ -535,9 +536,9 @@ public class EventBus extends MockServerEventLogNotifier
 				catch(final Exception ex)
 				{
 					LOG.error("exception while processing verification: {}", verification, ex);
-					resultConsumer.accept("exception while processing verification" + (isNotBlank(ex.getMessage()) ?
-						" " + ex.getMessage() :
-						""));
+					resultConsumer.accept("exception while processing verification" + (isNotBlank(ex.getMessage())
+						? " " + ex.getMessage()
+						: ""));
 				}
 			});
 		}
@@ -698,14 +699,14 @@ public class EventBus extends MockServerEventLogNotifier
 		final String serializedRequestToBeVerified =
 			this.requestDefinitionSerializer.serialize(true, verificationSequence.getHttpRequests());
 		final Integer maximumNumberOfRequestToReturnInVerificationFailure =
-			verificationSequence.getMaximumNumberOfRequestToReturnInVerificationFailure() != null ?
-				verificationSequence.getMaximumNumberOfRequestToReturnInVerificationFailure() :
-				this.configuration.maximumNumberOfRequestToReturnInVerificationFailure();
+			verificationSequence.getMaximumNumberOfRequestToReturnInVerificationFailure() != null
+				? verificationSequence.getMaximumNumberOfRequestToReturnInVerificationFailure()
+				: this.configuration.maximumNumberOfRequestToReturnInVerificationFailure();
 		if(allRequests.size() < maximumNumberOfRequestToReturnInVerificationFailure)
 		{
-			final String serializedAllRequestInLog = allRequests.size() == 1 ?
-				this.requestDefinitionSerializer.serialize(true, allRequests.get(0)) :
-				this.requestDefinitionSerializer.serialize(true, allRequests);
+			final String serializedAllRequestInLog = allRequests.size() == 1
+				? this.requestDefinitionSerializer.serialize(true, allRequests.get(0))
+				: this.requestDefinitionSerializer.serialize(true, allRequests);
 			failureMessage = "Request sequence not found, expected:<" + serializedRequestToBeVerified + "> but was:<"
 				+ serializedAllRequestInLog + ">";
 		}

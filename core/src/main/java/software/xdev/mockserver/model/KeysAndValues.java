@@ -140,6 +140,7 @@ public abstract class KeysAndValues<T extends KeyAndValue, K extends KeysAndValu
 		return false;
 	}
 	
+	@SuppressWarnings("checkstyle:NoClone")
 	@Override
 	public abstract K clone();
 	

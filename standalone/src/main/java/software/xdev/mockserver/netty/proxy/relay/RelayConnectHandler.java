@@ -125,7 +125,8 @@ public abstract class RelayConnectHandler<T> extends SimpleChannelInboundHandler
 									pipelineToMockServer.addLast(new HttpContentDecompressor());
 									pipelineToMockServer.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
 									
-									pipelineToMockServer.addLast(new DownstreamProxyRelayHandler(proxyClientCtx.channel()));
+									pipelineToMockServer.addLast(
+										new DownstreamProxyRelayHandler(proxyClientCtx.channel()));
 									
 									// downstream (to proxy client)
 									final ChannelPipeline pipelineToProxyClient = proxyClientCtx.channel().pipeline();
@@ -143,7 +144,8 @@ public abstract class RelayConnectHandler<T> extends SimpleChannelInboundHandler
 									pipelineToProxyClient.addLast(new HttpContentDecompressor());
 									pipelineToProxyClient.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
 									
-									pipelineToProxyClient.addLast(new UpstreamProxyRelayHandler(mockServerCtx.channel()));
+									pipelineToProxyClient.addLast(
+										new UpstreamProxyRelayHandler(mockServerCtx.channel()));
 								});
 						}
 						else

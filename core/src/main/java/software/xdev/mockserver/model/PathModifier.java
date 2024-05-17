@@ -105,8 +105,8 @@ public class PathModifier extends ObjectWithJsonToString
 			return false;
 		}
 		final PathModifier that = (PathModifier)o;
-		return Objects.equals(this.regex, that.regex) &&
-			Objects.equals(this.substitution, that.substitution);
+		return Objects.equals(this.regex, that.regex)
+			&& Objects.equals(this.substitution, that.substitution);
 	}
 	
 	@Override

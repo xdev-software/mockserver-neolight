@@ -105,15 +105,15 @@ public class HttpForwardClassCallbackActionHandler extends HttpForwardAction
 			{
 				try
 				{
-					final HttpRequest request = expectationForwardCallback != null ?
-						expectationForwardCallback.handle(httpRequest) :
-						httpRequest;
+					final HttpRequest request = expectationForwardCallback != null
+						? expectationForwardCallback.handle(httpRequest)
+						: httpRequest;
 					return this.sendRequest(request, null, response -> {
 						try
 						{
-							return expectationForwardResponseCallback != null ?
-								expectationForwardResponseCallback.handle(request, response) :
-								response;
+							return expectationForwardResponseCallback != null
+								? expectationForwardResponseCallback.handle(request, response)
+								: response;
 						}
 						catch(final Exception ex)
 						{

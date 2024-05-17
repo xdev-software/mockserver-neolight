@@ -135,6 +135,7 @@ public class NottableString extends ObjectWithJsonToString implements Comparable
 		return new NottableString(value, not);
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
 	public static NottableString string(String value)
 	{
 		Boolean not = null;

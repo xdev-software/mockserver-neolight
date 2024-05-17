@@ -536,7 +536,7 @@ public class Expectation extends ObjectWithJsonToString
 	}
 	
 	@Override
-	@SuppressWarnings("MethodDoesntCallSuperMethod")
+	@SuppressWarnings({"MethodDoesntCallSuperMethod", "checkstyle:NoClone"})
 	public Expectation clone()
 	{
 		return new Expectation(this.httpRequest, this.times.clone(), this.timeToLive, this.priority)
@@ -568,18 +568,18 @@ public class Expectation extends ObjectWithJsonToString
 			return false;
 		}
 		final Expectation that = (Expectation)o;
-		return Objects.equals(this.priority, that.priority) &&
-			Objects.equals(this.httpRequest, that.httpRequest) &&
-			Objects.equals(this.times, that.times) &&
-			Objects.equals(this.timeToLive, that.timeToLive) &&
-			Objects.equals(this.httpResponse, that.httpResponse) &&
-			Objects.equals(this.httpResponseClassCallback, that.httpResponseClassCallback) &&
-			Objects.equals(this.httpResponseObjectCallback, that.httpResponseObjectCallback) &&
-			Objects.equals(this.httpForward, that.httpForward) &&
-			Objects.equals(this.httpForwardClassCallback, that.httpForwardClassCallback) &&
-			Objects.equals(this.httpForwardObjectCallback, that.httpForwardObjectCallback) &&
-			Objects.equals(this.httpOverrideForwardedRequest, that.httpOverrideForwardedRequest) &&
-			Objects.equals(this.httpError, that.httpError);
+		return Objects.equals(this.priority, that.priority)
+			&& Objects.equals(this.httpRequest, that.httpRequest)
+			&& Objects.equals(this.times, that.times)
+			&& Objects.equals(this.timeToLive, that.timeToLive)
+			&& Objects.equals(this.httpResponse, that.httpResponse)
+			&& Objects.equals(this.httpResponseClassCallback, that.httpResponseClassCallback)
+			&& Objects.equals(this.httpResponseObjectCallback, that.httpResponseObjectCallback)
+			&& Objects.equals(this.httpForward, that.httpForward)
+			&& Objects.equals(this.httpForwardClassCallback, that.httpForwardClassCallback)
+			&& Objects.equals(this.httpForwardObjectCallback, that.httpForwardObjectCallback)
+			&& Objects.equals(this.httpOverrideForwardedRequest, that.httpOverrideForwardedRequest)
+			&& Objects.equals(this.httpError, that.httpError);
 	}
 	
 	@Override

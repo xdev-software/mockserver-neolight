@@ -78,10 +78,10 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 	
 	private static final AttributeKey<Boolean> TLS_ENABLED_UPSTREAM = AttributeKey.valueOf("TLS_ENABLED_UPSTREAM");
 	private static final AttributeKey<Boolean> HTTP_ENABLED = AttributeKey.valueOf("HTTP_ENABLED");
-	private static final Map<PortBinding, Set<String>> localAddressesCache = new ConcurrentHashMap<>();
+	private static final Map<PortBinding, Set<String>> LOCAL_ADDRESSES_CACHE = new ConcurrentHashMap<>();
 	
-	private final LoggingHandler loggingHandler = new LoggingHandler(PortUnificationHandler.class.getName() +
-		"-first");
+	private final LoggingHandler loggingHandler = new LoggingHandler(
+		PortUnificationHandler.class.getName() + "-first");
 	private final HttpContentLengthRemover httpContentLengthRemover = new HttpContentLengthRemover();
 	private final PreserveHeadersNettyRemoves preserveHeadersNettyRemoves = new PreserveHeadersNettyRemoves();
 	private final ServerConfiguration configuration;
@@ -250,15 +250,15 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 	private boolean isHttp(final ByteBuf msg)
 	{
 		final String method = msg.toString(msg.readerIndex(), 8, StandardCharsets.US_ASCII);
-		return method.startsWith("GET ") ||
-			method.startsWith("POST ") ||
-			method.startsWith("PUT ") ||
-			method.startsWith("HEAD ") ||
-			method.startsWith("OPTIONS ") ||
-			method.startsWith("PATCH ") ||
-			method.startsWith("DELETE ") ||
-			method.startsWith("TRACE ") ||
-			method.startsWith("CONNECT ");
+		return method.startsWith("GET ")
+			|| method.startsWith("POST ")
+			|| method.startsWith("PUT ")
+			|| method.startsWith("HEAD ")
+			|| method.startsWith("OPTIONS ")
+			|| method.startsWith("PATCH ")
+			|| method.startsWith("DELETE ")
+			|| method.startsWith("TRACE ")
+			|| method.startsWith("CONNECT ");
 	}
 	
 	private void switchToHttp(final ChannelHandlerContext ctx, final ByteBuf msg)
@@ -293,11 +293,13 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	private boolean isProxyConnected(final ByteBuf msg)
 	{
 		return msg.toString(msg.readerIndex(), 8, StandardCharsets.US_ASCII).startsWith(PROXIED);
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	private void switchToProxyConnected(final ChannelHandlerContext ctx, final ByteBuf msg)
 	{
 		final String message = this.readMessage(msg);
@@ -349,16 +351,17 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 			final String portExtension =
 				this.calculatePortExtension(inetSocketAddress, isSslEnabledUpstream(ctx.channel()));
 			final PortBinding cacheKey = new PortBinding(inetSocketAddress, portExtension);
-			localAddresses = localAddressesCache.get(cacheKey);
+			localAddresses = LOCAL_ADDRESSES_CACHE.get(cacheKey);
 			if(localAddresses == null)
 			{
 				localAddresses = this.calculateLocalAddresses(inetSocketAddress, portExtension);
-				localAddressesCache.put(cacheKey, localAddresses);
+				LOCAL_ADDRESSES_CACHE.put(cacheKey, localAddresses);
 			}
 		}
 		return (localAddresses == null) ? Collections.emptySet() : localAddresses;
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	private String calculatePortExtension(final InetSocketAddress inetSocketAddress, final boolean sslEnabledUpstream)
 	{
 		final String portExtension;

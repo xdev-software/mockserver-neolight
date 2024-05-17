@@ -75,6 +75,7 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 		super(BodyDTO.class);
 	}
 	
+	@SuppressWarnings("checkstyle:MethodLength")
 	@Override
 	public BodyDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
 	{
@@ -120,8 +121,8 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 						{
 							type = FIELD_NAME_TO_TYPE.get(fieldName);
 						}
-						if(Map.class.isAssignableFrom(entry.getValue().getClass()) ||
-							this.containsIgnoreCase(key, "json", "jsonSchema")
+						if(Map.class.isAssignableFrom(entry.getValue().getClass())
+							|| this.containsIgnoreCase(key, "json", "jsonSchema")
 								&& !String.class.isAssignableFrom(entry.getValue().getClass()))
 						{
 							if(jsonBodyObjectWriter == null)
@@ -325,6 +326,8 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							result = new StringBodyDTO(new StringBody(valueJsonValue, rawBytes, subString, null), not);
 							break;
 						}
+					default:
+						throw new UnsupportedOperationException();
 				}
 			}
 		}

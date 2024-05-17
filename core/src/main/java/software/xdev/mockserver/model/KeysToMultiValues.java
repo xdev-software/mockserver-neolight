@@ -367,6 +367,7 @@ public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends Key
 		return this.multimap.isEmpty();
 	}
 	
+	@SuppressWarnings("checkstyle:NoClone")
 	@Override
 	public abstract K clone();
 	

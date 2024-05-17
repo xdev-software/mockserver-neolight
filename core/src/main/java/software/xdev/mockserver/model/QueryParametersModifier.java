@@ -29,13 +29,13 @@ public class QueryParametersModifier extends KeysToMultiValuesModifier<Parameter
 	}
 	
 	@Override
-	Parameters construct(List<Parameter> parameters)
+	Parameters construct(final List<Parameter> parameters)
 	{
 		return new Parameters(parameters);
 	}
 	
 	@Override
-	Parameters construct(Parameter... parameters)
+	Parameters construct(final Parameter... parameters)
 	{
 		return new Parameters(parameters);
 	}

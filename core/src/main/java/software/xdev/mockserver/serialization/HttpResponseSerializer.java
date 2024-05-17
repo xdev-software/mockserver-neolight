@@ -82,6 +82,7 @@ public class HttpResponseSerializer implements Serializer<HttpResponse>
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
 	@Override
 	public HttpResponse deserialize(String jsonHttpResponse)
 	{

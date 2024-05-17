@@ -349,7 +349,8 @@ public class ServerConfiguration extends Configuration
 	 * @param useSemicolonAsQueryParameterSeparator if true semicolons are treated as a separator for a query parameter
 	 *                                              string
 	 */
-	public ServerConfiguration useSemicolonAsQueryParameterSeparator(final Boolean useSemicolonAsQueryParameterSeparator)
+	public ServerConfiguration useSemicolonAsQueryParameterSeparator(
+		final Boolean useSemicolonAsQueryParameterSeparator)
 	{
 		this.useSemicolonAsQueryParameterSeparator = useSemicolonAsQueryParameterSeparator;
 		return this;
@@ -567,7 +568,8 @@ public class ServerConfiguration extends Configuration
 	 * @param maximumNumberOfRequestToReturnInVerificationFailure maximum number of expectations to return in
 	 *                                                            verification failure result
 	 */
-	public ServerConfiguration maximumNumberOfRequestToReturnInVerificationFailure(final Integer maximumNumberOfRequestToReturnInVerificationFailure)
+	public ServerConfiguration maximumNumberOfRequestToReturnInVerificationFailure(
+		final Integer maximumNumberOfRequestToReturnInVerificationFailure)
 	{
 		this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
 		return this;
@@ -705,6 +707,7 @@ public class ServerConfiguration extends Configuration
 		return this.nextPowerOfTwo(this.maxLogEntries());
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	private int nextPowerOfTwo(final int value)
 	{
 		for(int i = 0; i < 16; i++)

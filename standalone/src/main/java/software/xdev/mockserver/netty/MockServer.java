@@ -158,7 +158,7 @@ public class MockServer extends LifeCycle
 	public MockServer(
 		final ServerConfiguration configuration,
 		final List<ProxyConfiguration> proxyConfigurations,
-		String remoteHost,
+		final String remoteHost,
 		final Integer remotePort,
 		final Integer... localPorts)
 	{
@@ -167,12 +167,8 @@ public class MockServer extends LifeCycle
 		{
 			throw new IllegalArgumentException("You must specify a remote hostname");
 		}
-		if(isBlank(remoteHost))
-		{
-			remoteHost = "localhost";
-		}
 		
-		this.remoteSocket = new InetSocketAddress(remoteHost, remotePort);
+		this.remoteSocket = new InetSocketAddress(isBlank(remoteHost) ? remoteHost : "localhost", remotePort);
 		if(proxyConfigurations != null && LOG.isInfoEnabled())
 		{
 			LOG.info("Using proxy configuration for forwarded requests: {}", proxyConfigurations);
@@ -183,6 +179,7 @@ public class MockServer extends LifeCycle
 		this.getLocalPort();
 	}
 	
+	@SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:FinalParameters"})
 	private void createServerBootstrap(
 		ServerConfiguration configuration,
 		final List<ProxyConfiguration> proxyConfigurations,

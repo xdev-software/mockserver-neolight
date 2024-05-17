@@ -84,11 +84,16 @@ public abstract class Action<T extends Action> extends ObjectWithJsonToString
 		RESPONSE_OBJECT_CALLBACK(Direction.RESPONSE),
 		ERROR(Direction.RESPONSE);
 		
-		public final Direction direction;
+		private final Direction direction;
 		
 		Type(final Direction direction)
 		{
 			this.direction = direction;
+		}
+		
+		public Direction getDirection()
+		{
+			return this.direction;
 		}
 	}
 	

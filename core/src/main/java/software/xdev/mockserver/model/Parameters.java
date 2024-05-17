@@ -74,6 +74,7 @@ public class Parameters extends KeysToMultiValues<Parameter, Parameters>
 		return this;
 	}
 	
+	@SuppressWarnings("checkstyle:NoClone")
 	@Override
 	public Parameters clone()
 	{

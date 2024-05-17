@@ -72,7 +72,8 @@ public class Verification extends ObjectWithJsonToString
 		return this.maximumNumberOfRequestToReturnInVerificationFailure;
 	}
 	
-	public Verification withMaximumNumberOfRequestToReturnInVerificationFailure(final Integer maximumNumberOfRequestToReturnInVerificationFailure)
+	public Verification withMaximumNumberOfRequestToReturnInVerificationFailure(
+		final Integer maximumNumberOfRequestToReturnInVerificationFailure)
 	{
 		this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
 		return this;

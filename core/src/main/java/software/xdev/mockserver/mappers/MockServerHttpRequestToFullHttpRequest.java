@@ -59,7 +59,8 @@ public class MockServerHttpRequestToFullHttpRequest
 	private final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations;
 	private final BodyDecoderEncoder bodyDecoderEncoder;
 	
-	public MockServerHttpRequestToFullHttpRequest(final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations)
+	public MockServerHttpRequestToFullHttpRequest(
+		final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations)
 	{
 		this.proxyConfigurations = proxyConfigurations;
 		this.bodyDecoderEncoder = new BodyDecoderEncoder();

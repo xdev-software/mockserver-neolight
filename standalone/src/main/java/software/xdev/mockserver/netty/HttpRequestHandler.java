@@ -105,19 +105,19 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 	
 	private static Set<String> getLocalAddresses(final ChannelHandlerContext ctx)
 	{
-		if(ctx != null &&
-			ctx.channel().attr(LOCAL_HOST_HEADERS) != null &&
-			ctx.channel().attr(LOCAL_HOST_HEADERS).get() != null)
+		if(ctx != null
+			&& ctx.channel().attr(LOCAL_HOST_HEADERS) != null
+			&& ctx.channel().attr(LOCAL_HOST_HEADERS).get() != null)
 		{
 			return ctx.channel().attr(LOCAL_HOST_HEADERS).get();
 		}
 		return new HashSet<>();
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	@Override
 	protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest request)
 	{
-		
 		final ResponseWriter responseWriter =
 			new NettyResponseWriter(this.configuration, ctx, this.httpState.getScheduler());
 		try
@@ -125,8 +125,8 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 			if(!this.httpState.handle(request, responseWriter, false))
 			{
 				
-				if(request.matches("PUT", PATH_PREFIX + "/status", "/status") ||
-					isNotBlank(this.configuration.livenessHttpGetPath()) && request.matches(
+				if(request.matches("PUT", PATH_PREFIX + "/status", "/status")
+					|| isNotBlank(this.configuration.livenessHttpGetPath()) && request.matches(
 						"GET",
 						this.configuration.livenessHttpGetPath()))
 				{
@@ -173,13 +173,11 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 				}
 				else if(request.matches("PUT", PATH_PREFIX + "/stop", "/stop"))
 				{
-					
 					ctx.writeAndFlush(response().withStatusCode(OK.code()));
-					new SchedulerThreadFactory("MockServer Stop").newThread(() -> this.server.stop()).start();
+					new SchedulerThreadFactory("MockServer Stop").newThread(this.server::stop).start();
 				}
 				else if(request.getMethod().getValue().equals("CONNECT"))
 				{
-					
 					final String username = this.configuration.proxyAuthenticationUsername();
 					final String password = this.configuration.proxyAuthenticationPassword();
 					if(isNotBlank(username)
@@ -207,9 +205,9 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 						// assume SSL for CONNECT request
 						enableSslUpstreamAndDownstream(ctx.channel());
 						final String[] hostParts = request.getPath().getValue().split(":");
-						final int port = hostParts.length > 1 ?
-							Integer.parseInt(hostParts[1]) :
-							isSslEnabledUpstream(ctx.channel()) ? 443 : 80;
+						final int port = hostParts.length > 1
+							? Integer.parseInt(hostParts[1])
+							: isSslEnabledUpstream(ctx.channel()) ? 443 : 80;
 						ctx.pipeline().addLast(new HttpConnectHandler(this.configuration,
 							this.server, hostParts[0], port));
 						ctx.pipeline().remove(this);
@@ -218,7 +216,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 				}
 				else
 				{
-					
 					try
 					{
 						this.httpActionHandler.processAction(

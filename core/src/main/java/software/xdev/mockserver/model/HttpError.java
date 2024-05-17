@@ -93,8 +93,8 @@ public class HttpError extends Action<HttpError>
 			return false;
 		}
 		final HttpError httpError = (HttpError)o;
-		return Objects.equals(this.dropConnection, httpError.dropConnection) &&
-			Arrays.equals(this.responseBytes, httpError.responseBytes);
+		return Objects.equals(this.dropConnection, httpError.dropConnection)
+			&& Arrays.equals(this.responseBytes, httpError.responseBytes);
 	}
 	
 	@Override

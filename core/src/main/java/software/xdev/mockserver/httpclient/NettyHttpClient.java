@@ -60,7 +60,7 @@ public class NettyHttpClient
 	static final AttributeKey<CompletableFuture<Message>> RESPONSE_FUTURE = AttributeKey.valueOf("RESPONSE_FUTURE");
 	static final AttributeKey<Boolean> ERROR_IF_CHANNEL_CLOSED_WITHOUT_RESPONSE =
 		AttributeKey.valueOf("ERROR_IF_CHANNEL_CLOSED_WITHOUT_RESPONSE");
-	private static final HopByHopHeaderFilter hopByHopHeaderFilter = new HopByHopHeaderFilter();
+	private static final HopByHopHeaderFilter HOP_BY_HOP_HEADER_FILTER = new HopByHopHeaderFilter();
 	private final Configuration configuration;
 	private final EventLoopGroup eventLoopGroup;
 	private final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations;
@@ -94,6 +94,7 @@ public class NettyHttpClient
 		return this.sendRequest(httpRequest, remoteAddress, this.configuration.socketConnectionTimeoutInMillis());
 	}
 	
+	@SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:FinalParameters"})
 	public CompletableFuture<HttpResponse> sendRequest(
 		final HttpRequest httpRequest,
 		InetSocketAddress remoteAddress,
@@ -163,7 +164,7 @@ public class NettyHttpClient
 						{
 							if(this.forwardProxyClient)
 							{
-								httpResponseFuture.complete(hopByHopHeaderFilter.onResponse((HttpResponse)message));
+								httpResponseFuture.complete(HOP_BY_HOP_HEADER_FILTER.onResponse((HttpResponse)message));
 							}
 							else
 							{
@@ -191,6 +192,7 @@ public class NettyHttpClient
 		}
 	}
 	
+	@SuppressWarnings({"checkstyle:FinalParameters", "checkstyle:MagicNumber"})
 	public CompletableFuture<BinaryMessage> sendRequest(
 		final BinaryMessage binaryRequest,
 		final boolean isSecure,

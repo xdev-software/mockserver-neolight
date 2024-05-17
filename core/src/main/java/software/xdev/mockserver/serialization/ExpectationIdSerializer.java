@@ -73,6 +73,7 @@ public class ExpectationIdSerializer implements Serializer<ExpectationId>
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
 	@Override
 	public ExpectationId deserialize(String jsonExpectationId)
 	{

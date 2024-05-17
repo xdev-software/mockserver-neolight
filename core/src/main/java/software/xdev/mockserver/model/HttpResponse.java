@@ -177,12 +177,6 @@ public class HttpResponse extends Action<HttpResponse> implements HttpMessage<Ht
 	/**
 	 * Set the body to return for example:
 	 * <p/>
-	 * string body: - exact("<html><head/><body><div>a simple string body</div></body></html>");
-	 * <p/>
-	 * or
-	 * <p/>
-	 * - new StringBody("<html><head/><body><div>a simple string body</div></body></html>")
-	 * <p/>
 	 * binary body: - binary(IOUtils.readFully(getClass().getClassLoader().getResourceAsStream("example.pdf"), 1024));
 	 * <p/>
 	 * or
@@ -305,13 +299,9 @@ public class HttpResponse extends Action<HttpResponse> implements HttpMessage<Ht
 	 * @param values the header values
 	 */
 	@Override
-	public HttpResponse withHeader(final String name, String... values)
+	public HttpResponse withHeader(final String name, final String... values)
 	{
-		if(values.length == 0)
-		{
-			values = new String[]{".*"};
-		}
-		this.getOrCreateHeaders().withEntry(name, values);
+		this.getOrCreateHeaders().withEntry(name, values.length == 0 ? new String[]{".*"} : values);
 		this.hashCode = 0;
 		return this;
 	}
@@ -324,13 +314,10 @@ public class HttpResponse extends Action<HttpResponse> implements HttpMessage<Ht
 	 * @param values the header values which can be a varags of NottableStrings
 	 */
 	@Override
-	public HttpResponse withHeader(final NottableString name, NottableString... values)
+	public HttpResponse withHeader(final NottableString name, final NottableString... values)
 	{
-		if(values.length == 0)
-		{
-			values = new NottableString[]{string(".*")};
-		}
-		this.getOrCreateHeaders().withEntry(header(name, values));
+		this.getOrCreateHeaders()
+			.withEntry(header(name, values.length == 0 ? new NottableString[]{string(".*")} : values));
 		this.hashCode = 0;
 		return this;
 	}
@@ -362,13 +349,9 @@ public class HttpResponse extends Action<HttpResponse> implements HttpMessage<Ht
 	 * @param name   the header name
 	 * @param values the header values
 	 */
-	public HttpResponse replaceHeader(final String name, String... values)
+	public HttpResponse replaceHeader(final String name, final String... values)
 	{
-		if(values.length == 0)
-		{
-			values = new String[]{".*"};
-		}
-		this.getOrCreateHeaders().replaceEntry(name, values);
+		this.getOrCreateHeaders().replaceEntry(name, values.length == 0 ? new String[]{".*"} : values);
 		this.hashCode = 0;
 		return this;
 	}
@@ -695,7 +678,7 @@ public class HttpResponse extends Action<HttpResponse> implements HttpMessage<Ht
 	}
 	
 	@Override
-	@SuppressWarnings("MethodDoesntCallSuperMethod")
+	@SuppressWarnings({"MethodDoesntCallSuperMethod", "checkstyle:NoClone"})
 	public HttpResponse clone()
 	{
 		return response()
@@ -777,13 +760,13 @@ public class HttpResponse extends Action<HttpResponse> implements HttpMessage<Ht
 			return false;
 		}
 		final HttpResponse that = (HttpResponse)o;
-		return Objects.equals(this.statusCode, that.statusCode) &&
-			Objects.equals(this.reasonPhrase, that.reasonPhrase) &&
-			Objects.equals(this.body, that.body) &&
-			Objects.equals(this.headers, that.headers) &&
-			Objects.equals(this.cookies, that.cookies) &&
-			Objects.equals(this.connectionOptions, that.connectionOptions) &&
-			Objects.equals(this.streamId, that.streamId);
+		return Objects.equals(this.statusCode, that.statusCode)
+			&& Objects.equals(this.reasonPhrase, that.reasonPhrase)
+			&& Objects.equals(this.body, that.body)
+			&& Objects.equals(this.headers, that.headers)
+			&& Objects.equals(this.cookies, that.cookies)
+			&& Objects.equals(this.connectionOptions, that.connectionOptions)
+			&& Objects.equals(this.streamId, that.streamId);
 	}
 	
 	@Override

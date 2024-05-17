@@ -105,8 +105,7 @@ public abstract class Body<T> extends Not
 			return false;
 		}
 		final Body<?> body = (Body<?>)o;
-		return this.type == body.type &&
-			Objects.equals(this.optional, body.optional);
+		return this.type == body.type && Objects.equals(this.optional, body.optional);
 	}
 	
 	@Override

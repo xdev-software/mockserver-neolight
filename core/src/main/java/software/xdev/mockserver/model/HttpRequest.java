@@ -168,6 +168,7 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	 * @param host     the remote host or ip to send request to
 	 * @param port     the remote port to send request to
 	 */
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public HttpRequest withSocketAddress(final String host, final Integer port)
 	{
 		if(isNotBlank(host))
@@ -411,13 +412,9 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	 * @param name   the parameter name
 	 * @param values the parameter values which can be a varags of strings or regular expressions
 	 */
-	public HttpRequest withPathParameter(final String name, String... values)
+	public HttpRequest withPathParameter(final String name, final String... values)
 	{
-		if(values.length == 0)
-		{
-			values = new String[]{".*"};
-		}
-		this.getOrCreatePathParameters().withEntry(name, values);
+		this.getOrCreatePathParameters().withEntry(name, values.length == 0 ? new String[]{".*"} : values);
 		this.hashCode = 0;
 		return this;
 	}
@@ -431,13 +428,10 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	 * @param name   the parameter name as a NottableString
 	 * @param values the parameter values which can be a varags of NottableStrings
 	 */
-	public HttpRequest withPathParameter(final NottableString name, NottableString... values)
+	public HttpRequest withPathParameter(final NottableString name, final NottableString... values)
 	{
-		if(values.length == 0)
-		{
-			values = new NottableString[]{string(".*")};
-		}
-		this.getOrCreatePathParameters().withEntry(name, values);
+		this.getOrCreatePathParameters()
+			.withEntry(name, values.length == 0 ? new NottableString[]{string(".*")} : values);
 		this.hashCode = 0;
 		return this;
 	}
@@ -606,13 +600,10 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	 * @param name   the parameter name as a NottableString
 	 * @param values the parameter values which can be a varags of NottableStrings
 	 */
-	public HttpRequest withQueryStringParameter(final NottableString name, NottableString... values)
+	public HttpRequest withQueryStringParameter(final NottableString name, final NottableString... values)
 	{
-		if(values.length == 0)
-		{
-			values = new NottableString[]{string(".*")};
-		}
-		this.getOrCreateQueryStringParameters().withEntry(name, values);
+		this.getOrCreateQueryStringParameters()
+			.withEntry(name, values.length == 0 ? new NottableString[]{string(".*")} : values);
 		this.hashCode = 0;
 		return this;
 	}
@@ -919,13 +910,9 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	 * @param values the header values which can be a varags of strings or regular expressions
 	 */
 	@Override
-	public HttpRequest withHeader(final String name, String... values)
+	public HttpRequest withHeader(final String name, final String... values)
 	{
-		if(values.length == 0)
-		{
-			values = new String[]{".*"};
-		}
-		this.getOrCreateHeaders().withEntry(header(name, values));
+		this.getOrCreateHeaders().withEntry(header(name, values.length == 0 ? new String[]{".*"} : values));
 		this.hashCode = 0;
 		return this;
 	}
@@ -940,13 +927,10 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	 * @param values the header values which can be a varags of NottableStrings
 	 */
 	@Override
-	public HttpRequest withHeader(final NottableString name, NottableString... values)
+	public HttpRequest withHeader(final NottableString name, final NottableString... values)
 	{
-		if(values.length == 0)
-		{
-			values = new NottableString[]{string(".*")};
-		}
-		this.getOrCreateHeaders().withEntry(header(name, values));
+		this.getOrCreateHeaders()
+			.withEntry(header(name, values.length == 0 ? new NottableString[]{string(".*")} : values));
 		this.hashCode = 0;
 		return this;
 	}
@@ -1195,6 +1179,7 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public InetSocketAddress socketAddressFromHostHeader()
 	{
 		if(this.socketAddress != null && this.socketAddress.getHost() != null)
@@ -1242,7 +1227,7 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	}
 	
 	@Override
-	@SuppressWarnings("MethodDoesntCallSuperMethod")
+	@SuppressWarnings({"MethodDoesntCallSuperMethod", "checkstyle:NoClone"})
 	public HttpRequest clone()
 	{
 		return not(request(), this.not)

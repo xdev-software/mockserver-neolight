@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 
+@SuppressWarnings("checkstyle:MagicNumber")
 public class ServerConfigurationProperties extends ConfigurationProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ServerConfigurationProperties.class);
@@ -145,17 +146,17 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 		if(isNotBlank(System.getProperty(MOCKSERVER_PROPERTY_FILE)) && System.getProperty(MOCKSERVER_PROPERTY_FILE)
 			.equals("/config/mockserver.properties"))
 		{
-			return isBlank(System.getenv("MOCKSERVER_PROPERTY_FILE")) ?
-				System.getProperty(MOCKSERVER_PROPERTY_FILE) :
-				System.getenv("MOCKSERVER_PROPERTY_FILE");
+			return isBlank(System.getenv("MOCKSERVER_PROPERTY_FILE"))
+				? System.getProperty(MOCKSERVER_PROPERTY_FILE)
+				: System.getenv("MOCKSERVER_PROPERTY_FILE");
 		}
 		else
 		{
 			return System.getProperty(
 				MOCKSERVER_PROPERTY_FILE,
-				isBlank(System.getenv("MOCKSERVER_PROPERTY_FILE")) ?
-					"mockserver.properties" :
-					System.getenv("MOCKSERVER_PROPERTY_FILE"));
+				isBlank(System.getenv("MOCKSERVER_PROPERTY_FILE"))
+					? "mockserver.properties"
+					: System.getenv("MOCKSERVER_PROPERTY_FILE"));
 		}
 	}
 	
@@ -728,7 +729,8 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 * @param maximumNumberOfRequestToReturnInVerification maximum number of expectations to return in verification
 	 *                                                     failure result
 	 */
-	public static void maximumNumberOfRequestToReturnInVerificationFailure(final Integer maximumNumberOfRequestToReturnInVerification)
+	public static void maximumNumberOfRequestToReturnInVerificationFailure(
+		final Integer maximumNumberOfRequestToReturnInVerification)
 	{
 		setProperty(
 			MOCKSERVER_MAXIMUM_NUMBER_OF_REQUESTS_TO_RETURN_IN_VERIFICATION_FAILURE,

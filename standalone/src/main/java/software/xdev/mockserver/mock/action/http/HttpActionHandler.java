@@ -103,6 +103,7 @@ public class HttpActionHandler
 		this.httpClient = new NettyHttpClient(configuration, eventLoopGroup, proxyConfigurations, true);
 	}
 	
+	@SuppressWarnings("checkstyle:MethodLength")
 	public void processAction(
 		final HttpRequest request,
 		final ResponseWriter responseWriter,
@@ -281,6 +282,8 @@ public class HttpActionHandler
 						}), synchronous, action.getDelay());
 					break;
 				}
+				default:
+					throw new UnsupportedOperationException();
 			}
 		}
 		else if(CORSHeaders.isPreflightRequest(this.configuration, request) && (this.configuration.enableCORSForAPI()
@@ -318,8 +321,8 @@ public class HttpActionHandler
 				final String password = this.configuration.proxyAuthenticationPassword();
 				// only authenticate potentiallyHttpProxy because other proxied requests should have already been
 				// authenticated (i.e. in CONNECT request)
-				if(potentiallyHttpProxy && isNotBlank(username) && isNotBlank(password) &&
-					!request.containsHeader(
+				if(potentiallyHttpProxy && isNotBlank(username) && isNotBlank(password)
+					&& !request.containsHeader(
 						PROXY_AUTHORIZATION.toString(),
 						"Basic " + Base64.encode(Unpooled.copiedBuffer(
 							username + ':' + password,
@@ -419,7 +422,8 @@ public class HttpActionHandler
 									this.returnNotFound(
 										responseWriter,
 										request,
-										"TLS handshake exception while proxying request to remote address" + remoteAddress);
+										"TLS handshake exception while proxying request to remote address"
+											+ remoteAddress);
 								}
 								else if(!connectionClosedException(ex))
 								{

@@ -19,7 +19,7 @@ public final class EpochService
 {
 	public static final long FIXED_TIME_FOR_TESTS = System.currentTimeMillis();
 	@SuppressWarnings("checkstyle:VisibilityModifier")
-	public static boolean fixedTime = false;
+	public static boolean fixedTime;
 	
 	public static long currentTimeMillis()
 	{

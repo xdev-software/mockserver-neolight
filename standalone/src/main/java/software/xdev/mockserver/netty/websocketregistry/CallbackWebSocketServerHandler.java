@@ -78,9 +78,9 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
 				this.upgradeChannel(ctx, fullHttpRequest);
 				ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).set(true);
 			}
-			else if(ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).get() != null &&
-				ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).get() &&
-				msg instanceof final WebSocketFrame webSocketFrame)
+			else if(ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).get() != null
+				&& ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).get()
+				&& msg instanceof final WebSocketFrame webSocketFrame)
 			{
 				this.handleWebSocketFrame(ctx, webSocketFrame);
 			}
@@ -120,9 +120,9 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
 		}
 		else
 		{
-			final String clientId = httpRequest.headers().contains(CLIENT_REGISTRATION_ID_HEADER) ?
-				httpRequest.headers().get(CLIENT_REGISTRATION_ID_HEADER) :
-				UUIDService.getUUID();
+			final String clientId = httpRequest.headers().contains(CLIENT_REGISTRATION_ID_HEADER)
+				? httpRequest.headers().get(CLIENT_REGISTRATION_ID_HEADER)
+				: UUIDService.getUUID();
 			if(LocalCallbackRegistry.responseClientExists(clientId)
 				|| LocalCallbackRegistry.forwardClientExists(clientId))
 			{

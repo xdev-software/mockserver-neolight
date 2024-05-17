@@ -65,9 +65,9 @@ public class CORSHeaders
 	public static boolean isPreflightRequest(final ServerConfiguration configuration, final HttpRequest request)
 	{
 		final Headers headers = request.getHeaders();
-		final boolean isPreflightRequest = request.getMethod().getValue().equals(OPTIONS.name()) &&
-			headers.containsEntry(HttpHeaderNames.ORIGIN.toString()) &&
-			headers.containsEntry(HttpHeaderNames.ACCESS_CONTROL_REQUEST_METHOD.toString());
+		final boolean isPreflightRequest = request.getMethod().getValue().equals(OPTIONS.name())
+			&& headers.containsEntry(HttpHeaderNames.ORIGIN.toString())
+			&& headers.containsEntry(HttpHeaderNames.ACCESS_CONTROL_REQUEST_METHOD.toString());
 		if(isPreflightRequest)
 		{
 			configuration.enableCORSForAPI(true);

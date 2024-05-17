@@ -117,8 +117,7 @@ public final class ExceptionHandling
 				}
 				
 				// also match against SctpChannel via String matching as it may not present.
-				if(PlatformDependent.javaVersion() >= 7
-					&& "com.sun.nio.sctp.SctpChannel".equals(clazz.getSuperclass().getName()))
+				if("com.sun.nio.sctp.SctpChannel".equals(clazz.getSuperclass().getName()))
 				{
 					return false;
 				}

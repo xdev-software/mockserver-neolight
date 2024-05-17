@@ -332,6 +332,8 @@ public final class Main
 									+ "\"FINE\", \"INFO\", \"WARNING\", \"SEVERE\", \"OFF\"";
 							}
 							break;
+						default:
+							throw new UnsupportedOperationException();
 					}
 					if(errorMessage.isEmpty())
 					{
@@ -401,13 +403,13 @@ public final class Main
 		proxyRemotePort("PROXY_REMOTE_PORT"),
 		logLevel("LOG_LEVEL");
 		
-		static final CaseInsensitiveList names = new CaseInsensitiveList();
+		static final CaseInsensitiveList NAMES = new CaseInsensitiveList();
 		
 		static
 		{
 			for(final Arguments arguments : values())
 			{
-				names.add(arguments.name());
+				NAMES.add(arguments.name());
 			}
 		}
 		
@@ -420,7 +422,7 @@ public final class Main
 		
 		public static CaseInsensitiveList names()
 		{
-			return names;
+			return NAMES;
 		}
 		
 		public String shortEnvironmentVariableName()

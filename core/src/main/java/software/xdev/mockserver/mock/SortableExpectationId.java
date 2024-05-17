@@ -58,10 +58,10 @@ public class SortableExpectationId implements Keyed<String>
 			}
 		};
 	
-	public final int hashCode;
-	public final String id;
-	public final int priority;
-	public final long created;
+	private final int hashCode;
+	private final String id;
+	private final int priority;
+	private final long created;
 	
 	public SortableExpectationId(final String id, final int priority, final long created)
 	{
@@ -69,6 +69,26 @@ public class SortableExpectationId implements Keyed<String>
 		this.priority = priority;
 		this.created = created;
 		this.hashCode = Objects.hash(id, priority, created);
+	}
+	
+	public int getHashCode()
+	{
+		return this.hashCode;
+	}
+	
+	public String getId()
+	{
+		return this.id;
+	}
+	
+	public int getPriority()
+	{
+		return this.priority;
+	}
+	
+	public long getCreated()
+	{
+		return this.created;
 	}
 	
 	@Override

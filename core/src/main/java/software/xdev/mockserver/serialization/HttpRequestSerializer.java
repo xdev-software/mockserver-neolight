@@ -116,6 +116,7 @@ public class HttpRequestSerializer implements Serializer<HttpRequest>
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
 	@Override
 	public HttpRequest deserialize(String jsonHttpRequest)
 	{

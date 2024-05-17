@@ -53,6 +53,7 @@ public class ExpandedParameterDecoder
 		this.configuration = configuration;
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
 	public Parameters retrieveFormParameters(final String parameterString, boolean hasPath)
 	{
 		final Parameters parameters = new Parameters();
@@ -77,6 +78,7 @@ public class ExpandedParameterDecoder
 		return parameters.withEntries(parameterMap);
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
 	public Parameters retrieveQueryParameters(final String parameterString, boolean hasPath)
 	{
 		if(isNotBlank(parameterString))
@@ -118,10 +120,11 @@ public class ExpandedParameterDecoder
 						if(matcherEntry.getName().getValue().equals(matchedEntry.getName().getValue())
 							|| matchedEntry.getName().getValue().matches(matcherEntry.getName().getValue()))
 						{
-							matchedEntry.replaceValues(new ExpandedParameterDecoder(this.configuration).splitOnDelimiter(
-								matcherEntry.getName().getParameterStyle(),
-								matcherEntry.getName().getValue(),
-								matchedEntry.getValues()));
+							matchedEntry.replaceValues(new ExpandedParameterDecoder(this.configuration)
+								.splitOnDelimiter(
+									matcherEntry.getName().getParameterStyle(),
+									matcherEntry.getName().getValue(),
+									matchedEntry.getValues()));
 							matched.replaceEntry(matchedEntry);
 						}
 					}

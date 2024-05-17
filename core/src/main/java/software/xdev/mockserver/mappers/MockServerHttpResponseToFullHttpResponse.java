@@ -111,6 +111,7 @@ public class MockServerHttpResponseToFullHttpResponse
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	private HttpResponseStatus getStatus(final HttpResponse httpResponse)
 	{
 		final int statusCode = httpResponse.getStatusCode() != null ? httpResponse.getStatusCode() : 200;
@@ -203,8 +204,8 @@ public class MockServerHttpResponseToFullHttpResponse
 					response.headers()
 						.add(
 							SET_COOKIE,
-							io.netty.handler.codec.http.cookie.ServerCookieEncoder.LAX.encode(new DefaultCookie(cookie.getKey()
-								.getValue(), cookie.getValue().getValue())));
+							io.netty.handler.codec.http.cookie.ServerCookieEncoder.LAX.encode(
+								new DefaultCookie(cookie.getKey().getValue(), cookie.getValue().getValue())));
 				}
 			}
 		}

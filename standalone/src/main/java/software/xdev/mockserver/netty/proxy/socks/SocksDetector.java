@@ -30,6 +30,7 @@ import io.netty.handler.codec.socksx.v5.Socks5AuthMethod;
  * This class is expected to be used from within a {@link ReplayingDecoder}, or with enough bytes available. Readable
  * bytes are not checked and so if not enough bytes are supplied, index exceptions will arise.
  */
+@SuppressWarnings("checkstyle:FinalParameters")
 public final class SocksDetector
 {
 	private SocksDetector()
@@ -66,10 +67,10 @@ public final class SocksDetector
 	
 	private static int consumeFields(final ByteBuf msg, int i)
 	{
-		final boolean socks4a = msg.getByte(i++) == 0 &&
-			msg.getByte(i) == 0 &&
-			msg.getByte(i + 1) == 0 &&
-			msg.getByte(i + 2) != 0;
+		final boolean socks4a = msg.getByte(i++) == 0
+			&& msg.getByte(i) == 0
+			&& msg.getByte(i + 1) == 0
+			&& msg.getByte(i + 2) != 0;
 		
 		if(-1 == (i = consumeUsername(msg, i + 3)))
 		{
@@ -105,6 +106,7 @@ public final class SocksDetector
 		return i + 1;
 	}
 	
+	@SuppressWarnings("checkstyle:EmptyBlock")
 	private static int consumeHostname(final ByteBuf msg, int i)
 	{
 		// empty hostname
@@ -117,6 +119,7 @@ public final class SocksDetector
 		final int j = i + 256;
 		while((++i < j) && (msg.getByte(i) != 0))
 		{
+			// Imported from upstream
 		}
 		
 		// hostname was not 0-terminated

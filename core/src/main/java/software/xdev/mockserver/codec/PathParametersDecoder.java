@@ -110,10 +110,10 @@ public class PathParametersDecoder
 	
 	private String[] getPathParts(final NottableString path)
 	{
-		return path != null ?
-			Arrays.stream(StringUtils.removeStart(path.getValue(), "/").split("/"))
+		return path != null
+			? Arrays.stream(StringUtils.removeStart(path.getValue(), "/").split("/"))
 				.filter(StringUtils::isNotBlank)
-				.toArray(String[]::new) :
-			new String[0];
+			.toArray(String[]::new)
+			: new String[0];
 	}
 }

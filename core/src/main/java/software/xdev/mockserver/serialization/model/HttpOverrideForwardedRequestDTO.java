@@ -61,9 +61,9 @@ public class HttpOverrideForwardedRequestDTO implements DTO<HttpOverrideForwarde
 			{
 				this.responseModifier = new HttpResponseModifierDTO(modifyHttpResponse);
 			}
-			this.delay = (httpOverrideForwardedRequest.getDelay() != null ?
-				new DelayDTO(httpOverrideForwardedRequest.getDelay()) :
-				null);
+			this.delay = (httpOverrideForwardedRequest.getDelay() != null
+				? new DelayDTO(httpOverrideForwardedRequest.getDelay())
+				: null);
 		}
 	}
 	

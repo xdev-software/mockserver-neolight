@@ -311,7 +311,8 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
 		return this.httpOverrideForwardedRequest;
 	}
 	
-	public ExpectationDTO setHttpOverrideForwardedRequest(final HttpOverrideForwardedRequestDTO httpOverrideForwardedRequest)
+	public ExpectationDTO setHttpOverrideForwardedRequest(
+		final HttpOverrideForwardedRequestDTO httpOverrideForwardedRequest)
 	{
 		this.httpOverrideForwardedRequest = httpOverrideForwardedRequest;
 		return this;

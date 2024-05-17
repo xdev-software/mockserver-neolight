@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class JsonArraySerializer
 {
-	private static final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.createObjectMapper();
 	
 	public List<String> splitJSONArray(final String jsonArray)
 	{
@@ -41,7 +41,7 @@ public class JsonArraySerializer
 		final List<JsonNode> arrayItems = new ArrayList<>();
 		try
 		{
-			final JsonNode jsonNode = objectMapper.readTree(jsonArray);
+			final JsonNode jsonNode = OBJECT_MAPPER.readTree(jsonArray);
 			if(jsonNode instanceof ArrayNode)
 			{
 				for(final JsonNode arrayElement : jsonNode)

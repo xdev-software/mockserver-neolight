@@ -46,6 +46,7 @@ public class HttpForwardDTO implements DTO<HttpForward>
 	{
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	@Override
 	public HttpForward buildObject()
 	{

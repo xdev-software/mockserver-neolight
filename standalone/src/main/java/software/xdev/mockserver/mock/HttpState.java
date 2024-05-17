@@ -201,6 +201,8 @@ public class HttpState
 						this.requestMatchers.clear(requestDefinition);
 					}
 					break;
+				default:
+					throw new UnsupportedOperationException();
 			}
 		}
 		catch(final IllegalArgumentException iae)
@@ -278,6 +280,7 @@ public class HttpState
 		this.requestMatchers.postProcess(expectation);
 	}
 	
+	@SuppressWarnings({"checkstyle:MethodLength", "checkstyle:MagicNumber"})
 	public HttpResponse retrieve(final HttpRequest request)
 	{
 		final String logCorrelationId = UUIDService.getUUID();
@@ -287,9 +290,9 @@ public class HttpState
 		{
 			try
 			{
-				final RequestDefinition requestDefinition = isNotBlank(request.getBodyAsString()) ?
-					this.getRequestDefinitionSerializer().deserialize(request.getBodyAsJsonOrXmlString()) :
-					request();
+				final RequestDefinition requestDefinition = isNotBlank(request.getBodyAsString())
+					? this.getRequestDefinitionSerializer().deserialize(request.getBodyAsJsonOrXmlString())
+					: request();
 				requestDefinition.withLogCorrelationId(logCorrelationId);
 				final Format format = Format.valueOf(defaultIfEmpty(
 					request.getFirstQueryStringParameter("format").toUpperCase(),
@@ -341,6 +344,8 @@ public class HttpState
 										}
 									);
 								break;
+							default:
+								throw new UnsupportedOperationException();
 						}
 						break;
 					}
@@ -375,6 +380,8 @@ public class HttpState
 										}
 									);
 								break;
+							default:
+								throw new UnsupportedOperationException();
 						}
 						break;
 					}
@@ -416,6 +423,8 @@ public class HttpState
 										}
 									);
 								break;
+							default:
+								throw new UnsupportedOperationException();
 						}
 						break;
 					}
@@ -435,6 +444,8 @@ public class HttpState
 									this.getExpectationSerializer().serialize(expectations),
 									MediaType.JSON_UTF_8);
 								break;
+							default:
+								throw new UnsupportedOperationException();
 						}
 						if(LOG.isInfoEnabled())
 						{
@@ -447,6 +458,8 @@ public class HttpState
 						httpResponseFuture.complete(response);
 						break;
 					}
+					default:
+						throw new UnsupportedOperationException();
 				}
 				
 				try
@@ -683,23 +696,23 @@ public class HttpState
 	{
 		boolean valid = true;
 		final Action action = expectation.getAction();
-		final String NOT_SUPPORTED_MESSAGE =
+		final String notSupportedMessage =
 			" is not supported by MockServer deployed as a WAR due to limitations in the JEE specification; use "
 				+ "mockserver-netty to enable these features";
 		if(action instanceof HttpResponse && ((HttpResponse)action).getConnectionOptions() != null)
 		{
 			valid = false;
-			responseWriter.writeResponse(request, response("ConnectionOptions" + NOT_SUPPORTED_MESSAGE), true);
+			responseWriter.writeResponse(request, response("ConnectionOptions" + notSupportedMessage), true);
 		}
 		else if(action instanceof HttpObjectCallback)
 		{
 			valid = false;
-			responseWriter.writeResponse(request, response("HttpObjectCallback" + NOT_SUPPORTED_MESSAGE), true);
+			responseWriter.writeResponse(request, response("HttpObjectCallback" + notSupportedMessage), true);
 		}
 		else if(action instanceof HttpError)
 		{
 			valid = false;
-			responseWriter.writeResponse(request, response("HttpError" + NOT_SUPPORTED_MESSAGE), true);
+			responseWriter.writeResponse(request, response("HttpError" + notSupportedMessage), true);
 		}
 		return valid;
 	}

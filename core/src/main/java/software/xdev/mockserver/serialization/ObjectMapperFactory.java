@@ -73,17 +73,17 @@ public final class ObjectMapperFactory
 {
 	private static ObjectMapper objectMapper =
 		buildObjectMapperWithDeserializerAndSerializers(Collections.emptyList(), Collections.emptyList(), false);
-	private static final ObjectWriter prettyPrintWriter =
+	private static final ObjectWriter PRETTY_PRINT_WRITER =
 		buildObjectMapperWithDeserializerAndSerializers(
 			Collections.emptyList(),
 			Collections.emptyList(),
 			false).writerWithDefaultPrettyPrinter();
-	private static final ObjectWriter prettyPrintWriterThatSerialisesDefaultFields =
+	private static final ObjectWriter PRETTY_PRINT_WRITER_THAT_SERIALISES_DEFAULT_FIELDS =
 		buildObjectMapperWithDeserializerAndSerializers(
 			Collections.emptyList(),
 			Collections.emptyList(),
 			true).writerWithDefaultPrettyPrinter();
-	private static final ObjectWriter writer = buildObjectMapperWithDeserializerAndSerializers(
+	private static final ObjectWriter WRITER = buildObjectMapperWithDeserializerAndSerializers(
 		Collections.emptyList(),
 		Collections.emptyList(),
 		false).writer();
@@ -131,15 +131,15 @@ public final class ObjectMapperFactory
 		{
 			if(pretty && serialiseDefaultValues)
 			{
-				return prettyPrintWriterThatSerialisesDefaultFields;
+				return PRETTY_PRINT_WRITER_THAT_SERIALISES_DEFAULT_FIELDS;
 			}
 			else if(pretty)
 			{
-				return prettyPrintWriter;
+				return PRETTY_PRINT_WRITER;
 			}
 			else
 			{
-				return writer;
+				return WRITER;
 			}
 		}
 		else
@@ -311,17 +311,17 @@ public final class ObjectMapperFactory
 		}
 	}
 	
-	private static List<ObjectMapperFactoryCustomizer> _customizers;
+	private static List<ObjectMapperFactoryCustomizer> customizers;
 	
 	private static List<ObjectMapperFactoryCustomizer> customizers()
 	{
-		if(_customizers == null)
+		if(customizers == null)
 		{
-			_customizers = ServiceLoader.load(ObjectMapperFactoryCustomizer.class).stream()
+			customizers = ServiceLoader.load(ObjectMapperFactoryCustomizer.class).stream()
 				.map(ServiceLoader.Provider::get)
 				.toList();
 		}
-		return _customizers;
+		return customizers;
 	}
 	
 	private ObjectMapperFactory()

@@ -208,8 +208,8 @@ public class HttpForwardObjectCallbackActionHandler extends HttpForwardAction
 					{
 						LOG.trace("Received response for request {} from client {}", callbackRequest, clientId);
 					}
-					HttpForwardObjectCallbackActionHandler.this.webSocketClientRegistry.unregisterForwardCallbackHandler(
-						webSocketCorrelationId);
+					HttpForwardObjectCallbackActionHandler.this.webSocketClientRegistry
+						.unregisterForwardCallbackHandler(webSocketCorrelationId);
 					if(expectationPostProcessor != null && isFalse(httpObjectCallback.getResponseCallback()))
 					{
 						expectationPostProcessor.run();
@@ -248,8 +248,8 @@ public class HttpForwardObjectCallbackActionHandler extends HttpForwardAction
 							clientId,
 							webSocketCorrelationId);
 					}
-					HttpForwardObjectCallbackActionHandler.this.webSocketClientRegistry.unregisterForwardCallbackHandler(
-						webSocketCorrelationId);
+					HttpForwardObjectCallbackActionHandler.this.webSocketClientRegistry
+						.unregisterForwardCallbackHandler(webSocketCorrelationId);
 					actionHandler.writeResponseActionResponse(
 						httpResponse,
 						responseWriter,

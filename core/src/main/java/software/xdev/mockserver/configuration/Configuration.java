@@ -205,7 +205,8 @@ public class Configuration
 	 *
 	 * @param forwardBinaryRequestsWithoutWaitingForResponse target value
 	 */
-	public Configuration forwardBinaryRequestsWithoutWaitingForResponse(final Boolean forwardBinaryRequestsWithoutWaitingForResponse)
+	public Configuration forwardBinaryRequestsWithoutWaitingForResponse(
+		final Boolean forwardBinaryRequestsWithoutWaitingForResponse)
 	{
 		this.forwardBinaryRequestsWithoutWaitingForResponse = forwardBinaryRequestsWithoutWaitingForResponse;
 		return this;

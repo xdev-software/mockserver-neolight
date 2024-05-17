@@ -112,6 +112,7 @@ public class MockServerClient implements Stoppable
 	 *
 	 * @param portFuture the port for the MockServer to communicate with
 	 */
+	@SuppressWarnings("checkstyle:FinalParameters")
 	public MockServerClient(ClientConfiguration configuration, final CompletableFuture<Integer> portFuture)
 	{
 		if(configuration == null)
@@ -190,6 +191,7 @@ public class MockServerClient implements Stoppable
 	 * @param port        the port for the MockServer to communicate with
 	 * @param contextPath the context path that the MockServer war is deployed to
 	 */
+	@SuppressWarnings("checkstyle:FinalParameters")
 	public MockServerClient(
 		ClientConfiguration configuration,
 		final String host,
@@ -314,10 +316,10 @@ public class MockServerClient implements Stoppable
 		if(isNotBlank(this.contextPath))
 		{
 			cleanedPath =
-				(!this.contextPath.startsWith("/") ? "/" : "") +
-					this.contextPath +
-					(!this.contextPath.endsWith("/") ? "/" : "") +
-					(cleanedPath.startsWith("/") ? cleanedPath.substring(1) : cleanedPath);
+				(!this.contextPath.startsWith("/") ? "/" : "")
+					+ this.contextPath
+					+ (!this.contextPath.endsWith("/") ? "/" : "")
+					+ (cleanedPath.startsWith("/") ? cleanedPath.substring(1) : cleanedPath);
 		}
 		return (!cleanedPath.startsWith("/") ? "/" : "") + cleanedPath;
 	}
@@ -336,6 +338,7 @@ public class MockServerClient implements Stoppable
 		return this.nettyHttpClient;
 	}
 	
+	@SuppressWarnings({"checkstyle:FinalParameters", "checkstyle:MagicNumber"})
 	private HttpResponse sendRequest(
 		HttpRequest request,
 		final boolean ignoreErrors,
@@ -417,6 +420,7 @@ public class MockServerClient implements Stoppable
 	 * Returns whether MockServer has stopped, if called too quickly after starting MockServer this may return false
 	 * because MockServer has not yet started, to ensure MockServer has started use hasStarted()
 	 */
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public boolean hasStopped()
 	{
 		return this.hasStopped(10, 500, TimeUnit.MILLISECONDS);
@@ -467,6 +471,7 @@ public class MockServerClient implements Stoppable
 	 * Returns whether MockServer has started, if called after MockServer has been stopped this method will block for 5
 	 * seconds while confirming MockServer is not starting
 	 */
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public boolean hasStarted()
 	{
 		return this.hasStarted(10, 500, TimeUnit.MILLISECONDS);
@@ -572,6 +577,7 @@ public class MockServerClient implements Stoppable
 	/**
 	 * Stop MockServer gracefully (only support for Netty version, not supported for WAR version)
 	 */
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public CompletableFuture<MockServerClient> stop(final boolean ignoreFailure)
 	{
 		if(!this.stopFuture.isDone())
@@ -797,7 +803,8 @@ public class MockServerClient implements Stoppable
 		
 		final VerificationSequence verificationSequence = new VerificationSequence()
 			.withRequests(requestDefinitions)
-			.withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
+			.withMaximumNumberOfRequestToReturnInVerificationFailure(
+				maximumNumberOfRequestToReturnInVerificationFailure);
 		final String result = this.sendRequest(
 			request()
 				.withMethod("PUT")
@@ -891,7 +898,8 @@ public class MockServerClient implements Stoppable
 		
 		final VerificationSequence verificationSequence = new VerificationSequence()
 			.withExpectationIds(expectationIds)
-			.withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
+			.withMaximumNumberOfRequestToReturnInVerificationFailure(
+				maximumNumberOfRequestToReturnInVerificationFailure);
 		final String result = this.sendRequest(
 			request()
 				.withMethod("PUT")
@@ -976,7 +984,8 @@ public class MockServerClient implements Stoppable
 		final Verification verification = verification()
 			.withRequest(requestDefinition)
 			.withTimes(times)
-			.withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
+			.withMaximumNumberOfRequestToReturnInVerificationFailure(
+				maximumNumberOfRequestToReturnInVerificationFailure);
 		final String result = this.sendRequest(
 			request()
 				.withMethod("PUT")
@@ -1086,7 +1095,8 @@ public class MockServerClient implements Stoppable
 		final Verification verification = verification()
 			.withExpectationId(expectationId)
 			.withTimes(times)
-			.withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
+			.withMaximumNumberOfRequestToReturnInVerificationFailure(
+				maximumNumberOfRequestToReturnInVerificationFailure);
 		final String result = this.sendRequest(
 			request()
 				.withMethod("PUT")
@@ -1445,6 +1455,7 @@ public class MockServerClient implements Stoppable
 	 * @param expectations one or more expectations to create or update (if the id field matches)
 	 * @return upserted expectations
 	 */
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public Expectation[] upsert(final Expectation... expectations)
 	{
 		if(expectations != null)

@@ -117,14 +117,10 @@ public class ImmutableEntry extends Pair<NottableString, NottableString>
 			return false;
 		}
 		final ImmutableEntry that = (ImmutableEntry)o;
-		return this.regexStringMatcher.matches(this.key, that.key) &&
-			this.regexStringMatcher.matches(this.value, that.value) ||
-			(
-				!this.regexStringMatcher.matches(this.key, that.key) &&
-					(
-						this.key.isOptional() || that.key.isOptional()
-					)
-			);
+		return this.regexStringMatcher.matches(this.key, that.key)
+			&& this.regexStringMatcher.matches(this.value, that.value)
+			|| (!this.regexStringMatcher.matches(this.key, that.key)
+			&& (this.key.isOptional() || that.key.isOptional()));
 	}
 	
 	@Override

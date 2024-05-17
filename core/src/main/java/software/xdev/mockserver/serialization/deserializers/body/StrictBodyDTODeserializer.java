@@ -74,6 +74,7 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
 		super(BodyDTO.class);
 	}
 	
+	@SuppressWarnings("checkstyle:MethodLength")
 	@Override
 	public BodyDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
 	{
@@ -281,6 +282,8 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
 							result = new StringBodyDTO(new StringBody(valueJsonValue, rawBytes, subString, null), not);
 							break;
 						}
+					default:
+						throw new UnsupportedOperationException();
 				}
 			}
 		}

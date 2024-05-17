@@ -138,9 +138,9 @@ public class StringBody extends BodyWithContentType<String>
 			return false;
 		}
 		final StringBody that = (StringBody)o;
-		return this.subString == that.subString &&
-			Objects.equals(this.value, that.value) &&
-			Arrays.equals(this.rawBytes, that.rawBytes);
+		return this.subString == that.subString
+			&& Objects.equals(this.value, that.value)
+			&& Arrays.equals(this.rawBytes, that.rawBytes);
 	}
 	
 	@Override

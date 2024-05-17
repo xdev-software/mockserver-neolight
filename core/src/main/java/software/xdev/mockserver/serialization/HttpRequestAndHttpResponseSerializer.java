@@ -32,17 +32,18 @@ import software.xdev.mockserver.serialization.model.HttpRequestAndHttpResponseDT
 
 public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequestAndHttpResponse>
 {
-	private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-	private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
+	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
+	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
 	
-	public String serialize(HttpRequestAndHttpResponse httpRequestAndHttpResponse)
+	@Override
+	public String serialize(final HttpRequestAndHttpResponse httpRequestAndHttpResponse)
 	{
 		try
 		{
-			return objectWriter.writeValueAsString(new HttpRequestAndHttpResponseDTO(httpRequestAndHttpResponse));
+			return this.objectWriter.writeValueAsString(new HttpRequestAndHttpResponseDTO(httpRequestAndHttpResponse));
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
 			throw new IllegalStateException("Exception while serializing HttpRequestAndHttpResponse to JSON with "
 				+ "value "
@@ -50,31 +51,31 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 		}
 	}
 	
-	public String serialize(List<HttpRequestAndHttpResponse> httpRequests)
+	public String serialize(final List<HttpRequestAndHttpResponse> httpRequests)
 	{
-		return serialize(httpRequests.toArray(new HttpRequestAndHttpResponse[0]));
+		return this.serialize(httpRequests.toArray(new HttpRequestAndHttpResponse[0]));
 	}
 	
-	public String serialize(HttpRequestAndHttpResponse... httpRequests)
+	public String serialize(final HttpRequestAndHttpResponse... httpRequests)
 	{
 		try
 		{
 			if(httpRequests != null && httpRequests.length > 0)
 			{
-				HttpRequestAndHttpResponseDTO[] httpRequestDTOs =
+				final HttpRequestAndHttpResponseDTO[] httpRequestDTOs =
 					new HttpRequestAndHttpResponseDTO[httpRequests.length];
 				for(int i = 0; i < httpRequests.length; i++)
 				{
 					httpRequestDTOs[i] = new HttpRequestAndHttpResponseDTO(httpRequests[i]);
 				}
-				return objectWriter.writeValueAsString(httpRequestDTOs);
+				return this.objectWriter.writeValueAsString(httpRequestDTOs);
 			}
 			else
 			{
 				return "[]";
 			}
 		}
-		catch(Exception e)
+		catch(final Exception e)
 		{
 			throw new IllegalStateException(
 				"Exception while serializing HttpRequestAndHttpResponse to JSON with value " + Arrays.asList(
@@ -82,19 +83,21 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
+	@Override
 	public HttpRequestAndHttpResponse deserialize(String jsonHttpRequest)
 	{
 		if(jsonHttpRequest.contains("\"httpRequestAndHttpResponse\""))
 		{
 			try
 			{
-				JsonNode jsonNode = objectMapper.readTree(jsonHttpRequest);
+				final JsonNode jsonNode = this.objectMapper.readTree(jsonHttpRequest);
 				if(jsonNode.has("httpRequestAndHttpResponse"))
 				{
 					jsonHttpRequest = jsonNode.get("httpRequestAndHttpResponse").toString();
 				}
 			}
-			catch(Exception ex)
+			catch(final Exception ex)
 			{
 				throw new IllegalArgumentException(
 					"exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
@@ -103,14 +106,14 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 		HttpRequestAndHttpResponse httpRequestAndHttpResponse = null;
 		try
 		{
-			HttpRequestAndHttpResponseDTO httpRequestDTO =
-				objectMapper.readValue(jsonHttpRequest, HttpRequestAndHttpResponseDTO.class);
+			final HttpRequestAndHttpResponseDTO httpRequestDTO =
+				this.objectMapper.readValue(jsonHttpRequest, HttpRequestAndHttpResponseDTO.class);
 			if(httpRequestDTO != null)
 			{
 				httpRequestAndHttpResponse = httpRequestDTO.buildObject();
 			}
 		}
-		catch(Exception ex)
+		catch(final Exception ex)
 		{
 			throw new IllegalArgumentException(
 				"exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
@@ -124,9 +127,9 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 		return HttpRequestAndHttpResponse.class;
 	}
 	
-	public HttpRequestAndHttpResponse[] deserializeArray(String jsonHttpRequests)
+	public HttpRequestAndHttpResponse[] deserializeArray(final String jsonHttpRequests)
 	{
-		List<HttpRequestAndHttpResponse> httpRequests = new ArrayList<>();
+		final List<HttpRequestAndHttpResponse> httpRequests = new ArrayList<>();
 		if(isBlank(jsonHttpRequests))
 		{
 			throw new IllegalArgumentException(
@@ -135,7 +138,7 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 		}
 		else
 		{
-			List<String> jsonRequestList = jsonArraySerializer.splitJSONArray(jsonHttpRequests);
+			final List<String> jsonRequestList = this.jsonArraySerializer.splitJSONArray(jsonHttpRequests);
 			if(jsonRequestList.isEmpty())
 			{
 				throw new IllegalArgumentException(
@@ -143,14 +146,14 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 			}
 			else
 			{
-				List<String> validationErrorsList = new ArrayList<>();
-				for(String jsonRequest : jsonRequestList)
+				final List<String> validationErrorsList = new ArrayList<>();
+				for(final String jsonRequest : jsonRequestList)
 				{
 					try
 					{
-						httpRequests.add(deserialize(jsonRequest));
+						httpRequests.add(this.deserialize(jsonRequest));
 					}
-					catch(IllegalArgumentException iae)
+					catch(final IllegalArgumentException iae)
 					{
 						validationErrorsList.add(iae.getMessage());
 					}

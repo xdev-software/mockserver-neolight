@@ -35,19 +35,18 @@ public class LogEventRequestAndResponseSerializer
 {
 	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-	private static final ObjectWriter objectWriter = ObjectMapperFactory
+	private static final ObjectWriter OBJECT_WRITER = ObjectMapperFactory
 		.createObjectMapper()
 		.writer(
 			new DefaultPrettyPrinter()
 				.withArrayIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-				.withObjectIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-		);
+				.withObjectIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE));
 	
 	public String serialize(final LogEventRequestAndResponse httpRequestAndHttpResponse)
 	{
 		try
 		{
-			return objectWriter.writeValueAsString(new LogEventRequestAndResponseDTO(httpRequestAndHttpResponse));
+			return OBJECT_WRITER.writeValueAsString(new LogEventRequestAndResponseDTO(httpRequestAndHttpResponse));
 		}
 		catch(final Exception e)
 		{
@@ -76,7 +75,7 @@ public class LogEventRequestAndResponseSerializer
 					httpRequestAndHttpResponseDTOS[i] =
 						new LogEventRequestAndResponseDTO(httpRequestAndHttpResponses[i]);
 				}
-				return objectWriter
+				return OBJECT_WRITER
 					.withDefaultPrettyPrinter()
 					.writeValueAsString(httpRequestAndHttpResponseDTOS);
 			}

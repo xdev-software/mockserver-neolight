@@ -28,7 +28,7 @@ import software.xdev.mockserver.mock.action.ExpectationResponseCallback;
 
 public final class LocalCallbackRegistry
 {
-	public static boolean enabled = true;
+	static boolean enabled = true;
 	private static Map<String, ExpectationResponseCallback> responseCallbackRegistry;
 	private static Map<String, ExpectationForwardCallback> forwardCallbackRegistry;
 	private static Map<String, ExpectationForwardAndResponseCallback> forwardAndResponseCallbackRegistry;

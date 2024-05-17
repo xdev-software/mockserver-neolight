@@ -44,8 +44,8 @@ public class MediaType
 	 * specification section 3.7.1 (http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.7.1):
 	 * <pre>
 	 *     The "charset" parameter is used with some media types to define the character set (section 3.4) of the data.
-	 *     When no explicit charset parameter is provided by the sender, media subtypes of the "text" type are defined to
-	 *     have a default charset value of "ISO-8859-1" when received via HTTP. Data in character sets other than
+	 *     When no explicit charset parameter is provided by the sender, media subtypes of the "text" type are defined
+	 *     to have a default charset value of "ISO-8859-1" when received via HTTP. Data in character sets other than
 	 *     "ISO-8859-1" or its subsets MUST be labeled with an appropriate charset value.
 	 * </pre>
 	 */

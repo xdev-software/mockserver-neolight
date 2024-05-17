@@ -58,7 +58,7 @@ public class WebSocketClient<T extends HttpMessage>
 	private final WebSocketMessageSerializer webSocketMessageSerializer;
 	private ExpectationCallback<T> expectationCallback;
 	private ExpectationForwardAndResponseCallback expectationForwardResponseCallback;
-	private boolean isStopped = false;
+	private boolean isStopped;
 	private final EventLoopGroup eventLoopGroup;
 	private final String clientId;
 	public static final String CLIENT_REGISTRATION_ID_HEADER = "X-CLIENT-REGISTRATION-ID";

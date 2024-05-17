@@ -111,6 +111,7 @@ public class RequestDefinitionSerializer implements Serializer<RequestDefinition
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
 	@Override
 	public RequestDefinition deserialize(String jsonRequestDefinition)
 	{

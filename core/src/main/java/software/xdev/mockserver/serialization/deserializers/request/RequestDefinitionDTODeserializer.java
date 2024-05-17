@@ -147,6 +147,8 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
 						}
 						break;
 					}
+					default:
+						throw new UnsupportedOperationException();
 				}
 			}
 		}

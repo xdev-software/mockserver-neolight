@@ -78,9 +78,9 @@ public abstract class LifeCycle implements Stoppable
 	{
 		if(!this.stopFuture.isDone() && this.stopping.compareAndSet(false, true))
 		{
-			final String message = "stopped for port" + (this.getLocalPorts().size() == 1 ?
-				": " + this.getLocalPorts().get(0) :
-				"s: " + this.getLocalPorts());
+			final String message = "stopped for port" + (this.getLocalPorts().size() == 1
+				? ": " + this.getLocalPorts().get(0)
+				: "s: " + this.getLocalPorts());
 			if(LOG.isInfoEnabled())
 			{
 				LOG.info(message);
@@ -177,6 +177,7 @@ public abstract class LifeCycle implements Stoppable
 		return this.getFirstBoundPort(this.serverChannelFutures);
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	private Integer getFirstBoundPort(final List<Future<Channel>> channelFutures)
 	{
 		for(final Future<Channel> channelOpened : channelFutures)

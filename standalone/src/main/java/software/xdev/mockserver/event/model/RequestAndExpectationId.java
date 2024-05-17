@@ -23,8 +23,8 @@ import software.xdev.mockserver.model.RequestDefinition;
 
 public class RequestAndExpectationId
 {
-	public final RequestDefinition requestDefinition;
-	public final String expectationId;
+	private final RequestDefinition requestDefinition;
+	private final String expectationId;
 	
 	public RequestAndExpectationId(final RequestDefinition requestDefinition, final String expectationId)
 	{

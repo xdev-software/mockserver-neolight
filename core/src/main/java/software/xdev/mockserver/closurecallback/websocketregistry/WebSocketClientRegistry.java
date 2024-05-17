@@ -56,6 +56,7 @@ public class WebSocketClientRegistry
 		this.forwardCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public void receivedTextWebSocketFrame(final TextWebSocketFrame textWebSocketFrame)
 	{
 		try
@@ -126,8 +127,9 @@ public class WebSocketClientRegistry
 		try
 		{
 			ctx.channel()
-				.writeAndFlush(new TextWebSocketFrame(this.webSocketMessageSerializer.serialize(new WebSocketClientIdDTO().setClientId(
-					clientId))));
+				.writeAndFlush(new TextWebSocketFrame(
+					this.webSocketMessageSerializer.serialize(
+						new WebSocketClientIdDTO().setClientId(clientId))));
 		}
 		catch(final Exception e)
 		{

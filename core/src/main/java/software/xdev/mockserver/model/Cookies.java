@@ -47,6 +47,7 @@ public class Cookies extends KeysAndValues<Cookie, Cookies>
 		return new Cookie(name, value);
 	}
 	
+	@SuppressWarnings("checkstyle:NoClone")
 	@Override
 	public Cookies clone()
 	{

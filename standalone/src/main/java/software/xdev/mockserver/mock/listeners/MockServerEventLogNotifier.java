@@ -26,7 +26,7 @@ import software.xdev.mockserver.scheduler.Scheduler;
 
 public class MockServerEventLogNotifier
 {
-	private boolean listenerAdded = false;
+	private boolean listenerAdded;
 	private final List<MockServerLogListener> listeners = Collections.synchronizedList(new ArrayList<>());
 	private final Scheduler scheduler;
 	

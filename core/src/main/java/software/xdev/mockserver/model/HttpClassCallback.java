@@ -65,7 +65,8 @@ public class HttpClassCallback extends Action<HttpClassCallback>
 	 *                      "com.foo.MyExpectationResponseCallback"
 	 */
 	@SuppressWarnings("rawtypes")
-	public static HttpClassCallback callback(final Class<? extends ExpectationCallback<? extends HttpMessage>> callbackClass)
+	public static HttpClassCallback callback(
+		final Class<? extends ExpectationCallback<? extends HttpMessage>> callbackClass)
 	{
 		return new HttpClassCallback().withCallbackClass(callbackClass);
 	}
@@ -105,7 +106,8 @@ public class HttpClassCallback extends Action<HttpClassCallback>
 	 *                      "com.foo.MyExpectationResponseCallback"
 	 */
 	@SuppressWarnings("rawtypes")
-	public HttpClassCallback withCallbackClass(final Class<? extends ExpectationCallback<? extends HttpMessage>> callbackClass)
+	public HttpClassCallback withCallbackClass(
+		final Class<? extends ExpectationCallback<? extends HttpMessage>> callbackClass)
 	{
 		this.callbackClass = callbackClass.getName();
 		this.hashCode = 0;
@@ -146,8 +148,7 @@ public class HttpClassCallback extends Action<HttpClassCallback>
 			return false;
 		}
 		final HttpClassCallback that = (HttpClassCallback)o;
-		return Objects.equals(this.callbackClass, that.callbackClass) &&
-			this.actionType == that.actionType;
+		return Objects.equals(this.callbackClass, that.callbackClass) && this.actionType == that.actionType;
 	}
 	
 	@Override

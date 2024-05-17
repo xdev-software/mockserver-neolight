@@ -60,6 +60,7 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 		super(BodyWithContentTypeDTO.class);
 	}
 	
+	@SuppressWarnings("checkstyle:MethodLength")
 	@Override
 	public BodyWithContentTypeDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
 		throws IOException
@@ -215,6 +216,8 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 							result = new StringBodyDTO(new StringBody(valueJsonValue, rawBytes, false, null), not);
 							break;
 						}
+					default:
+						throw new UnsupportedOperationException();
 				}
 			}
 		}

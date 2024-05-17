@@ -98,7 +98,7 @@ public class Times
 	}
 	
 	@Override
-	@SuppressWarnings("MethodDoesntCallSuperMethod")
+	@SuppressWarnings({"MethodDoesntCallSuperMethod", "checkstyle:NoClone"})
 	public Times clone()
 	{
 		if(this.unlimited)

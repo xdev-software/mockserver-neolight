@@ -28,6 +28,7 @@ public class MatcherBuilder
 	private final ServerConfiguration configuration;
 	private final LRUCache<RequestDefinition, HttpRequestMatcher> requestMatcherLRUCache;
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public MatcherBuilder(final ServerConfiguration configuration)
 	{
 		this.configuration = configuration;

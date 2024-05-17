@@ -60,6 +60,7 @@ public class Headers extends KeysToMultiValues<Header, Headers>
 		return this;
 	}
 	
+	@SuppressWarnings("checkstyle:NoClone")
 	@Override
 	public Headers clone()
 	{

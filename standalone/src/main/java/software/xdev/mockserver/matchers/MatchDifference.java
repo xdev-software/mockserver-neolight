@@ -45,14 +45,14 @@ public class MatchDifference
 		
 		private final String name;
 		
-		Field(String name)
+		Field(final String name)
 		{
 			this.name = name;
 		}
 		
 		public String getName()
 		{
-			return name;
+			return this.name;
 		}
 	}
 	
@@ -62,15 +62,15 @@ public class MatchDifference
 	private final Map<Field, List<String>> differences = new ConcurrentHashMap<>();
 	private Field fieldName;
 	
-	public MatchDifference(boolean detailedMatchFailures, RequestDefinition httpRequest)
+	public MatchDifference(final boolean detailedMatchFailures, final RequestDefinition httpRequest)
 	{
 		this.detailedMatchFailures = detailedMatchFailures;
 		this.httpRequest = httpRequest;
 	}
 	
-	public MatchDifference addDifference(Field fieldName, String messageFormat, Object... arguments)
+	public MatchDifference addDifference(final Field fieldName, final String messageFormat, final Object... arguments)
 	{
-		if(detailedMatchFailures)
+		if(this.detailedMatchFailures)
 		{
 			if(isNotBlank(messageFormat) && arguments != null && fieldName != null)
 			{
@@ -83,29 +83,29 @@ public class MatchDifference
 	}
 	
 	@SuppressWarnings("UnusedReturnValue")
-	public MatchDifference addDifference(String messageFormat, Object... arguments)
+	public MatchDifference addDifference(final String messageFormat, final Object... arguments)
 	{
-		return addDifference(fieldName, messageFormat, arguments);
+		return this.addDifference(this.fieldName, messageFormat, arguments);
 	}
 	
 	public RequestDefinition getHttpRequest()
 	{
-		return httpRequest;
+		return this.httpRequest;
 	}
 	
 	public String getLogCorrelationId()
 	{
-		return httpRequest.getLogCorrelationId();
+		return this.httpRequest.getLogCorrelationId();
 	}
 	
 	@SuppressWarnings("UnusedReturnValue")
-	protected MatchDifference currentField(Field fieldName)
+	protected MatchDifference currentField(final Field fieldName)
 	{
 		this.fieldName = fieldName;
 		return this;
 	}
 	
-	public List<String> getDifferences(Field fieldName)
+	public List<String> getDifferences(final Field fieldName)
 	{
 		return this.differences.get(fieldName);
 	}
@@ -115,9 +115,9 @@ public class MatchDifference
 		return this.differences;
 	}
 	
-	public void addDifferences(Map<Field, List<String>> differences)
+	public void addDifferences(final Map<Field, List<String>> differences)
 	{
-		for(Field field : differences.keySet())
+		for(final Field field : differences.keySet())
 		{
 			this.differences
 				.computeIfAbsent(field, key -> new ArrayList<>())

@@ -59,7 +59,8 @@ public class VerificationDTO extends ObjectWithJsonToString implements DTO<Verif
 			.withRequest((this.httpRequest != null ? this.httpRequest.buildObject() : null))
 			.withExpectationId(this.expectationId)
 			.withTimes((this.times != null ? this.times.buildObject() : once()))
-			.withMaximumNumberOfRequestToReturnInVerificationFailure(this.maximumNumberOfRequestToReturnInVerificationFailure);
+			.withMaximumNumberOfRequestToReturnInVerificationFailure(
+				this.maximumNumberOfRequestToReturnInVerificationFailure);
 	}
 	
 	public RequestDefinitionDTO getHttpRequest()
@@ -100,7 +101,8 @@ public class VerificationDTO extends ObjectWithJsonToString implements DTO<Verif
 		return this.maximumNumberOfRequestToReturnInVerificationFailure;
 	}
 	
-	public VerificationDTO setMaximumNumberOfRequestToReturnInVerificationFailure(final Integer maximumNumberOfRequestToReturnInVerificationFailure)
+	public VerificationDTO setMaximumNumberOfRequestToReturnInVerificationFailure(
+		final Integer maximumNumberOfRequestToReturnInVerificationFailure)
 	{
 		this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
 		return this;

@@ -139,6 +139,8 @@ public class NottableStringMultiMap
 				}
 				return true;
 			}
+			default:
+				throw new UnsupportedOperationException();
 		}
 		return false;
 	}

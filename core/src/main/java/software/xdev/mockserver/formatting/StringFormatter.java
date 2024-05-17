@@ -68,8 +68,8 @@ public final class StringFormatter
 		for(int messagePartIndex = 0; messagePartIndex < messageParts.length; messagePartIndex++)
 		{
 			logMessage.append(INDENTS.get(indent)).append(messageParts[messagePartIndex]);
-			if(formattedArguments.length > 0 &&
-				formattedArguments.length > messagePartIndex)
+			if(formattedArguments.length > 0
+				&& formattedArguments.length > messagePartIndex)
 			{
 				logMessage.append(formattedArguments[messagePartIndex]);
 			}
@@ -92,8 +92,8 @@ public final class StringFormatter
 		for(int messagePartIndex = 0; messagePartIndex < messageParts.length; messagePartIndex++)
 		{
 			logMessage.append(messageParts[messagePartIndex]);
-			if(formattedArguments.length > 0 &&
-				formattedArguments.length > messagePartIndex)
+			if(formattedArguments.length > 0
+				&& formattedArguments.length > messagePartIndex)
 			{
 				logMessage.append(formattedArguments[messagePartIndex]);
 			}

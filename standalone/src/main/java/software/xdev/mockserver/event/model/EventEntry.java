@@ -308,7 +308,7 @@ public class EventEntry implements EventTranslator<EventEntry>
 	}
 	
 	@Override
-	@SuppressWarnings("MethodDoesntCallSuperMethod")
+	@SuppressWarnings({"MethodDoesntCallSuperMethod", "checkstyle:NoClone"})
 	public EventEntry clone()
 	{
 		return new EventEntry()
@@ -361,15 +361,15 @@ public class EventEntry implements EventTranslator<EventEntry>
 			return false;
 		}
 		final EventEntry eventEntry = (EventEntry)o;
-		return this.epochTime == eventEntry.epochTime &&
-			this.deleted == eventEntry.deleted &&
-			this.type == eventEntry.type &&
-			Objects.equals(this.httpResponse, eventEntry.httpResponse) &&
-			Objects.equals(this.httpError, eventEntry.httpError) &&
-			Objects.equals(this.expectation, eventEntry.expectation) &&
-			Objects.equals(this.expectationId, eventEntry.expectationId) &&
-			Objects.equals(this.consumer, eventEntry.consumer) &&
-			Arrays.equals(this.httpRequests, eventEntry.httpRequests);
+		return this.epochTime == eventEntry.epochTime
+			&& this.deleted == eventEntry.deleted
+			&& this.type == eventEntry.type
+			&& Objects.equals(this.httpResponse, eventEntry.httpResponse)
+			&& Objects.equals(this.httpError, eventEntry.httpError)
+			&& Objects.equals(this.expectation, eventEntry.expectation)
+			&& Objects.equals(this.expectationId, eventEntry.expectationId)
+			&& Objects.equals(this.consumer, eventEntry.consumer)
+			&& Arrays.equals(this.httpRequests, eventEntry.httpRequests);
 	}
 	
 	@Override

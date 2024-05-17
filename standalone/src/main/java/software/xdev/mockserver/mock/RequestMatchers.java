@@ -79,12 +79,12 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		this.httpRequestMatchers = new CircularPriorityQueue<>(
 			configuration.maxExpectations(),
 			EXPECTATION_SORTABLE_PRIORITY_COMPARATOR,
-			httpRequestMatcher -> httpRequestMatcher.getExpectation() != null ?
-				httpRequestMatcher.getExpectation().getSortableId() :
-				NULL,
-			httpRequestMatcher -> httpRequestMatcher.getExpectation() != null ?
-				httpRequestMatcher.getExpectation().getId() :
-				""
+			httpRequestMatcher -> httpRequestMatcher.getExpectation() != null
+				? httpRequestMatcher.getExpectation().getSortableId()
+				: NULL,
+			httpRequestMatcher -> httpRequestMatcher.getExpectation() != null
+				? httpRequestMatcher.getExpectation().getId()
+				: ""
 		);
 		this.expectationRequestDefinitions = new CircularHashMap<>(configuration.maxExpectations());
 		if(LOG.isTraceEnabled())
@@ -240,9 +240,9 @@ public class RequestMatchers extends MockServerMatcherNotifier
 			.map(httpRequestMatcher -> {
 				Expectation matchingExpectation = null;
 				boolean remainingMatchesDecremented = false;
-				if(httpRequestMatcher.matches(LOG.isDebugEnabled() ?
-					new MatchDifference(this.configuration.detailedMatchFailures(), httpRequest) :
-					null, httpRequest))
+				if(httpRequestMatcher.matches(LOG.isDebugEnabled()
+					? new MatchDifference(this.configuration.detailedMatchFailures(), httpRequest)
+					: null, httpRequest))
 				{
 					matchingExpectation = httpRequestMatcher.getExpectation();
 					httpRequestMatcher.setResponseInProgress(true);

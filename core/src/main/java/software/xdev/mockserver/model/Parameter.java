@@ -73,15 +73,13 @@ public class Parameter extends KeyToMultiValue
 		return new Parameter(name, value);
 	}
 	
-	public static Parameter optionalParam(final String name, String... values)
+	public static Parameter optionalParam(final String name, final String... values)
 	{
-		if(values.length == 0)
-		{
-			values = new String[]{".*"};
-		}
 		return new Parameter(
 			optional(name),
-			Arrays.stream(values).map(NottableString::string).toArray(NottableString[]::new));
+			Arrays.stream(values.length == 0 ? new String[]{".*"} : values)
+				.map(NottableString::string)
+				.toArray(NottableString[]::new));
 	}
 	
 	public Parameter withStyle(final ParameterStyle style)

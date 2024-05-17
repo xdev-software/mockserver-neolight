@@ -26,10 +26,10 @@ public class LogEventRequestAndResponse extends ObjectWithJsonToString
 	
 	public String getTimestamp()
 	{
-		return timestamp;
+		return this.timestamp;
 	}
 	
-	public LogEventRequestAndResponse withTimestamp(String timestamp)
+	public LogEventRequestAndResponse withTimestamp(final String timestamp)
 	{
 		this.timestamp = timestamp;
 		return this;
@@ -37,10 +37,10 @@ public class LogEventRequestAndResponse extends ObjectWithJsonToString
 	
 	public RequestDefinition getHttpRequest()
 	{
-		return httpRequest;
+		return this.httpRequest;
 	}
 	
-	public LogEventRequestAndResponse withHttpRequest(RequestDefinition httpRequest)
+	public LogEventRequestAndResponse withHttpRequest(final RequestDefinition httpRequest)
 	{
 		this.httpRequest = httpRequest;
 		return this;
@@ -48,10 +48,10 @@ public class LogEventRequestAndResponse extends ObjectWithJsonToString
 	
 	public HttpResponse getHttpResponse()
 	{
-		return httpResponse;
+		return this.httpResponse;
 	}
 	
-	public LogEventRequestAndResponse withHttpResponse(HttpResponse httpResponse)
+	public LogEventRequestAndResponse withHttpResponse(final HttpResponse httpResponse)
 	{
 		this.httpResponse = httpResponse;
 		return this;
@@ -68,14 +68,14 @@ public class LogEventRequestAndResponse extends ObjectWithJsonToString
 		{
 			return false;
 		}
-		return Objects.equals(getTimestamp(), that.getTimestamp())
-			&& Objects.equals(getHttpRequest(), that.getHttpRequest())
-			&& Objects.equals(getHttpResponse(), that.getHttpResponse());
+		return Objects.equals(this.getTimestamp(), that.getTimestamp())
+			&& Objects.equals(this.getHttpRequest(), that.getHttpRequest())
+			&& Objects.equals(this.getHttpResponse(), that.getHttpResponse());
 	}
 	
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(getTimestamp(), getHttpRequest(), getHttpResponse());
+		return Objects.hash(this.getTimestamp(), this.getHttpRequest(), this.getHttpResponse());
 	}
 }

@@ -63,7 +63,8 @@ public class VerificationSequenceDTO implements DTO<VerificationSequence>
 		return new VerificationSequence()
 			.withRequests(httpRequests)
 			.withExpectationIds(this.expectationIds)
-			.withMaximumNumberOfRequestToReturnInVerificationFailure(this.maximumNumberOfRequestToReturnInVerificationFailure);
+			.withMaximumNumberOfRequestToReturnInVerificationFailure(
+				this.maximumNumberOfRequestToReturnInVerificationFailure);
 	}
 	
 	public List<RequestDefinitionDTO> getHttpRequests()
@@ -93,7 +94,8 @@ public class VerificationSequenceDTO implements DTO<VerificationSequence>
 		return this.maximumNumberOfRequestToReturnInVerificationFailure;
 	}
 	
-	public VerificationSequenceDTO setMaximumNumberOfRequestToReturnInVerificationFailure(final Integer maximumNumberOfRequestToReturnInVerificationFailure)
+	public VerificationSequenceDTO setMaximumNumberOfRequestToReturnInVerificationFailure(
+		final Integer maximumNumberOfRequestToReturnInVerificationFailure)
 	{
 		this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
 		return this;

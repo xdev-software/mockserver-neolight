@@ -34,8 +34,8 @@ public class MultiValueMapMatcher
 	private Boolean allKeysOptional;
 	
 	MultiValueMapMatcher(
-		KeysToMultiValues<? extends KeyToMultiValue, ? extends KeysToMultiValues> keysToMultiValues,
-		boolean controlPlaneMatcher)
+		final KeysToMultiValues<? extends KeyToMultiValue, ? extends KeysToMultiValues> keysToMultiValues,
+		final boolean controlPlaneMatcher)
 	{
 		this.keysToMultiValues = keysToMultiValues;
 		this.controlPlaneMatcher = controlPlaneMatcher;
@@ -54,53 +54,54 @@ public class MultiValueMapMatcher
 	@Override
 	public boolean matches(
 		final MatchDifference context,
-		KeysToMultiValues<? extends KeyToMultiValue, ? extends KeysToMultiValues> matched)
+		final KeysToMultiValues<? extends KeyToMultiValue, ? extends KeysToMultiValues> matched)
 	{
-		boolean result;
+		final boolean result;
 		
-		if(matcher == null || matcher.isEmpty())
+		if(this.matcher == null || this.matcher.isEmpty())
 		{
 			result = true;
 		}
 		else if(matched == null || matched.isEmpty())
 		{
-			if(allKeysNotted == null)
+			if(this.allKeysNotted == null)
 			{
-				allKeysNotted = matcher.allKeysNotted();
+				this.allKeysNotted = this.matcher.allKeysNotted();
 			}
-			if(allKeysOptional == null)
+			if(this.allKeysOptional == null)
 			{
-				allKeysOptional = matcher.allKeysOptional();
+				this.allKeysOptional = this.matcher.allKeysOptional();
 			}
-			result = allKeysNotted || allKeysOptional;
+			result = this.allKeysNotted || this.allKeysOptional;
 		}
 		else
 		{
-			result = new NottableStringMultiMap(controlPlaneMatcher,
+			result = new NottableStringMultiMap(
+				this.controlPlaneMatcher,
 				matched.getKeyMatchStyle(),
-				matched.getEntries()).containsAll(context, matcher);
+				matched.getEntries()).containsAll(context, this.matcher);
 		}
 		
 		if(!result && context != null)
 		{
 			context.addDifference(
 				"multimap match failed expected:{}found:{}failed because:{}",
-				keysToMultiValues,
+				this.keysToMultiValues,
 				matched != null ? matched : "none",
-				matched != null ?
-					(matcher.getKeyMatchStyle() == KeyMatchStyle.SUB_SET ?
-						"multimap is not a subset" :
-						"multimap values don't match") :
-					"none is not a subset");
+				matched != null
+					? (this.matcher.getKeyMatchStyle() == KeyMatchStyle.SUB_SET
+					? "multimap is not a subset"
+					: "multimap values don't match")
+					: "none is not a subset");
 		}
 		
-		return not != result;
+		return this.not != result;
 	}
 	
 	@Override
 	public boolean isBlank()
 	{
-		return matcher == null || matcher.isEmpty();
+		return this.matcher == null || this.matcher.isEmpty();
 	}
 	
 	@Override
@@ -118,11 +119,11 @@ public class MultiValueMapMatcher
 		{
 			return false;
 		}
-		return controlPlaneMatcher == that.controlPlaneMatcher
-			&& Objects.equals(matcher, that.matcher)
-			&& Objects.equals(keysToMultiValues, that.keysToMultiValues)
-			&& Objects.equals(allKeysNotted, that.allKeysNotted)
-			&& Objects.equals(allKeysOptional, that.allKeysOptional);
+		return this.controlPlaneMatcher == that.controlPlaneMatcher
+			&& Objects.equals(this.matcher, that.matcher)
+			&& Objects.equals(this.keysToMultiValues, that.keysToMultiValues)
+			&& Objects.equals(this.allKeysNotted, that.allKeysNotted)
+			&& Objects.equals(this.allKeysOptional, that.allKeysOptional);
 	}
 	
 	@Override
@@ -130,10 +131,10 @@ public class MultiValueMapMatcher
 	{
 		return Objects.hash(
 			super.hashCode(),
-			matcher,
-			keysToMultiValues,
-			controlPlaneMatcher,
-			allKeysNotted,
-			allKeysOptional);
+			this.matcher,
+			this.keysToMultiValues,
+			this.controlPlaneMatcher,
+			this.allKeysNotted,
+			this.allKeysOptional);
 	}
 }

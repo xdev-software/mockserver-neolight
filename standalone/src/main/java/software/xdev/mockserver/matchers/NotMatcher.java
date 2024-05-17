@@ -20,7 +20,7 @@ import java.util.Objects;
 
 public abstract class NotMatcher<MatchedType> implements Matcher<MatchedType>
 {
-	boolean not = false;
+	boolean not;
 	
 	public static <MatcherType extends NotMatcher<?>> MatcherType notMatcher(final MatcherType matcher)
 	{

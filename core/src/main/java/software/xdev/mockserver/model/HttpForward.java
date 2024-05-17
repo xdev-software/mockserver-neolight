@@ -120,9 +120,9 @@ public class HttpForward extends Action<HttpForward>
 			return false;
 		}
 		final HttpForward that = (HttpForward)o;
-		return Objects.equals(this.host, that.host) &&
-			Objects.equals(this.port, that.port) &&
-			this.scheme == that.scheme;
+		return Objects.equals(this.host, that.host)
+			&& Objects.equals(this.port, that.port)
+			&& this.scheme == that.scheme;
 	}
 	
 	@Override

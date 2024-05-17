@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import software.xdev.mockserver.util.StringUtils;
 
 
+@SuppressWarnings("checkstyle:MagicNumber")
 public class ConfigurationProperties
 {
 	protected static final Logger LOG = LoggerFactory.getLogger(ConfigurationProperties.class);
@@ -380,6 +381,7 @@ public class ConfigurationProperties
 		}
 	}
 	
+	@SuppressWarnings("checkstyle:FinalParameters")
 	protected static void validateHostAndPortAndSetProperty(String hostAndPort, final String mockserverSocksProxy)
 	{
 		if(isNotBlank(hostAndPort))
@@ -525,14 +527,14 @@ public class ConfigurationProperties
 			{
 				throw new IllegalArgumentException("environment property name cannot be null for " + systemPropertyKey);
 			}
-			final String defaultOrEnvironmentVariable = isNotBlank(System.getenv(environmentVariableKey)) ?
-				System.getenv(environmentVariableKey) :
-				defaultValue;
+			final String defaultOrEnvironmentVariable = isNotBlank(System.getenv(environmentVariableKey))
+				? System.getenv(environmentVariableKey)
+				: defaultValue;
 			String propertyValue = System.getProperty(
 				systemPropertyKey,
-				properties != null ?
-					properties.getProperty(systemPropertyKey, defaultOrEnvironmentVariable) :
-					defaultOrEnvironmentVariable);
+				properties != null
+					? properties.getProperty(systemPropertyKey, defaultOrEnvironmentVariable)
+					: defaultOrEnvironmentVariable);
 			if(propertyValue != null && propertyValue.startsWith("\"") && propertyValue.endsWith("\""))
 			{
 				propertyValue = propertyValue.replaceAll("^\"|\"$", "");
