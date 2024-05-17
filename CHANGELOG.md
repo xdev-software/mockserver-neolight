@@ -16,3 +16,7 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * parts of Logging
   * TLS/SSL MitM (did never work with TLS 1.3+ and HTTP2+ anyway) 
   * JWT + mDNS auth
+* Split configuration into corresponding modules
+* Improved performance
+  * Removed reflective ``equals`` & ``hashCode``
+* Slimed down dependencies
