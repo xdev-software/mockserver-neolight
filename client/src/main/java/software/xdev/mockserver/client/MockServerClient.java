@@ -624,33 +624,26 @@ public class MockServerClient implements Stoppable {
      *
      * @param maximumNumberOfRequestToReturnInVerificationFailure the maximum number requests return in the error response when the verification fails
      * @param requestDefinitions                                  the http requests that must be matched for this verification to pass
-     * @throws AssertionError if the request has not been found
      */
     public MockServerClient verify(Integer maximumNumberOfRequestToReturnInVerificationFailure, RequestDefinition... requestDefinitions) throws AssertionError {
         if (requestDefinitions == null || requestDefinitions.length == 0 || requestDefinitions[0] == null) {
             throw new IllegalArgumentException("verify(RequestDefinition...) requires a non-null non-empty array of RequestDefinition objects");
         }
-
-        try {
-            VerificationSequence verificationSequence = new VerificationSequence()
-                .withRequests(requestDefinitions)
-                .withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
-            String result = sendRequest(
-                request()
-                    .withMethod("PUT")
-                    .withContentType(APPLICATION_JSON_UTF_8)
-                    .withPath(calculatePath("verifySequence"))
-                    .withBody(verificationSequenceSerializer.serialize(verificationSequence), StandardCharsets.UTF_8),
-                false
-            ).getBodyAsString();
-
-            if (result != null && !result.isEmpty()) {
-                throw new AssertionError(result);
-            }
-        } catch (AuthenticationException authenticationException) {
-            throw authenticationException;
-        } catch (Throwable throwable) {
-            throw new AssertionError(throwable.getMessage());
+        
+        VerificationSequence verificationSequence = new VerificationSequence()
+            .withRequests(requestDefinitions)
+            .withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
+        String result = sendRequest(
+            request()
+                .withMethod("PUT")
+                .withContentType(APPLICATION_JSON_UTF_8)
+                .withPath(calculatePath("verifySequence"))
+                .withBody(verificationSequenceSerializer.serialize(verificationSequence), StandardCharsets.UTF_8),
+            false
+        ).getBodyAsString();
+        
+        if (result != null && !result.isEmpty()) {
+            throw new IllegalStateException(result);
         }
         return clientClass.cast(this);
     }
@@ -713,33 +706,26 @@ public class MockServerClient implements Stoppable {
      *
      * @param maximumNumberOfRequestToReturnInVerificationFailure the maximum number requests return in the error response when the verification fails
      * @param expectationIds                                      the http requests that must be matched for this verification to pass
-     * @throws AssertionError if the request has not been found
      */
     public MockServerClient verify(Integer maximumNumberOfRequestToReturnInVerificationFailure, ExpectationId... expectationIds) throws AssertionError {
         if (expectationIds == null || expectationIds.length == 0 || expectationIds[0] == null) {
             throw new IllegalArgumentException("verify(ExpectationId...) requires a non-null non-empty array of ExpectationId objects");
         }
 
-        try {
-            VerificationSequence verificationSequence = new VerificationSequence()
-                .withExpectationIds(expectationIds)
-                .withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
-            String result = sendRequest(
-                request()
-                    .withMethod("PUT")
-                    .withContentType(APPLICATION_JSON_UTF_8)
-                    .withPath(calculatePath("verifySequence"))
-                    .withBody(verificationSequenceSerializer.serialize(verificationSequence), StandardCharsets.UTF_8),
-                false
-            ).getBodyAsString();
+        VerificationSequence verificationSequence = new VerificationSequence()
+            .withExpectationIds(expectationIds)
+            .withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
+        String result = sendRequest(
+            request()
+                .withMethod("PUT")
+                .withContentType(APPLICATION_JSON_UTF_8)
+                .withPath(calculatePath("verifySequence"))
+                .withBody(verificationSequenceSerializer.serialize(verificationSequence), StandardCharsets.UTF_8),
+            false
+        ).getBodyAsString();
 
-            if (result != null && !result.isEmpty()) {
-                throw new AssertionError(result);
-            }
-        } catch (AuthenticationException authenticationException) {
-            throw authenticationException;
-        } catch (Throwable throwable) {
-            throw new AssertionError(throwable.getMessage());
+        if (result != null && !result.isEmpty()) {
+            throw new IllegalStateException(result);
         }
         return clientClass.cast(this);
     }
@@ -801,27 +787,21 @@ public class MockServerClient implements Stoppable {
             throw new IllegalArgumentException("verify(RequestDefinition, VerificationTimes) requires a non null VerificationTimes object");
         }
 
-        try {
-            Verification verification = verification()
-                .withRequest(requestDefinition)
-                .withTimes(times)
-                .withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
-            String result = sendRequest(
-                request()
-                    .withMethod("PUT")
-                    .withContentType(APPLICATION_JSON_UTF_8)
-                    .withPath(calculatePath("verify"))
-                    .withBody(verificationSerializer.serialize(verification), StandardCharsets.UTF_8),
-                false
-            ).getBodyAsString();
+        Verification verification = verification()
+            .withRequest(requestDefinition)
+            .withTimes(times)
+            .withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
+        String result = sendRequest(
+            request()
+                .withMethod("PUT")
+                .withContentType(APPLICATION_JSON_UTF_8)
+                .withPath(calculatePath("verify"))
+                .withBody(verificationSerializer.serialize(verification), StandardCharsets.UTF_8),
+            false
+        ).getBodyAsString();
 
-            if (result != null && !result.isEmpty()) {
-                throw new AssertionError(result);
-            }
-        } catch (AuthenticationException authenticationException) {
-            throw authenticationException;
-        } catch (Throwable throwable) {
-            throw new AssertionError(throwable.getMessage());
+        if (result != null && !result.isEmpty()) {
+            throw new IllegalStateException(result);
         }
         return clientClass.cast(this);
     }
@@ -909,27 +889,21 @@ public class MockServerClient implements Stoppable {
             throw new IllegalArgumentException("verify(ExpectationId, VerificationTimes) requires a non null VerificationTimes object");
         }
 
-        try {
-            Verification verification = verification()
-                .withExpectationId(expectationId)
-                .withTimes(times)
-                .withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
-            String result = sendRequest(
-                request()
-                    .withMethod("PUT")
-                    .withContentType(APPLICATION_JSON_UTF_8)
-                    .withPath(calculatePath("verify"))
-                    .withBody(verificationSerializer.serialize(verification), StandardCharsets.UTF_8),
-                false
-            ).getBodyAsString();
+        Verification verification = verification()
+            .withExpectationId(expectationId)
+            .withTimes(times)
+            .withMaximumNumberOfRequestToReturnInVerificationFailure(maximumNumberOfRequestToReturnInVerificationFailure);
+        String result = sendRequest(
+            request()
+                .withMethod("PUT")
+                .withContentType(APPLICATION_JSON_UTF_8)
+                .withPath(calculatePath("verify"))
+                .withBody(verificationSerializer.serialize(verification), StandardCharsets.UTF_8),
+            false
+        ).getBodyAsString();
 
-            if (result != null && !result.isEmpty()) {
-                throw new AssertionError(result);
-            }
-        } catch (AuthenticationException authenticationException) {
-            throw authenticationException;
-        } catch (Throwable throwable) {
-            throw new AssertionError(throwable.getMessage());
+        if (result != null && !result.isEmpty()) {
+            throw new IllegalStateException(result);
         }
         return clientClass.cast(this);
     }
@@ -941,24 +915,18 @@ public class MockServerClient implements Stoppable {
      */
     @SuppressWarnings({"DuplicatedCode", "UnusedReturnValue"})
     public MockServerClient verifyZeroInteractions() throws AssertionError {
-        try {
-            Verification verification = verification().withRequest(request()).withTimes(exactly(0));
-            String result = sendRequest(
-                request()
-                    .withMethod("PUT")
-                    .withContentType(APPLICATION_JSON_UTF_8)
-                    .withPath(calculatePath("verify"))
-                    .withBody(verificationSerializer.serialize(verification), StandardCharsets.UTF_8),
-                false
-            ).getBodyAsString();
+        Verification verification = verification().withRequest(request()).withTimes(exactly(0));
+        String result = sendRequest(
+            request()
+                .withMethod("PUT")
+                .withContentType(APPLICATION_JSON_UTF_8)
+                .withPath(calculatePath("verify"))
+                .withBody(verificationSerializer.serialize(verification), StandardCharsets.UTF_8),
+            false
+        ).getBodyAsString();
 
-            if (result != null && !result.isEmpty()) {
-                throw new AssertionError(result);
-            }
-        } catch (AuthenticationException authenticationException) {
-            throw authenticationException;
-        } catch (Throwable throwable) {
-            throw new AssertionError(throwable.getMessage());
+        if (result != null && !result.isEmpty()) {
+            throw new IllegalStateException(result);
         }
         return clientClass.cast(this);
     }

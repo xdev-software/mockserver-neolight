@@ -62,7 +62,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
     private HttpError httpError;
     private Expectation expectation;
     private String expectationId;
-    private Throwable throwable;
+    private Exception exception;
     private Runnable consumer;
     private boolean deleted = false;
 
@@ -102,7 +102,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
         httpError = null;
         expectation = null;
         expectationId = null;
-        throwable = null;
+        exception = null;
         consumer = null;
         deleted = false;
         messageFormat = null;
@@ -301,14 +301,14 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return false;
     }
 
-    public Throwable getThrowable() {
-        return throwable;
+    public Exception getException() {
+        return exception;
     }
 
-    public LogEntry setThrowable(Throwable throwable) {
-        this.throwable = throwable;
-        if (isBlank(messageFormat) && throwable != null) {
-            messageFormat = throwable.getClass().getSimpleName();
+    public LogEntry setException(Exception ex) {
+        this.exception = ex;
+        if (isBlank(messageFormat) && ex != null) {
+            messageFormat = ex.getClass().getSimpleName();
         }
         return this;
     }
@@ -336,8 +336,8 @@ public class LogEntry implements EventTranslator<LogEntry> {
     }
 
     public LogEntry setMessageFormat(String messageFormat) {
-        if (isBlank(messageFormat) && throwable != null) {
-            this.messageFormat = throwable.getClass().getSimpleName();
+        if (isBlank(messageFormat) && exception != null) {
+            this.messageFormat = exception.getClass().getSimpleName();
         } else {
             this.messageFormat = messageFormat;
         }
@@ -432,7 +432,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
             .setMessageFormat(getMessageFormat())
             .setArguments(getArguments())
             .setBecause(getBecause())
-            .setThrowable(getThrowable())
+            .setException(getException())
             .setConsumer(getConsumer())
             .setDeleted(isDeleted());
     }
@@ -455,7 +455,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
             .setMessageFormat(getMessageFormat())
             .setArguments(getArguments())
             .setBecause(getBecause())
-            .setThrowable(getThrowable())
+            .setException(getException())
             .setConsumer(getConsumer())
             .setDeleted(isDeleted());
         clear();

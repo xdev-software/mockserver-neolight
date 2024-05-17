@@ -171,13 +171,13 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
             notifyListeners(this, true);
             eventLog.clear();
             disruptor.shutdown(2, SECONDS);
-        } catch (Throwable throwable) {
-            if (!(throwable instanceof com.lmax.disruptor.TimeoutException)) {
+        } catch (Exception ex) {
+            if (!(ex instanceof com.lmax.disruptor.TimeoutException)) {
                 if (LOG.isWarnEnabled()) {
                     writeToSystemOut(LOG, new LogEntry()
                         .setLogLevel(Level.WARN)
                         .setMessageFormat("exception while shutting down log ring buffer")
-                        .setThrowable(throwable)
+                        .setException(ex)
                     );
                 }
             }
