@@ -20,7 +20,7 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.ExpectationsListener;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
-import static software.xdev.mockserver.configuration.Configuration.configuration;
+import static software.xdev.mockserver.configuration.ServerConfiguration.configuration;
 import static software.xdev.mockserver.mock.action.http.HttpActionHandler.REMOTE_SOCKET;
 import static software.xdev.mockserver.netty.HttpRequestHandler.PROXYING;
 import static software.xdev.mockserver.proxyconfiguration.ProxyConfiguration.proxyConfiguration;
@@ -60,7 +60,7 @@ public class MockServer extends LifeCycle {
      *
      * @param localPorts the local port(s) to use, use 0 or no vararg values to specify any free port
      */
-    public MockServer(final Configuration configuration, final Integer... localPorts) {
+    public MockServer(final ServerConfiguration configuration, final Integer... localPorts) {
         this(configuration, proxyConfiguration(configuration), localPorts);
     }
 
@@ -80,7 +80,7 @@ public class MockServer extends LifeCycle {
      * @param proxyConfigurations the proxy configuration to send requests forwarded or proxied by MockServer via another proxy
      * @param localPorts          the local port(s) to use, use 0 or no vararg values to specify any free port
      */
-    public MockServer(final Configuration configuration, final List<ProxyConfiguration> proxyConfigurations, final Integer... localPorts) {
+    public MockServer(final ServerConfiguration configuration, final List<ProxyConfiguration> proxyConfigurations, final Integer... localPorts) {
         super(configuration);
         createServerBootstrap(configuration, proxyConfigurations, localPorts);
 
@@ -106,7 +106,7 @@ public class MockServer extends LifeCycle {
      * @param remoteHost the hostname of the remote server to connect to (if null defaults to "localhost")
      * @param localPorts the local port(s) to use
      */
-    public MockServer(final Configuration configuration, final Integer remotePort, final String remoteHost, final Integer... localPorts) {
+    public MockServer(final ServerConfiguration configuration, final Integer remotePort, final String remoteHost, final Integer... localPorts) {
         this(configuration, proxyConfiguration(configuration), remoteHost, remotePort, localPorts);
     }
 
@@ -117,7 +117,7 @@ public class MockServer extends LifeCycle {
      * @param remoteHost the hostname of the remote server to connect to (if null defaults to "localhost")
      * @param remotePort the port of the remote server to connect to
      */
-    public MockServer(final Configuration configuration, final ProxyConfiguration proxyConfiguration, String remoteHost, final Integer remotePort, final Integer... localPorts) {
+    public MockServer(final ServerConfiguration configuration, final ProxyConfiguration proxyConfiguration, String remoteHost, final Integer remotePort, final Integer... localPorts) {
         this(configuration, List.of(proxyConfiguration), remoteHost, remotePort, localPorts);
     }
 
@@ -128,7 +128,7 @@ public class MockServer extends LifeCycle {
      * @param remoteHost the hostname of the remote server to connect to (if null defaults to "localhost")
      * @param remotePort the port of the remote server to connect to
      */
-    public MockServer(final Configuration configuration, final List<ProxyConfiguration> proxyConfigurations, String remoteHost, final Integer remotePort, final Integer... localPorts) {
+    public MockServer(final ServerConfiguration configuration, final List<ProxyConfiguration> proxyConfigurations, String remoteHost, final Integer remotePort, final Integer... localPorts) {
         super(configuration);
         if (remotePort == null) {
             throw new IllegalArgumentException("You must specify a remote hostname");
@@ -147,7 +147,7 @@ public class MockServer extends LifeCycle {
         getLocalPort();
     }
 
-    private void createServerBootstrap(Configuration configuration, final List<ProxyConfiguration> proxyConfigurations, final Integer... localPorts) {
+    private void createServerBootstrap(ServerConfiguration configuration, final List<ProxyConfiguration> proxyConfigurations, final Integer... localPorts) {
         if (configuration == null) {
             configuration = configuration();
         }

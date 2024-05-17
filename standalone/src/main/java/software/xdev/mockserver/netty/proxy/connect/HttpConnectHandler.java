@@ -22,7 +22,7 @@ import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpServerCodec;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.netty.proxy.relay.RelayConnectHandler;
@@ -33,7 +33,7 @@ import static software.xdev.mockserver.model.HttpResponse.response;
 @ChannelHandler.Sharable
 public final class HttpConnectHandler extends RelayConnectHandler<HttpRequest> {
 
-    public HttpConnectHandler(Configuration configuration, LifeCycle server, String host, int port) {
+    public HttpConnectHandler(ServerConfiguration configuration, LifeCycle server, String host, int port) {
         super(configuration, server, host, port);
     }
 

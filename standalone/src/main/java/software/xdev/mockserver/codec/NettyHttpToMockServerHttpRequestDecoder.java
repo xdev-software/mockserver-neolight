@@ -18,7 +18,7 @@ package software.xdev.mockserver.codec;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.FullHttpRequest;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.mappers.FullHttpRequestToMockServerHttpRequest;
 import software.xdev.mockserver.model.Header;
 
@@ -29,7 +29,7 @@ public class NettyHttpToMockServerHttpRequestDecoder extends MessageToMessageDec
 
     private final FullHttpRequestToMockServerHttpRequest fullHttpRequestToMockServerRequest;
 
-    public NettyHttpToMockServerHttpRequestDecoder(Configuration configuration, Integer port) {
+    public NettyHttpToMockServerHttpRequestDecoder(ServerConfiguration configuration, Integer port) {
         this.fullHttpRequestToMockServerRequest = new FullHttpRequestToMockServerHttpRequest(configuration, port);
     }
 

@@ -18,7 +18,7 @@ package software.xdev.mockserver.netty;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
@@ -26,12 +26,12 @@ import software.xdev.mockserver.netty.unification.PortUnificationHandler;
 
 @ChannelHandler.Sharable
 public class MockServerUnificationInitializer extends ChannelHandlerAdapter {
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final LifeCycle server;
     private final HttpState httpState;
     private final HttpActionHandler actionHandler;
 
-    public MockServerUnificationInitializer(Configuration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler) {
+    public MockServerUnificationInitializer(ServerConfiguration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler) {
         this.configuration = configuration;
         this.server = server;
         this.httpState = httpState;

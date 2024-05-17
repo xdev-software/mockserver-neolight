@@ -17,7 +17,7 @@ package software.xdev.mockserver.mock;
 
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
 import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.log.MockServerEventLog;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier.Cause;
@@ -65,7 +65,7 @@ public class HttpState {
     private final Scheduler scheduler;
     // mockserver
     private final RequestMatchers requestMatchers;
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final WebSocketClientRegistry webSocketClientRegistry;
     // serializers
     private ExpectationIdSerializer expectationIdSerializer;
@@ -104,7 +104,7 @@ public class HttpState {
         return LOCAL_PORT.get();
     }
 
-    public HttpState(Configuration configuration, Scheduler scheduler) {
+    public HttpState(ServerConfiguration configuration, Scheduler scheduler) {
         this.configuration = configuration;
         this.scheduler = scheduler;
         this.webSocketClientRegistry = new WebSocketClientRegistry(configuration);

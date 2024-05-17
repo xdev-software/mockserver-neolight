@@ -40,9 +40,8 @@ import org.slf4j.event.Level;
 import software.xdev.mockserver.util.StringUtils;
 
 
-public class ServerConfigurationProperties
+public class ServerConfigurationProperties extends ConfigurationProperties
 {
-
     private static final Logger LOG = LoggerFactory.getLogger(ServerConfigurationProperties.class);
     
     private static final String DEFAULT_LOG_LEVEL = "INFO";
@@ -56,19 +55,13 @@ public class ServerConfigurationProperties
     // memory usage
     private static final String MOCKSERVER_MAX_EXPECTATIONS = "mockserver.maxExpectations";
     private static final String MOCKSERVER_MAX_LOG_ENTRIES = "mockserver.maxLogEntries";
-    private static final String MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS = "mockserver.maxWebSocketExpectations";
 
     // scalability
     private static final String MOCKSERVER_NIO_EVENT_LOOP_THREAD_COUNT = "mockserver.nioEventLoopThreadCount";
     private static final String MOCKSERVER_ACTION_HANDLER_THREAD_COUNT = "mockserver.actionHandlerThreadCount";
-    private static final String MOCKSERVER_CLIENT_NIO_EVENT_LOOP_THREAD_COUNT = "mockserver.clientNioEventLoopThreadCount";
-    private static final String MOCKSERVER_WEB_SOCKET_CLIENT_EVENT_LOOP_THREAD_COUNT = "mockserver.webSocketClientEventLoopThreadCount";
-    private static final String MOCKSERVER_MAX_FUTURE_TIMEOUT = "mockserver.maxFutureTimeout";
     private static final String MOCKSERVER_MATCHERS_FAIL_FAST = "mockserver.matchersFailFast";
 
     // socket
-    private static final String MOCKSERVER_MAX_SOCKET_TIMEOUT = "mockserver.maxSocketTimeout";
-    private static final String MOCKSERVER_SOCKET_CONNECTION_TIMEOUT = "mockserver.socketConnectionTimeout";
     private static final String MOCKSERVER_ALWAYS_CLOSE_SOCKET_CONNECTIONS = "mockserver.alwaysCloseSocketConnections";
     private static final String MOCKSERVER_LOCAL_BOUND_IP = "mockserver.localBoundIP";
 
@@ -78,9 +71,6 @@ public class ServerConfigurationProperties
     private static final String MOCKSERVER_MAX_CHUNK_SIZE = "mockserver.maxChunkSize";
     private static final String MOCKSERVER_USE_SEMICOLON_AS_QUERY_PARAMETER_SEPARATOR = "mockserver.useSemicolonAsQueryParameterSeparator";
     private static final String MOCKSERVER_ASSUME_ALL_REQUESTS_ARE_HTTP = "mockserver.assumeAllRequestsAreHttp";
-
-    // non http proxying
-    private static final String MOCKSERVER_FORWARD_BINARY_REQUESTS_WITHOUT_WAITING_FOR_RESPONSE = "mockserver.forwardBinaryRequestsWithoutWaitingForResponse";
 
     // CORS
     private static final String MOCKSERVER_ENABLE_CORS_FOR_API = "mockserver.enableCORSForAPI";
@@ -95,11 +85,6 @@ public class ServerConfigurationProperties
     private static final String MOCKSERVER_MAXIMUM_NUMBER_OF_REQUESTS_TO_RETURN_IN_VERIFICATION_FAILURE = "mockserver.maximumNumberOfRequestToReturnInVerificationFailure";
 
     // proxy
-    private static final String MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION = "mockserver.attemptToProxyIfNoMatchingExpectation";
-    private static final String MOCKSERVER_FORWARD_HTTP_PROXY = "mockserver.forwardHttpProxy";
-    private static final String MOCKSERVER_FORWARD_SOCKS_PROXY = "mockserver.forwardSocksProxy";
-    private static final String MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_USERNAME = "mockserver.forwardProxyAuthenticationUsername";
-    private static final String MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_PASSWORD = "mockserver.forwardProxyAuthenticationPassword";
     private static final String MOCKSERVER_PROXY_SERVER_REALM = "mockserver.proxyAuthenticationRealm";
     private static final String MOCKSERVER_PROXY_AUTHENTICATION_USERNAME = "mockserver.proxyAuthenticationUsername";
     private static final String MOCKSERVER_PROXY_AUTHENTICATION_PASSWORD = "mockserver.proxyAuthenticationPassword";
@@ -110,7 +95,10 @@ public class ServerConfigurationProperties
 
     // properties file
     private static final String MOCKSERVER_PROPERTY_FILE = "mockserver.propertyFile";
-    public static final Properties PROPERTIES = readPropertyFile();
+    
+    static {
+        properties = readPropertyFile();
+    }
 
     private static Map<String, String> slf4jOrJavaLoggerToJavaLoggerLevelMapping;
 
@@ -163,7 +151,7 @@ public class ServerConfigurationProperties
     // logging
 
     public static Level logLevel() {
-        String logLevel = readPropertyHierarchically(PROPERTIES, MOCKSERVER_LOG_LEVEL, "MOCKSERVER_LOG_LEVEL", DEFAULT_LOG_LEVEL).toUpperCase();
+        String logLevel = readPropertyHierarchically(properties, MOCKSERVER_LOG_LEVEL, "MOCKSERVER_LOG_LEVEL", DEFAULT_LOG_LEVEL).toUpperCase();
         if (isNotBlank(logLevel)) {
             if (getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(logLevel).equals("OFF")) {
                 return null;
@@ -176,7 +164,7 @@ public class ServerConfigurationProperties
     }
 
     public static String javaLoggerLogLevel() {
-        String logLevel = readPropertyHierarchically(PROPERTIES, MOCKSERVER_LOG_LEVEL, "MOCKSERVER_LOG_LEVEL", DEFAULT_LOG_LEVEL).toUpperCase();
+        String logLevel = readPropertyHierarchically(properties, MOCKSERVER_LOG_LEVEL, "MOCKSERVER_LOG_LEVEL", DEFAULT_LOG_LEVEL).toUpperCase();
         if (isNotBlank(logLevel)) {
             if (getSLF4JOrJavaLoggerToJavaLoggerLevelMapping().get(logLevel).equals("OFF")) {
                 return "OFF";
@@ -216,7 +204,7 @@ public class ServerConfigurationProperties
     }
 
     public static boolean disableSystemOut() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_DISABLE_SYSTEM_OUT, "MOCKSERVER_DISABLE_SYSTEM_OUT", "" + false));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_DISABLE_SYSTEM_OUT, "MOCKSERVER_DISABLE_SYSTEM_OUT", "" + false));
     }
 
     /**
@@ -230,7 +218,7 @@ public class ServerConfigurationProperties
     }
 
     public static boolean disableLogging() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_DISABLE_LOGGING, "MOCKSERVER_DISABLE_LOGGING", "" + false));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_DISABLE_LOGGING, "MOCKSERVER_DISABLE_LOGGING", "" + false));
     }
 
     /**
@@ -246,7 +234,7 @@ public class ServerConfigurationProperties
     }
 
     public static boolean detailedMatchFailures() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_DETAILED_MATCH_FAILURES, "MOCKSERVER_DETAILED_MATCH_FAILURES", "" + true));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_DETAILED_MATCH_FAILURES, "MOCKSERVER_DETAILED_MATCH_FAILURES", "" + true));
     }
 
     /**
@@ -294,24 +282,6 @@ public class ServerConfigurationProperties
         setProperty(MOCKSERVER_MAX_LOG_ENTRIES, "" + count);
     }
 
-    public static int maxWebSocketExpectations() {
-        return readIntegerProperty(MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS, "MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS", 1500);
-    }
-
-    /**
-     * <p>
-     * Maximum number of remote (not the same JVM) method callbacks (i.e. web sockets) registered for expectations.  The web socket client registry entries are stored in a circular queue so once this limit is reach the oldest are overwritten.
-     * </p>
-     * <p>
-     * The default is 1500
-     * </p>
-     *
-     * @param count maximum number of method callbacks (i.e. web sockets) registered for expectations
-     */
-    public static void maxWebSocketExpectations(int count) {
-        setProperty(MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS, "" + count);
-    }
-
     // scalability
 
     public static int nioEventLoopThreadCount() {
@@ -349,53 +319,8 @@ public class ServerConfigurationProperties
         setProperty(MOCKSERVER_ACTION_HANDLER_THREAD_COUNT, "" + count);
     }
 
-    public static int clientNioEventLoopThreadCount() {
-        return readIntegerProperty(MOCKSERVER_CLIENT_NIO_EVENT_LOOP_THREAD_COUNT, "MOCKSERVER_CLIENT_NIO_EVENT_LOOP_THREAD_COUNT", 5);
-    }
-
-    /**
-     * <p>Client Netty worker thread pool size for handling requests and response.  These threads handle deserializing and serialising HTTP requests and responses and some other fast logic.</p>
-     *
-     * <p>Default is 5 threads</p>
-     *
-     * @param count Client Netty worker thread pool size
-     */
-    public static void clientNioEventLoopThreadCount(int count) {
-        setProperty(MOCKSERVER_CLIENT_NIO_EVENT_LOOP_THREAD_COUNT, "" + count);
-    }
-
-    public static int webSocketClientEventLoopThreadCount() {
-        return readIntegerProperty(MOCKSERVER_WEB_SOCKET_CLIENT_EVENT_LOOP_THREAD_COUNT, "MOCKSERVER_WEB_SOCKET_CLIENT_EVENT_LOOP_THREAD_COUNT", 5);
-    }
-
-    /**
-     * <p>Web socket thread pool size for expectations with remote (not the same JVM) method callbacks (i.e. web sockets).</p>
-     * <p>
-     * Default is 5 threads
-     *
-     * @param count web socket worker thread pool size
-     */
-    public static void webSocketClientEventLoopThreadCount(int count) {
-        setProperty(MOCKSERVER_WEB_SOCKET_CLIENT_EVENT_LOOP_THREAD_COUNT, "" + count);
-    }
-
-    public static long maxFutureTimeout() {
-        return readLongProperty(MOCKSERVER_MAX_FUTURE_TIMEOUT, "MOCKSERVER_MAX_FUTURE_TIMEOUT", TimeUnit.SECONDS.toMillis(90));
-    }
-
-    /**
-     * Maximum time allowed in milliseconds for any future to wait, for example when waiting for a response over a web socket callback.
-     * <p>
-     * Default is 60,000 ms
-     *
-     * @param milliseconds maximum time allowed in milliseconds
-     */
-    public static void maxFutureTimeout(long milliseconds) {
-        setProperty(MOCKSERVER_MAX_FUTURE_TIMEOUT, "" + milliseconds);
-    }
-
     public static boolean matchersFailFast() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_MATCHERS_FAIL_FAST, "MOCKSERVER_MATCHERS_FAIL_FAST", "" + true));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_MATCHERS_FAIL_FAST, "MOCKSERVER_MATCHERS_FAIL_FAST", "" + true));
     }
 
     /**
@@ -410,36 +335,6 @@ public class ServerConfigurationProperties
 
     // socket
 
-    public static long maxSocketTimeout() {
-        return readLongProperty(MOCKSERVER_MAX_SOCKET_TIMEOUT, "MOCKSERVER_MAX_SOCKET_TIMEOUT", TimeUnit.SECONDS.toMillis(20));
-    }
-
-    /**
-     * Maximum time in milliseconds allowed for a response from a socket
-     * <p>
-     * Default is 20,000 ms
-     *
-     * @param milliseconds maximum time in milliseconds allowed
-     */
-    public static void maxSocketTimeout(long milliseconds) {
-        setProperty(MOCKSERVER_MAX_SOCKET_TIMEOUT, "" + milliseconds);
-    }
-
-    public static long socketConnectionTimeout() {
-        return readLongProperty(MOCKSERVER_SOCKET_CONNECTION_TIMEOUT, "MOCKSERVER_SOCKET_CONNECTION_TIMEOUT", TimeUnit.SECONDS.toMillis(20));
-    }
-
-    /**
-     * Maximum time in milliseconds allowed to connect to a socket
-     * <p>
-     * Default is 20,000 ms
-     *
-     * @param milliseconds maximum time allowed in milliseconds
-     */
-    public static void socketConnectionTimeout(long milliseconds) {
-        setProperty(MOCKSERVER_SOCKET_CONNECTION_TIMEOUT, "" + milliseconds);
-    }
-
     /**
      * <p>If true socket connections will always be closed after a response is returned, if false connection is only closed if request header indicate connection should be closed.</p>
      * <p>
@@ -452,11 +347,11 @@ public class ServerConfigurationProperties
     }
 
     public static boolean alwaysCloseSocketConnections() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_ALWAYS_CLOSE_SOCKET_CONNECTIONS, "MOCKSERVER_ALWAYS_CLOSE_SOCKET_CONNECTIONS", "false"));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_ALWAYS_CLOSE_SOCKET_CONNECTIONS, "MOCKSERVER_ALWAYS_CLOSE_SOCKET_CONNECTIONS", "false"));
     }
 
     public static String localBoundIP() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_LOCAL_BOUND_IP, "MOCKSERVER_LOCAL_BOUND_IP", "");
+        return readPropertyHierarchically(properties, MOCKSERVER_LOCAL_BOUND_IP, "MOCKSERVER_LOCAL_BOUND_IP", "");
     }
 
     /**
@@ -531,7 +426,7 @@ public class ServerConfigurationProperties
     }
 
     public static boolean useSemicolonAsQueryParameterSeparator() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_USE_SEMICOLON_AS_QUERY_PARAMETER_SEPARATOR, "MOCKSERVER_USE_SEMICOLON_AS_QUERY_PARAMETER_SEPARATOR", "true"));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_USE_SEMICOLON_AS_QUERY_PARAMETER_SEPARATOR, "MOCKSERVER_USE_SEMICOLON_AS_QUERY_PARAMETER_SEPARATOR", "true"));
     }
 
     /**
@@ -546,29 +441,13 @@ public class ServerConfigurationProperties
     }
 
     public static boolean assumeAllRequestsAreHttp() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_ASSUME_ALL_REQUESTS_ARE_HTTP, "MOCKSERVER_ASSUME_ALL_REQUESTS_ARE_HTTP", "false"));
-    }
-
-    /**
-     * If true the BinaryRequestProxyingHandler.binaryExchangeCallback is called before a response is received from the
-     * remote host. This enables the proxying of messages without a response.
-     * <p>
-     * The default is false
-     *
-     * @param forwardBinaryRequestsAsynchronously target value
-     */
-    public static void forwardBinaryRequestsWithoutWaitingForResponse(boolean forwardBinaryRequestsAsynchronously) {
-        setProperty(MOCKSERVER_FORWARD_BINARY_REQUESTS_WITHOUT_WAITING_FOR_RESPONSE, "" + forwardBinaryRequestsAsynchronously);
-    }
-
-    public static boolean forwardBinaryRequestsWithoutWaitingForResponse() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_FORWARD_BINARY_REQUESTS_WITHOUT_WAITING_FOR_RESPONSE, "MOCKSERVER_FORWARD_BINARY_REQUESTS_WITHOUT_WAITING_FOR_RESPONSE", "false"));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_ASSUME_ALL_REQUESTS_ARE_HTTP, "MOCKSERVER_ASSUME_ALL_REQUESTS_ARE_HTTP", "false"));
     }
 
     // CORS
 
     public static boolean enableCORSForAPI() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_ENABLE_CORS_FOR_API, "MOCKSERVER_ENABLE_CORS_FOR_API", "false"));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_ENABLE_CORS_FOR_API, "MOCKSERVER_ENABLE_CORS_FOR_API", "false"));
     }
 
     /**
@@ -583,7 +462,7 @@ public class ServerConfigurationProperties
     }
 
     public static boolean enableCORSForAllResponses() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_ENABLE_CORS_FOR_ALL_RESPONSES, "MOCKSERVER_ENABLE_CORS_FOR_ALL_RESPONSES", "false"));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_ENABLE_CORS_FOR_ALL_RESPONSES, "MOCKSERVER_ENABLE_CORS_FOR_ALL_RESPONSES", "false"));
     }
 
     /**
@@ -598,7 +477,7 @@ public class ServerConfigurationProperties
     }
 
     public static String corsAllowOrigin() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CORS_ALLOW_ORIGIN, "MOCKSERVER_CORS_ALLOW_ORIGIN", "");
+        return readPropertyHierarchically(properties, MOCKSERVER_CORS_ALLOW_ORIGIN, "MOCKSERVER_CORS_ALLOW_ORIGIN", "");
     }
 
     /**
@@ -612,7 +491,7 @@ public class ServerConfigurationProperties
     }
 
     public static String corsAllowMethods() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CORS_ALLOW_METHODS, "MOCKSERVER_CORS_ALLOW_METHODS", "");
+        return readPropertyHierarchically(properties, MOCKSERVER_CORS_ALLOW_METHODS, "MOCKSERVER_CORS_ALLOW_METHODS", "");
     }
 
     /**
@@ -626,7 +505,7 @@ public class ServerConfigurationProperties
     }
 
     public static String corsAllowHeaders() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_CORS_ALLOW_HEADERS, "MOCKSERVER_CORS_ALLOW_HEADERS", "");
+        return readPropertyHierarchically(properties, MOCKSERVER_CORS_ALLOW_HEADERS, "MOCKSERVER_CORS_ALLOW_HEADERS", "");
     }
 
     /**
@@ -641,7 +520,7 @@ public class ServerConfigurationProperties
     }
 
     public static boolean corsAllowCredentials() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_CORS_ALLOW_CREDENTIALS, "MOCKSERVER_CORS_ALLOW_CREDENTIALS", "false"));
+        return Boolean.parseBoolean(readPropertyHierarchically(properties, MOCKSERVER_CORS_ALLOW_CREDENTIALS, "MOCKSERVER_CORS_ALLOW_CREDENTIALS", "false"));
     }
 
     /**
@@ -686,115 +565,8 @@ public class ServerConfigurationProperties
     }
 
     // proxy
-
-    public static boolean attemptToProxyIfNoMatchingExpectation() {
-        return Boolean.parseBoolean(readPropertyHierarchically(PROPERTIES, MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION, "MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION", "" + true));
-    }
-
-    /**
-     * If true (the default) when no matching expectation is found, and the host header of the request does not match MockServer's host, then MockServer attempts to proxy the request if that fails then a 404 is returned.
-     * If false when no matching expectation is found, and MockServer is not being used as a proxy, then MockServer always returns a 404 immediately.
-     *
-     * @param enable enables automatically attempted proxying of request that don't match an expectation and look like they should be proxied
-     */
-    public static void attemptToProxyIfNoMatchingExpectation(boolean enable) {
-        setProperty(MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION, "" + enable);
-    }
-
-    public static InetSocketAddress forwardHttpProxy() {
-        return readInetSocketAddressProperty(MOCKSERVER_FORWARD_HTTP_PROXY, "MOCKSERVER_FORWARD_HTTP_PROXY");
-    }
-
-    /**
-     * Use HTTP proxy (i.e. via Host header) for all outbound / forwarded requests
-     * <p>
-     * The default is null
-     *
-     * @param hostAndPort host and port for HTTP proxy (i.e. via Host header) for all outbound / forwarded requests
-     */
-    public static void forwardHttpProxy(String hostAndPort) {
-        validateHostAndPortAndSetProperty(hostAndPort, MOCKSERVER_FORWARD_HTTP_PROXY);
-    }
-
-    /**
-     * Use HTTP proxy (i.e. via Host header) for all outbound / forwarded requests
-     * <p>
-     * The default is null
-     *
-     * @param hostAndPort host and port for HTTP proxy (i.e. via Host header) for all outbound / forwarded requests
-     */
-    public static void forwardHttpProxy(InetSocketAddress hostAndPort) {
-        validateHostAndPortAndSetProperty(hostAndPort.toString(), MOCKSERVER_FORWARD_HTTP_PROXY);
-    }
-
-    public static InetSocketAddress forwardSocksProxy() {
-        return readInetSocketAddressProperty(MOCKSERVER_FORWARD_SOCKS_PROXY, "MOCKSERVER_FORWARD_SOCKS_PROXY");
-    }
-
-    /**
-     * Use SOCKS proxy for all outbound / forwarded requests, support TLS tunnelling of TCP connections
-     * <p>
-     * The default is null
-     *
-     * @param hostAndPort host and port for SOCKS proxy for all outbound / forwarded requests
-     */
-    public static void forwardSocksProxy(String hostAndPort) {
-        validateHostAndPortAndSetProperty(hostAndPort, MOCKSERVER_FORWARD_SOCKS_PROXY);
-    }
-
-    /**
-     * Use SOCKS proxy for all outbound / forwarded requests, support TLS tunnelling of TCP connections
-     * <p>
-     * The default is null
-     *
-     * @param hostAndPort host and port for SOCKS proxy for all outbound / forwarded requests
-     */
-    public static void forwardSocksProxy(InetSocketAddress hostAndPort) {
-        validateHostAndPortAndSetProperty(hostAndPort.toString(), MOCKSERVER_FORWARD_SOCKS_PROXY);
-    }
-
-    public static String forwardProxyAuthenticationUsername() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_USERNAME, "MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_USERNAME", "");
-    }
-
-    /**
-     * <p>Username for proxy authentication when using HTTPS proxy (i.e. HTTP CONNECT) for all outbound / forwarded requests</p>
-     * <p><strong>Note:</strong> <a target="_blank" href="https://www.oracle.com/java/technologies/javase/8u111-relnotes.html">8u111 Update Release Notes</a> state that the Basic authentication scheme has been deactivated when setting up an HTTPS tunnel.  To resolve this clear or set to an empty string the following system properties: <code class="inline code">jdk.http.auth.tunneling.disabledSchemes</code> and <code class="inline code">jdk.http.auth.proxying.disabledSchemes</code>.</p>
-     * <p>
-     * The default is null
-     *
-     * @param forwardProxyAuthenticationUsername username for proxy authentication
-     */
-    public static void forwardProxyAuthenticationUsername(String forwardProxyAuthenticationUsername) {
-        if (forwardProxyAuthenticationUsername != null) {
-            setProperty(MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_USERNAME, forwardProxyAuthenticationUsername);
-        } else {
-            clearProperty(MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_USERNAME);
-        }
-    }
-
-    public static String forwardProxyAuthenticationPassword() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_PASSWORD, "MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_PASSWORD", "");
-    }
-
-    /**
-     * <p>Password for proxy authentication when using HTTPS proxy (i.e. HTTP CONNECT) for all outbound / forwarded requests</p>
-     * <p><strong>Note:</strong> <a target="_blank" href="https://www.oracle.com/java/technologies/javase/8u111-relnotes.html">8u111 Update Release Notes</a> state that the Basic authentication scheme has been deactivated when setting up an HTTPS tunnel.  To resolve this clear or set to an empty string the following system properties: <code class="inline code">jdk.http.auth.tunneling.disabledSchemes</code> and <code class="inline code">jdk.http.auth.proxying.disabledSchemes</code>.</p>
-     * <p>
-     * The default is null
-     *
-     * @param forwardProxyAuthenticationPassword password for proxy authentication
-     */
-    public static void forwardProxyAuthenticationPassword(String forwardProxyAuthenticationPassword) {
-        if (forwardProxyAuthenticationPassword != null) {
-            setProperty(MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_PASSWORD, forwardProxyAuthenticationPassword);
-        } else {
-            clearProperty(MOCKSERVER_FORWARD_PROXY_AUTHENTICATION_PASSWORD);
-        }
-    }
-
     public static String proxyAuthenticationRealm() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_PROXY_SERVER_REALM, "MOCKSERVER_PROXY_SERVER_REALM", "MockServer HTTP Proxy");
+        return readPropertyHierarchically(properties, MOCKSERVER_PROXY_SERVER_REALM, "MOCKSERVER_PROXY_SERVER_REALM", "MockServer HTTP Proxy");
     }
 
     /**
@@ -807,7 +579,7 @@ public class ServerConfigurationProperties
     }
 
     public static String proxyAuthenticationUsername() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_PROXY_AUTHENTICATION_USERNAME, "MOCKSERVER_PROXY_AUTHENTICATION_USERNAME", "");
+        return readPropertyHierarchically(properties, MOCKSERVER_PROXY_AUTHENTICATION_USERNAME, "MOCKSERVER_PROXY_AUTHENTICATION_USERNAME", "");
     }
 
     /**
@@ -823,7 +595,7 @@ public class ServerConfigurationProperties
     }
 
     public static String proxyAuthenticationPassword() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_PROXY_AUTHENTICATION_PASSWORD, "MOCKSERVER_PROXY_AUTHENTICATION_PASSWORD", "");
+        return readPropertyHierarchically(properties, MOCKSERVER_PROXY_AUTHENTICATION_PASSWORD, "MOCKSERVER_PROXY_AUTHENTICATION_PASSWORD", "");
     }
 
     /**
@@ -837,7 +609,7 @@ public class ServerConfigurationProperties
     }
 
     public static String noProxyHosts() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_NO_PROXY_HOSTS, "MOCKSERVER_NO_PROXY_HOSTS", "");
+        return readPropertyHierarchically(properties, MOCKSERVER_NO_PROXY_HOSTS, "MOCKSERVER_NO_PROXY_HOSTS", "");
     }
 
     /**
@@ -855,7 +627,7 @@ public class ServerConfigurationProperties
     // liveness
 
     public static String livenessHttpGetPath() {
-        return readPropertyHierarchically(PROPERTIES, MOCKSERVER_LIVENESS_HTTP_GET_PATH, "MOCKSERVER_LIVENESS_HTTP_GET_PATH", "");
+        return readPropertyHierarchically(properties, MOCKSERVER_LIVENESS_HTTP_GET_PATH, "MOCKSERVER_LIVENESS_HTTP_GET_PATH", "");
     }
 
     /**
@@ -871,67 +643,6 @@ public class ServerConfigurationProperties
      */
     public static void livenessHttpGetPath(String livenessPath) {
         setProperty(MOCKSERVER_LIVENESS_HTTP_GET_PATH, livenessPath);
-    }
-
-    private static void validateHostAndPortAndSetProperty(String hostAndPort, String mockserverSocksProxy) {
-        if (isNotBlank(hostAndPort)) {
-            if (hostAndPort.startsWith("/")) {
-                hostAndPort = StringUtils.substringAfter(hostAndPort, "/");
-            }
-            String errorMessage = "Invalid property value \"" + hostAndPort + "\" for \"" + mockserverSocksProxy + "\" must include <host>:<port> for example \"127.0.0.1:1090\" or \"localhost:1090\"";
-            try {
-                URI uri = new URI("https://" + hostAndPort);
-                if (uri.getHost() == null || uri.getPort() == -1) {
-                    throw new IllegalArgumentException(errorMessage);
-                } else {
-                    setProperty(mockserverSocksProxy, hostAndPort);
-                }
-            } catch (URISyntaxException ex) {
-                throw new IllegalArgumentException(errorMessage);
-            }
-        } else {
-            clearProperty(mockserverSocksProxy);
-        }
-    }
-
-    private static InetSocketAddress readInetSocketAddressProperty(String key, String environmentVariableKey) {
-        InetSocketAddress inetSocketAddress = null;
-        String proxy = readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "");
-        if (isNotBlank(proxy)) {
-            String[] proxyParts = proxy.split(":");
-            if (proxyParts.length > 1) {
-                try {
-                    inetSocketAddress = new InetSocketAddress(proxyParts[0], Integer.parseInt(proxyParts[1]));
-                } catch (NumberFormatException nfe) {
-                    LOG.error("NumberFormatException converting value \"{}\" into an integer", proxyParts[1], nfe);
-                }
-            }
-        }
-        return inetSocketAddress;
-    }
-
-    private static Integer readIntegerProperty(String key, String environmentVariableKey, int defaultValue) {
-        try {
-            return Integer.parseInt(readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue));
-        } catch (NumberFormatException nfe) {
-            LOG.error("NumberFormatException converting {} with value [{}]", 
-                key, 
-                readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue), 
-                nfe);
-            return defaultValue;
-        }
-    }
-
-    private static Long readLongProperty(String key, String environmentVariableKey, long defaultValue) {
-        try {
-            return Long.parseLong(readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue));
-        } catch (NumberFormatException nfe) {
-            LOG.error("NumberFormatException converting {} with value [{}]", 
-                key, 
-                readPropertyHierarchically(PROPERTIES, key, environmentVariableKey, "" + defaultValue), 
-                nfe);
-            return defaultValue;
-        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -981,42 +692,5 @@ public class ServerConfigurationProperties
         }
 
         return properties;
-    }
-
-    private static Map<String, String> propertyCache;
-
-    private static Map<String, String> getPropertyCache() {
-        if (propertyCache == null) {
-            propertyCache = new ConcurrentHashMap<>();
-        }
-        return propertyCache;
-    }
-
-    private static void setProperty(String systemPropertyKey, String value) {
-        getPropertyCache().put(systemPropertyKey, value);
-        System.setProperty(systemPropertyKey, value);
-    }
-
-    private static void clearProperty(String systemPropertyKey) {
-        getPropertyCache().remove(systemPropertyKey);
-        System.clearProperty(systemPropertyKey);
-    }
-
-    private static String readPropertyHierarchically(Properties properties, String systemPropertyKey, String environmentVariableKey, String defaultValue) {
-        String cachedPropertyValue = getPropertyCache().get(systemPropertyKey);
-        if (cachedPropertyValue != null) {
-            return cachedPropertyValue;
-        } else {
-            if (isBlank(environmentVariableKey)) {
-                throw new IllegalArgumentException("environment property name cannot be null for " + systemPropertyKey);
-            }
-            String defaultOrEnvironmentVariable = isNotBlank(System.getenv(environmentVariableKey)) ? System.getenv(environmentVariableKey) : defaultValue;
-            String propertyValue = System.getProperty(systemPropertyKey, properties != null ? properties.getProperty(systemPropertyKey, defaultOrEnvironmentVariable) : defaultOrEnvironmentVariable);
-            if (propertyValue != null && propertyValue.startsWith("\"") && propertyValue.endsWith("\"")) {
-                propertyValue = propertyValue.replaceAll("^\"|\"$", "");
-            }
-            getPropertyCache().put(systemPropertyKey, propertyValue);
-            return propertyValue;
-        }
     }
 }

@@ -18,7 +18,7 @@ package software.xdev.mockserver.mock;
 import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClientRegistry;
 import software.xdev.mockserver.collections.CircularHashMap;
 import software.xdev.mockserver.collections.CircularPriorityQueue;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.matchers.HttpRequestMatcher;
 import software.xdev.mockserver.matchers.MatchDifference;
 import software.xdev.mockserver.matchers.MatcherBuilder;
@@ -49,12 +49,12 @@ public class RequestMatchers extends MockServerMatcherNotifier {
     
     final CircularPriorityQueue<String, HttpRequestMatcher, SortableExpectationId> httpRequestMatchers;
     final CircularHashMap<String, RequestDefinition> expectationRequestDefinitions;
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final Scheduler scheduler;
     private WebSocketClientRegistry webSocketClientRegistry;
     private MatcherBuilder matcherBuilder;
 
-    public RequestMatchers(Configuration configuration, Scheduler scheduler, WebSocketClientRegistry webSocketClientRegistry) {
+    public RequestMatchers(ServerConfiguration configuration, Scheduler scheduler, WebSocketClientRegistry webSocketClientRegistry) {
         super(scheduler);
         this.configuration = configuration;
         this.scheduler = scheduler;

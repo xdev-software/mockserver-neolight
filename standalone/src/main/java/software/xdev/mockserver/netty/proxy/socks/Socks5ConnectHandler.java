@@ -18,13 +18,13 @@ package software.xdev.mockserver.netty.proxy.socks;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.socksx.v5.*;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 
 @ChannelHandler.Sharable
 public final class Socks5ConnectHandler extends SocksConnectHandler<Socks5CommandRequest> {
 
-    public Socks5ConnectHandler(Configuration configuration, LifeCycle server, String host, int port) {
+    public Socks5ConnectHandler(ServerConfiguration configuration, LifeCycle server, String host, int port) {
         super(configuration, server, host, port);
     }
 

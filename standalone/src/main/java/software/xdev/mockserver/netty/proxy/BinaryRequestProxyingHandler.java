@@ -21,7 +21,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
 import software.xdev.mockserver.model.BinaryMessage;
 import software.xdev.mockserver.model.BinaryProxyListener;
@@ -46,12 +46,12 @@ import static software.xdev.mockserver.netty.unification.PortUnificationHandler.
 public class BinaryRequestProxyingHandler extends SimpleChannelInboundHandler<ByteBuf> {
     
     private static final Logger LOG = LoggerFactory.getLogger(BinaryRequestProxyingHandler.class);
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final Scheduler scheduler;
     private final NettyHttpClient httpClient;
     private final BinaryProxyListener binaryExchangeCallback;
 
-    public BinaryRequestProxyingHandler(final Configuration configuration,final Scheduler scheduler, final NettyHttpClient httpClient) {
+    public BinaryRequestProxyingHandler(final ServerConfiguration configuration,final Scheduler scheduler, final NettyHttpClient httpClient) {
         super(true);
         this.configuration = configuration;
         this.scheduler = scheduler;

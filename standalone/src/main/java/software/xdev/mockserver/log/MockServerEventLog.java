@@ -19,7 +19,7 @@ import com.lmax.disruptor.ExceptionHandler;
 import com.lmax.disruptor.dsl.Disruptor;
 
 import software.xdev.mockserver.collections.CircularConcurrentLinkedDeque;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.log.model.LogEntry;
 import software.xdev.mockserver.log.model.RequestAndExpectationId;
 import software.xdev.mockserver.matchers.HttpRequestMatcher;
@@ -91,14 +91,14 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
             .withHttpRequest(logEntry.getHttpRequest())
             .withHttpResponse(logEntry.getHttpResponse())
             .withTimestamp(logEntry.getTimestamp());
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private CircularConcurrentLinkedDeque<LogEntry> eventLog;
     private MatcherBuilder matcherBuilder;
     private RequestDefinitionSerializer requestDefinitionSerializer;
     private final boolean asynchronousEventProcessing;
     private Disruptor<LogEntry> disruptor;
 
-    public MockServerEventLog(Configuration configuration, Scheduler scheduler, boolean asynchronousEventProcessing) {
+    public MockServerEventLog(ServerConfiguration configuration, Scheduler scheduler, boolean asynchronousEventProcessing) {
         super(scheduler);
         this.configuration = configuration;
         this.matcherBuilder = new MatcherBuilder(configuration);

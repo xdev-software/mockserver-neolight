@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.matchers;
 
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.model.RequestDefinition;
@@ -36,7 +36,7 @@ public abstract class AbstractHttpRequestMatcher extends NotMatcher<RequestDefin
     protected static final String MATCHED = " matched";
     protected static final String COLON_NEW_LINES = ": " + NEW_LINE + NEW_LINE;
 
-    protected final Configuration configuration;
+    protected final ServerConfiguration configuration;
     private int hashCode;
     private boolean isBlank = false;
     private boolean responseInProgress = false;
@@ -47,7 +47,7 @@ public abstract class AbstractHttpRequestMatcher extends NotMatcher<RequestDefin
     protected String didNotMatchExpectationBecause = REQUEST_DID_NOT_MATCH + EXPECTATION + BECAUSE;
     protected String didNotMatchExpectationWithoutBecause = REQUEST_DID_NOT_MATCH + EXPECTATION;
 
-    protected AbstractHttpRequestMatcher(Configuration configuration) {
+    protected AbstractHttpRequestMatcher(ServerConfiguration configuration) {
         this.configuration = configuration;
     }
 

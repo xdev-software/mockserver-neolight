@@ -21,7 +21,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.handler.codec.base64.Base64;
 import io.netty.util.AttributeKey;
 import org.apache.commons.text.StringEscapeUtils;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.cors.CORSHeaders;
 import software.xdev.mockserver.filters.HopByHopHeaderFilter;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
@@ -60,7 +60,7 @@ public class HttpActionHandler {
     
     public static final AttributeKey<InetSocketAddress> REMOTE_SOCKET = AttributeKey.valueOf("REMOTE_SOCKET");
     
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final HttpState httpStateHandler;
     private final Scheduler scheduler;
     private HttpResponseActionHandler httpResponseActionHandler;
@@ -76,7 +76,7 @@ public class HttpActionHandler {
     private NettyHttpClient httpClient;
     private HopByHopHeaderFilter hopByHopHeaderFilter = new HopByHopHeaderFilter();
 
-    public HttpActionHandler(Configuration configuration, EventLoopGroup eventLoopGroup, HttpState httpStateHandler, List<ProxyConfiguration> proxyConfigurations) {
+    public HttpActionHandler(ServerConfiguration configuration, EventLoopGroup eventLoopGroup, HttpState httpStateHandler, List<ProxyConfiguration> proxyConfigurations) {
         this.configuration = configuration;
         this.httpStateHandler = httpStateHandler;
         this.scheduler = httpStateHandler.getScheduler();

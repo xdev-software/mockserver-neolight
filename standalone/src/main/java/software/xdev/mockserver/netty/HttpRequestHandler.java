@@ -20,7 +20,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import org.apache.commons.text.StringEscapeUtils;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
@@ -63,13 +63,13 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
     
     public static final AttributeKey<Boolean> PROXYING = AttributeKey.valueOf("PROXYING");
     public static final AttributeKey<Set<String>> LOCAL_HOST_HEADERS = AttributeKey.valueOf("LOCAL_HOST_HEADERS");
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private LifeCycle server;
     private HttpState httpState;
     private PortBindingSerializer portBindingSerializer;
     private HttpActionHandler httpActionHandler;
 
-    public HttpRequestHandler(Configuration configuration, LifeCycle server, HttpState httpState, HttpActionHandler httpActionHandler) {
+    public HttpRequestHandler(ServerConfiguration configuration, LifeCycle server, HttpState httpState, HttpActionHandler httpActionHandler) {
         super(false);
         this.configuration = configuration;
         this.server = server;

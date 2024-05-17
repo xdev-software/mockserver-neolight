@@ -19,7 +19,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.socksx.v5.*;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class Socks5ProxyHandler extends SocksProxyHandler<Socks5Message> {
     
     private static final Logger LOG = LoggerFactory.getLogger(Socks5ProxyHandler.class);
     
-    public Socks5ProxyHandler(Configuration configuration, LifeCycle server) {
+    public Socks5ProxyHandler(ServerConfiguration configuration, LifeCycle server) {
         super(configuration, server);
     }
 

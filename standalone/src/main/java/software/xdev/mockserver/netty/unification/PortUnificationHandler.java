@@ -31,7 +31,7 @@ import io.netty.util.AttributeKey;
 import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
 import software.xdev.mockserver.codec.PreserveHeadersNettyRemoves;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.logging.LoggingHandler;
 import software.xdev.mockserver.mock.HttpState;
@@ -71,12 +71,12 @@ public class PortUnificationHandler extends ReplayingDecoder<Void> {
     private final LoggingHandler loggingHandler = new LoggingHandler(PortUnificationHandler.class.getName() + "-first");
     private final HttpContentLengthRemover httpContentLengthRemover = new HttpContentLengthRemover();
     private final PreserveHeadersNettyRemoves preserveHeadersNettyRemoves = new PreserveHeadersNettyRemoves();
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final LifeCycle server;
     private final HttpState httpState;
     private final HttpActionHandler actionHandler;
 
-    public PortUnificationHandler(Configuration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler) {
+    public PortUnificationHandler(ServerConfiguration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler) {
         this.configuration = configuration;
         this.server = server;
         this.httpState = httpState;

@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.scheduler;
 
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.httpclient.SocketCommunicationException;
 import software.xdev.mockserver.mock.action.http.HttpForwardActionResult;
 import software.xdev.mockserver.model.BinaryMessage;
@@ -36,16 +36,16 @@ import static software.xdev.mockserver.mock.HttpState.setPort;
 public class Scheduler {
     
     private static final Logger LOG = LoggerFactory.getLogger(Scheduler.class);
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final ScheduledExecutorService scheduler;
 
     private final boolean synchronous;
     
-    public Scheduler(Configuration configuration) {
+    public Scheduler(ServerConfiguration configuration) {
         this(configuration, false);
     }
 
-    public Scheduler(Configuration configuration, boolean synchronous) {
+    public Scheduler(ServerConfiguration configuration, boolean synchronous) {
         this.configuration = configuration;
         this.synchronous = synchronous;
         if (!this.synchronous) {

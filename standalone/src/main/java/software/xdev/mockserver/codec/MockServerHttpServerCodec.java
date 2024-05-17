@@ -16,7 +16,7 @@
 package software.xdev.mockserver.codec;
 
 import io.netty.channel.CombinedChannelDuplexHandler;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -24,11 +24,11 @@ import java.net.SocketAddress;
 
 public class MockServerHttpServerCodec extends CombinedChannelDuplexHandler<NettyHttpToMockServerHttpRequestDecoder, MockServerHttpToNettyHttpResponseEncoder> {
 
-    public MockServerHttpServerCodec(Configuration configuration, SocketAddress socketAddress) {
+    public MockServerHttpServerCodec(ServerConfiguration configuration, SocketAddress socketAddress) {
         this(configuration, socketAddress instanceof InetSocketAddress isa ? isa.getPort() : null);
     }
 
-    public MockServerHttpServerCodec(Configuration configuration, Integer port) {
+    public MockServerHttpServerCodec(ServerConfiguration configuration, Integer port) {
         init(
             new NettyHttpToMockServerHttpRequestDecoder(configuration, port),
             new MockServerHttpToNettyHttpResponseEncoder());

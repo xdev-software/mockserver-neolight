@@ -18,7 +18,7 @@ package software.xdev.mockserver.netty.proxy.socks;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 
 import org.slf4j.Logger;
@@ -32,10 +32,10 @@ public abstract class SocksProxyHandler<T> extends SimpleChannelInboundHandler<T
     
     private static final Logger LOG = LoggerFactory.getLogger(SocksProxyHandler.class);
     
-    protected final Configuration configuration;
+    protected final ServerConfiguration configuration;
     protected final LifeCycle server;
 
-    protected SocksProxyHandler(Configuration configuration, LifeCycle server) {
+    protected SocksProxyHandler(ServerConfiguration configuration, LifeCycle server) {
         super(false);
         this.configuration = configuration;
         this.server = server;

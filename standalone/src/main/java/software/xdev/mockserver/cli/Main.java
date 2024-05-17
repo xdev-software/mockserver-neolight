@@ -117,7 +117,7 @@ public class Main {
                         } else if (isNotBlank(System.getenv(parsedArgument.shortEnvironmentVariableName()))) {
                             if (!(parsedArgument == serverPort
                                 && "1080".equals(System.getenv(serverPort.shortEnvironmentVariableName()))
-                                && ServerConfigurationProperties.PROPERTIES.containsKey(serverPort.systemPropertyName()))) {
+                                && ServerConfigurationProperties.properties.containsKey(serverPort.systemPropertyName()))) {
                                 environmentVariableArguments.put(parsedArgument.shortEnvironmentVariableName(), System.getenv(parsedArgument.shortEnvironmentVariableName()));
                                 parsedArguments.put(parsedArgument.name(), environmentVariableArguments.get(parsedArgument.shortEnvironmentVariableName()));
                             }
@@ -129,10 +129,10 @@ public class Main {
                     environmentVariableArguments.remove(parsedArgument.shortEnvironmentVariableName());
                 }
                 if (!parsedArguments.containsKey(parsedArgument.name())
-                    && ServerConfigurationProperties.PROPERTIES.containsKey(parsedArgument.systemPropertyName())) {
+                    && ServerConfigurationProperties.properties.containsKey(parsedArgument.systemPropertyName())) {
                     parsedArguments.put(
                         parsedArgument.name(),
-                        String.valueOf(ServerConfigurationProperties.PROPERTIES.get(parsedArgument.systemPropertyName())));
+                        String.valueOf(ServerConfigurationProperties.properties.get(parsedArgument.systemPropertyName())));
                 }
             }
 

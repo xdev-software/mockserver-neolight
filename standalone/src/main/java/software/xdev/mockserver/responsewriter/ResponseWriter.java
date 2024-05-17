@@ -16,7 +16,7 @@
 package software.xdev.mockserver.responsewriter;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.cors.CORSHeaders;
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.HttpRequest;
@@ -38,10 +38,10 @@ public abstract class ResponseWriter {
     
     private static final Logger LOG = LoggerFactory.getLogger(ResponseWriter.class);
     
-    protected final Configuration configuration;
+    protected final ServerConfiguration configuration;
     private final CORSHeaders corsHeaders;
 
-    protected ResponseWriter(Configuration configuration) {
+    protected ResponseWriter(ServerConfiguration configuration) {
         this.configuration = configuration;
         corsHeaders = new CORSHeaders(configuration);
     }

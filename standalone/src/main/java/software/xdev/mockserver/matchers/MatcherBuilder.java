@@ -16,7 +16,7 @@
 package software.xdev.mockserver.matchers;
 
 import software.xdev.mockserver.cache.LRUCache;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.model.RequestDefinition;
 
@@ -24,10 +24,10 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class MatcherBuilder {
 
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final LRUCache<RequestDefinition, HttpRequestMatcher> requestMatcherLRUCache;
 
-    public MatcherBuilder(Configuration configuration) {
+    public MatcherBuilder(ServerConfiguration configuration) {
         this.configuration = configuration;
         this.requestMatcherLRUCache = new LRUCache<>(250, MINUTES.toMillis(10));
     }

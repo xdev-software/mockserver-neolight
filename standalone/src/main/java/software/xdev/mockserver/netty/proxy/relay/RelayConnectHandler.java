@@ -25,7 +25,7 @@ import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.logging.LoggingHandler;
 
@@ -46,12 +46,12 @@ public abstract class RelayConnectHandler<T> extends SimpleChannelInboundHandler
     public static final String PROXIED = "PROXIED_";
     public static final String PROXIED_SECURE = PROXIED + "SECURE_";
     public static final String PROXIED_RESPONSE = "PROXIED_RESPONSE_";
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final LifeCycle server;
     protected final String host;
     protected final int port;
 
-    protected RelayConnectHandler(Configuration configuration, LifeCycle server, String host, int port) {
+    protected RelayConnectHandler(ServerConfiguration configuration, LifeCycle server, String host, int port) {
         this.configuration = configuration;
         this.server = server;
         this.host = host;

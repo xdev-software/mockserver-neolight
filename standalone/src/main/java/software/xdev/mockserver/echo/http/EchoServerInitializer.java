@@ -25,7 +25,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.logging.LoggingHandler;
 
 import org.slf4j.Logger;
@@ -38,13 +38,13 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
     
     private static final Logger LOG = LoggerFactory.getLogger(EchoServerInitializer.class);
     
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     private final EchoServer.Error error;
     private final List<TextWebSocketFrame> textWebSocketFrames;
     private final List<Channel> websocketChannels;
     private final List<String> registeredClients;
 
-    EchoServerInitializer(Configuration configuration, EchoServer.Error error, List<String> registeredClients, List<Channel> websocketChannels, List<TextWebSocketFrame> textWebSocketFrames) {
+    EchoServerInitializer(ServerConfiguration configuration, EchoServer.Error error, List<String> registeredClients, List<Channel> websocketChannels, List<TextWebSocketFrame> textWebSocketFrames) {
         this.configuration = configuration;
         if (error == EchoServer.Error.CLOSE_CONNECTION) {
             throw new IllegalArgumentException("Error type CLOSE_CONNECTION is not supported in non-secure mode");

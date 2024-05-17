@@ -22,14 +22,14 @@ import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.netty.proxy.relay.RelayConnectHandler;
 
 @ChannelHandler.Sharable
 public abstract class SocksConnectHandler<T> extends RelayConnectHandler<T> {
 
-    protected SocksConnectHandler(Configuration configuration, LifeCycle server, String host, int port) {
+    protected SocksConnectHandler(ServerConfiguration configuration, LifeCycle server, String host, int port) {
         super(configuration, server, host, port);
     }
 

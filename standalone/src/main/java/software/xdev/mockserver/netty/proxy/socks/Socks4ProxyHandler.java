@@ -22,13 +22,13 @@ import io.netty.handler.codec.socksx.v4.DefaultSocks4CommandResponse;
 import io.netty.handler.codec.socksx.v4.Socks4CommandRequest;
 import io.netty.handler.codec.socksx.v4.Socks4CommandStatus;
 import io.netty.handler.codec.socksx.v4.Socks4CommandType;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 
 @ChannelHandler.Sharable
 public class Socks4ProxyHandler extends SocksProxyHandler<Socks4CommandRequest> {
 
-    public Socks4ProxyHandler(Configuration configuration, LifeCycle server) {
+    public Socks4ProxyHandler(ServerConfiguration configuration, LifeCycle server) {
         super(configuration, server);
     }
 

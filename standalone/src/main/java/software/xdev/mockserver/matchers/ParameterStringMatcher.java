@@ -18,7 +18,7 @@ package software.xdev.mockserver.matchers;
 import java.util.Objects;
 
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.model.Parameters;
 
 public class ParameterStringMatcher extends BodyMatcher<String> {
@@ -27,7 +27,7 @@ public class ParameterStringMatcher extends BodyMatcher<String> {
     private final Parameters matcherParameters;
     private final ExpandedParameterDecoder expandedParameterDecoder;
 
-    ParameterStringMatcher(Configuration configuration, Parameters matcherParameters, boolean controlPlaneMatcher) {
+    ParameterStringMatcher(ServerConfiguration configuration, Parameters matcherParameters, boolean controlPlaneMatcher) {
         this.matcherParameters = matcherParameters;
         this.matcher = new MultiValueMapMatcher(matcherParameters, controlPlaneMatcher);
         this.formParameterParser = new ExpandedParameterDecoder(configuration);

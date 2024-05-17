@@ -17,12 +17,13 @@ package software.xdev.mockserver.cors;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.model.Headers;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
 
 import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
-import static software.xdev.mockserver.configuration.Configuration.configuration;
+import static software.xdev.mockserver.configuration.ServerConfiguration.configuration;
 
 public class CORSHeaders {
 
@@ -46,7 +47,7 @@ public class CORSHeaders {
         );
     }
 
-    public CORSHeaders(Configuration configuration) {
+    public CORSHeaders(ServerConfiguration configuration) {
         this.corsAllowOrigin = configuration.corsAllowOrigin();
         this.corsAllowHeaders = configuration.corsAllowHeaders();
         this.corsAllowMethods = configuration.corsAllowMethods();
@@ -54,7 +55,7 @@ public class CORSHeaders {
         this.corsMaxAge = "" + configuration.corsMaxAgeInSeconds();
     }
 
-    public static boolean isPreflightRequest(Configuration configuration, HttpRequest request) {
+    public static boolean isPreflightRequest(ServerConfiguration configuration, HttpRequest request) {
         final Headers headers = request.getHeaders();
         boolean isPreflightRequest = request.getMethod().getValue().equals(OPTIONS.name()) &&
             headers.containsEntry(HttpHeaderNames.ORIGIN.toString()) &&

@@ -25,7 +25,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.AttributeKey;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.log.MockServerEventLog;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static software.xdev.mockserver.configuration.Configuration.configuration;
+import static software.xdev.mockserver.configuration.ServerConfiguration.configuration;
 
 
 public class EchoServer implements Stoppable {
@@ -56,7 +56,7 @@ public class EchoServer implements Stoppable {
     static final AttributeKey<NextResponse> NEXT_RESPONSE = AttributeKey.valueOf("NEXT_RESPONSE");
     static final AttributeKey<LastRequest> LAST_REQUEST = AttributeKey.valueOf("LAST_REQUEST");
     
-    private final Configuration configuration = configuration();
+    private final ServerConfiguration configuration = configuration();
     private final Scheduler scheduler = new Scheduler(configuration);
     private final MockServerEventLog mockServerEventLog = new MockServerEventLog(configuration, scheduler, true);
     private final NextResponse nextResponse = new NextResponse();

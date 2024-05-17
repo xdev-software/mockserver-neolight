@@ -18,7 +18,7 @@ package software.xdev.mockserver.codec;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import software.xdev.mockserver.util.StringUtils;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.model.NottableString;
 import software.xdev.mockserver.model.Parameter;
 import software.xdev.mockserver.model.ParameterStyle;
@@ -45,9 +45,9 @@ public class ExpandedParameterDecoder {
     private static final Pattern QUOTED_PARAMETER_VALUE = Pattern.compile("\\s*^[\"']+(.*)[\"']+\\s*$");
     private static final Pattern JSON_VALUE = Pattern.compile("(?s)^\\s*[{\\[].*[}\\]]\\s*$");
     
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
 
-    public ExpandedParameterDecoder(Configuration configuration) {
+    public ExpandedParameterDecoder(ServerConfiguration configuration) {
         this.configuration = configuration;
     }
 

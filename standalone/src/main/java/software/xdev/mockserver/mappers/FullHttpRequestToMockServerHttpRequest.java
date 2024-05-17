@@ -23,7 +23,7 @@ import io.netty.handler.codec.http2.HttpConversionUtil;
 import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.codec.BodyDecoderEncoder;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.url.URLParser;
 
@@ -46,7 +46,7 @@ public class FullHttpRequestToMockServerHttpRequest {
     private final ExpandedParameterDecoder formParameterParser;
     private final Integer port;
 
-    public FullHttpRequestToMockServerHttpRequest(Configuration configuration, Integer port) {
+    public FullHttpRequestToMockServerHttpRequest(ServerConfiguration configuration, Integer port) {
         this.bodyDecoderEncoder = new BodyDecoderEncoder();
         this.formParameterParser = new ExpandedParameterDecoder(configuration);
         this.port = port;

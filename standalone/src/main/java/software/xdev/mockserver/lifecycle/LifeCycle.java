@@ -18,7 +18,7 @@ package software.xdev.mockserver.lifecycle;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.scheduler.Scheduler;
@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
-import static software.xdev.mockserver.configuration.Configuration.configuration;
+import static software.xdev.mockserver.configuration.ServerConfiguration.configuration;
 import static software.xdev.mockserver.mock.HttpState.setPort;
 
 import org.slf4j.Logger;
@@ -51,14 +51,14 @@ public abstract class LifeCycle implements Stoppable {
     protected final EventLoopGroup bossGroup;
     protected final EventLoopGroup workerGroup;
     protected final HttpState httpState;
-    private final Configuration configuration;
+    private final ServerConfiguration configuration;
     protected ServerBootstrap serverServerBootstrap;
     private final List<Future<Channel>> serverChannelFutures = new ArrayList<>();
     private final CompletableFuture<String> stopFuture = new CompletableFuture<>();
     private final AtomicBoolean stopping = new AtomicBoolean(false);
     private final Scheduler scheduler;
 
-    protected LifeCycle(Configuration configuration) {
+    protected LifeCycle(ServerConfiguration configuration) {
         this.configuration = configuration != null ? configuration : configuration();
         this.bossGroup = new NioEventLoopGroup(5, new SchedulerThreadFactory(this.getClass().getSimpleName() + "-bossEventLoop"));
         this.workerGroup = new NioEventLoopGroup(this.configuration.nioEventLoopThreadCount(), new SchedulerThreadFactory(this.getClass().getSimpleName() + "-workerEventLoop"));

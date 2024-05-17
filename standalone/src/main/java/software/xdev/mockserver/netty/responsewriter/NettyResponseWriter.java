@@ -18,7 +18,7 @@ package software.xdev.mockserver.netty.responsewriter;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.model.ConnectionOptions;
 import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpRequest;
@@ -37,7 +37,7 @@ public class NettyResponseWriter extends ResponseWriter {
     private final ChannelHandlerContext ctx;
     private final Scheduler scheduler;
 
-    public NettyResponseWriter(Configuration configuration, ChannelHandlerContext ctx, Scheduler scheduler) {
+    public NettyResponseWriter(ServerConfiguration configuration, ChannelHandlerContext ctx, Scheduler scheduler) {
         super(configuration);
         this.ctx = ctx;
         this.scheduler = scheduler;

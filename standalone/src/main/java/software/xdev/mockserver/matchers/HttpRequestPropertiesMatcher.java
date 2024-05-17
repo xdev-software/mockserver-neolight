@@ -15,13 +15,12 @@
  */
 package software.xdev.mockserver.matchers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import software.xdev.mockserver.util.StringUtils;
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.codec.PathParametersDecoder;
-import software.xdev.mockserver.configuration.Configuration;
+import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 import software.xdev.mockserver.serialization.deserializers.body.StrictBodyDTODeserializer;
@@ -65,7 +64,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher {
     private ExactStringMatcher protocolMatcher = null;
     private ObjectMapper objectMapperWithStrictBodyDTODeserializer;
 
-    public HttpRequestPropertiesMatcher(Configuration configuration) {
+    public HttpRequestPropertiesMatcher(ServerConfiguration configuration) {
         super(configuration);
         this.expandedParameterDecoder = new ExpandedParameterDecoder(configuration);
     }
