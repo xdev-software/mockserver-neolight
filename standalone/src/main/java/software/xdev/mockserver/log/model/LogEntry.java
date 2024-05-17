@@ -26,7 +26,6 @@ import software.xdev.mockserver.model.*;
 import software.xdev.mockserver.serialization.ObjectMapperFactory;
 import software.xdev.mockserver.time.EpochService;
 import software.xdev.mockserver.uuid.UUIDService;
-import org.slf4j.event.Level;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,12 +34,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
 import static software.xdev.mockserver.model.HttpRequest.request;
 
-@Deprecated
 public class LogEntry implements EventTranslator<LogEntry> {
 
     private static final RequestDefinition[] EMPTY_REQUEST_DEFINITIONS = new RequestDefinition[0];
@@ -49,9 +45,6 @@ public class LogEntry implements EventTranslator<LogEntry> {
     private int hashCode;
     private String id;
     private String correlationId;
-    private Integer port;
-    private Level logLevel = Level.INFO;
-    private boolean alwaysLog = false;
     private long epochTime = EpochService.currentTimeMillis();
     private String timestamp;
     private LogMessageType type;
@@ -65,11 +58,6 @@ public class LogEntry implements EventTranslator<LogEntry> {
     private Exception exception;
     private Runnable consumer;
     private boolean deleted = false;
-
-    private String messageFormat;
-    private String message;
-    private Object[] arguments;
-    private String because;
 
     public LogEntry() {
 
@@ -90,10 +78,7 @@ public class LogEntry implements EventTranslator<LogEntry> {
 
     public void clear() {
         id = null;
-        logLevel = Level.INFO;
-        alwaysLog = false;
         correlationId = null;
-        port = null;
         epochTime = -1;
         timestamp = null;
         type = null;
@@ -105,31 +90,6 @@ public class LogEntry implements EventTranslator<LogEntry> {
         exception = null;
         consumer = null;
         deleted = false;
-        messageFormat = null;
-        message = null;
-        arguments = null;
-        because = null;
-    }
-
-    public Level getLogLevel() {
-        return logLevel;
-    }
-
-    public LogEntry setLogLevel(Level logLevel) {
-        this.logLevel = logLevel;
-        if (type == null) {
-            type = LogMessageType.valueOf(logLevel.name());
-        }
-        return this;
-    }
-
-    public boolean isAlwaysLog() {
-        return alwaysLog;
-    }
-
-    public LogEntry setAlwaysLog(boolean alwaysLog) {
-        this.alwaysLog = alwaysLog;
-        return this;
     }
 
     public long getEpochTime() {
@@ -165,15 +125,6 @@ public class LogEntry implements EventTranslator<LogEntry> {
     public LogEntry setCorrelationId(String correlationId) {
         this.correlationId = correlationId;
         return this;
-    }
-
-    public LogEntry setPort(Integer port) {
-        this.port = port;
-        return this;
-    }
-
-    public Integer getPort() {
-        return port;
     }
 
     @JsonIgnore
@@ -307,9 +258,6 @@ public class LogEntry implements EventTranslator<LogEntry> {
 
     public LogEntry setException(Exception ex) {
         this.exception = ex;
-        if (isBlank(messageFormat) && ex != null) {
-            messageFormat = ex.getClass().getSimpleName();
-        }
         return this;
     }
 
@@ -328,66 +276,6 @@ public class LogEntry implements EventTranslator<LogEntry> {
 
     public LogEntry setDeleted(boolean deleted) {
         this.deleted = deleted;
-        return this;
-    }
-
-    public String getMessageFormat() {
-        return messageFormat;
-    }
-
-    public LogEntry setMessageFormat(String messageFormat) {
-        if (isBlank(messageFormat) && exception != null) {
-            this.messageFormat = exception.getClass().getSimpleName();
-        } else {
-            this.messageFormat = messageFormat;
-        }
-        return this;
-    }
-
-    @JsonIgnore
-    public String getMessage() {
-        if (message == null) {
-            if (arguments != null) {
-                message = formatLogMessage(messageFormat, arguments);
-            } else {
-                message = messageFormat;
-            }
-        }
-        return message;
-    }
-
-    public Object[] getArguments() {
-        return arguments;
-    }
-
-    public LogEntry setArguments(Object... arguments) {
-        if (arguments != null) {
-            this.arguments = Arrays
-                .stream(arguments)
-                .map(argument -> {
-                    if (argument instanceof HttpRequest) {
-                        return updateBody((HttpRequest) argument);
-                    } else if (argument instanceof HttpResponse) {
-                        return updateBody((HttpResponse) argument);
-                    } else if (argument == null) {
-                        return "";
-                    } else {
-                        return argument;
-                    }
-                })
-                .toArray(Object[]::new);
-        } else {
-            this.arguments = null;
-        }
-        return this;
-    }
-
-    public String getBecause() {
-        return because;
-    }
-
-    public LogEntry setBecause(String because) {
-        this.because = because;
         return this;
     }
 
@@ -419,19 +307,13 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return new LogEntry()
             .setId(id())
             .setType(getType())
-            .setLogLevel(getLogLevel())
-            .setAlwaysLog(isAlwaysLog())
             .setEpochTime(getEpochTime())
             .setCorrelationId(getCorrelationId())
-            .setPort(getPort())
             .setHttpRequests(getHttpRequests())
             .setHttpResponse(getHttpResponse())
             .setHttpError(getHttpError())
             .setExpectation(getExpectation())
             .setExpectationId(getExpectationId())
-            .setMessageFormat(getMessageFormat())
-            .setArguments(getArguments())
-            .setBecause(getBecause())
             .setException(getException())
             .setConsumer(getConsumer())
             .setDeleted(isDeleted());
@@ -442,19 +324,13 @@ public class LogEntry implements EventTranslator<LogEntry> {
         event
             .setId(id())
             .setType(getType())
-            .setLogLevel(getLogLevel())
-            .setAlwaysLog(isAlwaysLog())
             .setEpochTime(getEpochTime())
             .setCorrelationId(getCorrelationId())
-            .setPort(getPort())
             .setHttpRequests(getHttpRequests())
             .setHttpResponse(getHttpResponse())
             .setHttpError(getHttpError())
             .setExpectation(getExpectation())
             .setExpectationId(getExpectationId())
-            .setMessageFormat(getMessageFormat())
-            .setArguments(getArguments())
-            .setBecause(getBecause())
             .setException(getException())
             .setConsumer(getConsumer())
             .setDeleted(isDeleted());
@@ -476,23 +352,18 @@ public class LogEntry implements EventTranslator<LogEntry> {
         return epochTime == logEntry.epochTime &&
             deleted == logEntry.deleted &&
             type == logEntry.type &&
-            logLevel == logEntry.logLevel &&
-            alwaysLog == logEntry.alwaysLog &&
-            Objects.equals(messageFormat, logEntry.messageFormat) &&
             Objects.equals(httpResponse, logEntry.httpResponse) &&
             Objects.equals(httpError, logEntry.httpError) &&
             Objects.equals(expectation, logEntry.expectation) &&
             Objects.equals(expectationId, logEntry.expectationId) &&
             Objects.equals(consumer, logEntry.consumer) &&
-            Arrays.equals(arguments, logEntry.arguments) &&
             Arrays.equals(httpRequests, logEntry.httpRequests);
     }
 
     @Override
     public int hashCode() {
         if (hashCode == 0) {
-            int result = Objects.hash(epochTime, deleted, type, logLevel, alwaysLog, messageFormat, httpResponse, httpError, expectation, expectationId, consumer);
-            result = 31 * result + Arrays.hashCode(arguments);
+            int result = Objects.hash(epochTime, deleted, type, httpResponse, httpError, expectation, expectationId, consumer);
             result = 31 * result + Arrays.hashCode(httpRequests);
             hashCode = result;
         }

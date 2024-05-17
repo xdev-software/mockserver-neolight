@@ -49,7 +49,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
@@ -57,17 +56,11 @@ import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.log.model.LogEntry.LogMessageType.*;
 import static software.xdev.mockserver.log.model.LogEntryMessages.VERIFICATION_REQUESTS_MESSAGE_FORMAT;
 import static software.xdev.mockserver.log.model.LogEntryMessages.VERIFICATION_REQUEST_SEQUENCES_MESSAGE_FORMAT;
-import static software.xdev.mockserver.logging.MockServerLogger.writeToSystemOut;
-import static software.xdev.mockserver.mock.HttpState.getPort;
 import static software.xdev.mockserver.model.HttpRequest.request;
 
 public class MockServerEventLog extends MockServerEventLogNotifier {
     
     private static final Logger LOG = LoggerFactory.getLogger(MockServerEventLog.class);
-    private static final Predicate<LogEntry> allPredicate = input
-        -> true;
-    private static final Predicate<LogEntry> notDeletedPredicate = input
-        -> !input.isDeleted();
     private static final Predicate<LogEntry> requestLogPredicate = input
         -> !input.isDeleted() && input.getType() == RECEIVED_REQUEST;
     private static final Predicate<LogEntry> expectationLogPredicate = input
@@ -108,13 +101,9 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
     }
 
     public void add(LogEntry logEntry) {
-        logEntry.setPort(getPort());
         if (asynchronousEventProcessing) {
             if (!disruptor.getRingBuffer().tryPublishEvent(logEntry)) {
-                // if ring buffer full only write WARN and ERROR to logger
-                if (logEntry.getLogLevel().toInt() >= Level.WARN.toInt()) {
-                    LOG.warn("Too many log events failed to add log event to ring buffer: {}", logEntry);
-                }
+                LOG.warn("Too many log events failed to add log event to ring buffer: {}", logEntry);
             }
         } else {
             processLogEntry(logEntry);
@@ -162,7 +151,6 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         logEntry = logEntry.cloneAndClear();
         eventLog.add(logEntry);
         notifyListeners(this, false);
-        writeToSystemOut(LOG, logEntry);
     }
 
     public void stop() {
@@ -173,11 +161,7 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         } catch (Exception ex) {
             if (!(ex instanceof com.lmax.disruptor.TimeoutException)) {
                 if (LOG.isWarnEnabled()) {
-                    writeToSystemOut(LOG, new LogEntry()
-                        .setLogLevel(Level.WARN)
-                        .setMessageFormat("exception while shutting down log ring buffer")
-                        .setException(ex)
-                    );
+                    LOG.warn("Exception while shutting down log ring buffer", ex);
                 }
             }
         }
@@ -239,30 +223,6 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
             future.get(2, SECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException ignore) {
         }
-    }
-
-    public void retrieveMessageLogEntries(RequestDefinition requestDefinition, Consumer<List<LogEntry>> listConsumer) {
-        retrieveLogEntries(
-            requestDefinition,
-            notDeletedPredicate,
-            (Stream<LogEntry> logEventStream) -> listConsumer.accept(logEventStream.filter(Objects::nonNull).collect(Collectors.toList()))
-        );
-    }
-
-    public void retrieveMessageLogEntriesIncludingDeleted(RequestDefinition requestDefinition, Consumer<List<LogEntry>> listConsumer) {
-        retrieveLogEntries(
-            requestDefinition,
-            allPredicate,
-            (Stream<LogEntry> logEventStream) -> listConsumer.accept(logEventStream.filter(Objects::nonNull).collect(Collectors.toList()))
-        );
-    }
-
-    public void retrieveRequestLogEntries(RequestDefinition requestDefinition, Consumer<List<LogEntry>> listConsumer) {
-        retrieveLogEntries(
-            requestDefinition,
-            requestLogPredicate,
-            (Stream<LogEntry> logEventStream) -> listConsumer.accept(logEventStream.filter(Objects::nonNull).collect(Collectors.toList()))
-        );
     }
 
     public void retrieveRequests(Verification verification, String logCorrelationId, Consumer<List<RequestDefinition>> listConsumer) {
@@ -348,56 +308,12 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
         );
     }
 
-    public void retrieveRequests(ExpectationId expectationId, Consumer<List<RequestDefinition>> listConsumer) {
-        retrieveLogEntries(
-            expectationId != null ? Collections.singletonList(expectationId.getId()) : Collections.emptyList(),
-            expectationLogPredicate,
-            logEntryToRequest,
-            logEventStream -> listConsumer.accept(
-                logEventStream
-                    .filter(Objects::nonNull)
-                    .flatMap(Arrays::stream)
-                    .collect(Collectors.toList())
-            )
-        );
-    }
-
-    public void retrieveRequests(List<String> expectationIds, Consumer<List<RequestDefinition>> listConsumer) {
-        retrieveLogEntries(
-            expectationIds,
-            expectationLogPredicate,
-            logEntryToRequest,
-            logEventStream -> listConsumer.accept(
-                logEventStream
-                    .filter(Objects::nonNull)
-                    .flatMap(Arrays::stream)
-                    .collect(Collectors.toList())
-            )
-        );
-    }
-
-    public void retrieveRequestResponseMessageLogEntries(RequestDefinition requestDefinition, Consumer<List<LogEntry>> listConsumer) {
-        retrieveLogEntries(
-            requestDefinition,
-            requestResponseLogPredicate,
-            (Stream<LogEntry> logEventStream) -> listConsumer.accept(logEventStream.filter(Objects::nonNull).collect(Collectors.toList()))
-        );
-    }
-
     public void retrieveRequestResponses(RequestDefinition requestDefinition, Consumer<List<LogEventRequestAndResponse>> listConsumer) {
         retrieveLogEntries(
             requestDefinition,
             requestResponseLogPredicate,
             logEntryToHttpRequestAndHttpResponse,
             logEventStream -> listConsumer.accept(logEventStream.filter(Objects::nonNull).collect(Collectors.toList()))
-        );
-    }
-
-    public void retrieveRecordedExpectationLogEntries(RequestDefinition requestDefinition, Consumer<List<LogEntry>> listConsumer) {
-        retrieveLogEntries(
-            requestDefinition,
-            recordedExpectationLogPredicate,
-            (Stream<LogEntry> logEventStream) -> listConsumer.accept(logEventStream.filter(Objects::nonNull).collect(Collectors.toList()))
         );
     }
 
@@ -450,22 +366,6 @@ public class MockServerEventLog extends MockServerEventLogNotifier {
                 .filter(logItem -> expectationIds == null || logItem.matchesAnyExpectationId(expectationIds))
                 .map(logEntryMapper)
             ))
-        );
-    }
-
-    public <T> void retrieveLogEntriesInReverseForUI(RequestDefinition requestDefinition, Predicate<LogEntry> logEntryPredicate, Function<LogEntry, T> logEntryMapper, Consumer<Stream<T>> consumer) {
-        disruptor.publishEvent(new LogEntry()
-            .setType(RUNNABLE)
-            .setConsumer(() -> {
-                HttpRequestMatcher httpRequestMatcher = matcherBuilder.transformsToMatcher(requestDefinition);
-                consumer.accept(
-                    StreamSupport
-                        .stream(Spliterators.spliteratorUnknownSize(this.eventLog.descendingIterator(), 0), false)
-                        .filter(logItem -> logItem.matches(httpRequestMatcher))
-                        .filter(logEntryPredicate)
-                        .map(logEntryMapper)
-                );
-            })
         );
     }
 

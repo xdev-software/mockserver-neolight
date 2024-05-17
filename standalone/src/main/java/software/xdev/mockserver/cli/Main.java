@@ -37,39 +37,40 @@ public class Main {
     
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
     
-    static final String USAGE = "" +
-        "   java -jar <path to mockserver-netty-jar-with-dependencies.jar> -serverPort <port> [-proxyRemotePort <port>] [-proxyRemoteHost <hostname>] [-logLevel <level>] " + NEW_LINE +
-        "                                                                                                                                                                 " + NEW_LINE +
-        "     valid options are:                                                                                                                                          " + NEW_LINE +
-        "        -serverPort <port>           The HTTP, HTTPS, SOCKS and HTTP CONNECT                                                                                     " + NEW_LINE +
-        "                                     port(s) for both mocking and proxying                                                                                       " + NEW_LINE +
-        "                                     requests.  Port unification is used to                                                                                      " + NEW_LINE +
-        "                                     support all protocols for proxying and                                                                                      " + NEW_LINE +
-        "                                     mocking on the same port(s). Supports                                                                                       " + NEW_LINE +
-        "                                     comma separated list for binding to                                                                                         " + NEW_LINE +
-        "                                     multiple ports.                                                                                                             " + NEW_LINE +
-        "                                                                                                                                                                 " + NEW_LINE +
-        "        -proxyRemotePort <port>      Optionally enables port forwarding mode.                                                                                    " + NEW_LINE +
-        "                                     When specified all requests received will                                                                                   " + NEW_LINE +
-        "                                     be forwarded to the specified port, unless                                                                                  " + NEW_LINE +
-        "                                     they match an expectation.                                                                                                  " + NEW_LINE +
-        "                                                                                                                                                                 " + NEW_LINE +
-        "        -proxyRemoteHost <hostname>  Specified the host to forward all proxy                                                                                     " + NEW_LINE +
-        "                                     requests to when port forwarding mode has                                                                                   " + NEW_LINE +
-        "                                     been enabled using the proxyRemotePort                                                                                      " + NEW_LINE +
-        "                                     option.  This setting is ignored unless                                                                                     " + NEW_LINE +
-        "                                     proxyRemotePort has been specified. If no                                                                                   " + NEW_LINE +
-        "                                     value is provided for proxyRemoteHost when                                                                                  " + NEW_LINE +
-        "                                     proxyRemotePort has been specified,                                                                                         " + NEW_LINE +
-        "                                     proxyRemoteHost will default to \"localhost\".                                                                              " + NEW_LINE +
-        "                                                                                                                                                                 " + NEW_LINE +
-        "        -logLevel <level>            Optionally specify log level using SLF4J levels:                                                                            " + NEW_LINE +
-        "                                     TRACE, DEBUG, INFO, WARN, ERROR, OFF or Java                                                                                " + NEW_LINE +
-        "                                     Logger levels: FINEST, FINE, INFO, WARNING,                                                                                 " + NEW_LINE +
-        "                                     SEVERE or OFF. If not specified default is INFO                                                                             " + NEW_LINE +
-        "                                                                                                                                                                 " + NEW_LINE +
-        "   i.e. java -jar ./mockserver-netty-jar-with-dependencies.jar -serverPort 1080 -proxyRemotePort 80 -proxyRemoteHost www.mock-server.com -logLevel WARN                         " + NEW_LINE +
-        "                                                                                                                                                                 " + NEW_LINE;
+    static final String USAGE = String.join(NEW_LINE, List.of(
+        "   java -jar <path to mockserver.jar> -serverPort <port> [-proxyRemotePort <port>] [-proxyRemoteHost <hostname>] [-logLevel <level>] ",
+        "                                                                                                                           ",
+        "     valid options are:                                                                                                    ",
+        "        -serverPort <port>           The HTTP, HTTPS, SOCKS and HTTP CONNECT                                               ",
+        "                                     port(s) for both mocking and proxying                                                 ",
+        "                                     requests.  Port unification is used to                                                ",
+        "                                     support all protocols for proxying and                                                ",
+        "                                     mocking on the same port(s). Supports                                                 ",
+        "                                     comma separated list for binding to                                                   ",
+        "                                     multiple ports.                                                                       ",
+        "                                                                                                                           ",
+        "        -proxyRemotePort <port>      Optionally enables port forwarding mode.                                              ",
+        "                                     When specified all requests received will                                             ",
+        "                                     be forwarded to the specified port, unless                                            ",
+        "                                     they match an expectation.                                                            ",
+        "                                                                                                                           ",
+        "        -proxyRemoteHost <hostname>  Specified the host to forward all proxy                                               ",
+        "                                     requests to when port forwarding mode has                                             ",
+        "                                     been enabled using the proxyRemotePort                                                ",
+        "                                     option.  This setting is ignored unless                                               ",
+        "                                     proxyRemotePort has been specified. If no                                             ",
+        "                                     value is provided for proxyRemoteHost when                                            ",
+        "                                     proxyRemotePort has been specified,                                                   ",
+        "                                     proxyRemoteHost will default to \"localhost\".                                        ",
+        "                                                                                                                           ",
+        "        -logLevel <level>            Optionally specify log level using SLF4J levels:                                      ",
+        "                                     TRACE, DEBUG, INFO, WARN, ERROR, OFF or Java                                          ",
+        "                                     Logger levels: FINEST, FINE, INFO, WARNING,                                           ",
+        "                                     SEVERE or OFF. If not specified default is INFO                                       ",
+        "                                                                                                                           ",
+        "   i.e. java -jar ./mockserver.jar -serverPort 1080 -proxyRemotePort 80 -proxyRemoteHost www.mock-server.com -logLevel WARN",
+        "                                                                                                                           "
+    ));
     private static final IntegerStringListParser INTEGER_STRING_LIST_PARSER = new IntegerStringListParser();
     static PrintStream systemErr = System.err;
     static PrintStream systemOut = System.out;
@@ -86,51 +87,52 @@ public class Main {
      */
     public static void main(String... arguments) {
         try {
-            Map<String, String> parsedArguments = parseArguments(arguments);
-            Map<String, String> commandLineArguments = new HashMap<>(parsedArguments);
-            Map<String, String> environmentVariableArguments = new HashMap<>();
-            Map<String, String> systemPropertyArguments = new HashMap<>();
+            Map<String, String> parsedArgs = parseArguments(arguments);
+            Map<String, String> cmdArgs = new HashMap<>(parsedArgs);
+            Map<String, String> envVarArgs = new HashMap<>();
+            Map<String, String> sysPropArgs = new HashMap<>();
 
             System.getenv().forEach((key, value) -> {
                 if (key.startsWith("MOCKSERVER_") && isNotBlank(value)) {
-                    environmentVariableArguments.put(key, value);
+                    envVarArgs.put(key, value);
                 }
             });
             System.getProperties().forEach((key, value) -> {
-                if (key instanceof String && value instanceof String) {
-                    if (((String) key).startsWith("mockserver") && isNotBlank((String) value)) {
-                        systemPropertyArguments.put((String) key, (String) value);
-                    }
+                if (key instanceof String strKey
+                    && value instanceof String strValue
+                    && strKey.startsWith("mockserver")
+                    && isNotBlank(strValue)) {
+                    sysPropArgs.put((String) key, (String) value);
                 }
             });
 
             for (Arguments parsedArgument : Arrays.asList(serverPort, proxyRemoteHost, proxyRemotePort)) {
-                if (!parsedArguments.containsKey(parsedArgument.name())) {
-                    if (systemPropertyArguments.containsKey(parsedArgument.systemPropertyName())) {
-                        parsedArguments.put(parsedArgument.name(), systemPropertyArguments.get(parsedArgument.systemPropertyName()));
-                        environmentVariableArguments.remove(parsedArgument.longEnvironmentVariableName());
-                        environmentVariableArguments.remove(parsedArgument.shortEnvironmentVariableName());
+                if (!parsedArgs.containsKey(parsedArgument.name())) {
+                    if (sysPropArgs.containsKey(parsedArgument.systemPropertyName())) {
+                        parsedArgs.put(parsedArgument.name(), sysPropArgs.get(parsedArgument.systemPropertyName()));
+                        envVarArgs.remove(parsedArgument.longEnvironmentVariableName());
+                        envVarArgs.remove(parsedArgument.shortEnvironmentVariableName());
                     } else {
-                        if (environmentVariableArguments.containsKey(parsedArgument.longEnvironmentVariableName())) {
-                            environmentVariableArguments.remove(parsedArgument.shortEnvironmentVariableName());
-                            parsedArguments.put(parsedArgument.name(), environmentVariableArguments.get(parsedArgument.longEnvironmentVariableName()));
+                        if (envVarArgs.containsKey(parsedArgument.longEnvironmentVariableName())) {
+                            envVarArgs.remove(parsedArgument.shortEnvironmentVariableName());
+                            parsedArgs.put(parsedArgument.name(), envVarArgs.get(parsedArgument.longEnvironmentVariableName()));
                         } else if (isNotBlank(System.getenv(parsedArgument.shortEnvironmentVariableName()))) {
                             if (!(parsedArgument == serverPort
                                 && "1080".equals(System.getenv(serverPort.shortEnvironmentVariableName()))
                                 && ServerConfigurationProperties.properties.containsKey(serverPort.systemPropertyName()))) {
-                                environmentVariableArguments.put(parsedArgument.shortEnvironmentVariableName(), System.getenv(parsedArgument.shortEnvironmentVariableName()));
-                                parsedArguments.put(parsedArgument.name(), environmentVariableArguments.get(parsedArgument.shortEnvironmentVariableName()));
+                                envVarArgs.put(parsedArgument.shortEnvironmentVariableName(), System.getenv(parsedArgument.shortEnvironmentVariableName()));
+                                parsedArgs.put(parsedArgument.name(), envVarArgs.get(parsedArgument.shortEnvironmentVariableName()));
                             }
                         }
                     }
                 } else {
-                    systemPropertyArguments.remove(parsedArgument.systemPropertyName());
-                    environmentVariableArguments.remove(parsedArgument.longEnvironmentVariableName());
-                    environmentVariableArguments.remove(parsedArgument.shortEnvironmentVariableName());
+                    sysPropArgs.remove(parsedArgument.systemPropertyName());
+                    envVarArgs.remove(parsedArgument.longEnvironmentVariableName());
+                    envVarArgs.remove(parsedArgument.shortEnvironmentVariableName());
                 }
-                if (!parsedArguments.containsKey(parsedArgument.name())
+                if (!parsedArgs.containsKey(parsedArgument.name())
                     && ServerConfigurationProperties.properties.containsKey(parsedArgument.systemPropertyName())) {
-                    parsedArguments.put(
+                    parsedArgs.put(
                         parsedArgument.name(),
                         String.valueOf(ServerConfigurationProperties.properties.get(parsedArgument.systemPropertyName())));
                 }
@@ -138,23 +140,23 @@ public class Main {
 
             if (LOG.isInfoEnabled()) {
                 LOG.info("Using environment variables: {} and system properties: {} and command line options: {}",
-                    formatArgsForLog(environmentVariableArguments),
-                    formatArgsForLog(systemPropertyArguments),
-                    formatArgsForLog(commandLineArguments));
+                    formatArgsForLog(envVarArgs),
+                    formatArgsForLog(sysPropArgs),
+                    formatArgsForLog(cmdArgs));
             }
 
-            if (!parsedArguments.isEmpty() && parsedArguments.containsKey(serverPort.name())) {
-                if (parsedArguments.containsKey(logLevel.name())) {
-                    ServerConfigurationProperties.logLevel(parsedArguments.get(logLevel.name()));
+            if (!parsedArgs.isEmpty() && parsedArgs.containsKey(serverPort.name())) {
+                if (parsedArgs.containsKey(logLevel.name())) {
+                    ServerConfigurationProperties.logLevel(parsedArgs.get(logLevel.name()));
                 }
                 MockServerLoggerConfiguration.configureLogger();
-                Integer[] localPorts = INTEGER_STRING_LIST_PARSER.toArray(parsedArguments.get(serverPort.name()));
-                if (parsedArguments.containsKey(proxyRemotePort.name())) {
-                    String remoteHost = parsedArguments.get(proxyRemoteHost.name());
+                Integer[] localPorts = INTEGER_STRING_LIST_PARSER.toArray(parsedArgs.get(serverPort.name()));
+                if (parsedArgs.containsKey(proxyRemotePort.name())) {
+                    String remoteHost = parsedArgs.get(proxyRemoteHost.name());
                     if (isBlank(remoteHost)) {
                         remoteHost = "localhost";
                     }
-                    new MockServer(Integer.parseInt(parsedArguments.get(proxyRemotePort.name())), remoteHost, localPorts);
+                    new MockServer(Integer.parseInt(parsedArgs.get(proxyRemotePort.name())), remoteHost, localPorts);
                 } else {
                     new MockServer(localPorts);
                 }
