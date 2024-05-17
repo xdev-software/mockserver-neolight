@@ -5,6 +5,7 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * client-java -> client
   * core -> core
   * netty -> standalone
+* Bring code into a maintainable state
 * Removed everything that is not core functionality
   * Metrics
   * MemoryTracing

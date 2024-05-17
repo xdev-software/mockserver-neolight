@@ -9,13 +9,13 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>mockserver-neo-client</name>
-	<description>mockserver-neo-client</description>
-	<url>https://github.com/xdev-software/mockserver-neo</url>
+	<name>mockserver-neolight-client</name>
+	<description>mockserver-neolight-client</description>
+	<url>https://github.com/xdev-software/mockserver-neolight</url>
 
 	<scm>
-		<url>https://github.com/xdev-software/mockserver-neo</url>
-		<connection>scm:git:https://github.com/xdev-software/mockserver-neo.git</connection>
+		<url>https://github.com/xdev-software/mockserver-neolight</url>
+		<connection>scm:git:https://github.com/xdev-software/mockserver-neolight.git</connection>
 	</scm>
 
 	<inceptionYear>2024</inceptionYear>
