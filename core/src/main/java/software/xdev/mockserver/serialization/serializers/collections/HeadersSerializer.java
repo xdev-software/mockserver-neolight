@@ -17,10 +17,11 @@ package software.xdev.mockserver.serialization.serializers.collections;
 
 import software.xdev.mockserver.model.Headers;
 
-public class HeadersSerializer extends KeysToMultiValuesSerializer<Headers> {
 
-    public HeadersSerializer() {
-        super(Headers.class);
-    }
-
+public class HeadersSerializer extends KeysToMultiValuesSerializer<Headers>
+{
+	public HeadersSerializer()
+	{
+		super(Headers.class);
+	}
 }

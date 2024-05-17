@@ -15,119 +15,151 @@
  */
 package software.xdev.mockserver.model;
 
-import java.util.*;
-
-import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 import static software.xdev.mockserver.model.NottableString.string;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class KeysAndValues<T extends KeyAndValue, K extends KeysAndValues> extends ObjectWithJsonToString {
-
-    private final Map<NottableString, NottableString> map;
-
-    protected KeysAndValues() {
-        map = new LinkedHashMap<>();
-    }
-
-    protected KeysAndValues(Map<NottableString, NottableString> map) {
-        this.map = new LinkedHashMap<>(map);
-    }
-
-    public abstract T build(NottableString name, NottableString value);
-
-    public K withEntries(List<T> entries) {
-        map.clear();
-        if (entries != null) {
-            for (T cookie : entries) {
-                withEntry(cookie);
-            }
-        }
-        return (K) this;
-    }
-
-    public K withEntries(T... entries) {
-        if (entries != null) {
-            withEntries(Arrays.asList(entries));
-        }
-        return (K) this;
-    }
-
-    public K withEntry(T entry) {
-        if (entry != null) {
-            map.put(entry.getName(), entry.getValue());
-        }
-        return (K) this;
-    }
-
-    public K withEntry(String name, String value) {
-        map.put(string(name), string(value));
-        return (K) this;
-    }
-
-    public K withEntry(NottableString name, NottableString value) {
-        map.put(name, value);
-        return (K) this;
-    }
-
-    public K replaceEntryIfExists(final T entry) {
-        if (entry != null) {
-            if (remove(entry.getName())) {
-                map.put(entry.getName(), entry.getValue());
-            }
-        }
-        return (K) this;
-    }
-
-    public List<T> getEntries() {
-        if (!map.isEmpty()) {
-            ArrayList<T> cookies = new ArrayList<>();
-            for (NottableString nottableString : map.keySet()) {
-                cookies.add(build(nottableString, map.get(nottableString)));
-            }
-            return cookies;
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    public Map<NottableString, NottableString> getMap() {
-        return map;
-    }
-
-    public boolean isEmpty() {
-        return map.isEmpty();
-    }
-
-    public boolean remove(NottableString name) {
-        return remove(name.getValue());
-    }
-
-    public boolean remove(String name) {
-        if (isNotBlank(name)) {
-            return map.remove(string(name)) != null;
-        }
-        return false;
-    }
-
-    public abstract K clone();
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final KeysAndValues<?, ?> that))
-        {
-            return false;
-        }
-		return Objects.equals(getMap(), that.getMap());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hashCode(getMap());
-    }
+public abstract class KeysAndValues<T extends KeyAndValue, K extends KeysAndValues> extends ObjectWithJsonToString
+{
+	private final Map<NottableString, NottableString> map;
+	
+	protected KeysAndValues()
+	{
+		this.map = new LinkedHashMap<>();
+	}
+	
+	protected KeysAndValues(final Map<NottableString, NottableString> map)
+	{
+		this.map = new LinkedHashMap<>(map);
+	}
+	
+	public abstract T build(NottableString name, NottableString value);
+	
+	public K withEntries(final List<T> entries)
+	{
+		this.map.clear();
+		if(entries != null)
+		{
+			for(final T cookie : entries)
+			{
+				this.withEntry(cookie);
+			}
+		}
+		return (K)this;
+	}
+	
+	public K withEntries(final T... entries)
+	{
+		if(entries != null)
+		{
+			this.withEntries(Arrays.asList(entries));
+		}
+		return (K)this;
+	}
+	
+	public K withEntry(final T entry)
+	{
+		if(entry != null)
+		{
+			this.map.put(entry.getName(), entry.getValue());
+		}
+		return (K)this;
+	}
+	
+	public K withEntry(final String name, final String value)
+	{
+		this.map.put(string(name), string(value));
+		return (K)this;
+	}
+	
+	public K withEntry(final NottableString name, final NottableString value)
+	{
+		this.map.put(name, value);
+		return (K)this;
+	}
+	
+	public K replaceEntryIfExists(final T entry)
+	{
+		if(entry != null)
+		{
+			if(this.remove(entry.getName()))
+			{
+				this.map.put(entry.getName(), entry.getValue());
+			}
+		}
+		return (K)this;
+	}
+	
+	public List<T> getEntries()
+	{
+		if(!this.map.isEmpty())
+		{
+			final ArrayList<T> cookies = new ArrayList<>();
+			for(final NottableString nottableString : this.map.keySet())
+			{
+				cookies.add(this.build(nottableString, this.map.get(nottableString)));
+			}
+			return cookies;
+		}
+		else
+		{
+			return Collections.emptyList();
+		}
+	}
+	
+	public Map<NottableString, NottableString> getMap()
+	{
+		return this.map;
+	}
+	
+	public boolean isEmpty()
+	{
+		return this.map.isEmpty();
+	}
+	
+	public boolean remove(final NottableString name)
+	{
+		return this.remove(name.getValue());
+	}
+	
+	public boolean remove(final String name)
+	{
+		if(isNotBlank(name))
+		{
+			return this.map.remove(string(name)) != null;
+		}
+		return false;
+	}
+	
+	@Override
+	public abstract K clone();
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final KeysAndValues<?, ?> that))
+		{
+			return false;
+		}
+		return Objects.equals(this.getMap(), that.getMap());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hashCode(this.getMap());
+	}
 }

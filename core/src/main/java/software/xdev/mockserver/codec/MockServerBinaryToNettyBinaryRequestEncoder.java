@@ -15,16 +15,19 @@
  */
 package software.xdev.mockserver.codec;
 
+import java.util.List;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import software.xdev.mockserver.model.BinaryMessage;
 
-import java.util.List;
 
-public class MockServerBinaryToNettyBinaryRequestEncoder extends MessageToMessageEncoder<BinaryMessage> {
-    @Override
-    protected void encode(ChannelHandlerContext ctx, BinaryMessage binaryMessage, List<Object> out) {
-        out.add(Unpooled.copiedBuffer(binaryMessage.getBytes()));
-    }
+public class MockServerBinaryToNettyBinaryRequestEncoder extends MessageToMessageEncoder<BinaryMessage>
+{
+	@Override
+	protected void encode(final ChannelHandlerContext ctx, final BinaryMessage binaryMessage, final List<Object> out)
+	{
+		out.add(Unpooled.copiedBuffer(binaryMessage.getBytes()));
+	}
 }

@@ -15,11 +15,8 @@
  */
 package software.xdev.mockserver.model;
 
-public enum KeyMatchStyle {
-
-    SUB_SET, // default
-    MATCHING_KEY;
-
-    public static KeyMatchStyle defaultValue = SUB_SET;
-
+public enum KeyMatchStyle
+{
+	SUB_SET, // default
+	MATCHING_KEY
 }

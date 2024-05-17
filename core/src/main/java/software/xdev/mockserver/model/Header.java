@@ -17,45 +17,56 @@ package software.xdev.mockserver.model;
 
 import java.util.Collection;
 
-public class Header extends KeyToMultiValue {
 
-    public Header(String name, String... value) {
-        super(name, value);
-    }
-
-    public Header(NottableString name, NottableString... value) {
-        super(name, value);
-    }
-
-    public Header(NottableString name, String... value) {
-        super(name, value);
-    }
-
-    public Header(String name, Collection<String> value) {
-        super(name, value);
-    }
-
-    public Header(NottableString name, Collection<NottableString> value) {
-        super(name, value);
-    }
-
-    public static Header header(String name, int value) {
-        return new Header(name, String.valueOf(value));
-    }
-
-    public static Header header(String name, String... value) {
-        return new Header(name, value);
-    }
-
-    public static Header header(NottableString name, NottableString... value) {
-        return new Header(name, value);
-    }
-
-    public static Header header(String name, Collection<String> value) {
-        return new Header(name, value);
-    }
-
-    public static Header header(NottableString name, Collection<NottableString> value) {
-        return new Header(name, value);
-    }
+public class Header extends KeyToMultiValue
+{
+	public Header(final String name, final String... value)
+	{
+		super(name, value);
+	}
+	
+	public Header(final NottableString name, final NottableString... value)
+	{
+		super(name, value);
+	}
+	
+	public Header(final NottableString name, final String... value)
+	{
+		super(name, value);
+	}
+	
+	public Header(final String name, final Collection<String> value)
+	{
+		super(name, value);
+	}
+	
+	public Header(final NottableString name, final Collection<NottableString> value)
+	{
+		super(name, value);
+	}
+	
+	public static Header header(final String name, final int value)
+	{
+		return new Header(name, String.valueOf(value));
+	}
+	
+	public static Header header(final String name, final String... value)
+	{
+		return new Header(name, value);
+	}
+	
+	public static Header header(final NottableString name, final NottableString... value)
+	{
+		return new Header(name, value);
+	}
+	
+	public static Header header(final String name, final Collection<String> value)
+	{
+		return new Header(name, value);
+	}
+	
+	public static Header header(final NottableString name, final Collection<NottableString> value)
+	{
+		return new Header(name, value);
+	}
 }

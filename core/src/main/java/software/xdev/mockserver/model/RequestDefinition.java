@@ -15,45 +15,49 @@
  */
 package software.xdev.mockserver.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
-import static software.xdev.mockserver.util.StringUtils.isNotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public abstract class RequestDefinition extends Not {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(RequestDefinition.class);
-    private String logCorrelationId;
 
-    @JsonIgnore
-    public String getLogCorrelationId() {
-        return logCorrelationId;
-    }
-
-    public RequestDefinition withLogCorrelationId(String logCorrelationId) {
-        this.logCorrelationId = logCorrelationId;
-        return this;
-    }
-
-    public abstract RequestDefinition shallowClone();
-
-    public RequestDefinition cloneWithLogCorrelationId() {
-        return LOG.isTraceEnabled() && isNotBlank(getLogCorrelationId())
-            ? shallowClone().withLogCorrelationId(getLogCorrelationId())
-            : this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
+public abstract class RequestDefinition extends Not
+{
+	private static final Logger LOG = LoggerFactory.getLogger(RequestDefinition.class);
+	private String logCorrelationId;
+	
+	@JsonIgnore
+	public String getLogCorrelationId()
+	{
+		return this.logCorrelationId;
+	}
+	
+	public RequestDefinition withLogCorrelationId(final String logCorrelationId)
+	{
+		this.logCorrelationId = logCorrelationId;
+		return this;
+	}
+	
+	public abstract RequestDefinition shallowClone();
+	
+	public RequestDefinition cloneWithLogCorrelationId()
+	{
+		return LOG.isTraceEnabled() && isNotBlank(this.getLogCorrelationId())
+			? this.shallowClone().withLogCorrelationId(this.getLogCorrelationId())
+			: this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		return super.equals(o);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode();
+	}
 }

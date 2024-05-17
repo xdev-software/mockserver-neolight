@@ -18,8 +18,12 @@ package software.xdev.mockserver.model;
 import java.net.SocketAddress;
 import java.util.concurrent.CompletableFuture;
 
-public interface BinaryProxyListener {
 
-    public void onProxy(BinaryMessage binaryRequest, CompletableFuture<BinaryMessage> binaryResponse, SocketAddress serverAddress, SocketAddress clientAddress);
-
+public interface BinaryProxyListener
+{
+	void onProxy(
+		BinaryMessage binaryRequest,
+		CompletableFuture<BinaryMessage> binaryResponse,
+		SocketAddress serverAddress,
+		SocketAddress clientAddress);
 }

@@ -15,24 +15,31 @@
  */
 package software.xdev.mockserver.serialization.serializers.matcher;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
 import software.xdev.mockserver.matchers.HttpRequestPropertiesMatcher;
 
-import java.io.IOException;
 
-public class HttpRequestPropertiesMatcherSerializer extends StdSerializer<HttpRequestPropertiesMatcher> {
-
-    public HttpRequestPropertiesMatcherSerializer() {
-        super(HttpRequestPropertiesMatcher.class);
-    }
-
-    @Override
-    public void serialize(HttpRequestPropertiesMatcher requestPropertiesMatcher, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        if (requestPropertiesMatcher.getHttpRequest() != null) {
-            jgen.writeObject(requestPropertiesMatcher.getHttpRequest());
-        }
-    }
-
+public class HttpRequestPropertiesMatcherSerializer extends StdSerializer<HttpRequestPropertiesMatcher>
+{
+	public HttpRequestPropertiesMatcherSerializer()
+	{
+		super(HttpRequestPropertiesMatcher.class);
+	}
+	
+	@Override
+	public void serialize(
+		final HttpRequestPropertiesMatcher requestPropertiesMatcher,
+		final JsonGenerator jgen,
+		final SerializerProvider provider) throws IOException
+	{
+		if(requestPropertiesMatcher.getHttpRequest() != null)
+		{
+			jgen.writeObject(requestPropertiesMatcher.getHttpRequest());
+		}
+	}
 }

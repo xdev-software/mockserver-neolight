@@ -15,32 +15,37 @@
  */
 package software.xdev.mockserver.cache;
 
-public class Entry<T> {
-
-    private final long ttlInMillis;
-    private final T value;
-    private long expiryInMillis;
-
-    public Entry(long ttlInMillis, long expiryInMillis, T value) {
-        this.ttlInMillis = ttlInMillis;
-        this.expiryInMillis = expiryInMillis;
-        this.value = value;
-    }
-
-    public long getTtlInMillis() {
-        return ttlInMillis;
-    }
-
-    public long getExpiryInMillis() {
-        return expiryInMillis;
-    }
-
-    public Entry<T> updateExpiryInMillis(long expiryInMillis) {
-        this.expiryInMillis = expiryInMillis;
-        return this;
-    }
-
-    public T getValue() {
-        return value;
-    }
+public class Entry<T>
+{
+	private final long ttlInMillis;
+	private final T value;
+	private long expiryInMillis;
+	
+	public Entry(final long ttlInMillis, final long expiryInMillis, final T value)
+	{
+		this.ttlInMillis = ttlInMillis;
+		this.expiryInMillis = expiryInMillis;
+		this.value = value;
+	}
+	
+	public long getTtlInMillis()
+	{
+		return this.ttlInMillis;
+	}
+	
+	public long getExpiryInMillis()
+	{
+		return this.expiryInMillis;
+	}
+	
+	public Entry<T> updateExpiryInMillis(final long expiryInMillis)
+	{
+		this.expiryInMillis = expiryInMillis;
+		return this;
+	}
+	
+	public T getValue()
+	{
+		return this.value;
+	}
 }

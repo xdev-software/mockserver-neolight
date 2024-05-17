@@ -15,37 +15,49 @@
  */
 package software.xdev.mockserver.serialization;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JsonArraySerializer {
-    private static final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
-    public List<String> splitJSONArray(String jsonArray) {
-        return splitJSONArrayToJSONNodes(jsonArray).stream().map(JacksonUtils::prettyPrint).collect(Collectors.toList());
-    }
 
-    public List<JsonNode> splitJSONArrayToJSONNodes(String jsonArray) {
-        List<JsonNode> arrayItems = new ArrayList<>();
-        try {
-            JsonNode jsonNode = objectMapper.readTree(jsonArray);
-            if (jsonNode instanceof ArrayNode) {
-                for (JsonNode arrayElement : jsonNode) {
-                    arrayItems.add(arrayElement);
-                }
-            } else {
-                arrayItems.add(jsonNode);
-            }
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-        return arrayItems;
-    }
-
+public class JsonArraySerializer
+{
+	private static final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	
+	public List<String> splitJSONArray(final String jsonArray)
+	{
+		return this.splitJSONArrayToJSONNodes(jsonArray).stream()
+			.map(JacksonUtils::prettyPrint)
+			.collect(Collectors.toList());
+	}
+	
+	public List<JsonNode> splitJSONArrayToJSONNodes(final String jsonArray)
+	{
+		final List<JsonNode> arrayItems = new ArrayList<>();
+		try
+		{
+			final JsonNode jsonNode = objectMapper.readTree(jsonArray);
+			if(jsonNode instanceof ArrayNode)
+			{
+				for(final JsonNode arrayElement : jsonNode)
+				{
+					arrayItems.add(arrayElement);
+				}
+			}
+			else
+			{
+				arrayItems.add(jsonNode);
+			}
+		}
+		catch(final IOException e)
+		{
+			throw new IllegalArgumentException(e);
+		}
+		return arrayItems;
+	}
 }

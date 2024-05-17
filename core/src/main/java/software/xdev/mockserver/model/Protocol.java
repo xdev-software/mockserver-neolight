@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.model;
 
-public enum Protocol {
-    HTTP_1_1, HTTP_2
+public enum Protocol
+{
+	HTTP_1_1,
+	HTTP_2
 }

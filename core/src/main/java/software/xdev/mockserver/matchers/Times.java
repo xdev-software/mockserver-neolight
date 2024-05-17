@@ -17,97 +17,127 @@ package software.xdev.mockserver.matchers;
 
 import java.util.Objects;
 
-public class Times {
 
-    private static final Times TIMES_UNLIMITED = new Times(-1, true) {
-        public int getRemainingTimes() {
-            return -1;
-        }
-
-        public boolean isUnlimited() {
-            return true;
-        }
-
-        public boolean greaterThenZero() {
-            return true;
-        }
-
-        public boolean decrement() {
-            return false;
-        }
-    };
-
-    private int hashCode;
-    private int remainingTimes;
-    private final boolean unlimited;
-
-    private Times(int remainingTimes, boolean unlimited) {
-        this.remainingTimes = remainingTimes;
-        this.unlimited = unlimited;
-    }
-
-    public static Times unlimited() {
-        return TIMES_UNLIMITED;
-    }
-
-    public static Times once() {
-        return new Times(1, false);
-    }
-
-    public static Times exactly(int count) {
-        return new Times(count, false);
-    }
-
-    public int getRemainingTimes() {
-        return remainingTimes;
-    }
-
-    public boolean isUnlimited() {
-        return unlimited;
-    }
-
-    public boolean greaterThenZero() {
-        return unlimited || remainingTimes > 0;
-    }
-
-    public boolean decrement() {
-        if (!unlimited) {
-            remainingTimes--;
-            return true;
-        }
-        return false;
-    }
-
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public Times clone() {
-        if (unlimited) {
-            return Times.unlimited();
-        } else {
-            return Times.exactly(remainingTimes);
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (hashCode() != o.hashCode()) {
-            return false;
-        }
-        Times times = (Times) o;
-        return remainingTimes == times.remainingTimes &&
-            unlimited == times.unlimited;
-    }
-
-    @Override
-    public int hashCode() {
-        if (hashCode == 0) {
-            hashCode = Objects.hash(remainingTimes, unlimited);
-        }
-        return hashCode;
-    }
+public class Times
+{
+	private static final Times TIMES_UNLIMITED = new Times(-1, true)
+	{
+		@Override
+		public int getRemainingTimes()
+		{
+			return -1;
+		}
+		
+		@Override
+		public boolean isUnlimited()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean greaterThenZero()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean decrement()
+		{
+			return false;
+		}
+	};
+	
+	private int hashCode;
+	private int remainingTimes;
+	private final boolean unlimited;
+	
+	private Times(final int remainingTimes, final boolean unlimited)
+	{
+		this.remainingTimes = remainingTimes;
+		this.unlimited = unlimited;
+	}
+	
+	public static Times unlimited()
+	{
+		return TIMES_UNLIMITED;
+	}
+	
+	public static Times once()
+	{
+		return new Times(1, false);
+	}
+	
+	public static Times exactly(final int count)
+	{
+		return new Times(count, false);
+	}
+	
+	public int getRemainingTimes()
+	{
+		return this.remainingTimes;
+	}
+	
+	public boolean isUnlimited()
+	{
+		return this.unlimited;
+	}
+	
+	public boolean greaterThenZero()
+	{
+		return this.unlimited || this.remainingTimes > 0;
+	}
+	
+	public boolean decrement()
+	{
+		if(!this.unlimited)
+		{
+			this.remainingTimes--;
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	@SuppressWarnings("MethodDoesntCallSuperMethod")
+	public Times clone()
+	{
+		if(this.unlimited)
+		{
+			return Times.unlimited();
+		}
+		else
+		{
+			return Times.exactly(this.remainingTimes);
+		}
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(o == null || this.getClass() != o.getClass())
+		{
+			return false;
+		}
+		if(this.hashCode() != o.hashCode())
+		{
+			return false;
+		}
+		final Times times = (Times)o;
+		return this.remainingTimes == times.remainingTimes
+			&& this.unlimited == times.unlimited;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		if(this.hashCode == 0)
+		{
+			this.hashCode = Objects.hash(this.remainingTimes, this.unlimited);
+		}
+		return this.hashCode;
+	}
 }

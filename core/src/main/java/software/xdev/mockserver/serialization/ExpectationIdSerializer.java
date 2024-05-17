@@ -15,96 +15,140 @@
  */
 package software.xdev.mockserver.serialization;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import software.xdev.mockserver.model.ExpectationId;
+import static software.xdev.mockserver.character.Character.NEW_LINE;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static software.xdev.mockserver.util.StringUtils.isBlank;
-import static software.xdev.mockserver.character.Character.NEW_LINE;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
-public class ExpectationIdSerializer implements Serializer<ExpectationId> {
-    private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-    private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-    private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
+import software.xdev.mockserver.model.ExpectationId;
 
-    public String serialize(ExpectationId expectationId) {
-        try {
-            return objectWriter.writeValueAsString(expectationId);
-        } catch (Exception e) {
-            throw new IllegalStateException("Exception while serializing ExpectationId to JSON with value " + expectationId, e);
-        }
-    }
 
-    public String serialize(List<? extends ExpectationId> expectationIds) {
-        return serialize(expectationIds.toArray(new ExpectationId[0]));
-    }
-
-    public String serialize(ExpectationId... expectationIds) {
-        try {
-            if (expectationIds != null && expectationIds.length > 0) {
-                return objectWriter.writeValueAsString(expectationIds);
-            }
-            return "[]";
-        } catch (Exception e) {
-            throw new IllegalStateException("Exception while serializing ExpectationId to JSON with value " + Arrays.asList(expectationIds), e);
-        }
-    }
-
-    public ExpectationId deserialize(String jsonExpectationId) {
-        try {
-            if (jsonExpectationId.contains("\"httpRequest\"")) {
-                JsonNode jsonNode = objectMapper.readTree(jsonExpectationId);
-                if (jsonNode.has("httpRequest")) {
-                    jsonExpectationId = jsonNode.get("httpRequest").toString();
-                }
-            } else if (jsonExpectationId.contains("\"openAPIDefinition\"")) {
-                JsonNode jsonNode = objectMapper.readTree(jsonExpectationId);
-                if (jsonNode.has("openAPIDefinition")) {
-                    jsonExpectationId = jsonNode.get("openAPIDefinition").toString();
-                }
-            }
-            return objectMapper.readValue(jsonExpectationId, ExpectationId.class);
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("exception while parsing [" + jsonExpectationId + "] for ExpectationId", ex);
-        }
-    }
-
-    @Override
-    public Class<ExpectationId> supportsType() {
-        return ExpectationId.class;
-    }
-
-    public ExpectationId[] deserializeArray(String jsonExpectationIds) {
-        List<ExpectationId> expectationIds = new ArrayList<>();
-        if (isBlank(jsonExpectationIds)) {
-            throw new IllegalArgumentException("1 error:" + NEW_LINE + " - a request or request array is required but value was \"" + jsonExpectationIds + "\"");
-        } else {
-            List<String> jsonRequestList = jsonArraySerializer.splitJSONArray(jsonExpectationIds);
-            if (jsonRequestList.isEmpty()) {
-                throw new IllegalArgumentException("1 error:" + NEW_LINE + " - a request or array of request is required");
-            } else {
-                List<String> validationErrorsList = new ArrayList<>();
-                for (String jsonRequest : jsonRequestList) {
-                    try {
-                        expectationIds.add(deserialize(jsonRequest));
-                    } catch (IllegalArgumentException iae) {
-                        validationErrorsList.add(iae.getMessage());
-                    }
-
-                }
-                if (!validationErrorsList.isEmpty()) {
-                    throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
-                        + String.join("," + NEW_LINE, validationErrorsList)
-                        + (validationErrorsList.size() > 1 ? "]" : ""));
-                }
-            }
-        }
-        return expectationIds.toArray(new ExpectationId[0]);
-    }
-
+public class ExpectationIdSerializer implements Serializer<ExpectationId>
+{
+	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
+	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
+	
+	@Override
+	public String serialize(final ExpectationId expectationId)
+	{
+		try
+		{
+			return this.objectWriter.writeValueAsString(expectationId);
+		}
+		catch(final Exception e)
+		{
+			throw new IllegalStateException(
+				"Exception while serializing ExpectationId to JSON with value " + expectationId,
+				e);
+		}
+	}
+	
+	public String serialize(final List<? extends ExpectationId> expectationIds)
+	{
+		return this.serialize(expectationIds.toArray(new ExpectationId[0]));
+	}
+	
+	public String serialize(final ExpectationId... expectationIds)
+	{
+		try
+		{
+			if(expectationIds != null && expectationIds.length > 0)
+			{
+				return this.objectWriter.writeValueAsString(expectationIds);
+			}
+			return "[]";
+		}
+		catch(final Exception e)
+		{
+			throw new IllegalStateException(
+				"Exception while serializing ExpectationId to JSON with value " + Arrays.asList(expectationIds),
+				e);
+		}
+	}
+	
+	@Override
+	public ExpectationId deserialize(String jsonExpectationId)
+	{
+		try
+		{
+			if(jsonExpectationId.contains("\"httpRequest\""))
+			{
+				final JsonNode jsonNode = this.objectMapper.readTree(jsonExpectationId);
+				if(jsonNode.has("httpRequest"))
+				{
+					jsonExpectationId = jsonNode.get("httpRequest").toString();
+				}
+			}
+			else if(jsonExpectationId.contains("\"openAPIDefinition\""))
+			{
+				final JsonNode jsonNode = this.objectMapper.readTree(jsonExpectationId);
+				if(jsonNode.has("openAPIDefinition"))
+				{
+					jsonExpectationId = jsonNode.get("openAPIDefinition").toString();
+				}
+			}
+			return this.objectMapper.readValue(jsonExpectationId, ExpectationId.class);
+		}
+		catch(final Exception ex)
+		{
+			throw new IllegalArgumentException(
+				"exception while parsing [" + jsonExpectationId + "] for ExpectationId",
+				ex);
+		}
+	}
+	
+	@Override
+	public Class<ExpectationId> supportsType()
+	{
+		return ExpectationId.class;
+	}
+	
+	public ExpectationId[] deserializeArray(final String jsonExpectationIds)
+	{
+		final List<ExpectationId> expectationIds = new ArrayList<>();
+		if(isBlank(jsonExpectationIds))
+		{
+			throw new IllegalArgumentException(
+				"1 error:" + NEW_LINE + " - a request or request array is required but value was \""
+					+ jsonExpectationIds + "\"");
+		}
+		else
+		{
+			final List<String> jsonRequestList = this.jsonArraySerializer.splitJSONArray(jsonExpectationIds);
+			if(jsonRequestList.isEmpty())
+			{
+				throw new IllegalArgumentException(
+					"1 error:" + NEW_LINE + " - a request or array of request is required");
+			}
+			else
+			{
+				final List<String> validationErrorsList = new ArrayList<>();
+				for(final String jsonRequest : jsonRequestList)
+				{
+					try
+					{
+						expectationIds.add(this.deserialize(jsonRequest));
+					}
+					catch(final IllegalArgumentException iae)
+					{
+						validationErrorsList.add(iae.getMessage());
+					}
+				}
+				if(!validationErrorsList.isEmpty())
+				{
+					throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
+						+ String.join("," + NEW_LINE, validationErrorsList)
+						+ (validationErrorsList.size() > 1 ? "]" : ""));
+				}
+			}
+		}
+		return expectationIds.toArray(new ExpectationId[0]);
+	}
 }

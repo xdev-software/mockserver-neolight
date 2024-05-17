@@ -15,30 +15,37 @@
  */
 package software.xdev.mockserver.serialization.serializers.body;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
 import software.xdev.mockserver.model.RegexBody;
 
-import java.io.IOException;
 
-public class RegexBodySerializer extends StdSerializer<RegexBody> {
-
-    public RegexBodySerializer() {
-        super(RegexBody.class);
-    }
-
-    @Override
-    public void serialize(RegexBody regexBody, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        jgen.writeStartObject();
-        if (regexBody.getNot() != null && regexBody.getNot()) {
-            jgen.writeBooleanField("not", regexBody.getNot());
-        }
-        if (regexBody.getOptional() != null && regexBody.getOptional()) {
-            jgen.writeBooleanField("optional", regexBody.getOptional());
-        }
-        jgen.writeStringField("type", regexBody.getType().name());
-        jgen.writeStringField("regex", regexBody.getValue());
-        jgen.writeEndObject();
-    }
+public class RegexBodySerializer extends StdSerializer<RegexBody>
+{
+	public RegexBodySerializer()
+	{
+		super(RegexBody.class);
+	}
+	
+	@Override
+	public void serialize(final RegexBody regexBody, final JsonGenerator jgen, final SerializerProvider provider)
+		throws IOException
+	{
+		jgen.writeStartObject();
+		if(regexBody.getNot() != null && regexBody.getNot())
+		{
+			jgen.writeBooleanField("not", regexBody.getNot());
+		}
+		if(regexBody.getOptional() != null && regexBody.getOptional())
+		{
+			jgen.writeBooleanField("optional", regexBody.getOptional());
+		}
+		jgen.writeStringField("type", regexBody.getType().name());
+		jgen.writeStringField("regex", regexBody.getValue());
+		jgen.writeEndObject();
+	}
 }

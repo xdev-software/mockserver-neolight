@@ -15,18 +15,21 @@
  */
 package software.xdev.mockserver.codec;
 
+import static software.xdev.mockserver.model.BinaryMessage.bytes;
+
+import java.util.List;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
-import java.util.List;
 
-import static software.xdev.mockserver.model.BinaryMessage.bytes;
-
-public class NettyBinaryToMockServerBinaryResponseDecoder extends MessageToMessageDecoder<ByteBuf> {
-    @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        out.add(bytes(ByteBufUtil.getBytes(byteBuf)));
-    }
+public class NettyBinaryToMockServerBinaryResponseDecoder extends MessageToMessageDecoder<ByteBuf>
+{
+	@Override
+	protected void decode(final ChannelHandlerContext ctx, final ByteBuf byteBuf, final List<Object> out)
+	{
+		out.add(bytes(ByteBufUtil.getBytes(byteBuf)));
+	}
 }

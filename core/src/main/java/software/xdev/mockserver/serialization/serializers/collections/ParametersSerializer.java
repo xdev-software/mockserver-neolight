@@ -17,10 +17,11 @@ package software.xdev.mockserver.serialization.serializers.collections;
 
 import software.xdev.mockserver.model.Parameters;
 
-public class ParametersSerializer extends KeysToMultiValuesSerializer<Parameters> {
 
-    public ParametersSerializer() {
-        super(Parameters.class);
-    }
-
+public class ParametersSerializer extends KeysToMultiValuesSerializer<Parameters>
+{
+	public ParametersSerializer()
+	{
+		super(Parameters.class);
+	}
 }

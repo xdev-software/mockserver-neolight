@@ -17,14 +17,21 @@ package software.xdev.mockserver.serialization.java;
 
 import software.xdev.mockserver.model.Delay;
 
-public class DelayToJavaSerializer implements ToJavaSerializer<Delay> {
 
-    @Override
-    public String serialize(int numberOfSpacesToIndent, Delay delay) {
-        StringBuilder output = new StringBuilder();
-        if (delay != null) {
-            output.append("new Delay(TimeUnit.").append(delay.getTimeUnit().name()).append(", ").append(delay.getValue()).append(")");
-        }
-        return output.toString();
-    }
+public class DelayToJavaSerializer implements ToJavaSerializer<Delay>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final Delay delay)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(delay != null)
+		{
+			output.append("new Delay(TimeUnit.")
+				.append(delay.getTimeUnit().name())
+				.append(", ")
+				.append(delay.getValue())
+				.append(")");
+		}
+		return output.toString();
+	}
 }

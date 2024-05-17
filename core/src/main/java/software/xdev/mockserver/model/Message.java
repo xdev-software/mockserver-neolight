@@ -15,5 +15,6 @@
  */
 package software.xdev.mockserver.model;
 
-public interface Message {
+public interface Message
+{
 }

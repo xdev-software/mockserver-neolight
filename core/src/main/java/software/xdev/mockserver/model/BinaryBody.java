@@ -15,71 +15,90 @@
  */
 package software.xdev.mockserver.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import software.xdev.mockserver.serialization.Base64Converter;
-
 import java.util.Arrays;
 import java.util.Objects;
 
-public class BinaryBody extends BodyWithContentType<byte[]> {
-    private int hashCode;
-    private final byte[] bytes;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-    public BinaryBody(byte[] bytes) {
-        this(bytes, null);
-    }
+import software.xdev.mockserver.serialization.Base64Converter;
 
-    public BinaryBody(byte[] bytes, MediaType contentType) {
-        super(Type.BINARY, contentType);
-        this.bytes = bytes;
-    }
 
-    public static BinaryBody binary(byte[] body) {
-        return new BinaryBody(body);
-    }
-
-    public static BinaryBody binary(byte[] body, MediaType contentType) {
-        return new BinaryBody(body, contentType);
-    }
-
-    public byte[] getValue() {
-        return bytes;
-    }
-
-    @JsonIgnore
-    public byte[] getRawBytes() {
-        return bytes;
-    }
-
-    @Override
-    public String toString() {
-        return bytes != null ? Base64Converter.bytesToBase64String(bytes) : null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (hashCode() != o.hashCode()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        BinaryBody that = (BinaryBody) o;
-        return Arrays.equals(bytes, that.bytes);
-    }
-
-    @Override
-    public int hashCode() {
-        if (hashCode == 0) {
-            int result = Objects.hash(super.hashCode());
-            hashCode = 31 * result + Arrays.hashCode(bytes);
-        }
-        return hashCode;
-    }
+public class BinaryBody extends BodyWithContentType<byte[]>
+{
+	private int hashCode;
+	private final byte[] bytes;
+	
+	public BinaryBody(final byte[] bytes)
+	{
+		this(bytes, null);
+	}
+	
+	public BinaryBody(final byte[] bytes, final MediaType contentType)
+	{
+		super(Type.BINARY, contentType);
+		this.bytes = bytes;
+	}
+	
+	public static BinaryBody binary(final byte[] body)
+	{
+		return new BinaryBody(body);
+	}
+	
+	public static BinaryBody binary(final byte[] body, final MediaType contentType)
+	{
+		return new BinaryBody(body, contentType);
+	}
+	
+	@Override
+	public byte[] getValue()
+	{
+		return this.bytes;
+	}
+	
+	@Override
+	@JsonIgnore
+	public byte[] getRawBytes()
+	{
+		return this.bytes;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.bytes != null ? Base64Converter.bytesToBase64String(this.bytes) : null;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(o == null || this.getClass() != o.getClass())
+		{
+			return false;
+		}
+		if(this.hashCode() != o.hashCode())
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		final BinaryBody that = (BinaryBody)o;
+		return Arrays.equals(this.bytes, that.bytes);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		if(this.hashCode == 0)
+		{
+			final int result = Objects.hash(super.hashCode());
+			this.hashCode = 31 * result + Arrays.hashCode(this.bytes);
+		}
+		return this.hashCode;
+	}
 }

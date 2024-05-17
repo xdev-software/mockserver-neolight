@@ -17,8 +17,8 @@ package software.xdev.mockserver.mock.listeners;
 
 import software.xdev.mockserver.mock.RequestMatchers;
 
-public interface MockServerMatcherListener {
 
-    void updated(RequestMatchers requestMatchers, MockServerMatcherNotifier.Cause cause);
-
+public interface MockServerMatcherListener
+{
+	void updated(RequestMatchers requestMatchers, MockServerMatcherNotifier.Cause cause);
 }

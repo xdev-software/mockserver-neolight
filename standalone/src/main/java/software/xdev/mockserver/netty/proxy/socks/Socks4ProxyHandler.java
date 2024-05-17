@@ -25,20 +25,30 @@ import io.netty.handler.codec.socksx.v4.Socks4CommandType;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 
+
 @ChannelHandler.Sharable
-public class Socks4ProxyHandler extends SocksProxyHandler<Socks4CommandRequest> {
-
-    public Socks4ProxyHandler(ServerConfiguration configuration, LifeCycle server) {
-        super(configuration, server);
-    }
-
-    @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final Socks4CommandRequest commandRequest) {
-        if (commandRequest.type().equals(Socks4CommandType.CONNECT)) {
-            forwardConnection(ctx, new Socks4ConnectHandler(configuration, server, commandRequest.dstAddr(), commandRequest.dstPort()));
-            ctx.fireChannelRead(commandRequest);
-        } else {
-            ctx.writeAndFlush(new DefaultSocks4CommandResponse(Socks4CommandStatus.REJECTED_OR_FAILED)).addListener(ChannelFutureListener.CLOSE);
-        }
-    }
+public class Socks4ProxyHandler extends SocksProxyHandler<Socks4CommandRequest>
+{
+	public Socks4ProxyHandler(final ServerConfiguration configuration, final LifeCycle server)
+	{
+		super(configuration, server);
+	}
+	
+	@Override
+	protected void channelRead0(final ChannelHandlerContext ctx, final Socks4CommandRequest commandRequest)
+	{
+		if(commandRequest.type().equals(Socks4CommandType.CONNECT))
+		{
+			this.forwardConnection(
+				ctx,
+				new Socks4ConnectHandler(this.configuration,
+					this.server, commandRequest.dstAddr(), commandRequest.dstPort()));
+			ctx.fireChannelRead(commandRequest);
+		}
+		else
+		{
+			ctx.writeAndFlush(new DefaultSocks4CommandResponse(Socks4CommandStatus.REJECTED_OR_FAILED))
+				.addListener(ChannelFutureListener.CLOSE);
+		}
+	}
 }

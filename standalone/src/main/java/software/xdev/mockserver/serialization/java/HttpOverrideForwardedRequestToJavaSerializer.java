@@ -15,48 +15,70 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.HttpOverrideForwardedRequest;
-
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
-public class HttpOverrideForwardedRequestToJavaSerializer implements ToJavaSerializer<HttpOverrideForwardedRequest> {
+import software.xdev.mockserver.model.HttpOverrideForwardedRequest;
 
-    @Override
-    public String serialize(int numberOfSpacesToIndent, HttpOverrideForwardedRequest httpForward) {
-        StringBuilder output = new StringBuilder();
-        if (httpForward != null) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("forwardOverriddenRequest()");
-            if (httpForward.getRequestOverride() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withRequestOverride(");
-                output.append(new HttpRequestToJavaSerializer().serialize(numberOfSpacesToIndent + 2, httpForward.getRequestOverride()));
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
-            }
-            if (httpForward.getRequestModifier() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withRequestModifier(");
-                output.append(new HttpRequestModifierToJavaSerializer().serialize(numberOfSpacesToIndent + 2, httpForward.getRequestModifier()));
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
-            }
-            if (httpForward.getResponseOverride() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withResponseOverride(");
-                output.append(new HttpResponseToJavaSerializer().serialize(numberOfSpacesToIndent + 2, httpForward.getResponseOverride()));
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
-            }
-            if (httpForward.getResponseModifier() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withResponseModifier(");
-                output.append(new HttpResponseModifierToJavaSerializer().serialize(numberOfSpacesToIndent + 2, httpForward.getResponseModifier()));
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
-            }
-            if (httpForward.getDelay() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDelay(");
-                output.append(new DelayToJavaSerializer().serialize(0, httpForward.getDelay()));
-                output.append(")");
-            }
-        }
-        return output.toString();
-    }
 
-    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
-        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
-    }
+public class HttpOverrideForwardedRequestToJavaSerializer implements ToJavaSerializer<HttpOverrideForwardedRequest>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final HttpOverrideForwardedRequest httpForward)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(httpForward != null)
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output)
+				.append("forwardOverriddenRequest()");
+			if(httpForward.getRequestOverride() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+					".withRequestOverride(");
+				output.append(new HttpRequestToJavaSerializer().serialize(
+					numberOfSpacesToIndent + 2,
+					httpForward.getRequestOverride()));
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+			}
+			if(httpForward.getRequestModifier() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+					".withRequestModifier(");
+				output.append(new HttpRequestModifierToJavaSerializer().serialize(
+					numberOfSpacesToIndent + 2,
+					httpForward.getRequestModifier()));
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+			}
+			if(httpForward.getResponseOverride() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+					".withResponseOverride(");
+				output.append(new HttpResponseToJavaSerializer().serialize(
+					numberOfSpacesToIndent + 2,
+					httpForward.getResponseOverride()));
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+			}
+			if(httpForward.getResponseModifier() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+					".withResponseModifier(");
+				output.append(new HttpResponseModifierToJavaSerializer().serialize(
+					numberOfSpacesToIndent + 2,
+					httpForward.getResponseModifier()));
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+			}
+			if(httpForward.getDelay() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDelay(");
+				output.append(new DelayToJavaSerializer().serialize(0, httpForward.getDelay()));
+				output.append(")");
+			}
+		}
+		return output.toString();
+	}
+	
+	private StringBuilder appendNewLineAndIndent(final int numberOfSpacesToIndent, final StringBuilder output)
+	{
+		return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
+	}
 }

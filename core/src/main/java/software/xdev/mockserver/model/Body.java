@@ -15,88 +15,107 @@
  */
 package software.xdev.mockserver.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.nio.charset.Charset;
 import java.util.Objects;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public abstract class Body<T> extends Not {
-    private int hashCode;
-    private final Type type;
-    private Boolean optional;
 
-    public Body(Type type) {
-        this.type = type;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public Boolean getOptional() {
-        return optional;
-    }
-
-    public Body<T> withOptional(Boolean optional) {
-        this.optional = optional;
-        return this;
-    }
-
-    public abstract T getValue();
-
-    @JsonIgnore
-    public byte[] getRawBytes() {
-        return toString().getBytes(UTF_8);
-    }
-
-    @JsonIgnore
-    public Charset getCharset(Charset defaultIfNotSet) {
-        if (this instanceof BodyWithContentType) {
-            return this.getCharset(defaultIfNotSet);
-        }
-        return defaultIfNotSet;
-    }
-
-    public String getContentType() {
-        if (this instanceof BodyWithContentType) {
-            return this.getContentType();
-        }
-        return null;
-    }
-
-    public enum Type {
-        BINARY,
-        PARAMETERS,
-        REGEX,
-        STRING,
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (hashCode() != o.hashCode()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        Body<?> body = (Body<?>) o;
-        return type == body.type &&
-            Objects.equals(optional, body.optional);
-    }
-
-    @Override
-    public int hashCode() {
-        if (hashCode == 0) {
-            hashCode = Objects.hash(super.hashCode(), type, optional);
-        }
-        return hashCode;
-    }
+public abstract class Body<T> extends Not
+{
+	private int hashCode;
+	private final Type type;
+	private Boolean optional;
+	
+	protected Body(final Type type)
+	{
+		this.type = type;
+	}
+	
+	public Type getType()
+	{
+		return this.type;
+	}
+	
+	public Boolean getOptional()
+	{
+		return this.optional;
+	}
+	
+	public Body<T> withOptional(final Boolean optional)
+	{
+		this.optional = optional;
+		return this;
+	}
+	
+	public abstract T getValue();
+	
+	@JsonIgnore
+	public byte[] getRawBytes()
+	{
+		return this.toString().getBytes(UTF_8);
+	}
+	
+	@JsonIgnore
+	public Charset getCharset(final Charset defaultIfNotSet)
+	{
+		if(this instanceof BodyWithContentType)
+		{
+			return this.getCharset(defaultIfNotSet);
+		}
+		return defaultIfNotSet;
+	}
+	
+	public String getContentType()
+	{
+		if(this instanceof BodyWithContentType)
+		{
+			return this.getContentType();
+		}
+		return null;
+	}
+	
+	public enum Type
+	{
+		BINARY,
+		PARAMETERS,
+		REGEX,
+		STRING,
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(o == null || this.getClass() != o.getClass())
+		{
+			return false;
+		}
+		if(this.hashCode() != o.hashCode())
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		final Body<?> body = (Body<?>)o;
+		return this.type == body.type &&
+			Objects.equals(this.optional, body.optional);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		if(this.hashCode == 0)
+		{
+			this.hashCode = Objects.hash(super.hashCode(), this.type, this.optional);
+		}
+		return this.hashCode;
+	}
 }

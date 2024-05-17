@@ -15,6 +15,12 @@
  */
 package software.xdev.mockserver.serialization.deserializers.condition;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,62 +29,71 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import software.xdev.mockserver.matchers.TimeToLive;
 import software.xdev.mockserver.serialization.model.TimeToLiveDTO;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO> {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(TimeToLiveDTODeserializer.class);
-    
-    public TimeToLiveDTODeserializer() {
-        super(TimeToLiveDTO.class);
-    }
-
-    @Override
-    public TimeToLiveDTO deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException {
-        TimeToLiveDTO timeToLiveDTO = null;
-        TimeToLive timeToLive = null;
-        TimeUnit timeUnit;
-        long ttl = 0L;
-        long endDate;
-        boolean unlimited = false;
-
-        JsonNode timeToLiveDTONode = jsonParser.getCodec().readTree(jsonParser);
-        JsonNode unlimitedNode = timeToLiveDTONode.get("unlimited");
-        if (unlimitedNode != null) {
-            unlimited = unlimitedNode.asBoolean();
-        }
-        if (!unlimited) {
-            JsonNode timeToLiveNode = timeToLiveDTONode.get("timeToLive");
-            if (timeToLiveNode != null) {
-                ttl = timeToLiveNode.asLong();
-            }
-            JsonNode timeUnitNode = timeToLiveDTONode.get("timeUnit");
-            if (timeUnitNode != null) {
-                try {
-                    timeUnit = Enum.valueOf(TimeUnit.class, timeUnitNode.asText());
-                    timeToLive = TimeToLive.exactly(timeUnit, ttl);
-                } catch (IllegalArgumentException iae) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Exception parsing TimeToLiveDTO timeUnit", iae);
-                    }
-                }
-            }
-            if (timeToLive != null) {
-                JsonNode endDateNode = timeToLiveDTONode.get("endDate");
-                if (endDateNode != null) {
-                    endDate = endDateNode.asLong();
-                    timeToLive.setEndDate(endDate);
-                }
-                timeToLiveDTO = new TimeToLiveDTO(timeToLive);
-            }
-        } else {
-            timeToLiveDTO = new TimeToLiveDTO(TimeToLive.unlimited());
-        }
-
-        return timeToLiveDTO;
-    }
+public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
+{
+	private static final Logger LOG = LoggerFactory.getLogger(TimeToLiveDTODeserializer.class);
+	
+	public TimeToLiveDTODeserializer()
+	{
+		super(TimeToLiveDTO.class);
+	}
+	
+	@Override
+	public TimeToLiveDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
+	{
+		TimeToLiveDTO timeToLiveDTO = null;
+		TimeToLive timeToLive = null;
+		final TimeUnit timeUnit;
+		long ttl = 0L;
+		final long endDate;
+		boolean unlimited = false;
+		
+		final JsonNode timeToLiveDTONode = jsonParser.getCodec().readTree(jsonParser);
+		final JsonNode unlimitedNode = timeToLiveDTONode.get("unlimited");
+		if(unlimitedNode != null)
+		{
+			unlimited = unlimitedNode.asBoolean();
+		}
+		if(!unlimited)
+		{
+			final JsonNode timeToLiveNode = timeToLiveDTONode.get("timeToLive");
+			if(timeToLiveNode != null)
+			{
+				ttl = timeToLiveNode.asLong();
+			}
+			final JsonNode timeUnitNode = timeToLiveDTONode.get("timeUnit");
+			if(timeUnitNode != null)
+			{
+				try
+				{
+					timeUnit = Enum.valueOf(TimeUnit.class, timeUnitNode.asText());
+					timeToLive = TimeToLive.exactly(timeUnit, ttl);
+				}
+				catch(final IllegalArgumentException iae)
+				{
+					if(LOG.isTraceEnabled())
+					{
+						LOG.trace("Exception parsing TimeToLiveDTO timeUnit", iae);
+					}
+				}
+			}
+			if(timeToLive != null)
+			{
+				final JsonNode endDateNode = timeToLiveDTONode.get("endDate");
+				if(endDateNode != null)
+				{
+					endDate = endDateNode.asLong();
+					timeToLive.setEndDate(endDate);
+				}
+				timeToLiveDTO = new TimeToLiveDTO(timeToLive);
+			}
+		}
+		else
+		{
+			timeToLiveDTO = new TimeToLiveDTO(TimeToLive.unlimited());
+		}
+		
+		return timeToLiveDTO;
+	}
 }

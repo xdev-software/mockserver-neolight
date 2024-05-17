@@ -15,33 +15,39 @@
  */
 package software.xdev.mockserver.event.model;
 
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
+
 import software.xdev.mockserver.model.ExpectationId;
 import software.xdev.mockserver.model.RequestDefinition;
 
-import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
-public class RequestAndExpectationId {
-
-    public final RequestDefinition requestDefinition;
-    public final String expectationId;
-
-    public RequestAndExpectationId(RequestDefinition requestDefinition, String expectationId) {
-        this.requestDefinition = requestDefinition;
-        this.expectationId = expectationId;
-    }
-
-    public RequestDefinition getRequestDefinition() {
-        return requestDefinition;
-    }
-
-    public String getExpectationId() {
-        return expectationId;
-    }
-
-    public boolean matches(ExpectationId expectationId) {
-        if (expectationId != null && isNotBlank(expectationId.getId()) && isNotBlank(this.expectationId)) {
-            return this.expectationId.equals(expectationId.getId());
-        }
-        return false;
-    }
+public class RequestAndExpectationId
+{
+	public final RequestDefinition requestDefinition;
+	public final String expectationId;
+	
+	public RequestAndExpectationId(final RequestDefinition requestDefinition, final String expectationId)
+	{
+		this.requestDefinition = requestDefinition;
+		this.expectationId = expectationId;
+	}
+	
+	public RequestDefinition getRequestDefinition()
+	{
+		return this.requestDefinition;
+	}
+	
+	public String getExpectationId()
+	{
+		return this.expectationId;
+	}
+	
+	public boolean matches(final ExpectationId expectationId)
+	{
+		if(expectationId != null && isNotBlank(expectationId.getId()) && isNotBlank(this.expectationId))
+		{
+			return this.expectationId.equals(expectationId.getId());
+		}
+		return false;
+	}
 }

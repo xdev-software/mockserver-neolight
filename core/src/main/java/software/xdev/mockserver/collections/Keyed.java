@@ -15,8 +15,7 @@
  */
 package software.xdev.mockserver.collections;
 
-public interface Keyed<K> {
-
-    K getKey();
-
+public interface Keyed<K>
+{
+	K getKey();
 }

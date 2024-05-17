@@ -19,68 +19,82 @@ import java.util.Objects;
 
 import software.xdev.mockserver.model.HttpResponseModifier;
 
-public class HttpResponseModifierDTO implements DTO<HttpResponseModifier> {
 
-    private HeadersModifierDTO headers;
-    private CookiesModifierDTO cookies;
-
-    public HttpResponseModifierDTO() {
-    }
-
-    public HttpResponseModifierDTO(HttpResponseModifier httpResponseModifier) {
-        if (httpResponseModifier != null) {
-            headers = httpResponseModifier.getHeaders() != null ? new HeadersModifierDTO(httpResponseModifier.getHeaders()) : null;
-            cookies = httpResponseModifier.getCookies() != null ? new CookiesModifierDTO(httpResponseModifier.getCookies()) : null;
-        }
-    }
-
-    public HttpResponseModifier buildObject() {
-        return new HttpResponseModifier()
-            .withHeaders(headers != null ? headers.buildObject() : null)
-            .withCookies(cookies != null ? cookies.buildObject() : null);
-    }
-
-    public HeadersModifierDTO getHeaders() {
-        return headers;
-    }
-
-    public HttpResponseModifierDTO setHeaders(HeadersModifierDTO headers) {
-        this.headers = headers;
-        return this;
-    }
-
-    public CookiesModifierDTO getCookies() {
-        return cookies;
-    }
-
-    public HttpResponseModifierDTO setCookies(CookiesModifierDTO cookies) {
-        this.cookies = cookies;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final HttpResponseModifierDTO that))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return Objects.equals(getHeaders(), that.getHeaders()) && Objects.equals(
-            getCookies(),
-            that.getCookies());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(super.hashCode(), getHeaders(), getCookies());
-    }
+public class HttpResponseModifierDTO implements DTO<HttpResponseModifier>
+{
+	private HeadersModifierDTO headers;
+	private CookiesModifierDTO cookies;
+	
+	public HttpResponseModifierDTO()
+	{
+	}
+	
+	public HttpResponseModifierDTO(final HttpResponseModifier httpResponseModifier)
+	{
+		if(httpResponseModifier != null)
+		{
+			this.headers = httpResponseModifier.getHeaders() != null
+				? new HeadersModifierDTO(httpResponseModifier.getHeaders())
+				: null;
+			this.cookies = httpResponseModifier.getCookies() != null
+				? new CookiesModifierDTO(httpResponseModifier.getCookies())
+				: null;
+		}
+	}
+	
+	@Override
+	public HttpResponseModifier buildObject()
+	{
+		return new HttpResponseModifier()
+			.withHeaders(this.headers != null ? this.headers.buildObject() : null)
+			.withCookies(this.cookies != null ? this.cookies.buildObject() : null);
+	}
+	
+	public HeadersModifierDTO getHeaders()
+	{
+		return this.headers;
+	}
+	
+	public HttpResponseModifierDTO setHeaders(final HeadersModifierDTO headers)
+	{
+		this.headers = headers;
+		return this;
+	}
+	
+	public CookiesModifierDTO getCookies()
+	{
+		return this.cookies;
+	}
+	
+	public HttpResponseModifierDTO setCookies(final CookiesModifierDTO cookies)
+	{
+		this.cookies = cookies;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final HttpResponseModifierDTO that))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return Objects.equals(this.getHeaders(), that.getHeaders()) && Objects.equals(
+			this.getCookies(),
+			that.getCookies());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), this.getHeaders(), this.getCookies());
+	}
 }

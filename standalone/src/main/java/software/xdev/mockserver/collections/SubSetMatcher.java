@@ -15,74 +15,109 @@
  */
 package software.xdev.mockserver.collections;
 
-import software.xdev.mockserver.matchers.MatchDifference;
-import software.xdev.mockserver.matchers.RegexStringMatcher;
-import software.xdev.mockserver.model.NottableString;
+import static software.xdev.mockserver.model.NottableString.string;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static software.xdev.mockserver.model.NottableString.string;
+import software.xdev.mockserver.matchers.MatchDifference;
+import software.xdev.mockserver.matchers.RegexStringMatcher;
+import software.xdev.mockserver.model.NottableString;
 
-public class SubSetMatcher {
 
-    static boolean containsSubset(MatchDifference context, RegexStringMatcher regexStringMatcher, List<ImmutableEntry> subset, List<ImmutableEntry> superset) {
-        boolean result = true;
-        Set<Integer> matchingIndexes = new HashSet<>();
-        for (ImmutableEntry subsetItem : subset) {
-            Set<Integer> subsetItemMatchingIndexes = matchesIndexes(context, regexStringMatcher, subsetItem, superset);
-            boolean optionalAndNotPresent = subsetItem.isOptional() && !containsKey(regexStringMatcher, subsetItem, superset);
-            boolean nottedAndPresent = nottedAndPresent(regexStringMatcher, subsetItem, superset);
-            if ((!optionalAndNotPresent && subsetItemMatchingIndexes.isEmpty()) || nottedAndPresent) {
-                result = false;
-                break;
-            }
-            matchingIndexes.addAll(subsetItemMatchingIndexes);
-        }
-
-        if (result) {
-            long subsetNonOptionalSize = subset.stream().filter(ImmutableEntry::isNotOptional).count();
-            // this prevents multiple items in the subset from being matched by a single item in the superset
-            result = matchingIndexes.size() >= subsetNonOptionalSize;
-        }
-        return result;
-    }
-
-    private static Set<Integer> matchesIndexes(MatchDifference context, RegexStringMatcher regexStringMatcher, ImmutableEntry matcherItem, List<ImmutableEntry> matchedList) {
-        Set<Integer> matchingIndexes = new HashSet<>();
-        for (int i = 0; i < matchedList.size(); i++) {
-            ImmutableEntry matchedItem = matchedList.get(i);
-            boolean keyMatches = regexStringMatcher.matches(context, matcherItem.getKey(), matchedItem.getKey());
-            boolean valueMatches = regexStringMatcher.matches(context, matcherItem.getValue(), matchedItem.getValue());
-            if (keyMatches && valueMatches) {
-                matchingIndexes.add(i);
-            }
-        }
-        return matchingIndexes;
-    }
-
-    private static boolean containsKey(RegexStringMatcher regexStringMatcher, ImmutableEntry matcherItem, List<ImmutableEntry> matchedList) {
-        for (ImmutableEntry matchedItem : matchedList) {
-            if (regexStringMatcher.matches(matcherItem.getKey(), matchedItem.getKey())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean nottedAndPresent(RegexStringMatcher regexStringMatcher, ImmutableEntry matcherItem, List<ImmutableEntry> matchedList) {
-        if (matcherItem.getKey().isNot()) {
-            NottableString unNottedMatcherItemKey = string(matcherItem.getKey().getValue());
-            for (ImmutableEntry matchedItem : matchedList) {
-                if (!matchedItem.getKey().isNot()) {
-                    if (regexStringMatcher.matches(unNottedMatcherItemKey, matchedItem.getKey())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
+public final class SubSetMatcher
+{
+	static boolean containsSubset(
+		final MatchDifference context,
+		final RegexStringMatcher regexStringMatcher,
+		final List<ImmutableEntry> subset,
+		final List<ImmutableEntry> superset)
+	{
+		boolean result = true;
+		final Set<Integer> matchingIndexes = new HashSet<>();
+		for(final ImmutableEntry subsetItem : subset)
+		{
+			final Set<Integer> subsetItemMatchingIndexes =
+				matchesIndexes(context, regexStringMatcher, subsetItem, superset);
+			final boolean optionalAndNotPresent =
+				subsetItem.isOptional() && !containsKey(regexStringMatcher, subsetItem, superset);
+			final boolean nottedAndPresent = nottedAndPresent(regexStringMatcher, subsetItem, superset);
+			if((!optionalAndNotPresent && subsetItemMatchingIndexes.isEmpty()) || nottedAndPresent)
+			{
+				result = false;
+				break;
+			}
+			matchingIndexes.addAll(subsetItemMatchingIndexes);
+		}
+		
+		if(result)
+		{
+			final long subsetNonOptionalSize = subset.stream().filter(ImmutableEntry::isNotOptional).count();
+			// this prevents multiple items in the subset from being matched by a single item in the superset
+			result = matchingIndexes.size() >= subsetNonOptionalSize;
+		}
+		return result;
+	}
+	
+	private static Set<Integer> matchesIndexes(
+		final MatchDifference context,
+		final RegexStringMatcher regexStringMatcher,
+		final ImmutableEntry matcherItem,
+		final List<ImmutableEntry> matchedList)
+	{
+		final Set<Integer> matchingIndexes = new HashSet<>();
+		for(int i = 0; i < matchedList.size(); i++)
+		{
+			final ImmutableEntry matchedItem = matchedList.get(i);
+			final boolean keyMatches = regexStringMatcher.matches(context, matcherItem.getKey(), matchedItem.getKey());
+			final boolean valueMatches =
+				regexStringMatcher.matches(context, matcherItem.getValue(), matchedItem.getValue());
+			if(keyMatches && valueMatches)
+			{
+				matchingIndexes.add(i);
+			}
+		}
+		return matchingIndexes;
+	}
+	
+	private static boolean containsKey(
+		final RegexStringMatcher regexStringMatcher,
+		final ImmutableEntry matcherItem,
+		final List<ImmutableEntry> matchedList)
+	{
+		for(final ImmutableEntry matchedItem : matchedList)
+		{
+			if(regexStringMatcher.matches(matcherItem.getKey(), matchedItem.getKey()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static boolean nottedAndPresent(
+		final RegexStringMatcher regexStringMatcher,
+		final ImmutableEntry matcherItem,
+		final List<ImmutableEntry> matchedList)
+	{
+		if(matcherItem.getKey().isNot())
+		{
+			final NottableString unNottedMatcherItemKey = string(matcherItem.getKey().getValue());
+			for(final ImmutableEntry matchedItem : matchedList)
+			{
+				if(!matchedItem.getKey().isNot() && regexStringMatcher.matches(
+					unNottedMatcherItemKey,
+					matchedItem.getKey()))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private SubSetMatcher()
+	{
+	}
 }

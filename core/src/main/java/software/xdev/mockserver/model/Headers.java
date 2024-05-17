@@ -20,39 +20,49 @@ import java.util.List;
 import java.util.Map;
 
 
-public class Headers extends KeysToMultiValues<Header, Headers> {
-
-    public Headers(List<Header> headers) {
-        withEntries(headers);
-    }
-
-    public Headers(Header... headers) {
-        withEntries(headers);
-    }
-
-    public Headers(Map<NottableString, List<NottableString>> headers) {
-        super(headers);
-    }
-
-    public static Headers headers(Header... headers) {
-        return new Headers(headers);
-    }
-
-    @Override
-    public Header build(NottableString name, Collection<NottableString> values) {
-        return new Header(name, values);
-    }
-
-    protected void isModified() {
-    }
-
-    public Headers withKeyMatchStyle(KeyMatchStyle keyMatchStyle) {
-        super.withKeyMatchStyle(keyMatchStyle);
-        return this;
-    }
-
-    public Headers clone() {
-        return new Headers(getMultimap());
-    }
-
+public class Headers extends KeysToMultiValues<Header, Headers>
+{
+	public Headers(final List<Header> headers)
+	{
+		this.withEntries(headers);
+	}
+	
+	public Headers(final Header... headers)
+	{
+		this.withEntries(headers);
+	}
+	
+	public Headers(final Map<NottableString, List<NottableString>> headers)
+	{
+		super(headers);
+	}
+	
+	public static Headers headers(final Header... headers)
+	{
+		return new Headers(headers);
+	}
+	
+	@Override
+	public Header build(final NottableString name, final Collection<NottableString> values)
+	{
+		return new Header(name, values);
+	}
+	
+	@Override
+	protected void isModified()
+	{
+	}
+	
+	@Override
+	public Headers withKeyMatchStyle(final KeyMatchStyle keyMatchStyle)
+	{
+		super.withKeyMatchStyle(keyMatchStyle);
+		return this;
+	}
+	
+	@Override
+	public Headers clone()
+	{
+		return new Headers(this.getMultimap());
+	}
 }

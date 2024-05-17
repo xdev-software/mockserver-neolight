@@ -15,27 +15,35 @@
  */
 package software.xdev.mockserver.serialization.serializers.response;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
 import software.xdev.mockserver.matchers.Times;
 
-import java.io.IOException;
 
-public class TimesSerializer extends StdSerializer<Times> {
-
-    public TimesSerializer() {
-        super(Times.class);
-    }
-
-    @Override
-    public void serialize(Times times, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        jgen.writeStartObject();
-        if (!times.isUnlimited()) {
-            jgen.writeNumberField("remainingTimes", times.getRemainingTimes());
-        } else {
-            jgen.writeBooleanField("unlimited", times.isUnlimited());
-        }
-        jgen.writeEndObject();
-    }
+public class TimesSerializer extends StdSerializer<Times>
+{
+	public TimesSerializer()
+	{
+		super(Times.class);
+	}
+	
+	@Override
+	public void serialize(final Times times, final JsonGenerator jgen, final SerializerProvider provider)
+		throws IOException
+	{
+		jgen.writeStartObject();
+		if(!times.isUnlimited())
+		{
+			jgen.writeNumberField("remainingTimes", times.getRemainingTimes());
+		}
+		else
+		{
+			jgen.writeBooleanField("unlimited", times.isUnlimited());
+		}
+		jgen.writeEndObject();
+	}
 }

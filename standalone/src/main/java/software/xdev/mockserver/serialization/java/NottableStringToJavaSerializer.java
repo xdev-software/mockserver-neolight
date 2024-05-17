@@ -16,20 +16,33 @@
 package software.xdev.mockserver.serialization.java;
 
 import org.apache.commons.text.StringEscapeUtils;
+
 import software.xdev.mockserver.model.NottableString;
 
-public class NottableStringToJavaSerializer {
 
-    public static String serialize(NottableString nottableString, boolean alwaysNottableString) {
-        if (nottableString.isOptional()) {
-            return "optional(\"" + StringEscapeUtils.escapeJava(nottableString.getValue()) + "\")";
-        } else if (nottableString.isNot()) {
-            return "not(\"" + StringEscapeUtils.escapeJava(nottableString.getValue()) + "\")";
-        } else if (alwaysNottableString) {
-            return "string(\"" + StringEscapeUtils.escapeJava(nottableString.getValue()) + "\")";
-        } else {
-            return "\"" + StringEscapeUtils.escapeJava(nottableString.getValue()) + "\"";
-        }
-    }
-
+public final class NottableStringToJavaSerializer
+{
+	public static String serialize(final NottableString nottableString, final boolean alwaysNottableString)
+	{
+		if(nottableString.isOptional())
+		{
+			return "optional(\"" + StringEscapeUtils.escapeJava(nottableString.getValue()) + "\")";
+		}
+		else if(nottableString.isNot())
+		{
+			return "not(\"" + StringEscapeUtils.escapeJava(nottableString.getValue()) + "\")";
+		}
+		else if(alwaysNottableString)
+		{
+			return "string(\"" + StringEscapeUtils.escapeJava(nottableString.getValue()) + "\")";
+		}
+		else
+		{
+			return "\"" + StringEscapeUtils.escapeJava(nottableString.getValue()) + "\"";
+		}
+	}
+	
+	private NottableStringToJavaSerializer()
+	{
+	}
 }

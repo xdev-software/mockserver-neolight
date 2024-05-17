@@ -15,37 +15,41 @@
  */
 package software.xdev.mockserver.matchers;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import software.xdev.mockserver.cache.LRUCache;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.model.RequestDefinition;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
 
-public class MatcherBuilder {
-
-    private final ServerConfiguration configuration;
-    private final LRUCache<RequestDefinition, HttpRequestMatcher> requestMatcherLRUCache;
-
-    public MatcherBuilder(ServerConfiguration configuration) {
-        this.configuration = configuration;
-        this.requestMatcherLRUCache = new LRUCache<>(250, MINUTES.toMillis(10));
-    }
-
-    public HttpRequestMatcher transformsToMatcher(RequestDefinition requestDefinition) {
-        HttpRequestMatcher httpRequestMatcher = requestMatcherLRUCache.get(requestDefinition);
-        if (httpRequestMatcher == null) {
-            httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration);
-            httpRequestMatcher.update(requestDefinition);
-            requestMatcherLRUCache.put(requestDefinition, httpRequestMatcher);
-        }
-        return httpRequestMatcher;
-    }
-
-    public HttpRequestMatcher transformsToMatcher(Expectation expectation) {
-        HttpRequestMatcher httpRequestMatcher = new HttpRequestPropertiesMatcher(configuration);
-        httpRequestMatcher.update(expectation);
-        return httpRequestMatcher;
-    }
-
+public class MatcherBuilder
+{
+	private final ServerConfiguration configuration;
+	private final LRUCache<RequestDefinition, HttpRequestMatcher> requestMatcherLRUCache;
+	
+	public MatcherBuilder(final ServerConfiguration configuration)
+	{
+		this.configuration = configuration;
+		this.requestMatcherLRUCache = new LRUCache<>(250, MINUTES.toMillis(10));
+	}
+	
+	public HttpRequestMatcher transformsToMatcher(final RequestDefinition requestDefinition)
+	{
+		HttpRequestMatcher httpRequestMatcher = this.requestMatcherLRUCache.get(requestDefinition);
+		if(httpRequestMatcher == null)
+		{
+			httpRequestMatcher = new HttpRequestPropertiesMatcher(this.configuration);
+			httpRequestMatcher.update(requestDefinition);
+			this.requestMatcherLRUCache.put(requestDefinition, httpRequestMatcher);
+		}
+		return httpRequestMatcher;
+	}
+	
+	public HttpRequestMatcher transformsToMatcher(final Expectation expectation)
+	{
+		final HttpRequestMatcher httpRequestMatcher = new HttpRequestPropertiesMatcher(this.configuration);
+		httpRequestMatcher.update(expectation);
+		return httpRequestMatcher;
+	}
 }

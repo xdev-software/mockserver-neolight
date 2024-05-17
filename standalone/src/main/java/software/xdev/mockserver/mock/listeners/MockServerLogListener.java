@@ -17,8 +17,8 @@ package software.xdev.mockserver.mock.listeners;
 
 import software.xdev.mockserver.event.EventBus;
 
-public interface MockServerLogListener {
 
-    void updated(EventBus mockServerLog);
-
+public interface MockServerLogListener
+{
+	void updated(EventBus mockServerLog);
 }

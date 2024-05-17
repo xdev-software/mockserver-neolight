@@ -15,8 +15,11 @@
  */
 package software.xdev.mockserver.character;
 
-public class Character {
-
-    public static final String NEW_LINE = System.getProperty("line.separator");
-
+public final class Character
+{
+	public static final String NEW_LINE = "\n";
+	
+	private Character()
+	{
+	}
 }

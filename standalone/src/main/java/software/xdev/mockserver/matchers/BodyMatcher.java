@@ -15,6 +15,6 @@
  */
 package software.xdev.mockserver.matchers;
 
-public abstract class BodyMatcher<MatchedType> extends NotMatcher<MatchedType> {
-
+public abstract class BodyMatcher<MatchedType> extends NotMatcher<MatchedType>
+{
 }

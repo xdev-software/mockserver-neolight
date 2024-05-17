@@ -15,112 +15,165 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.*;
+import static software.xdev.mockserver.character.Character.NEW_LINE;
+import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
+import software.xdev.mockserver.model.Cookies;
+import software.xdev.mockserver.model.Headers;
+import software.xdev.mockserver.model.HttpRequestModifier;
+import software.xdev.mockserver.model.ObjectWithJsonToString;
+import software.xdev.mockserver.model.Parameters;
 
-public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<HttpRequestModifier> {
 
-    public String serialize(List<HttpRequestModifier> httpRequestModifiers) {
-        StringBuilder output = new StringBuilder();
-        for (HttpRequestModifier httpRequestModifier : httpRequestModifiers) {
-            output.append(serialize(0, httpRequestModifier));
-            output.append(";");
-            output.append(NEW_LINE);
-        }
-        return output.toString();
-    }
-
-    @Override
-    public String serialize(int numberOfSpacesToIndent, HttpRequestModifier request) {
-        StringBuilder output = new StringBuilder();
-        if (request != null) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
-            output.append("requestModifier()");
-            if (request.getPath() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                output.append(".withPath(\"").append(request.getPath().getRegex()).append("\",\"").append(request.getPath().getSubstitution()).append("\")");
-            }
-            if (request.getQueryStringParameters() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withQueryStringParameters(");
-                outputQueryStringParameters(numberOfSpacesToIndent, output, request.getQueryStringParameters().getAdd());
-                outputQueryStringParameters(numberOfSpacesToIndent, output, request.getQueryStringParameters().getReplace());
-                outputList(numberOfSpacesToIndent, output, request.getQueryStringParameters().getRemove());
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
-            }
-            if (request.getHeaders() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withHeaders(");
-                outputHeaders(numberOfSpacesToIndent, output, request.getHeaders().getAdd());
-                outputHeaders(numberOfSpacesToIndent, output, request.getHeaders().getReplace());
-                outputList(numberOfSpacesToIndent, output, request.getHeaders().getRemove());
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
-            }
-            if (request.getCookies() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withCookies(");
-                outputCookies(numberOfSpacesToIndent, output, request.getCookies().getAdd());
-                outputCookies(numberOfSpacesToIndent, output, request.getCookies().getReplace());
-                outputList(numberOfSpacesToIndent, output, request.getCookies().getRemove());
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
-            }
-        }
-
-        return output.toString();
-    }
-
-    private void outputQueryStringParameters(int numberOfSpacesToIndent, StringBuilder output, Parameters parameters) {
-        if (parameters != null && !parameters.isEmpty()) {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("parameters(");
-            appendObject((numberOfSpacesToIndent + 2), output, new ParameterToJavaSerializer(), parameters.getEntries());
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("),");
-        } else {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null,");
-        }
-    }
-
-    private void outputHeaders(int numberOfSpacesToIndent, StringBuilder output, Headers headers) {
-        if (headers != null && !headers.isEmpty()) {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("headers(");
-            appendObject((numberOfSpacesToIndent + 2), output, new HeaderToJavaSerializer(), headers.getEntries());
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("),");
-        } else {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null,");
-        }
-    }
-
-    private void outputCookies(int numberOfSpacesToIndent, StringBuilder output, Cookies cookies) {
-        if (cookies != null && !cookies.isEmpty()) {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("cookies(");
-            appendObject((numberOfSpacesToIndent + 2), output, new CookieToJavaSerializer(), cookies.getEntries());
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("),");
-        } else {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null,");
-        }
-    }
-
-    private void outputList(int numberOfSpacesToIndent, StringBuilder output, List<String> add) {
-        if (add != null && !add.isEmpty()) {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output)
-                .append("List.of(")
-                .append(add.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(",")))
-                .append(")");
-        } else {
-            appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null");
-        }
-    }
-
-    private <T extends ObjectWithJsonToString> void appendObject(
-        int numberOfSpacesToIndent,
-        StringBuilder output,
-        MultiValueToJavaSerializer<T> toJavaSerializer,
-        List<T> objects) {
-        output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
-    }
-
-    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
-        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
-    }
+public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<HttpRequestModifier>
+{
+	public String serialize(final List<HttpRequestModifier> httpRequestModifiers)
+	{
+		final StringBuilder output = new StringBuilder();
+		for(final HttpRequestModifier httpRequestModifier : httpRequestModifiers)
+		{
+			output.append(this.serialize(0, httpRequestModifier));
+			output.append(";");
+			output.append(NEW_LINE);
+		}
+		return output.toString();
+	}
+	
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final HttpRequestModifier request)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(request != null)
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
+			output.append("requestModifier()");
+			if(request.getPath() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+				output.append(".withPath(\"")
+					.append(request.getPath().getRegex())
+					.append("\",\"")
+					.append(request.getPath().getSubstitution())
+					.append("\")");
+			}
+			if(request.getQueryStringParameters() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+					".withQueryStringParameters(");
+				this.outputQueryStringParameters(
+					numberOfSpacesToIndent,
+					output,
+					request.getQueryStringParameters().getAdd());
+				this.outputQueryStringParameters(
+					numberOfSpacesToIndent,
+					output,
+					request.getQueryStringParameters().getReplace());
+				this.outputList(numberOfSpacesToIndent, output, request.getQueryStringParameters().getRemove());
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+			}
+			if(request.getHeaders() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withHeaders"
+					+ "(");
+				this.outputHeaders(numberOfSpacesToIndent, output, request.getHeaders().getAdd());
+				this.outputHeaders(numberOfSpacesToIndent, output, request.getHeaders().getReplace());
+				this.outputList(numberOfSpacesToIndent, output, request.getHeaders().getRemove());
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+			}
+			if(request.getCookies() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withCookies"
+					+ "(");
+				this.outputCookies(numberOfSpacesToIndent, output, request.getCookies().getAdd());
+				this.outputCookies(numberOfSpacesToIndent, output, request.getCookies().getReplace());
+				this.outputList(numberOfSpacesToIndent, output, request.getCookies().getRemove());
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+			}
+		}
+		
+		return output.toString();
+	}
+	
+	private void outputQueryStringParameters(
+		final int numberOfSpacesToIndent,
+		final StringBuilder output,
+		final Parameters parameters)
+	{
+		if(parameters != null && !parameters.isEmpty())
+		{
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("parameters(");
+			this.appendObject(
+				(numberOfSpacesToIndent + 2),
+				output,
+				new ParameterToJavaSerializer(),
+				parameters.getEntries());
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("),");
+		}
+		else
+		{
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null,");
+		}
+	}
+	
+	private void outputHeaders(final int numberOfSpacesToIndent, final StringBuilder output, final Headers headers)
+	{
+		if(headers != null && !headers.isEmpty())
+		{
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("headers(");
+			this.appendObject((numberOfSpacesToIndent + 2), output, new HeaderToJavaSerializer(),
+				headers.getEntries());
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("),");
+		}
+		else
+		{
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null,");
+		}
+	}
+	
+	private void outputCookies(final int numberOfSpacesToIndent, final StringBuilder output, final Cookies cookies)
+	{
+		if(cookies != null && !cookies.isEmpty())
+		{
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("cookies(");
+			this.appendObject((numberOfSpacesToIndent + 2), output, new CookieToJavaSerializer(),
+				cookies.getEntries());
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("),");
+		}
+		else
+		{
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null,");
+		}
+	}
+	
+	private void outputList(final int numberOfSpacesToIndent, final StringBuilder output, final List<String> add)
+	{
+		if(add != null && !add.isEmpty())
+		{
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output)
+				.append("List.of(")
+				.append(add.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(",")))
+				.append(")");
+		}
+		else
+		{
+			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("null");
+		}
+	}
+	
+	private <T extends ObjectWithJsonToString> void appendObject(
+		final int numberOfSpacesToIndent,
+		final StringBuilder output,
+		final MultiValueToJavaSerializer<T> toJavaSerializer,
+		final List<T> objects)
+	{
+		output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
+	}
+	
+	private StringBuilder appendNewLineAndIndent(final int numberOfSpacesToIndent, final StringBuilder output)
+	{
+		return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
+	}
 }

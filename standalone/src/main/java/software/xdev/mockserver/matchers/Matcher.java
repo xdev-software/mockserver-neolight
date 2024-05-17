@@ -15,10 +15,9 @@
  */
 package software.xdev.mockserver.matchers;
 
-public interface Matcher<T> {
-
-    boolean matches(MatchDifference context, T t);
-
-    boolean isBlank();
-
+public interface Matcher<T>
+{
+	boolean matches(MatchDifference context, T t);
+	
+	boolean isBlank();
 }

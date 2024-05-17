@@ -17,37 +17,53 @@ package software.xdev.mockserver.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
 import software.xdev.mockserver.serialization.model.VerificationSequenceDTO;
 import software.xdev.mockserver.verify.VerificationSequence;
 
 
-public class VerificationSequenceSerializer implements Serializer<VerificationSequence> {
-    private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-    private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-
-    public String serialize(VerificationSequence verificationSequence) {
-        try {
-            return objectWriter.writeValueAsString(new VerificationSequenceDTO(verificationSequence));
-        } catch (Exception e) {
-            throw new IllegalStateException("Exception while serializing verificationSequence to JSON with value " + verificationSequence, e);
-        }
-    }
-
-    public VerificationSequence deserialize(String jsonVerificationSequence) {
-        try {
-            VerificationSequenceDTO verificationDTO = objectMapper.readValue(jsonVerificationSequence, VerificationSequenceDTO.class);
-            if (verificationDTO != null) {
-                return verificationDTO.buildObject();
-            }
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("exception while parsing [" + jsonVerificationSequence + "] for VerificationSequence", ex);
-        }
-        return null;
-    }
-
-    @Override
-    public Class<VerificationSequence> supportsType() {
-        return VerificationSequence.class;
-    }
-
+public class VerificationSequenceSerializer implements Serializer<VerificationSequence>
+{
+	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
+	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	
+	@Override
+	public String serialize(final VerificationSequence verificationSequence)
+	{
+		try
+		{
+			return this.objectWriter.writeValueAsString(new VerificationSequenceDTO(verificationSequence));
+		}
+		catch(final Exception e)
+		{
+			throw new IllegalStateException(
+				"Exception while serializing verificationSequence to JSON with value " + verificationSequence, e);
+		}
+	}
+	
+	@Override
+	public VerificationSequence deserialize(final String jsonVerificationSequence)
+	{
+		try
+		{
+			final VerificationSequenceDTO verificationDTO =
+				this.objectMapper.readValue(jsonVerificationSequence, VerificationSequenceDTO.class);
+			if(verificationDTO != null)
+			{
+				return verificationDTO.buildObject();
+			}
+		}
+		catch(final Exception ex)
+		{
+			throw new IllegalArgumentException(
+				"exception while parsing [" + jsonVerificationSequence + "] for VerificationSequence", ex);
+		}
+		return null;
+	}
+	
+	@Override
+	public Class<VerificationSequence> supportsType()
+	{
+		return VerificationSequence.class;
+	}
 }

@@ -15,43 +15,62 @@
  */
 package software.xdev.mockserver.serialization.serializers.string;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import software.xdev.mockserver.model.NottableString;
+import static software.xdev.mockserver.model.NottableString.serialiseNottableString;
 
 import java.io.IOException;
 
-import static software.xdev.mockserver.model.NottableString.serialiseNottableString;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-public class NottableStringSerializer extends StdSerializer<NottableString> {
+import software.xdev.mockserver.model.NottableString;
 
-    public NottableStringSerializer() {
-        super(NottableString.class);
-    }
 
-    @Override
-    public void serialize(NottableString nottableString, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        if (nottableString.getParameterStyle() != null) {
-            writeObject(nottableString, jgen, "value", nottableString.getValue());
-        } else {
-            jgen.writeString(serialiseNottableString(nottableString));
-        }
-    }
-
-    private void writeObject(NottableString nottableString, JsonGenerator jgen, String valueFieldName, Object value) throws IOException {
-        jgen.writeStartObject();
-        if (Boolean.TRUE.equals(nottableString.isNot())) {
-            jgen.writeBooleanField("not", true);
-        }
-        if (Boolean.TRUE.equals(nottableString.isOptional())) {
-            jgen.writeBooleanField("optional", true);
-        }
-        if (nottableString.getParameterStyle() != null) {
-            jgen.writeObjectField("parameterStyle", nottableString.getParameterStyle());
-        }
-        jgen.writeObjectField(valueFieldName, value);
-        jgen.writeEndObject();
-    }
-
+public class NottableStringSerializer extends StdSerializer<NottableString>
+{
+	public NottableStringSerializer()
+	{
+		super(NottableString.class);
+	}
+	
+	@Override
+	public void serialize(
+		final NottableString nottableString,
+		final JsonGenerator jgen,
+		final SerializerProvider provider)
+		throws IOException
+	{
+		if(nottableString.getParameterStyle() != null)
+		{
+			this.writeObject(nottableString, jgen, "value", nottableString.getValue());
+		}
+		else
+		{
+			jgen.writeString(serialiseNottableString(nottableString));
+		}
+	}
+	
+	private void writeObject(
+		final NottableString nottableString,
+		final JsonGenerator jgen,
+		final String valueFieldName,
+		final Object value)
+		throws IOException
+	{
+		jgen.writeStartObject();
+		if(Boolean.TRUE.equals(nottableString.isNot()))
+		{
+			jgen.writeBooleanField("not", true);
+		}
+		if(Boolean.TRUE.equals(nottableString.isOptional()))
+		{
+			jgen.writeBooleanField("optional", true);
+		}
+		if(nottableString.getParameterStyle() != null)
+		{
+			jgen.writeObjectField("parameterStyle", nottableString.getParameterStyle());
+		}
+		jgen.writeObjectField(valueFieldName, value);
+		jgen.writeEndObject();
+	}
 }

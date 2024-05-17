@@ -15,6 +15,15 @@
  */
 package software.xdev.mockserver.httpclient;
 
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
+
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -29,80 +38,91 @@ import software.xdev.mockserver.logging.LoggingHandler;
 import software.xdev.mockserver.model.Protocol;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
 
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-
-import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 @ChannelHandler.Sharable
-public class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(HttpClientInitializer.class);
-    
-    private final Protocol httpProtocol;
-    private final HttpClientConnectionErrorHandler httpClientConnectionHandler;
-    private final CompletableFuture<Protocol> protocolFuture;
-    private final HttpClientHandler httpClientHandler;
-    private final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations;
-
-    HttpClientInitializer(Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations, Protocol httpProtocol) {
-        this.proxyConfigurations = proxyConfigurations;
-        this.httpProtocol = httpProtocol;
-        this.protocolFuture = new CompletableFuture<>();
-        this.httpClientHandler = new HttpClientHandler();
-        this.httpClientConnectionHandler = new HttpClientConnectionErrorHandler();
-    }
-
-    public void whenComplete(BiConsumer<? super Protocol, ? super Throwable> action) {
-        protocolFuture.whenComplete(action);
-    }
-
-    @Override
-    public void initChannel(SocketChannel channel) {
-        ChannelPipeline pipeline = channel.pipeline();
-
-        if (proxyConfigurations != null) {
-            if (proxyConfigurations.containsKey(ProxyConfiguration.Type.SOCKS5)) {
-                ProxyConfiguration proxyConfiguration = proxyConfigurations.get(ProxyConfiguration.Type.SOCKS5);
-                if (isNotBlank(proxyConfiguration.getUsername()) && isNotBlank(proxyConfiguration.getPassword())) {
-                    pipeline.addLast(new Socks5ProxyHandler(proxyConfiguration.getProxyAddress(), proxyConfiguration.getUsername(), proxyConfiguration.getPassword()));
-                } else {
-                    pipeline.addLast(new Socks5ProxyHandler(proxyConfiguration.getProxyAddress()));
-                }
-            }
-        }
-        pipeline.addLast(httpClientConnectionHandler);
-
-        // add logging
-        if (LOG.isTraceEnabled()) {
-            pipeline.addLast(new LoggingHandler(HttpClientHandler.class.getName()));
-        }
-
-        if (httpProtocol == null) {
-            configureBinaryPipeline(pipeline);
-        } else {
-            // default to http1 without TLS
-            configureHttp1Pipeline(pipeline);
-        }
-    }
-
-    private void configureHttp1Pipeline(ChannelPipeline pipeline) {
-        pipeline.addLast(new HttpClientCodec());
-        pipeline.addLast(new HttpContentDecompressor());
-        pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-        pipeline.addLast(new MockServerHttpClientCodec(proxyConfigurations));
-        pipeline.addLast(httpClientHandler);
-        protocolFuture.complete(Protocol.HTTP_1_1);
-    }
-
-    private void configureBinaryPipeline(ChannelPipeline pipeline) {
-        pipeline.addLast(new MockServerBinaryClientCodec());
-        pipeline.addLast(httpClientHandler);
-        protocolFuture.complete(null);
-    }
+public class HttpClientInitializer extends ChannelInitializer<SocketChannel>
+{
+	private static final Logger LOG = LoggerFactory.getLogger(HttpClientInitializer.class);
+	
+	private final Protocol httpProtocol;
+	private final HttpClientConnectionErrorHandler httpClientConnectionHandler;
+	private final CompletableFuture<Protocol> protocolFuture;
+	private final HttpClientHandler httpClientHandler;
+	private final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations;
+	
+	HttpClientInitializer(
+		final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations,
+		final Protocol httpProtocol)
+	{
+		this.proxyConfigurations = proxyConfigurations;
+		this.httpProtocol = httpProtocol;
+		this.protocolFuture = new CompletableFuture<>();
+		this.httpClientHandler = new HttpClientHandler();
+		this.httpClientConnectionHandler = new HttpClientConnectionErrorHandler();
+	}
+	
+	public void whenComplete(final BiConsumer<? super Protocol, ? super Throwable> action)
+	{
+		this.protocolFuture.whenComplete(action);
+	}
+	
+	@Override
+	public void initChannel(final SocketChannel channel)
+	{
+		final ChannelPipeline pipeline = channel.pipeline();
+		
+		if(this.proxyConfigurations != null)
+		{
+			if(this.proxyConfigurations.containsKey(ProxyConfiguration.Type.SOCKS5))
+			{
+				final ProxyConfiguration proxyConfiguration =
+					this.proxyConfigurations.get(ProxyConfiguration.Type.SOCKS5);
+				if(isNotBlank(proxyConfiguration.getUsername()) && isNotBlank(proxyConfiguration.getPassword()))
+				{
+					pipeline.addLast(new Socks5ProxyHandler(
+						proxyConfiguration.getProxyAddress(),
+						proxyConfiguration.getUsername(),
+						proxyConfiguration.getPassword()));
+				}
+				else
+				{
+					pipeline.addLast(new Socks5ProxyHandler(proxyConfiguration.getProxyAddress()));
+				}
+			}
+		}
+		pipeline.addLast(this.httpClientConnectionHandler);
+		
+		// add logging
+		if(LOG.isTraceEnabled())
+		{
+			pipeline.addLast(new LoggingHandler(HttpClientHandler.class.getName()));
+		}
+		
+		if(this.httpProtocol == null)
+		{
+			this.configureBinaryPipeline(pipeline);
+		}
+		else
+		{
+			// default to http1 without TLS
+			this.configureHttp1Pipeline(pipeline);
+		}
+	}
+	
+	private void configureHttp1Pipeline(final ChannelPipeline pipeline)
+	{
+		pipeline.addLast(new HttpClientCodec());
+		pipeline.addLast(new HttpContentDecompressor());
+		pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
+		pipeline.addLast(new MockServerHttpClientCodec(this.proxyConfigurations));
+		pipeline.addLast(this.httpClientHandler);
+		this.protocolFuture.complete(Protocol.HTTP_1_1);
+	}
+	
+	private void configureBinaryPipeline(final ChannelPipeline pipeline)
+	{
+		pipeline.addLast(new MockServerBinaryClientCodec());
+		pipeline.addLast(this.httpClientHandler);
+		this.protocolFuture.complete(null);
+	}
 }

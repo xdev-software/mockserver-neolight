@@ -18,51 +18,60 @@ package software.xdev.mockserver.matchers;
 import java.util.Objects;
 
 
-public class BooleanMatcher implements Matcher<Boolean> {
-    private final Boolean matcher;
-
-    BooleanMatcher(Boolean matcher) {
-        this.matcher = matcher;
-    }
-
-    @Override
-    public boolean matches(final MatchDifference context, Boolean matched) {
-        boolean result = false;
-
-        if (matcher == null) {
-            result = true;
-        } else if (matched != null) {
-            result = matched == matcher;
-        }
-
-        if (!result && context != null) {
-            context.addDifference("boolean match failed expected:{}found:{}", this.matcher, matched);
-        }
-
-        return result;
-    }
-
-    public boolean isBlank() {
-        return matcher == null;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final BooleanMatcher that))
-        {
-            return false;
-        }
-		return Objects.equals(matcher, that.matcher);
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hashCode(matcher);
-    }
+public class BooleanMatcher implements Matcher<Boolean>
+{
+	private final Boolean matcher;
+	
+	BooleanMatcher(final Boolean matcher)
+	{
+		this.matcher = matcher;
+	}
+	
+	@Override
+	public boolean matches(final MatchDifference context, final Boolean matched)
+	{
+		boolean result = false;
+		
+		if(this.matcher == null)
+		{
+			result = true;
+		}
+		else if(matched != null)
+		{
+			result = matched == this.matcher;
+		}
+		
+		if(!result && context != null)
+		{
+			context.addDifference("boolean match failed expected:{}found:{}", this.matcher, matched);
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public boolean isBlank()
+	{
+		return this.matcher == null;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final BooleanMatcher that))
+		{
+			return false;
+		}
+		return Objects.equals(this.matcher, that.matcher);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hashCode(this.matcher);
+	}
 }

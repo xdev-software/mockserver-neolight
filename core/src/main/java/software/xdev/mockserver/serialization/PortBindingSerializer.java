@@ -17,34 +17,53 @@ package software.xdev.mockserver.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
 import software.xdev.mockserver.model.PortBinding;
 
-public class PortBindingSerializer implements Serializer<PortBinding> {
-    private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-    private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 
-    public String serialize(PortBinding portBinding) {
-        try {
-            return objectWriter.writeValueAsString(portBinding);
-        } catch (Exception ex) {
-            throw new IllegalStateException("Exception while serializing portBinding to JSON with value " + portBinding, ex);
-        }
-    }
-
-    public PortBinding deserialize(String jsonPortBinding) {
-        PortBinding portBinding = null;
-        if (jsonPortBinding != null && !jsonPortBinding.isEmpty()) {
-            try {
-                portBinding = objectMapper.readValue(jsonPortBinding, PortBinding.class);
-            } catch (Exception ex) {
-                throw new IllegalArgumentException("exception while parsing PortBinding for [" + jsonPortBinding + "]", ex);
-            }
-        }
-        return portBinding;
-    }
-
-    @Override
-    public Class<PortBinding> supportsType() {
-        return PortBinding.class;
-    }
+public class PortBindingSerializer implements Serializer<PortBinding>
+{
+	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
+	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	
+	@Override
+	public String serialize(final PortBinding portBinding)
+	{
+		try
+		{
+			return this.objectWriter.writeValueAsString(portBinding);
+		}
+		catch(final Exception ex)
+		{
+			throw new IllegalStateException(
+				"Exception while serializing portBinding to JSON with value " + portBinding,
+				ex);
+		}
+	}
+	
+	@Override
+	public PortBinding deserialize(final String jsonPortBinding)
+	{
+		PortBinding portBinding = null;
+		if(jsonPortBinding != null && !jsonPortBinding.isEmpty())
+		{
+			try
+			{
+				portBinding = this.objectMapper.readValue(jsonPortBinding, PortBinding.class);
+			}
+			catch(final Exception ex)
+			{
+				throw new IllegalArgumentException(
+					"exception while parsing PortBinding for [" + jsonPortBinding + "]",
+					ex);
+			}
+		}
+		return portBinding;
+	}
+	
+	@Override
+	public Class<PortBinding> supportsType()
+	{
+		return PortBinding.class;
+	}
 }

@@ -19,17 +19,22 @@ import software.xdev.mockserver.model.Parameter;
 import software.xdev.mockserver.model.Parameters;
 import software.xdev.mockserver.model.QueryParametersModifier;
 
-public class QueryParametersModifierDTO extends KeysToMultiValuesModifierDTO<Parameters, QueryParametersModifier, Parameter, QueryParametersModifierDTO> {
 
-    public QueryParametersModifierDTO() {
-    }
-
-    public QueryParametersModifierDTO(QueryParametersModifier queryParameterModifier) {
-        super(queryParameterModifier);
-    }
-
-    @Override
-    QueryParametersModifier newKeysToMultiValuesModifier() {
-        return new QueryParametersModifier();
-    }
+public class QueryParametersModifierDTO
+	extends KeysToMultiValuesModifierDTO<Parameters, QueryParametersModifier, Parameter, QueryParametersModifierDTO>
+{
+	public QueryParametersModifierDTO()
+	{
+	}
+	
+	public QueryParametersModifierDTO(final QueryParametersModifier queryParameterModifier)
+	{
+		super(queryParameterModifier);
+	}
+	
+	@Override
+	QueryParametersModifier newKeysToMultiValuesModifier()
+	{
+		return new QueryParametersModifier();
+	}
 }

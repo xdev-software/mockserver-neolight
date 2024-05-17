@@ -15,12 +15,15 @@
  */
 package software.xdev.mockserver.closurecallback.websocketclient;
 
-public class WebSocketException extends RuntimeException {
-    public WebSocketException(String message) {
-        super(message);
-    }
-
-    public WebSocketException(String message, Throwable e) {
-        super(message, e);
-    }
+public class WebSocketException extends RuntimeException
+{
+	public WebSocketException(final String message)
+	{
+		super(message);
+	}
+	
+	public WebSocketException(final String message, final Throwable e)
+	{
+		super(message, e);
+	}
 }

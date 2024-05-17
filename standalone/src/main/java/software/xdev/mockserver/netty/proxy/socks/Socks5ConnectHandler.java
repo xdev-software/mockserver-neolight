@@ -17,27 +17,45 @@ package software.xdev.mockserver.netty.proxy.socks;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.socksx.v5.*;
+import io.netty.handler.codec.socksx.v5.DefaultSocks5CommandResponse;
+import io.netty.handler.codec.socksx.v5.Socks5AddressType;
+import io.netty.handler.codec.socksx.v5.Socks5CommandRequest;
+import io.netty.handler.codec.socksx.v5.Socks5CommandStatus;
+import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 
+
 @ChannelHandler.Sharable
-public final class Socks5ConnectHandler extends SocksConnectHandler<Socks5CommandRequest> {
-
-    public Socks5ConnectHandler(ServerConfiguration configuration, LifeCycle server, String host, int port) {
-        super(configuration, server, host, port);
-    }
-
-    protected void removeCodecSupport(ChannelHandlerContext ctx) {
-        super.removeCodecSupport(ctx);
-        removeHandler(ctx.pipeline(), Socks5ServerEncoder.class);
-    }
-
-    protected Object successResponse(Object request) {
-        return new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.DOMAIN, host, port);
-    }
-
-    protected Object failureResponse(Object request) {
-        return new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.DOMAIN, host, port);
-    }
+public final class Socks5ConnectHandler extends SocksConnectHandler<Socks5CommandRequest>
+{
+	public Socks5ConnectHandler(
+		final ServerConfiguration configuration,
+		final LifeCycle server,
+		final String host,
+		final int port)
+	{
+		super(configuration, server, host, port);
+	}
+	
+	@Override
+	protected void removeCodecSupport(final ChannelHandlerContext ctx)
+	{
+		super.removeCodecSupport(ctx);
+		this.removeHandler(ctx.pipeline(), Socks5ServerEncoder.class);
+	}
+	
+	@Override
+	protected Object successResponse(final Object request)
+	{
+		return new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.DOMAIN, this.host,
+			this.port);
+	}
+	
+	@Override
+	protected Object failureResponse(final Object request)
+	{
+		return new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.DOMAIN, this.host,
+			this.port);
+	}
 }

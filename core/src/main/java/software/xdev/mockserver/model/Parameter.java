@@ -15,64 +15,78 @@
  */
 package software.xdev.mockserver.model;
 
+import static software.xdev.mockserver.model.NottableOptionalString.optional;
+
 import java.util.Arrays;
 import java.util.Collection;
 
-import static software.xdev.mockserver.model.NottableOptionalString.optional;
-import static software.xdev.mockserver.model.NottableString.string;
 
-public class Parameter extends KeyToMultiValue {
-
-    public Parameter(String name, String... value) {
-        super(name, value);
-    }
-
-    public Parameter(NottableString name, NottableString... value) {
-        super(name, value);
-    }
-
-    public Parameter(NottableString name, String... value) {
-        super(name, value);
-    }
-
-    public Parameter(String name, Collection<String> value) {
-        super(name, value);
-    }
-
-    public Parameter(NottableString name, Collection<NottableString> value) {
-        super(name, value);
-    }
-
-    public static Parameter param(String name, String... value) {
-        return new Parameter(name, value);
-    }
-
-    public static Parameter param(NottableString name, NottableString... value) {
-        return new Parameter(name, value);
-    }
-
-    public static Parameter param(NottableString name, String... value) {
-        return new Parameter(name, value);
-    }
-
-    public static Parameter param(String name, Collection<String> value) {
-        return new Parameter(name, value);
-    }
-
-    public static Parameter param(NottableString name, Collection<NottableString> value) {
-        return new Parameter(name, value);
-    }
-
-    public static Parameter optionalParam(String name, String... values) {
-        if (values.length == 0) {
-            values = new String[]{".*"};
-        }
-        return new Parameter(optional(name), Arrays.stream(values).map(NottableString::string).toArray(NottableString[]::new));
-    }
-
-    public Parameter withStyle(ParameterStyle style) {
-        getName().withStyle(style);
-        return this;
-    }
-
+public class Parameter extends KeyToMultiValue
+{
+	public Parameter(final String name, final String... value)
+	{
+		super(name, value);
+	}
+	
+	public Parameter(final NottableString name, final NottableString... value)
+	{
+		super(name, value);
+	}
+	
+	public Parameter(final NottableString name, final String... value)
+	{
+		super(name, value);
+	}
+	
+	public Parameter(final String name, final Collection<String> value)
+	{
+		super(name, value);
+	}
+	
+	public Parameter(final NottableString name, final Collection<NottableString> value)
+	{
+		super(name, value);
+	}
+	
+	public static Parameter param(final String name, final String... value)
+	{
+		return new Parameter(name, value);
+	}
+	
+	public static Parameter param(final NottableString name, final NottableString... value)
+	{
+		return new Parameter(name, value);
+	}
+	
+	public static Parameter param(final NottableString name, final String... value)
+	{
+		return new Parameter(name, value);
+	}
+	
+	public static Parameter param(final String name, final Collection<String> value)
+	{
+		return new Parameter(name, value);
+	}
+	
+	public static Parameter param(final NottableString name, final Collection<NottableString> value)
+	{
+		return new Parameter(name, value);
+	}
+	
+	public static Parameter optionalParam(final String name, String... values)
+	{
+		if(values.length == 0)
+		{
+			values = new String[]{".*"};
+		}
+		return new Parameter(
+			optional(name),
+			Arrays.stream(values).map(NottableString::string).toArray(NottableString[]::new));
+	}
+	
+	public Parameter withStyle(final ParameterStyle style)
+	{
+		this.getName().withStyle(style);
+		return this;
+	}
 }

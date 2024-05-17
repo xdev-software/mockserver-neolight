@@ -15,43 +15,51 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.Header;
-import software.xdev.mockserver.model.NottableString;
+import static software.xdev.mockserver.character.Character.NEW_LINE;
+import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
+import software.xdev.mockserver.model.Header;
+import software.xdev.mockserver.model.NottableString;
 
-public class HeaderToJavaSerializer implements MultiValueToJavaSerializer<Header> {
-    @Override
-    public String serialize(int numberOfSpacesToIndent, Header header) {
-        StringBuilder output = new StringBuilder();
-        output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent * INDENT_SIZE));
-        String serializedKey = NottableStringToJavaSerializer.serialize(header.getName(), false);
-        output.append("new Header(").append(serializedKey);
-        for (NottableString value : header.getValues()) {
-            output.append(", ").append(NottableStringToJavaSerializer.serialize(value, serializedKey.endsWith(")")));
-        }
-        output.append(")");
-        return output.toString();
-    }
 
-    @Override
-    public String serializeAsJava(int numberOfSpacesToIndent, List<Header> headers) {
-        StringBuilder output = new StringBuilder();
-        for (int i = 0; i < headers.size(); i++) {
-            output.append(serialize(numberOfSpacesToIndent, headers.get(i)));
-            if (i < (headers.size() - 1)) {
-                output.append(",");
-            }
-        }
-        return output.toString();
-    }
-
-    @Override
-    public String serializeAsJava(int numberOfSpacesToIndent, Header... object) {
-        return serializeAsJava(numberOfSpacesToIndent, Arrays.asList(object));
-    }
+public class HeaderToJavaSerializer implements MultiValueToJavaSerializer<Header>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final Header header)
+	{
+		final StringBuilder output = new StringBuilder();
+		output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent * INDENT_SIZE));
+		final String serializedKey = NottableStringToJavaSerializer.serialize(header.getName(), false);
+		output.append("new Header(").append(serializedKey);
+		for(final NottableString value : header.getValues())
+		{
+			output.append(", ").append(NottableStringToJavaSerializer.serialize(value, serializedKey.endsWith(")")));
+		}
+		output.append(")");
+		return output.toString();
+	}
+	
+	@Override
+	public String serializeAsJava(final int numberOfSpacesToIndent, final List<Header> headers)
+	{
+		final StringBuilder output = new StringBuilder();
+		for(int i = 0; i < headers.size(); i++)
+		{
+			output.append(this.serialize(numberOfSpacesToIndent, headers.get(i)));
+			if(i < (headers.size() - 1))
+			{
+				output.append(",");
+			}
+		}
+		return output.toString();
+	}
+	
+	@Override
+	public String serializeAsJava(final int numberOfSpacesToIndent, final Header... object)
+	{
+		return this.serializeAsJava(numberOfSpacesToIndent, Arrays.asList(object));
+	}
 }

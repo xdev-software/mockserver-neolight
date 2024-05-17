@@ -18,32 +18,33 @@ package software.xdev.mockserver.matchers;
 import java.util.Objects;
 
 
-public abstract class NotMatcher<MatchedType> implements Matcher<MatchedType> {
-
-    boolean not = false;
-
-    public static <MatcherType extends NotMatcher<?>> MatcherType notMatcher(MatcherType matcher) {
-        matcher.not = true;
-        return matcher;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final NotMatcher<?> that))
-        {
-            return false;
-        }
-		return not == that.not;
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hashCode(not);
-    }
+public abstract class NotMatcher<MatchedType> implements Matcher<MatchedType>
+{
+	boolean not = false;
+	
+	public static <MatcherType extends NotMatcher<?>> MatcherType notMatcher(final MatcherType matcher)
+	{
+		matcher.not = true;
+		return matcher;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final NotMatcher<?> that))
+		{
+			return false;
+		}
+		return this.not == that.not;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hashCode(this.not);
+	}
 }

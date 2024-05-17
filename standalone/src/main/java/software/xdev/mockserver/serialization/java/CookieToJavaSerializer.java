@@ -15,36 +15,43 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.Cookie;
+import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static software.xdev.mockserver.character.Character.NEW_LINE;
+import software.xdev.mockserver.model.Cookie;
 
 
-public class CookieToJavaSerializer implements MultiValueToJavaSerializer<Cookie> {
-    @Override
-    public String serialize(int numberOfSpacesToIndent, Cookie cookie) {
-        return NEW_LINE + " ".repeat(numberOfSpacesToIndent * ExpectationToJavaSerializer.INDENT_SIZE) + "new Cookie(" +
-            NottableStringToJavaSerializer.serialize(cookie.getName(), false) + ", " +
-            NottableStringToJavaSerializer.serialize(cookie.getValue(), false) + ")";
-    }
-
-    @Override
-    public String serializeAsJava(int numberOfSpacesToIndent, List<Cookie> cookies) {
-        StringBuilder output = new StringBuilder();
-        for (int i = 0; i < cookies.size(); i++) {
-            output.append(serialize(numberOfSpacesToIndent, cookies.get(i)));
-            if (i < (cookies.size() - 1)) {
-                output.append(",");
-            }
-        }
-        return output.toString();
-    }
-
-    @Override
-    public String serializeAsJava(int numberOfSpacesToIndent, Cookie... object) {
-        return serializeAsJava(numberOfSpacesToIndent, Arrays.asList(object));
-    }
+public class CookieToJavaSerializer implements MultiValueToJavaSerializer<Cookie>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final Cookie cookie)
+	{
+		return NEW_LINE + " ".repeat(numberOfSpacesToIndent * ExpectationToJavaSerializer.INDENT_SIZE) + "new Cookie"
+			+ "("
+			+ NottableStringToJavaSerializer.serialize(cookie.getName(), false) + ", "
+			+ NottableStringToJavaSerializer.serialize(cookie.getValue(), false) + ")";
+	}
+	
+	@Override
+	public String serializeAsJava(final int numberOfSpacesToIndent, final List<Cookie> cookies)
+	{
+		final StringBuilder output = new StringBuilder();
+		for(int i = 0; i < cookies.size(); i++)
+		{
+			output.append(this.serialize(numberOfSpacesToIndent, cookies.get(i)));
+			if(i < (cookies.size() - 1))
+			{
+				output.append(",");
+			}
+		}
+		return output.toString();
+	}
+	
+	@Override
+	public String serializeAsJava(final int numberOfSpacesToIndent, final Cookie... object)
+	{
+		return this.serializeAsJava(numberOfSpacesToIndent, Arrays.asList(object));
+	}
 }

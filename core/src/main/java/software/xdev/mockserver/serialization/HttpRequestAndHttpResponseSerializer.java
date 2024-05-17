@@ -15,106 +15,154 @@
  */
 package software.xdev.mockserver.serialization;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
-import software.xdev.mockserver.serialization.model.HttpRequestAndHttpResponseDTO;
+import static software.xdev.mockserver.character.Character.NEW_LINE;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static software.xdev.mockserver.util.StringUtils.isBlank;
-import static software.xdev.mockserver.character.Character.NEW_LINE;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
-public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequestAndHttpResponse> {
-    private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-    private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-    private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
+import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
+import software.xdev.mockserver.serialization.model.HttpRequestAndHttpResponseDTO;
 
-    public String serialize(HttpRequestAndHttpResponse httpRequestAndHttpResponse) {
-        try {
-            return objectWriter.writeValueAsString(new HttpRequestAndHttpResponseDTO(httpRequestAndHttpResponse));
-        } catch (Exception e) {
-            throw new IllegalStateException("Exception while serializing HttpRequestAndHttpResponse to JSON with value " + httpRequestAndHttpResponse, e);
-        }
-    }
 
-    public String serialize(List<HttpRequestAndHttpResponse> httpRequests) {
-        return serialize(httpRequests.toArray(new HttpRequestAndHttpResponse[0]));
-    }
-
-    public String serialize(HttpRequestAndHttpResponse... httpRequests) {
-        try {
-            if (httpRequests != null && httpRequests.length > 0) {
-                HttpRequestAndHttpResponseDTO[] httpRequestDTOs = new HttpRequestAndHttpResponseDTO[httpRequests.length];
-                for (int i = 0; i < httpRequests.length; i++) {
-                    httpRequestDTOs[i] = new HttpRequestAndHttpResponseDTO(httpRequests[i]);
-                }
-                return objectWriter.writeValueAsString(httpRequestDTOs);
-            } else {
-                return "[]";
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException("Exception while serializing HttpRequestAndHttpResponse to JSON with value " + Arrays.asList(httpRequests), e);
-        }
-    }
-
-    public HttpRequestAndHttpResponse deserialize(String jsonHttpRequest) {
-        if (jsonHttpRequest.contains("\"httpRequestAndHttpResponse\"")) {
-            try {
-                JsonNode jsonNode = objectMapper.readTree(jsonHttpRequest);
-                if (jsonNode.has("httpRequestAndHttpResponse")) {
-                    jsonHttpRequest = jsonNode.get("httpRequestAndHttpResponse").toString();
-                }
-            } catch (Exception ex) {
-                throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
-            }
-        }
-        HttpRequestAndHttpResponse httpRequestAndHttpResponse = null;
-        try {
-            HttpRequestAndHttpResponseDTO httpRequestDTO = objectMapper.readValue(jsonHttpRequest, HttpRequestAndHttpResponseDTO.class);
-            if (httpRequestDTO != null) {
-                httpRequestAndHttpResponse = httpRequestDTO.buildObject();
-            }
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
-        }
-        return httpRequestAndHttpResponse;
-    }
-
-    @Override
-    public Class<HttpRequestAndHttpResponse> supportsType() {
-        return HttpRequestAndHttpResponse.class;
-    }
-
-    public HttpRequestAndHttpResponse[] deserializeArray(String jsonHttpRequests) {
-        List<HttpRequestAndHttpResponse> httpRequests = new ArrayList<>();
-        if (isBlank(jsonHttpRequests)) {
-            throw new IllegalArgumentException("1 error:" + NEW_LINE + " - a request or request array is required but value was \"" + jsonHttpRequests + "\"");
-        } else {
-            List<String> jsonRequestList = jsonArraySerializer.splitJSONArray(jsonHttpRequests);
-            if (jsonRequestList.isEmpty()) {
-                throw new IllegalArgumentException("1 error:" + NEW_LINE + " - a request or array of request is required");
-            } else {
-                List<String> validationErrorsList = new ArrayList<>();
-                for (String jsonRequest : jsonRequestList) {
-                    try {
-                        httpRequests.add(deserialize(jsonRequest));
-                    } catch (IllegalArgumentException iae) {
-                        validationErrorsList.add(iae.getMessage());
-                    }
-
-                }
-                if (!validationErrorsList.isEmpty()) {
-                    throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
-                        + String.join("," + NEW_LINE, validationErrorsList)
-                        + (validationErrorsList.size() > 1 ? "]" : ""));
-                }
-            }
-        }
-        return httpRequests.toArray(new HttpRequestAndHttpResponse[0]);
-    }
-
+public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequestAndHttpResponse>
+{
+	private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
+	private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	private JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
+	
+	public String serialize(HttpRequestAndHttpResponse httpRequestAndHttpResponse)
+	{
+		try
+		{
+			return objectWriter.writeValueAsString(new HttpRequestAndHttpResponseDTO(httpRequestAndHttpResponse));
+		}
+		catch(Exception e)
+		{
+			throw new IllegalStateException("Exception while serializing HttpRequestAndHttpResponse to JSON with "
+				+ "value "
+				+ httpRequestAndHttpResponse, e);
+		}
+	}
+	
+	public String serialize(List<HttpRequestAndHttpResponse> httpRequests)
+	{
+		return serialize(httpRequests.toArray(new HttpRequestAndHttpResponse[0]));
+	}
+	
+	public String serialize(HttpRequestAndHttpResponse... httpRequests)
+	{
+		try
+		{
+			if(httpRequests != null && httpRequests.length > 0)
+			{
+				HttpRequestAndHttpResponseDTO[] httpRequestDTOs =
+					new HttpRequestAndHttpResponseDTO[httpRequests.length];
+				for(int i = 0; i < httpRequests.length; i++)
+				{
+					httpRequestDTOs[i] = new HttpRequestAndHttpResponseDTO(httpRequests[i]);
+				}
+				return objectWriter.writeValueAsString(httpRequestDTOs);
+			}
+			else
+			{
+				return "[]";
+			}
+		}
+		catch(Exception e)
+		{
+			throw new IllegalStateException(
+				"Exception while serializing HttpRequestAndHttpResponse to JSON with value " + Arrays.asList(
+					httpRequests), e);
+		}
+	}
+	
+	public HttpRequestAndHttpResponse deserialize(String jsonHttpRequest)
+	{
+		if(jsonHttpRequest.contains("\"httpRequestAndHttpResponse\""))
+		{
+			try
+			{
+				JsonNode jsonNode = objectMapper.readTree(jsonHttpRequest);
+				if(jsonNode.has("httpRequestAndHttpResponse"))
+				{
+					jsonHttpRequest = jsonNode.get("httpRequestAndHttpResponse").toString();
+				}
+			}
+			catch(Exception ex)
+			{
+				throw new IllegalArgumentException(
+					"exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
+			}
+		}
+		HttpRequestAndHttpResponse httpRequestAndHttpResponse = null;
+		try
+		{
+			HttpRequestAndHttpResponseDTO httpRequestDTO =
+				objectMapper.readValue(jsonHttpRequest, HttpRequestAndHttpResponseDTO.class);
+			if(httpRequestDTO != null)
+			{
+				httpRequestAndHttpResponse = httpRequestDTO.buildObject();
+			}
+		}
+		catch(Exception ex)
+		{
+			throw new IllegalArgumentException(
+				"exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
+		}
+		return httpRequestAndHttpResponse;
+	}
+	
+	@Override
+	public Class<HttpRequestAndHttpResponse> supportsType()
+	{
+		return HttpRequestAndHttpResponse.class;
+	}
+	
+	public HttpRequestAndHttpResponse[] deserializeArray(String jsonHttpRequests)
+	{
+		List<HttpRequestAndHttpResponse> httpRequests = new ArrayList<>();
+		if(isBlank(jsonHttpRequests))
+		{
+			throw new IllegalArgumentException(
+				"1 error:" + NEW_LINE + " - a request or request array is required but value was \"" + jsonHttpRequests
+					+ "\"");
+		}
+		else
+		{
+			List<String> jsonRequestList = jsonArraySerializer.splitJSONArray(jsonHttpRequests);
+			if(jsonRequestList.isEmpty())
+			{
+				throw new IllegalArgumentException(
+					"1 error:" + NEW_LINE + " - a request or array of request is required");
+			}
+			else
+			{
+				List<String> validationErrorsList = new ArrayList<>();
+				for(String jsonRequest : jsonRequestList)
+				{
+					try
+					{
+						httpRequests.add(deserialize(jsonRequest));
+					}
+					catch(IllegalArgumentException iae)
+					{
+						validationErrorsList.add(iae.getMessage());
+					}
+				}
+				if(!validationErrorsList.isEmpty())
+				{
+					throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
+						+ String.join("," + NEW_LINE, validationErrorsList)
+						+ (validationErrorsList.size() > 1 ? "]" : ""));
+				}
+			}
+		}
+		return httpRequests.toArray(new HttpRequestAndHttpResponse[0]);
+	}
 }

@@ -15,7 +15,8 @@
  */
 package software.xdev.mockserver.model;
 
-public enum Format {
-    JAVA,
-    JSON
+public enum Format
+{
+	JAVA,
+	JSON
 }

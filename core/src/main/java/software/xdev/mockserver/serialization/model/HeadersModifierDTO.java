@@ -19,17 +19,22 @@ import software.xdev.mockserver.model.Header;
 import software.xdev.mockserver.model.Headers;
 import software.xdev.mockserver.model.HeadersModifier;
 
-public class HeadersModifierDTO extends KeysToMultiValuesModifierDTO<Headers, HeadersModifier, Header, HeadersModifierDTO> {
 
-    public HeadersModifierDTO() {
-    }
-
-    public HeadersModifierDTO(HeadersModifier headersModifier) {
-        super(headersModifier);
-    }
-
-    @Override
-    HeadersModifier newKeysToMultiValuesModifier() {
-        return new HeadersModifier();
-    }
+public class HeadersModifierDTO
+	extends KeysToMultiValuesModifierDTO<Headers, HeadersModifier, Header, HeadersModifierDTO>
+{
+	public HeadersModifierDTO()
+	{
+	}
+	
+	public HeadersModifierDTO(final HeadersModifier headersModifier)
+	{
+		super(headersModifier);
+	}
+	
+	@Override
+	HeadersModifier newKeysToMultiValuesModifier()
+	{
+		return new HeadersModifier();
+	}
 }

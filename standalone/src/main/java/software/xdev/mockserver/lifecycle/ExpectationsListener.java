@@ -15,12 +15,12 @@
  */
 package software.xdev.mockserver.lifecycle;
 
-import software.xdev.mockserver.mock.Expectation;
-
 import java.util.List;
 
-public interface ExpectationsListener {
+import software.xdev.mockserver.mock.Expectation;
 
-    void updated(List<Expectation> expectations);
 
+public interface ExpectationsListener
+{
+	void updated(List<Expectation> expectations);
 }

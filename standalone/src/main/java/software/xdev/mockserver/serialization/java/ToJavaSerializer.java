@@ -15,8 +15,7 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-public interface ToJavaSerializer<T> {
-
-    String serialize(int numberOfSpacesToIndent, T object);
-
+public interface ToJavaSerializer<T>
+{
+	String serialize(int numberOfSpacesToIndent, T object);
 }

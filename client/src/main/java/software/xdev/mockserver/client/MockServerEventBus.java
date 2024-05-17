@@ -22,30 +22,37 @@ import java.util.Set;
 
 
 /**
- * A publish/subscribe communication channel between {@link MockServerClient} and {@link ForwardChainExpectation} instances
- *
- * @author albans
+ * A publish/subscribe communication channel between {@link MockServerClient} and {@link ForwardChainExpectation}
+ * instances
  */
-final class MockServerEventBus {
-    private final Map<EventType, Set<SubscriberHandler>> subscribers = new LinkedHashMap<>();
-
-    void publish(EventType event) {
-        for (SubscriberHandler subscriber : subscribers.get(event)) {
-            subscriber.handle();
-        }
-    }
-
-    public void subscribe(SubscriberHandler subscriber, EventType... events) {
-        for (EventType event : events) {
-            subscribers.computeIfAbsent(event, x -> new LinkedHashSet<>()).add(subscriber);
-        }
-    }
-
-    enum EventType {
-        STOP, RESET
-    }
-
-    interface SubscriberHandler {
-        void handle();
-    }
+final class MockServerEventBus
+{
+	private final Map<EventType, Set<SubscriberHandler>> subscribers = new LinkedHashMap<>();
+	
+	void publish(final EventType event)
+	{
+		for(final SubscriberHandler subscriber : this.subscribers.get(event))
+		{
+			subscriber.handle();
+		}
+	}
+	
+	public void subscribe(final SubscriberHandler subscriber, final EventType... events)
+	{
+		for(final EventType event : events)
+		{
+			this.subscribers.computeIfAbsent(event, x -> new LinkedHashSet<>()).add(subscriber);
+		}
+	}
+	
+	enum EventType
+	{
+		STOP, RESET
+	}
+	
+	
+	interface SubscriberHandler
+	{
+		void handle();
+	}
 }

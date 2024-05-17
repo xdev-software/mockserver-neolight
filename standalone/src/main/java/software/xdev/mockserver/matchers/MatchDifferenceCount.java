@@ -17,26 +17,31 @@ package software.xdev.mockserver.matchers;
 
 import software.xdev.mockserver.model.HttpRequest;
 
-public class MatchDifferenceCount {
 
-    private final HttpRequest httpRequest;
-    private Integer failures = 0;
-
-    public MatchDifferenceCount(HttpRequest httpRequest) {
-        this.httpRequest = httpRequest;
-    }
-
-    public HttpRequest getHttpRequest() {
-        return httpRequest;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public MatchDifferenceCount incrementFailures() {
-        this.failures++;
-        return this;
-    }
-
-    public Integer getFailures() {
-        return failures;
-    }
+public class MatchDifferenceCount
+{
+	private final HttpRequest httpRequest;
+	private Integer failures = 0;
+	
+	public MatchDifferenceCount(final HttpRequest httpRequest)
+	{
+		this.httpRequest = httpRequest;
+	}
+	
+	public HttpRequest getHttpRequest()
+	{
+		return this.httpRequest;
+	}
+	
+	@SuppressWarnings("UnusedReturnValue")
+	public MatchDifferenceCount incrementFailures()
+	{
+		this.failures++;
+		return this;
+	}
+	
+	public Integer getFailures()
+	{
+		return this.failures;
+	}
 }

@@ -21,29 +21,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SchedulerThreadFactory implements ThreadFactory
 {
-	
 	private static final AtomicInteger THREAD_INIT_NUMBER = new AtomicInteger(0);
 	
 	private final String name;
 	private final boolean daemon;
 	
-	public SchedulerThreadFactory(String name)
+	public SchedulerThreadFactory(final String name)
 	{
 		this.name = name;
 		this.daemon = true;
 	}
 	
-	public SchedulerThreadFactory(String name, boolean daemon)
+	public SchedulerThreadFactory(final String name, final boolean daemon)
 	{
 		this.name = name;
 		this.daemon = daemon;
 	}
 	
 	@Override
-	public Thread newThread(Runnable runnable)
+	public Thread newThread(final Runnable runnable)
 	{
-		Thread thread = new Thread(runnable, "MockServer-" + name + THREAD_INIT_NUMBER.get());
-		thread.setDaemon(daemon);
+		final Thread thread = new Thread(runnable, "MockServer-" + this.name + THREAD_INIT_NUMBER.get());
+		thread.setDaemon(this.daemon);
 		return thread;
 	}
 }

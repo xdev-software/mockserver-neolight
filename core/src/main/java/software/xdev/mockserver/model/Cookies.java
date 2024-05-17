@@ -18,30 +18,38 @@ package software.xdev.mockserver.model;
 import java.util.List;
 import java.util.Map;
 
-public class Cookies extends KeysAndValues<Cookie, Cookies> {
 
-    public Cookies(List<Cookie> cookies) {
-        withEntries(cookies);
-    }
-
-    public Cookies(Cookie... cookies) {
-        withEntries(cookies);
-    }
-
-    public Cookies(Map<NottableString, NottableString> cookies) {
-        super(cookies);
-    }
-
-    public static Cookies cookies(Cookie... cookies) {
-        return new Cookies(cookies);
-    }
-
-    @Override
-    public Cookie build(NottableString name, NottableString value) {
-        return new Cookie(name, value);
-    }
-
-    public Cookies clone() {
-        return new Cookies(getMap());
-    }
+public class Cookies extends KeysAndValues<Cookie, Cookies>
+{
+	public Cookies(final List<Cookie> cookies)
+	{
+		this.withEntries(cookies);
+	}
+	
+	public Cookies(final Cookie... cookies)
+	{
+		this.withEntries(cookies);
+	}
+	
+	public Cookies(final Map<NottableString, NottableString> cookies)
+	{
+		super(cookies);
+	}
+	
+	public static Cookies cookies(final Cookie... cookies)
+	{
+		return new Cookies(cookies);
+	}
+	
+	@Override
+	public Cookie build(final NottableString name, final NottableString value)
+	{
+		return new Cookie(name, value);
+	}
+	
+	@Override
+	public Cookies clone()
+	{
+		return new Cookies(this.getMap());
+	}
 }

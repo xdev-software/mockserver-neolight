@@ -17,37 +17,55 @@ package software.xdev.mockserver.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
 import software.xdev.mockserver.serialization.model.VerificationDTO;
 import software.xdev.mockserver.verify.Verification;
 
-public class VerificationSerializer implements Serializer<Verification> {
-    private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-    private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 
-
-    public String serialize(Verification verification) {
-        try {
-            return objectWriter.writeValueAsString(new VerificationDTO(verification));
-        } catch (Exception e) {
-            throw new IllegalStateException("Exception while serializing verification to JSON with value " + verification, e);
-        }
-    }
-
-    public Verification deserialize(String jsonVerification) {
-        try {
-            VerificationDTO verificationDTO = objectMapper.readValue(jsonVerification, VerificationDTO.class);
-            if (verificationDTO != null) {
-                return verificationDTO.buildObject();
-            }
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("exception while parsing [" + jsonVerification + "] for Verification", ex);
-        }
-        return null;
-    }
-
-    @Override
-    public Class<Verification> supportsType() {
-        return Verification.class;
-    }
-
+public class VerificationSerializer implements Serializer<Verification>
+{
+	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
+	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	
+	@Override
+	public String serialize(final Verification verification)
+	{
+		try
+		{
+			return this.objectWriter.writeValueAsString(new VerificationDTO(verification));
+		}
+		catch(final Exception e)
+		{
+			throw new IllegalStateException(
+				"Exception while serializing verification to JSON with value " + verification,
+				e);
+		}
+	}
+	
+	@Override
+	public Verification deserialize(final String jsonVerification)
+	{
+		try
+		{
+			final VerificationDTO verificationDTO =
+				this.objectMapper.readValue(jsonVerification, VerificationDTO.class);
+			if(verificationDTO != null)
+			{
+				return verificationDTO.buildObject();
+			}
+		}
+		catch(final Exception ex)
+		{
+			throw new IllegalArgumentException(
+				"exception while parsing [" + jsonVerification + "] for Verification",
+				ex);
+		}
+		return null;
+	}
+	
+	@Override
+	public Class<Verification> supportsType()
+	{
+		return Verification.class;
+	}
 }

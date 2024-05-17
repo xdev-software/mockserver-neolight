@@ -15,103 +15,121 @@
  */
 package software.xdev.mockserver.mock.listeners;
 
-import software.xdev.mockserver.mock.RequestMatchers;
-import software.xdev.mockserver.scheduler.Scheduler;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class MockServerMatcherNotifier {
+import software.xdev.mockserver.mock.RequestMatchers;
+import software.xdev.mockserver.scheduler.Scheduler;
 
-    private boolean listenerAdded = false;
-    private final List<MockServerMatcherListener> listeners = Collections.synchronizedList(new ArrayList<>());
-    private final Scheduler scheduler;
 
-    public MockServerMatcherNotifier(Scheduler scheduler) {
-        this.scheduler = scheduler;
-    }
-
-    protected void notifyListeners(final RequestMatchers notifier, Cause cause) {
-        if (listenerAdded && !listeners.isEmpty()) {
-            for (MockServerMatcherListener listener : listeners.toArray(new MockServerMatcherListener[0])) {
-                scheduler.submit(() -> listener.updated(notifier, cause));
-            }
-        }
-    }
-
-    public void registerListener(MockServerMatcherListener listener) {
-        listeners.add(listener);
-        listenerAdded = true;
-    }
-
-    public void unregisterListener(MockServerMatcherListener listener) {
-        listeners.remove(listener);
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final MockServerMatcherNotifier that))
-        {
-            return false;
-        }
-		return listenerAdded == that.listenerAdded
-            && Objects.equals(listeners, that.listeners)
-            && Objects.equals(scheduler, that.scheduler);
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(listenerAdded, listeners, scheduler);
-    }
-    
-    public static class Cause {
-        public Cause(String source, Type type) {
-            this.source = source;
-            this.type = type;
-        }
-
-        public static final Cause API = new Cause("", Type.API);
-
-        public enum Type {
-            FILE_INITIALISER,
-            CLASS_INITIALISER,
-            API
-        }
-
-        private final String source;
-        private final Type type;
-
-        public String getSource() {
-            return source;
-        }
-
-        public Type getType() {
-            return type;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Cause cause = (Cause) o;
-            return Objects.equals(source, cause.source) && type == cause.type;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(source, type);
-        }
-    }
+public class MockServerMatcherNotifier
+{
+	private boolean listenerAdded;
+	private final List<MockServerMatcherListener> listeners = Collections.synchronizedList(new ArrayList<>());
+	private final Scheduler scheduler;
+	
+	public MockServerMatcherNotifier(final Scheduler scheduler)
+	{
+		this.scheduler = scheduler;
+	}
+	
+	protected void notifyListeners(final RequestMatchers notifier, final Cause cause)
+	{
+		if(this.listenerAdded && !this.listeners.isEmpty())
+		{
+			for(final MockServerMatcherListener listener : this.listeners.toArray(new MockServerMatcherListener[0]))
+			{
+				this.scheduler.submit(() -> listener.updated(notifier, cause));
+			}
+		}
+	}
+	
+	public void registerListener(final MockServerMatcherListener listener)
+	{
+		this.listeners.add(listener);
+		this.listenerAdded = true;
+	}
+	
+	public void unregisterListener(final MockServerMatcherListener listener)
+	{
+		this.listeners.remove(listener);
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final MockServerMatcherNotifier that))
+		{
+			return false;
+		}
+		return this.listenerAdded == that.listenerAdded
+			&& Objects.equals(this.listeners, that.listeners)
+			&& Objects.equals(this.scheduler, that.scheduler);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(this.listenerAdded, this.listeners, this.scheduler);
+	}
+	
+	public static class Cause
+	{
+		public Cause(final String source, final Type type)
+		{
+			this.source = source;
+			this.type = type;
+		}
+		
+		public static final Cause API = new Cause("", Type.API);
+		
+		
+		public enum Type
+		{
+			FILE_INITIALISER,
+			CLASS_INITIALISER,
+			API
+		}
+		
+		
+		private final String source;
+		private final Type type;
+		
+		public String getSource()
+		{
+			return this.source;
+		}
+		
+		public Type getType()
+		{
+			return this.type;
+		}
+		
+		@Override
+		public boolean equals(final Object o)
+		{
+			if(this == o)
+			{
+				return true;
+			}
+			if(o == null || this.getClass() != o.getClass())
+			{
+				return false;
+			}
+			final Cause cause = (Cause)o;
+			return Objects.equals(this.source, cause.source) && this.type == cause.type;
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return Objects.hash(this.source, this.type);
+		}
+	}
 }

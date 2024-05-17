@@ -15,25 +15,29 @@
  */
 package software.xdev.mockserver.netty.unification;
 
-import software.xdev.mockserver.model.ObjectWithJsonToString;
-
 import java.net.InetSocketAddress;
 
-public class PortBinding extends ObjectWithJsonToString {
+import software.xdev.mockserver.model.ObjectWithJsonToString;
 
-    private final InetSocketAddress inetSocketAddress;
-    private final String portExtension;
 
-    public PortBinding(InetSocketAddress inetSocketAddress, String portExtension) {
-        this.inetSocketAddress = inetSocketAddress;
-        this.portExtension = portExtension;
-    }
-
-    public InetSocketAddress getInetSocketAddress() {
-        return inetSocketAddress;
-    }
-
-    public String getPortExtension() {
-        return portExtension;
-    }
+public class PortBinding extends ObjectWithJsonToString
+{
+	private final InetSocketAddress inetSocketAddress;
+	private final String portExtension;
+	
+	public PortBinding(final InetSocketAddress inetSocketAddress, final String portExtension)
+	{
+		this.inetSocketAddress = inetSocketAddress;
+		this.portExtension = portExtension;
+	}
+	
+	public InetSocketAddress getInetSocketAddress()
+	{
+		return this.inetSocketAddress;
+	}
+	
+	public String getPortExtension()
+	{
+		return this.portExtension;
+	}
 }

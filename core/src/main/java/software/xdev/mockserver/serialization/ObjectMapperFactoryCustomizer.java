@@ -23,7 +23,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 
 public interface ObjectMapperFactoryCustomizer
 {
-	default Collection<JsonSerializer> additionalSerializers() {
+	default Collection<JsonSerializer> additionalSerializers()
+	{
 		return List.of();
 	}
 }

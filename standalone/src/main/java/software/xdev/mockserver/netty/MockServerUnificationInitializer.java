@@ -24,22 +24,32 @@ import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
 import software.xdev.mockserver.netty.unification.PortUnificationHandler;
 
+
 @ChannelHandler.Sharable
-public class MockServerUnificationInitializer extends ChannelHandlerAdapter {
-    private final ServerConfiguration configuration;
-    private final LifeCycle server;
-    private final HttpState httpState;
-    private final HttpActionHandler actionHandler;
-
-    public MockServerUnificationInitializer(ServerConfiguration configuration, LifeCycle server, HttpState httpState, HttpActionHandler actionHandler) {
-        this.configuration = configuration;
-        this.server = server;
-        this.httpState = httpState;
-        this.actionHandler = actionHandler;
-    }
-
-    @Override
-    public void handlerAdded(ChannelHandlerContext ctx) {
-        ctx.pipeline().replace(this, null, new PortUnificationHandler(configuration, server, httpState, actionHandler));
-    }
+public class MockServerUnificationInitializer extends ChannelHandlerAdapter
+{
+	private final ServerConfiguration configuration;
+	private final LifeCycle server;
+	private final HttpState httpState;
+	private final HttpActionHandler actionHandler;
+	
+	public MockServerUnificationInitializer(
+		final ServerConfiguration configuration,
+		final LifeCycle server,
+		final HttpState httpState,
+		final HttpActionHandler actionHandler)
+	{
+		this.configuration = configuration;
+		this.server = server;
+		this.httpState = httpState;
+		this.actionHandler = actionHandler;
+	}
+	
+	@Override
+	public void handlerAdded(final ChannelHandlerContext ctx)
+	{
+		ctx.pipeline().replace(this, null, new PortUnificationHandler(
+			this.configuration, this.server, this.httpState,
+			this.actionHandler));
+	}
 }

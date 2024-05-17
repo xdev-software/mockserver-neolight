@@ -28,33 +28,49 @@ import software.xdev.mockserver.configuration.ServerConfigurationProperties;
 
 public final class MockServerLoggerConfiguration
 {
-    public static void configureLogger() {
-        try {
-            if (System.getProperty("java.util.logging.config.file") == null && System.getProperty("java.util.logging.config.class") == null) {
-                LogManager.getLogManager().readConfiguration(new ByteArrayInputStream(("" +
-                    "handlers=software.xdev.mockserver.logging.StandardOutConsoleHandler" + NEW_LINE +
-                    "software.xdev.mockserver.logging.StandardOutConsoleHandler.level=ALL" + NEW_LINE +
-                    "software.xdev.mockserver.logging.StandardOutConsoleHandler.formatter=java.util.logging.SimpleFormatter" + NEW_LINE +
-                    "java.util.logging.SimpleFormatter.format=%1$tF %1$tT %4$s %5$s %6$s%n" + NEW_LINE +
-                    "software.xdev.mockserver.level=INFO" + NEW_LINE +
-                    "io.netty.level=WARNING").getBytes(UTF_8)));
-                if (isNotBlank(ServerConfigurationProperties.javaLoggerLogLevel())) {
-                    String loggingConfiguration = "" +
-                        (!ServerConfigurationProperties.disableSystemOut() ? "handlers=software.xdev.mockserver.logging.StandardOutConsoleHandler" + NEW_LINE +
-                            "software.xdev.mockserver.logging.StandardOutConsoleHandler.level=ALL" + NEW_LINE +
-                            "software.xdev.mockserver.logging.StandardOutConsoleHandler.formatter=java.util.logging.SimpleFormatter" + NEW_LINE : "") +
-                        "java.util.logging.SimpleFormatter.format=%1$tF %1$tT %4$s %5$s %6$s%n" + NEW_LINE +
-                        "software.xdev.mockserver.level=" + ServerConfigurationProperties.javaLoggerLogLevel() + NEW_LINE +
-                        "io.netty.level=" + (Arrays.asList("TRACE", "FINEST").contains(ServerConfigurationProperties.javaLoggerLogLevel()) ? "FINE" : "WARNING");
-                    LogManager.getLogManager().readConfiguration(new ByteArrayInputStream(loggingConfiguration.getBytes(UTF_8)));
-                }
-            }
-        } catch (Exception ex) {
-            System.err.println("Failed to configure logger");
-            ex.printStackTrace();
-        }
-    }
-    
-    private MockServerLoggerConfiguration() {
-    }
+	public static void configureLogger()
+	{
+		try
+		{
+			if(System.getProperty("java.util.logging.config.file") == null
+				&& System.getProperty("java.util.logging.config.class") == null)
+			{
+				LogManager.getLogManager().readConfiguration(new ByteArrayInputStream((
+					"handlers=software.xdev.mockserver.logging.StandardOutConsoleHandler" + NEW_LINE
+						+ "software.xdev.mockserver.logging.StandardOutConsoleHandler.level=ALL" + NEW_LINE
+						+ "software.xdev.mockserver.logging.StandardOutConsoleHandler.formatter="
+						+ "java.util.logging.SimpleFormatter" + NEW_LINE
+						+ "java.util.logging.SimpleFormatter.format=%1$tF %1$tT %4$s %5$s %6$s%n" + NEW_LINE
+						+ "software.xdev.mockserver.level=INFO" + NEW_LINE
+						+ "io.netty.level=WARNING").getBytes(UTF_8)));
+				if(isNotBlank(ServerConfigurationProperties.javaLoggerLogLevel()))
+				{
+					final String loggingConfiguration =
+						(!ServerConfigurationProperties.disableSystemOut()
+							? "handlers=software.xdev.mockserver.logging.StandardOutConsoleHandler" + NEW_LINE
+							+ "software.xdev.mockserver.logging.StandardOutConsoleHandler.level=ALL" + NEW_LINE
+							+ "software.xdev.mockserver.logging.StandardOutConsoleHandler.formatter="
+							+ "java.util.logging.SimpleFormatter" + NEW_LINE
+							: "")
+							+ "java.util.logging.SimpleFormatter.format=%1$tF %1$tT %4$s %5$s %6$s%n" + NEW_LINE
+							+ "software.xdev.mockserver.level=" + ServerConfigurationProperties.javaLoggerLogLevel()
+							+ NEW_LINE
+							+ "io.netty.level="
+							+ (Arrays.asList("TRACE", "FINEST")
+							.contains(ServerConfigurationProperties.javaLoggerLogLevel()) ? "FINE" : "WARNING");
+					LogManager.getLogManager()
+						.readConfiguration(new ByteArrayInputStream(loggingConfiguration.getBytes(UTF_8)));
+				}
+			}
+		}
+		catch(final Exception ex)
+		{
+			System.err.println("Failed to configure logger");
+			ex.printStackTrace();
+		}
+	}
+	
+	private MockServerLoggerConfiguration()
+	{
+	}
 }

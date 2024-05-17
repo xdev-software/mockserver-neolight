@@ -15,65 +15,80 @@
  */
 package software.xdev.mockserver.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.nio.charset.Charset;
 import java.util.Objects;
 
-public abstract class BodyWithContentType<T> extends Body<T> {
-    private int hashCode;
-    protected final MediaType contentType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-    public BodyWithContentType(Type type, MediaType contentType) {
-        super(type);
-        this.contentType = contentType;
-    }
 
-    @JsonIgnore
-    Charset determineCharacterSet(MediaType mediaType, Charset defaultCharset) {
-        if (mediaType != null) {
-            Charset charset = mediaType.getCharset();
-            if (charset != null) {
-                return charset;
-            }
-        }
-        return defaultCharset;
-    }
-
-    @Override
-    @JsonIgnore
-    public Charset getCharset(Charset defaultIfNotSet) {
-        return determineCharacterSet(contentType, defaultIfNotSet);
-    }
-
-    @Override
-    public String getContentType() {
-        return (contentType != null ? contentType.toString() : null);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (hashCode() != o.hashCode()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        BodyWithContentType<?> that = (BodyWithContentType<?>) o;
-        return Objects.equals(contentType, that.contentType);
-    }
-
-    @Override
-    public int hashCode() {
-        if (hashCode == 0) {
-            hashCode = Objects.hash(super.hashCode(), contentType);
-        }
-        return hashCode;
-    }
+public abstract class BodyWithContentType<T> extends Body<T>
+{
+	private int hashCode;
+	protected final MediaType contentType;
+	
+	protected BodyWithContentType(final Type type, final MediaType contentType)
+	{
+		super(type);
+		this.contentType = contentType;
+	}
+	
+	@JsonIgnore
+	Charset determineCharacterSet(final MediaType mediaType, final Charset defaultCharset)
+	{
+		if(mediaType != null)
+		{
+			final Charset charset = mediaType.getCharset();
+			if(charset != null)
+			{
+				return charset;
+			}
+		}
+		return defaultCharset;
+	}
+	
+	@Override
+	@JsonIgnore
+	public Charset getCharset(final Charset defaultIfNotSet)
+	{
+		return this.determineCharacterSet(this.contentType, defaultIfNotSet);
+	}
+	
+	@Override
+	public String getContentType()
+	{
+		return (this.contentType != null ? this.contentType.toString() : null);
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(o == null || this.getClass() != o.getClass())
+		{
+			return false;
+		}
+		if(this.hashCode() != o.hashCode())
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		final BodyWithContentType<?> that = (BodyWithContentType<?>)o;
+		return Objects.equals(this.contentType, that.contentType);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		if(this.hashCode == 0)
+		{
+			this.hashCode = Objects.hash(super.hashCode(), this.contentType);
+		}
+		return this.hashCode;
+	}
 }

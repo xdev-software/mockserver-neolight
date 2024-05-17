@@ -15,54 +15,60 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.Objects;
+
 import software.xdev.mockserver.model.ParameterBody;
 import software.xdev.mockserver.model.Parameters;
 
-import java.util.Objects;
 
-public class ParameterBodyDTO extends BodyDTO {
-
-    private final Parameters parameters;
-
-    public ParameterBodyDTO(ParameterBody parameterBody) {
-        this(parameterBody, null);
-    }
-
-    public ParameterBodyDTO(ParameterBody parameterBody, Boolean not) {
-        super(parameterBody.getType(), not);
-        parameters = parameterBody.getValue();
-        withOptional(parameterBody.getOptional());
-    }
-
-    public Parameters getParameters() {
-        return parameters;
-    }
-
-    public ParameterBody buildObject() {
-        return (ParameterBody) new ParameterBody(parameters).withOptional(getOptional());
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final ParameterBodyDTO that))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return Objects.equals(getParameters(), that.getParameters());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(super.hashCode(), getParameters());
-    }
+public class ParameterBodyDTO extends BodyDTO
+{
+	private final Parameters parameters;
+	
+	public ParameterBodyDTO(final ParameterBody parameterBody)
+	{
+		this(parameterBody, null);
+	}
+	
+	public ParameterBodyDTO(final ParameterBody parameterBody, final Boolean not)
+	{
+		super(parameterBody.getType(), not);
+		this.parameters = parameterBody.getValue();
+		this.withOptional(parameterBody.getOptional());
+	}
+	
+	public Parameters getParameters()
+	{
+		return this.parameters;
+	}
+	
+	@Override
+	public ParameterBody buildObject()
+	{
+		return (ParameterBody)new ParameterBody(this.parameters).withOptional(this.getOptional());
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final ParameterBodyDTO that))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return Objects.equals(this.getParameters(), that.getParameters());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), this.getParameters());
+	}
 }

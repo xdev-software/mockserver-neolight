@@ -20,52 +20,54 @@ import java.util.Objects;
 
 import software.xdev.mockserver.model.BinaryBody;
 
-public class BinaryBodyDTO extends BodyWithContentTypeDTO {
 
-    private final byte[] base64Bytes;
-
-    public BinaryBodyDTO(BinaryBody binaryBody) {
-        this(binaryBody, null);
-    }
-
-    public BinaryBodyDTO(BinaryBody binaryBody, Boolean not) {
-        super(binaryBody.getType(), not, binaryBody);
-        if (binaryBody.getRawBytes() != null) {
-            base64Bytes = binaryBody.getRawBytes();
-        } else {
-            base64Bytes = new byte[0];
-        }
-    }
-
-    public byte[] getBase64Bytes() {
-        return base64Bytes;
-    }
-
-    public BinaryBody buildObject() {
-        return (BinaryBody) new BinaryBody(getBase64Bytes(), getMediaType()).withOptional(getOptional());
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final BinaryBodyDTO that))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return Objects.deepEquals(getBase64Bytes(), that.getBase64Bytes());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(super.hashCode(), Arrays.hashCode(getBase64Bytes()));
-    }
+public class BinaryBodyDTO extends BodyWithContentTypeDTO
+{
+	private final byte[] base64Bytes;
+	
+	public BinaryBodyDTO(final BinaryBody binaryBody)
+	{
+		this(binaryBody, null);
+	}
+	
+	public BinaryBodyDTO(final BinaryBody binaryBody, final Boolean not)
+	{
+		super(binaryBody.getType(), not, binaryBody);
+		this.base64Bytes = binaryBody.getRawBytes() != null ? binaryBody.getRawBytes() : new byte[0];
+	}
+	
+	public byte[] getBase64Bytes()
+	{
+		return this.base64Bytes;
+	}
+	
+	@Override
+	public BinaryBody buildObject()
+	{
+		return (BinaryBody)new BinaryBody(this.getBase64Bytes(), this.getMediaType()).withOptional(this.getOptional());
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final BinaryBodyDTO that))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return Objects.deepEquals(this.getBase64Bytes(), that.getBase64Bytes());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), Arrays.hashCode(this.getBase64Bytes()));
+	}
 }

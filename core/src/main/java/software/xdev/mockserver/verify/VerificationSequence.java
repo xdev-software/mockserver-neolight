@@ -15,86 +15,96 @@
  */
 package software.xdev.mockserver.verify;
 
-import software.xdev.mockserver.model.ExpectationId;
-import software.xdev.mockserver.model.ObjectWithJsonToString;
-import software.xdev.mockserver.model.RequestDefinition;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import software.xdev.mockserver.model.ExpectationId;
+import software.xdev.mockserver.model.ObjectWithJsonToString;
+import software.xdev.mockserver.model.RequestDefinition;
 
-public class VerificationSequence extends ObjectWithJsonToString {
-    private List<RequestDefinition> httpRequests = new ArrayList<>();
-    private List<ExpectationId> expectationIds = new ArrayList<>();
-    private Integer maximumNumberOfRequestToReturnInVerificationFailure;
 
-    public static VerificationSequence verificationSequence() {
-        return new VerificationSequence();
-    }
-
-    public VerificationSequence withRequests(RequestDefinition... httpRequests) {
-        Collections.addAll(this.httpRequests, httpRequests);
-        return this;
-    }
-
-    public VerificationSequence withRequests(List<RequestDefinition> httpRequests) {
-        this.httpRequests = httpRequests;
-        return this;
-    }
-
-    public List<RequestDefinition> getHttpRequests() {
-        return httpRequests;
-    }
-
-    public VerificationSequence withExpectationIds(ExpectationId... expectationIds) {
-        Collections.addAll(this.expectationIds, expectationIds);
-        return this;
-    }
-
-    public VerificationSequence withExpectationIds(List<ExpectationId> expectationIds) {
-        this.expectationIds = expectationIds;
-        return this;
-    }
-
-    public List<ExpectationId> getExpectationIds() {
-        return expectationIds;
-    }
-
-    public Integer getMaximumNumberOfRequestToReturnInVerificationFailure() {
-        return maximumNumberOfRequestToReturnInVerificationFailure;
-    }
-
-    public VerificationSequence withMaximumNumberOfRequestToReturnInVerificationFailure(Integer maximumNumberOfRequestToReturnInVerificationFailure) {
-        this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final VerificationSequence that))
-        {
-            return false;
-        }
-		return Objects.equals(getHttpRequests(), that.getHttpRequests())
-            && Objects.equals(getExpectationIds(), that.getExpectationIds())
-            && Objects.equals(
-            getMaximumNumberOfRequestToReturnInVerificationFailure(),
-            that.getMaximumNumberOfRequestToReturnInVerificationFailure());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(
-            getHttpRequests(),
-            getExpectationIds(),
-            getMaximumNumberOfRequestToReturnInVerificationFailure());
-    }
+public class VerificationSequence extends ObjectWithJsonToString
+{
+	private List<RequestDefinition> httpRequests = new ArrayList<>();
+	private List<ExpectationId> expectationIds = new ArrayList<>();
+	private Integer maximumNumberOfRequestToReturnInVerificationFailure;
+	
+	public static VerificationSequence verificationSequence()
+	{
+		return new VerificationSequence();
+	}
+	
+	public VerificationSequence withRequests(final RequestDefinition... httpRequests)
+	{
+		Collections.addAll(this.httpRequests, httpRequests);
+		return this;
+	}
+	
+	public VerificationSequence withRequests(final List<RequestDefinition> httpRequests)
+	{
+		this.httpRequests = httpRequests;
+		return this;
+	}
+	
+	public List<RequestDefinition> getHttpRequests()
+	{
+		return this.httpRequests;
+	}
+	
+	public VerificationSequence withExpectationIds(final ExpectationId... expectationIds)
+	{
+		Collections.addAll(this.expectationIds, expectationIds);
+		return this;
+	}
+	
+	public VerificationSequence withExpectationIds(final List<ExpectationId> expectationIds)
+	{
+		this.expectationIds = expectationIds;
+		return this;
+	}
+	
+	public List<ExpectationId> getExpectationIds()
+	{
+		return this.expectationIds;
+	}
+	
+	public Integer getMaximumNumberOfRequestToReturnInVerificationFailure()
+	{
+		return this.maximumNumberOfRequestToReturnInVerificationFailure;
+	}
+	
+	public VerificationSequence withMaximumNumberOfRequestToReturnInVerificationFailure(final Integer maximumNumberOfRequestToReturnInVerificationFailure)
+	{
+		this.maximumNumberOfRequestToReturnInVerificationFailure = maximumNumberOfRequestToReturnInVerificationFailure;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final VerificationSequence that))
+		{
+			return false;
+		}
+		return Objects.equals(this.getHttpRequests(), that.getHttpRequests())
+			&& Objects.equals(this.getExpectationIds(), that.getExpectationIds())
+			&& Objects.equals(
+			this.getMaximumNumberOfRequestToReturnInVerificationFailure(),
+			that.getMaximumNumberOfRequestToReturnInVerificationFailure());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(
+			this.getHttpRequests(),
+			this.getExpectationIds(),
+			this.getMaximumNumberOfRequestToReturnInVerificationFailure());
+	}
 }

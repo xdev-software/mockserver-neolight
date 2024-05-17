@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.serialization.model;
 
-public interface DTO<T> {
-
-    T buildObject();
+public interface DTO<T>
+{
+	T buildObject();
 }

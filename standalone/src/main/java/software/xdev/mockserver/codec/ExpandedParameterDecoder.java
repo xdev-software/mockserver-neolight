@@ -15,17 +15,9 @@
  */
 package software.xdev.mockserver.codec;
 
-import io.netty.handler.codec.http.HttpConstants;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import software.xdev.mockserver.util.StringUtils;
-import software.xdev.mockserver.configuration.ServerConfiguration;
-import software.xdev.mockserver.model.NottableString;
-import software.xdev.mockserver.model.Parameter;
-import software.xdev.mockserver.model.ParameterStyle;
-import software.xdev.mockserver.model.Parameters;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static software.xdev.mockserver.model.NottableOptionalString.optional;
+import static software.xdev.mockserver.model.NottableString.string;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,92 +26,152 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-import static software.xdev.mockserver.model.NottableOptionalString.optional;
-import static software.xdev.mockserver.model.NottableString.string;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ExpandedParameterDecoder {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(ExpandedParameterDecoder.class);
-    
-    private static final Pattern QUOTED_PARAMETER_VALUE = Pattern.compile("\\s*^[\"']+(.*)[\"']+\\s*$");
-    private static final Pattern JSON_VALUE = Pattern.compile("(?s)^\\s*[{\\[].*[}\\]]\\s*$");
-    
-    private final ServerConfiguration configuration;
+import io.netty.handler.codec.http.HttpConstants;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import software.xdev.mockserver.configuration.ServerConfiguration;
+import software.xdev.mockserver.model.NottableString;
+import software.xdev.mockserver.model.Parameter;
+import software.xdev.mockserver.model.ParameterStyle;
+import software.xdev.mockserver.model.Parameters;
+import software.xdev.mockserver.util.StringUtils;
 
-    public ExpandedParameterDecoder(ServerConfiguration configuration) {
-        this.configuration = configuration;
-    }
 
-    public Parameters retrieveFormParameters(String parameterString, boolean hasPath) {
-        Parameters parameters = new Parameters();
-        Map<String, List<String>> parameterMap = new HashMap<>();
-        if (isNotBlank(parameterString)) {
-            try {
-                hasPath = parameterString.startsWith("/") || parameterString.contains("?") || hasPath;
-                parameterMap.putAll(new QueryStringDecoder(parameterString, HttpConstants.DEFAULT_CHARSET, hasPath, Integer.MAX_VALUE, !configuration.useSemicolonAsQueryParameterSeparator()).parameters());
-            } catch (IllegalArgumentException iae) {
-                LOG.error("Exception while parsing query string {}", parameterString, iae);
-            }
-        }
-        return parameters.withEntries(parameterMap);
-    }
-
-    public Parameters retrieveQueryParameters(String parameterString, boolean hasPath) {
-        if (isNotBlank(parameterString)) {
-            String rawParameterString = parameterString.contains("?") ? StringUtils.substringAfter(parameterString, "?") : parameterString;
-            Map<String, List<String>> parameterMap = new HashMap<>();
-            try {
-                hasPath = parameterString.startsWith("/") || parameterString.contains("?") || hasPath;
-                parameterMap.putAll(new QueryStringDecoder(parameterString, HttpConstants.DEFAULT_CHARSET, parameterString.contains("/") || hasPath, Integer.MAX_VALUE, true).parameters());
-            } catch (IllegalArgumentException iae) {
-                LOG.error("Exception while parsing query string {}", parameterString, iae);
-            }
-            return new Parameters().withEntries(parameterMap).withRawParameterString(rawParameterString);
-        }
-        return null;
-    }
-
-    public void splitParameters(Parameters matcher, Parameters matched) {
-        if (matcher != null && matched != null) {
-            for (Parameter matcherEntry : matcher.getEntries()) {
-                if (matcherEntry.getName().getParameterStyle() != null && matcherEntry.getName().getParameterStyle().isExploded()) {
-                    for (Parameter matchedEntry : matched.getEntries()) {
-                        if (matcherEntry.getName().getValue().equals(matchedEntry.getName().getValue()) || matchedEntry.getName().getValue().matches(matcherEntry.getName().getValue())) {
-                            matchedEntry.replaceValues(new ExpandedParameterDecoder(configuration).splitOnDelimiter(matcherEntry.getName().getParameterStyle(), matcherEntry.getName().getValue(), matchedEntry.getValues()));
-                            matched.replaceEntry(matchedEntry);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public List<NottableString> splitOnDelimiter(ParameterStyle style, String name, List<NottableString> values) {
-        if (isNotBlank(style.getRegex())) {
-            List<NottableString> splitValues = new ArrayList<>();
-            for (NottableString value : values) {
-                Matcher quotedValue = QUOTED_PARAMETER_VALUE.matcher(value.getValue());
-                if (quotedValue.matches()) {
-                    if (value.isOptional()) {
-                        splitValues.add(optional(quotedValue.group(1), value.isNot()));
-                    } else {
-                        splitValues.add(string(quotedValue.group(1), value.isNot()));
-                    }
-                } else if (!JSON_VALUE.matcher(value.getValue()).matches()) {
-                    for (String splitValue : value.getValue().split(style.getRegex().replaceAll("<name>", name))) {
-                        if (value.isOptional()) {
-                            splitValues.add(optional(splitValue, value.isNot()));
-                        } else {
-                            splitValues.add(string(splitValue, value.isNot()));
-                        }
-                    }
-                }
-            }
-            return splitValues;
-        } else {
-            return values;
-        }
-    }
-
+public class ExpandedParameterDecoder
+{
+	private static final Logger LOG = LoggerFactory.getLogger(ExpandedParameterDecoder.class);
+	
+	private static final Pattern QUOTED_PARAMETER_VALUE = Pattern.compile("\\s*^[\"']+(.*)[\"']+\\s*$");
+	private static final Pattern JSON_VALUE = Pattern.compile("(?s)^\\s*[{\\[].*[}\\]]\\s*$");
+	
+	private final ServerConfiguration configuration;
+	
+	public ExpandedParameterDecoder(final ServerConfiguration configuration)
+	{
+		this.configuration = configuration;
+	}
+	
+	public Parameters retrieveFormParameters(final String parameterString, boolean hasPath)
+	{
+		final Parameters parameters = new Parameters();
+		final Map<String, List<String>> parameterMap = new HashMap<>();
+		if(isNotBlank(parameterString))
+		{
+			try
+			{
+				hasPath = parameterString.startsWith("/") || parameterString.contains("?") || hasPath;
+				parameterMap.putAll(new QueryStringDecoder(
+					parameterString,
+					HttpConstants.DEFAULT_CHARSET,
+					hasPath,
+					Integer.MAX_VALUE,
+					!this.configuration.useSemicolonAsQueryParameterSeparator()).parameters());
+			}
+			catch(final IllegalArgumentException iae)
+			{
+				LOG.error("Exception while parsing query string {}", parameterString, iae);
+			}
+		}
+		return parameters.withEntries(parameterMap);
+	}
+	
+	public Parameters retrieveQueryParameters(final String parameterString, boolean hasPath)
+	{
+		if(isNotBlank(parameterString))
+		{
+			final String rawParameterString =
+				parameterString.contains("?") ? StringUtils.substringAfter(parameterString, "?") : parameterString;
+			final Map<String, List<String>> parameterMap = new HashMap<>();
+			try
+			{
+				hasPath = parameterString.startsWith("/") || parameterString.contains("?") || hasPath;
+				parameterMap.putAll(new QueryStringDecoder(
+					parameterString,
+					HttpConstants.DEFAULT_CHARSET,
+					parameterString.contains("/") || hasPath,
+					Integer.MAX_VALUE,
+					true).parameters());
+			}
+			catch(final IllegalArgumentException iae)
+			{
+				LOG.error("Exception while parsing query string {}", parameterString, iae);
+			}
+			return new Parameters().withEntries(parameterMap).withRawParameterString(rawParameterString);
+		}
+		return null;
+	}
+	
+	public void splitParameters(final Parameters matcher, final Parameters matched)
+	{
+		if(matcher != null && matched != null)
+		{
+			for(final Parameter matcherEntry : matcher.getEntries())
+			{
+				if(matcherEntry.getName().getParameterStyle() != null && matcherEntry.getName()
+					.getParameterStyle()
+					.isExploded())
+				{
+					for(final Parameter matchedEntry : matched.getEntries())
+					{
+						if(matcherEntry.getName().getValue().equals(matchedEntry.getName().getValue())
+							|| matchedEntry.getName().getValue().matches(matcherEntry.getName().getValue()))
+						{
+							matchedEntry.replaceValues(new ExpandedParameterDecoder(this.configuration).splitOnDelimiter(
+								matcherEntry.getName().getParameterStyle(),
+								matcherEntry.getName().getValue(),
+								matchedEntry.getValues()));
+							matched.replaceEntry(matchedEntry);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public List<NottableString> splitOnDelimiter(
+		final ParameterStyle style,
+		final String name,
+		final List<NottableString> values)
+	{
+		if(isNotBlank(style.getRegex()))
+		{
+			final List<NottableString> splitValues = new ArrayList<>();
+			for(final NottableString value : values)
+			{
+				final Matcher quotedValue = QUOTED_PARAMETER_VALUE.matcher(value.getValue());
+				if(quotedValue.matches())
+				{
+					if(value.isOptional())
+					{
+						splitValues.add(optional(quotedValue.group(1), value.isNot()));
+					}
+					else
+					{
+						splitValues.add(string(quotedValue.group(1), value.isNot()));
+					}
+				}
+				else if(!JSON_VALUE.matcher(value.getValue()).matches())
+				{
+					for(final String splitValue : value.getValue().split(style.getRegex().replaceAll("<name>", name)))
+					{
+						if(value.isOptional())
+						{
+							splitValues.add(optional(splitValue, value.isNot()));
+						}
+						else
+						{
+							splitValues.add(string(splitValue, value.isNot()));
+						}
+					}
+				}
+			}
+			return splitValues;
+		}
+		else
+		{
+			return values;
+		}
+	}
 }

@@ -15,14 +15,15 @@
  */
 package software.xdev.mockserver.client;
 
-public class ClientException extends RuntimeException {
-
-    ClientException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    ClientException(String message) {
-        super(message);
-    }
-
+public class ClientException extends RuntimeException
+{
+	ClientException(final String message, final Throwable cause)
+	{
+		super(message, cause);
+	}
+	
+	ClientException(final String message)
+	{
+		super(message);
+	}
 }

@@ -19,17 +19,21 @@ import software.xdev.mockserver.model.Cookie;
 import software.xdev.mockserver.model.Cookies;
 import software.xdev.mockserver.model.CookiesModifier;
 
-public class CookiesModifierDTO extends KeysAndValuesModifierDTO<Cookies, CookiesModifier, Cookie, CookiesModifierDTO> {
 
-    public CookiesModifierDTO() {
-    }
-
-    public CookiesModifierDTO(CookiesModifier headersModifier) {
-        super(headersModifier);
-    }
-
-    @Override
-    CookiesModifier newKeysAndValuesModifier() {
-        return new CookiesModifier();
-    }
+public class CookiesModifierDTO extends KeysAndValuesModifierDTO<Cookies, CookiesModifier, Cookie, CookiesModifierDTO>
+{
+	public CookiesModifierDTO()
+	{
+	}
+	
+	public CookiesModifierDTO(final CookiesModifier headersModifier)
+	{
+		super(headersModifier);
+	}
+	
+	@Override
+	CookiesModifier newKeysAndValuesModifier()
+	{
+		return new CookiesModifier();
+	}
 }

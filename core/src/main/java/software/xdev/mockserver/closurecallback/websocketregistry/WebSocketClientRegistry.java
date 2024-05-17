@@ -15,6 +15,14 @@
  */
 package software.xdev.mockserver.closurecallback.websocketregistry;
 
+import static software.xdev.mockserver.model.HttpResponse.response;
+
+import java.util.Collections;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -28,170 +36,228 @@ import software.xdev.mockserver.serialization.WebSocketMessageSerializer;
 import software.xdev.mockserver.serialization.model.WebSocketClientIdDTO;
 import software.xdev.mockserver.serialization.model.WebSocketErrorDTO;
 
-import java.util.Collections;
-import java.util.Map;
 
-import static software.xdev.mockserver.model.HttpResponse.response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
-public class WebSocketClientRegistry {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(WebSocketClientRegistry.class);
-    
-    public static final String WEB_SOCKET_CORRELATION_ID_HEADER_NAME = "WebSocketCorrelationId";
-    private final WebSocketMessageSerializer webSocketMessageSerializer;
-    private final Map<String, Channel> clientRegistry;
-    private final Map<String, WebSocketResponseCallback> responseCallbackRegistry;
-    private final Map<String, WebSocketRequestCallback> forwardCallbackRegistry;
-
-    public WebSocketClientRegistry(Configuration configuration) {
-        this.webSocketMessageSerializer = new WebSocketMessageSerializer();
-        this.clientRegistry = Collections.synchronizedMap(new CircularHashMap<>(configuration.maxWebSocketExpectations()));
-        this.responseCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
-        this.forwardCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
-    }
-
-    public void receivedTextWebSocketFrame(TextWebSocketFrame textWebSocketFrame) {
-        try {
-            Object deserializedMessage = webSocketMessageSerializer.deserialize(textWebSocketFrame.text());
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Received message over websocket {}", deserializedMessage);
-            }
-            if (deserializedMessage instanceof HttpResponse httpResponse) {
-                String firstHeader = httpResponse.getFirstHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME);
-                WebSocketResponseCallback webSocketResponseCallback = responseCallbackRegistry.get(firstHeader);
-                if (webSocketResponseCallback != null) {
-                    webSocketResponseCallback.handle(httpResponse);
-                }
-            } else if (deserializedMessage instanceof HttpRequest httpRequest) {
-                final String firstHeader = httpRequest.getFirstHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME);
-                WebSocketRequestCallback webSocketRequestCallback = forwardCallbackRegistry.get(firstHeader);
-                if (webSocketRequestCallback != null) {
-                    webSocketRequestCallback.handle(httpRequest);
-                }
-            } else if (deserializedMessage instanceof WebSocketErrorDTO webSocketErrorDTO) {
-                if (forwardCallbackRegistry.containsKey(webSocketErrorDTO.getWebSocketCorrelationId())) {
-                    forwardCallbackRegistry
-                        .get(webSocketErrorDTO.getWebSocketCorrelationId())
-                        .handleError(
-                            response()
-                                .withStatusCode(404)
-                                .withBody(webSocketErrorDTO.getMessage())
-                        );
-                } else if (responseCallbackRegistry.containsKey(webSocketErrorDTO.getWebSocketCorrelationId())) {
-                    responseCallbackRegistry
-                        .get(webSocketErrorDTO.getWebSocketCorrelationId())
-                        .handle(
-                            response()
-                                .withStatusCode(404)
-                                .withBody(webSocketErrorDTO.getMessage())
-                        );
-                }
-            } else {
-                throw new WebSocketException("Unsupported web socket message " + deserializedMessage);
-            }
-        } catch (Exception e) {
-            throw new WebSocketException("Exception while receiving web socket message" + textWebSocketFrame.text(), e);
-        }
-    }
-
-    public int size() {
-        return clientRegistry.size();
-    }
-
-    public void registerClient(String clientId, ChannelHandlerContext ctx) {
-        try {
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(new WebSocketClientIdDTO().setClientId(clientId))));
-        } catch (Exception e) {
-            throw new WebSocketException("Exception while sending web socket registration client id message to client " + clientId, e);
-        }
-        clientRegistry.put(clientId, ctx.channel());
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Registering client {}", clientId);
-        }
-    }
-
-    public void unregisterClient(String clientId) {
-        LocalCallbackRegistry.unregisterCallback(clientId);
-        Channel removeChannel = clientRegistry.remove(clientId);
-        if (removeChannel != null && removeChannel.isOpen()) {
-            removeChannel.close();
-        }
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Unregistering client {}", clientId);
-        }
-    }
-
-    public void registerResponseCallbackHandler(String webSocketCorrelationId, WebSocketResponseCallback expectationResponseCallback) {
-        responseCallbackRegistry.put(webSocketCorrelationId, expectationResponseCallback);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Registering response callback {}", webSocketCorrelationId);
-        }
-    }
-
-    public void unregisterResponseCallbackHandler(String webSocketCorrelationId) {
-        responseCallbackRegistry.remove(webSocketCorrelationId);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Unregistering response callback {}", webSocketCorrelationId);
-        }
-    }
-
-    public void registerForwardCallbackHandler(String webSocketCorrelationId, WebSocketRequestCallback expectationForwardCallback) {
-        forwardCallbackRegistry.put(webSocketCorrelationId, expectationForwardCallback);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Registering forward callback {}", webSocketCorrelationId);
-        }
-    }
-
-    public void unregisterForwardCallbackHandler(String webSocketCorrelationId) {
-        forwardCallbackRegistry.remove(webSocketCorrelationId);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Unregistering forward callback {}", webSocketCorrelationId);
-        }
-    }
-
-    public boolean sendClientMessage(String clientId, HttpRequest httpRequest, HttpResponse httpResponse) {
-        try {
-            if (clientRegistry.containsKey(clientId)) {
-                if (httpResponse == null) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Sending message {} to client {}", httpRequest, clientId);
-                    }
-                    clientRegistry.get(clientId).writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(httpRequest)));
-                } else {
-                    HttpRequestAndHttpResponse httpRequestAndHttpResponse = new HttpRequestAndHttpResponse()
-                        .withHttpRequest(httpRequest)
-                        .withHttpResponse(httpResponse);
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Sending message {} to client {}", httpRequestAndHttpResponse, clientId);
-                    }
-                    clientRegistry.get(clientId).writeAndFlush(new TextWebSocketFrame(webSocketMessageSerializer.serialize(httpRequestAndHttpResponse)));
-                }
-                return true;
-            } else {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Client {} not found for request {} client registry only contains {}",
-                        clientId,
-                        httpRequest,
-                        clientRegistry);
-                }
-                return false;
-            }
-        } catch (Exception e) {
-            throw new WebSocketException("Exception while sending web socket message " + httpRequest + " to client " + clientId, e);
-        }
-    }
-
-    public synchronized void reset() {
-        forwardCallbackRegistry.clear();
-        responseCallbackRegistry.clear();
-        clientRegistry.forEach((clientId, channel) -> {
-            LocalCallbackRegistry.unregisterCallback(clientId);
-            channel.close();
-        });
-        clientRegistry.clear();
-    }
+public class WebSocketClientRegistry
+{
+	private static final Logger LOG = LoggerFactory.getLogger(WebSocketClientRegistry.class);
+	
+	public static final String WEB_SOCKET_CORRELATION_ID_HEADER_NAME = "WebSocketCorrelationId";
+	private final WebSocketMessageSerializer webSocketMessageSerializer;
+	private final Map<String, Channel> clientRegistry;
+	private final Map<String, WebSocketResponseCallback> responseCallbackRegistry;
+	private final Map<String, WebSocketRequestCallback> forwardCallbackRegistry;
+	
+	public WebSocketClientRegistry(final Configuration configuration)
+	{
+		this.webSocketMessageSerializer = new WebSocketMessageSerializer();
+		this.clientRegistry =
+			Collections.synchronizedMap(new CircularHashMap<>(configuration.maxWebSocketExpectations()));
+		this.responseCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
+		this.forwardCallbackRegistry = new CircularHashMap<>(configuration.maxWebSocketExpectations());
+	}
+	
+	public void receivedTextWebSocketFrame(final TextWebSocketFrame textWebSocketFrame)
+	{
+		try
+		{
+			final Object deserializedMessage = this.webSocketMessageSerializer.deserialize(textWebSocketFrame.text());
+			if(LOG.isTraceEnabled())
+			{
+				LOG.trace("Received message over websocket {}", deserializedMessage);
+			}
+			if(deserializedMessage instanceof final HttpResponse httpResponse)
+			{
+				final String firstHeader = httpResponse.getFirstHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME);
+				final WebSocketResponseCallback webSocketResponseCallback =
+					this.responseCallbackRegistry.get(firstHeader);
+				if(webSocketResponseCallback != null)
+				{
+					webSocketResponseCallback.handle(httpResponse);
+				}
+			}
+			else if(deserializedMessage instanceof final HttpRequest httpRequest)
+			{
+				final String firstHeader = httpRequest.getFirstHeader(WEB_SOCKET_CORRELATION_ID_HEADER_NAME);
+				final WebSocketRequestCallback webSocketRequestCallback =
+					this.forwardCallbackRegistry.get(firstHeader);
+				if(webSocketRequestCallback != null)
+				{
+					webSocketRequestCallback.handle(httpRequest);
+				}
+			}
+			else if(deserializedMessage instanceof final WebSocketErrorDTO webSocketErrorDTO)
+			{
+				if(this.forwardCallbackRegistry.containsKey(webSocketErrorDTO.getWebSocketCorrelationId()))
+				{
+					this.forwardCallbackRegistry
+						.get(webSocketErrorDTO.getWebSocketCorrelationId())
+						.handleError(
+							response()
+								.withStatusCode(404)
+								.withBody(webSocketErrorDTO.getMessage())
+						);
+				}
+				else if(this.responseCallbackRegistry.containsKey(webSocketErrorDTO.getWebSocketCorrelationId()))
+				{
+					this.responseCallbackRegistry
+						.get(webSocketErrorDTO.getWebSocketCorrelationId())
+						.handle(
+							response()
+								.withStatusCode(404)
+								.withBody(webSocketErrorDTO.getMessage())
+						);
+				}
+			}
+			else
+			{
+				throw new WebSocketException("Unsupported web socket message " + deserializedMessage);
+			}
+		}
+		catch(final Exception e)
+		{
+			throw new WebSocketException(
+				"Exception while receiving web socket message" + textWebSocketFrame.text(),
+				e);
+		}
+	}
+	
+	public void registerClient(final String clientId, final ChannelHandlerContext ctx)
+	{
+		try
+		{
+			ctx.channel()
+				.writeAndFlush(new TextWebSocketFrame(this.webSocketMessageSerializer.serialize(new WebSocketClientIdDTO().setClientId(
+					clientId))));
+		}
+		catch(final Exception e)
+		{
+			throw new WebSocketException(
+				"Exception while sending web socket registration client id message to client " + clientId,
+				e);
+		}
+		this.clientRegistry.put(clientId, ctx.channel());
+		if(LOG.isTraceEnabled())
+		{
+			LOG.trace("Registering client {}", clientId);
+		}
+	}
+	
+	public void unregisterClient(final String clientId)
+	{
+		LocalCallbackRegistry.unregisterCallback(clientId);
+		final Channel removeChannel = this.clientRegistry.remove(clientId);
+		if(removeChannel != null && removeChannel.isOpen())
+		{
+			removeChannel.close();
+		}
+		if(LOG.isTraceEnabled())
+		{
+			LOG.trace("Unregistering client {}", clientId);
+		}
+	}
+	
+	public void registerResponseCallbackHandler(
+		final String webSocketCorrelationId,
+		final WebSocketResponseCallback expectationResponseCallback)
+	{
+		this.responseCallbackRegistry.put(webSocketCorrelationId, expectationResponseCallback);
+		if(LOG.isTraceEnabled())
+		{
+			LOG.trace("Registering response callback {}", webSocketCorrelationId);
+		}
+	}
+	
+	public void unregisterResponseCallbackHandler(final String webSocketCorrelationId)
+	{
+		this.responseCallbackRegistry.remove(webSocketCorrelationId);
+		if(LOG.isTraceEnabled())
+		{
+			LOG.trace("Unregistering response callback {}", webSocketCorrelationId);
+		}
+	}
+	
+	public void registerForwardCallbackHandler(
+		final String webSocketCorrelationId,
+		final WebSocketRequestCallback expectationForwardCallback)
+	{
+		this.forwardCallbackRegistry.put(webSocketCorrelationId, expectationForwardCallback);
+		if(LOG.isTraceEnabled())
+		{
+			LOG.trace("Registering forward callback {}", webSocketCorrelationId);
+		}
+	}
+	
+	public void unregisterForwardCallbackHandler(final String webSocketCorrelationId)
+	{
+		this.forwardCallbackRegistry.remove(webSocketCorrelationId);
+		if(LOG.isTraceEnabled())
+		{
+			LOG.trace("Unregistering forward callback {}", webSocketCorrelationId);
+		}
+	}
+	
+	public boolean sendClientMessage(
+		final String clientId,
+		final HttpRequest httpRequest,
+		final HttpResponse httpResponse)
+	{
+		try
+		{
+			if(this.clientRegistry.containsKey(clientId))
+			{
+				if(httpResponse == null)
+				{
+					if(LOG.isTraceEnabled())
+					{
+						LOG.trace("Sending message {} to client {}", httpRequest, clientId);
+					}
+					this.clientRegistry.get(clientId)
+						.writeAndFlush(new TextWebSocketFrame(this.webSocketMessageSerializer.serialize(httpRequest)));
+				}
+				else
+				{
+					final HttpRequestAndHttpResponse httpRequestAndHttpResponse = new HttpRequestAndHttpResponse()
+						.withHttpRequest(httpRequest)
+						.withHttpResponse(httpResponse);
+					if(LOG.isTraceEnabled())
+					{
+						LOG.trace("Sending message {} to client {}", httpRequestAndHttpResponse, clientId);
+					}
+					this.clientRegistry.get(clientId)
+						.writeAndFlush(new TextWebSocketFrame(this.webSocketMessageSerializer.serialize(
+							httpRequestAndHttpResponse)));
+				}
+				return true;
+			}
+			else
+			{
+				if(LOG.isWarnEnabled())
+				{
+					LOG.warn(
+						"Client {} not found for request {} client registry only contains {}",
+						clientId,
+						httpRequest,
+						this.clientRegistry);
+				}
+				return false;
+			}
+		}
+		catch(final Exception e)
+		{
+			throw new WebSocketException(
+				"Exception while sending web socket message " + httpRequest + " to client " + clientId,
+				e);
+		}
+	}
+	
+	public synchronized void reset()
+	{
+		this.forwardCallbackRegistry.clear();
+		this.responseCallbackRegistry.clear();
+		this.clientRegistry.forEach((clientId, channel) -> {
+			LocalCallbackRegistry.unregisterCallback(clientId);
+			channel.close();
+		});
+		this.clientRegistry.clear();
+	}
 }

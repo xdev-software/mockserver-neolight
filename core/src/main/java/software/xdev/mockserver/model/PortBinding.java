@@ -21,44 +21,48 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class PortBinding extends ObjectWithJsonToString {
-
-    private List<Integer> ports = new ArrayList<>();
-
-    public static PortBinding portBinding(Integer... ports) {
-        return portBinding(Arrays.asList(ports));
-    }
-
-    public static PortBinding portBinding(List<Integer> ports) {
-        return new PortBinding().setPorts(ports);
-    }
-
-    public List<Integer> getPorts() {
-        return ports;
-    }
-
-    public PortBinding setPorts(List<Integer> ports) {
-        this.ports = ports;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final PortBinding that))
-        {
-            return false;
-        }
-		return Objects.equals(getPorts(), that.getPorts());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hashCode(getPorts());
-    }
+public class PortBinding extends ObjectWithJsonToString
+{
+	private List<Integer> ports = new ArrayList<>();
+	
+	public static PortBinding portBinding(final Integer... ports)
+	{
+		return portBinding(Arrays.asList(ports));
+	}
+	
+	public static PortBinding portBinding(final List<Integer> ports)
+	{
+		return new PortBinding().setPorts(ports);
+	}
+	
+	public List<Integer> getPorts()
+	{
+		return this.ports;
+	}
+	
+	public PortBinding setPorts(final List<Integer> ports)
+	{
+		this.ports = ports;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final PortBinding that))
+		{
+			return false;
+		}
+		return Objects.equals(this.getPorts(), that.getPorts());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hashCode(this.getPorts());
+	}
 }

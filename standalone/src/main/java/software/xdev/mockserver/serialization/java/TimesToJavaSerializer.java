@@ -15,31 +15,40 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.matchers.Times;
-
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
-public class TimesToJavaSerializer implements ToJavaSerializer<Times> {
+import software.xdev.mockserver.matchers.Times;
 
-    @Override
-    public String serialize(int numberOfSpacesToIndent, Times times) {
-        StringBuilder output = new StringBuilder();
-        if (times != null) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
-            if (times.isUnlimited()) {
-                output.append("Times.unlimited()");
-            } else if (times.getRemainingTimes() == 1) {
-                output.append("Times.once()");
-            } else {
-                output.append("Times.exactly(").append(times.getRemainingTimes()).append(")");
-            }
-        }
 
-        return output.toString();
-    }
-
-    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
-        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
-    }
+public class TimesToJavaSerializer implements ToJavaSerializer<Times>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final Times times)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(times != null)
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
+			if(times.isUnlimited())
+			{
+				output.append("Times.unlimited()");
+			}
+			else if(times.getRemainingTimes() == 1)
+			{
+				output.append("Times.once()");
+			}
+			else
+			{
+				output.append("Times.exactly(").append(times.getRemainingTimes()).append(")");
+			}
+		}
+		
+		return output.toString();
+	}
+	
+	private StringBuilder appendNewLineAndIndent(final int numberOfSpacesToIndent, final StringBuilder output)
+	{
+		return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
+	}
 }

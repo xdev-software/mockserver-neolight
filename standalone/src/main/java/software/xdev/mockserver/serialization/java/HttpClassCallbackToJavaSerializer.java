@@ -15,30 +15,39 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.HttpClassCallback;
-
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
-public class HttpClassCallbackToJavaSerializer implements ToJavaSerializer<HttpClassCallback> {
+import software.xdev.mockserver.model.HttpClassCallback;
 
-    @Override
-    public String serialize(int numberOfSpacesToIndent, HttpClassCallback httpClassCallback) {
-        StringBuilder output = new StringBuilder();
-        if (httpClassCallback != null) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("callback()");
-            if (httpClassCallback.getCallbackClass() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withCallbackClass(\"").append(httpClassCallback.getCallbackClass()).append("\")");
-            }
-            if (httpClassCallback.getDelay() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDelay(").append(new DelayToJavaSerializer().serialize(0, httpClassCallback.getDelay())).append(")");
-            }
-        }
 
-        return output.toString();
-    }
-
-    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
-        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
-    }
+public class HttpClassCallbackToJavaSerializer implements ToJavaSerializer<HttpClassCallback>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final HttpClassCallback httpClassCallback)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(httpClassCallback != null)
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("callback()");
+			if(httpClassCallback.getCallbackClass() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+					".withCallbackClass(\"").append(httpClassCallback.getCallbackClass()).append("\")");
+			}
+			if(httpClassCallback.getDelay() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDelay(")
+					.append(new DelayToJavaSerializer().serialize(0, httpClassCallback.getDelay()))
+					.append(")");
+			}
+		}
+		
+		return output.toString();
+	}
+	
+	private StringBuilder appendNewLineAndIndent(final int numberOfSpacesToIndent, final StringBuilder output)
+	{
+		return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
+	}
 }

@@ -15,10 +15,10 @@
  */
 package software.xdev.mockserver.authentication;
 
-public class AuthenticationException extends RuntimeException {
-
-    public AuthenticationException(String message) {
-        super(message);
-    }
-
+public class AuthenticationException extends RuntimeException
+{
+	public AuthenticationException(final String message)
+	{
+		super(message);
+	}
 }

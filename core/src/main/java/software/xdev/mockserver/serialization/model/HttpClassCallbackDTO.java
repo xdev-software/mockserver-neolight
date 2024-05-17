@@ -20,70 +20,82 @@ import java.util.Objects;
 import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpClassCallback;
 
-public class HttpClassCallbackDTO implements DTO<HttpClassCallback> {
 
-    private String callbackClass;
-    private DelayDTO delay;
-
-    public HttpClassCallbackDTO(HttpClassCallback httpClassCallback) {
-        if (httpClassCallback != null) {
-            callbackClass = httpClassCallback.getCallbackClass();
-            if (httpClassCallback.getDelay() != null) {
-                delay = new DelayDTO(httpClassCallback.getDelay());
-            }
-        }
-    }
-
-    public HttpClassCallbackDTO() {
-    }
-
-    public HttpClassCallback buildObject() {
-        Delay delay = null;
-        if (this.delay != null) {
-            delay = this.delay.buildObject();
-        }
-        return new HttpClassCallback()
-            .withCallbackClass(callbackClass)
-            .withDelay(delay);
-    }
-
-    public String getCallbackClass() {
-        return callbackClass;
-    }
-
-    public HttpClassCallbackDTO setCallbackClass(String callbackClass) {
-        this.callbackClass = callbackClass;
-        return this;
-    }
-
-    public DelayDTO getDelay() {
-        return delay;
-    }
-
-    public void setDelay(DelayDTO delay) {
-        this.delay = delay;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final HttpClassCallbackDTO that))
-        {
-            return false;
-        }
-		return Objects.equals(getCallbackClass(), that.getCallbackClass()) && Objects.equals(
-            getDelay(),
-            that.getDelay());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(getCallbackClass(), getDelay());
-    }
+public class HttpClassCallbackDTO implements DTO<HttpClassCallback>
+{
+	private String callbackClass;
+	private DelayDTO delay;
+	
+	public HttpClassCallbackDTO(final HttpClassCallback httpClassCallback)
+	{
+		if(httpClassCallback != null)
+		{
+			this.callbackClass = httpClassCallback.getCallbackClass();
+			if(httpClassCallback.getDelay() != null)
+			{
+				this.delay = new DelayDTO(httpClassCallback.getDelay());
+			}
+		}
+	}
+	
+	public HttpClassCallbackDTO()
+	{
+	}
+	
+	@Override
+	public HttpClassCallback buildObject()
+	{
+		Delay delay = null;
+		if(this.delay != null)
+		{
+			delay = this.delay.buildObject();
+		}
+		return new HttpClassCallback()
+			.withCallbackClass(this.callbackClass)
+			.withDelay(delay);
+	}
+	
+	public String getCallbackClass()
+	{
+		return this.callbackClass;
+	}
+	
+	public HttpClassCallbackDTO setCallbackClass(final String callbackClass)
+	{
+		this.callbackClass = callbackClass;
+		return this;
+	}
+	
+	public DelayDTO getDelay()
+	{
+		return this.delay;
+	}
+	
+	public void setDelay(final DelayDTO delay)
+	{
+		this.delay = delay;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final HttpClassCallbackDTO that))
+		{
+			return false;
+		}
+		return Objects.equals(this.getCallbackClass(), that.getCallbackClass()) && Objects.equals(
+			this.getDelay(),
+			that.getDelay());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(this.getCallbackClass(), this.getDelay());
+	}
 }
 

@@ -15,43 +15,59 @@
  */
 package software.xdev.mockserver.mock.action.http;
 
-import software.xdev.mockserver.httpclient.NettyHttpClient;
-import software.xdev.mockserver.filters.HopByHopHeaderFilter;
-import software.xdev.mockserver.model.HttpRequest;
-import software.xdev.mockserver.model.HttpResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static software.xdev.mockserver.model.HttpResponse.notFoundResponse;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import static software.xdev.mockserver.model.HttpResponse.notFoundResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class HttpForwardAction {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(HttpForwardAction.class);
-    
-    private final NettyHttpClient httpClient;
-    private HopByHopHeaderFilter hopByHopHeaderFilter = new HopByHopHeaderFilter();
+import software.xdev.mockserver.filters.HopByHopHeaderFilter;
+import software.xdev.mockserver.httpclient.NettyHttpClient;
+import software.xdev.mockserver.model.HttpRequest;
+import software.xdev.mockserver.model.HttpResponse;
 
-    HttpForwardAction(NettyHttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
 
-    protected HttpForwardActionResult sendRequest(HttpRequest request, InetSocketAddress remoteAddress, Function<HttpResponse, HttpResponse> overrideHttpResponse) {
-        try {
-            return new HttpForwardActionResult(request, httpClient.sendRequest(hopByHopHeaderFilter.onRequest(request).withProtocol(null), remoteAddress), overrideHttpResponse, remoteAddress);
-        } catch (Exception e) {
-            LOG.error("Exception forwarding request {}", request, e);
-        }
-        return notFoundFuture(request);
-    }
-
-    HttpForwardActionResult notFoundFuture(HttpRequest httpRequest) {
-        CompletableFuture<HttpResponse> notFoundFuture = new CompletableFuture<>();
-        notFoundFuture.complete(notFoundResponse());
-        return new HttpForwardActionResult(httpRequest, notFoundFuture, null);
-    }
+public abstract class HttpForwardAction
+{
+	private static final Logger LOG = LoggerFactory.getLogger(HttpForwardAction.class);
+	
+	private final NettyHttpClient httpClient;
+	private final HopByHopHeaderFilter hopByHopHeaderFilter = new HopByHopHeaderFilter();
+	
+	HttpForwardAction(final NettyHttpClient httpClient)
+	{
+		this.httpClient = httpClient;
+	}
+	
+	protected HttpForwardActionResult sendRequest(
+		final HttpRequest request,
+		final InetSocketAddress remoteAddress,
+		final Function<HttpResponse, HttpResponse> overrideHttpResponse)
+	{
+		try
+		{
+			return new HttpForwardActionResult(
+				request,
+				this.httpClient.sendRequest(
+					this.hopByHopHeaderFilter.onRequest(request).withProtocol(null),
+					remoteAddress),
+				overrideHttpResponse,
+				remoteAddress);
+		}
+		catch(final Exception e)
+		{
+			LOG.error("Exception forwarding request {}", request, e);
+		}
+		return this.notFoundFuture(request);
+	}
+	
+	HttpForwardActionResult notFoundFuture(final HttpRequest httpRequest)
+	{
+		final CompletableFuture<HttpResponse> notFoundFuture = new CompletableFuture<>();
+		notFoundFuture.complete(notFoundResponse());
+		return new HttpForwardActionResult(httpRequest, notFoundFuture, null);
+	}
 }

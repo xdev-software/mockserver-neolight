@@ -15,33 +15,44 @@
  */
 package software.xdev.mockserver.serialization.serializers.body;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
 import software.xdev.mockserver.serialization.model.BinaryBodyDTO;
 
-import java.io.IOException;
 
-public class BinaryBodyDTOSerializer extends StdSerializer<BinaryBodyDTO> {
-
-    public BinaryBodyDTOSerializer() {
-        super(BinaryBodyDTO.class);
-    }
-
-    @Override
-    public void serialize(BinaryBodyDTO binaryBodyDTO, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        jgen.writeStartObject();
-        if (binaryBodyDTO.getNot() != null && binaryBodyDTO.getNot()) {
-            jgen.writeBooleanField("not", binaryBodyDTO.getNot());
-        }
-        if (binaryBodyDTO.getOptional() != null && binaryBodyDTO.getOptional()) {
-            jgen.writeBooleanField("optional", binaryBodyDTO.getOptional());
-        }
-        jgen.writeStringField("type", binaryBodyDTO.getType().name());
-        jgen.writeObjectField("base64Bytes", binaryBodyDTO.getBase64Bytes());
-        if (binaryBodyDTO.getContentType() != null) {
-            jgen.writeStringField("contentType", binaryBodyDTO.getContentType());
-        }
-        jgen.writeEndObject();
-    }
+public class BinaryBodyDTOSerializer extends StdSerializer<BinaryBodyDTO>
+{
+	public BinaryBodyDTOSerializer()
+	{
+		super(BinaryBodyDTO.class);
+	}
+	
+	@Override
+	public void serialize(
+		final BinaryBodyDTO binaryBodyDTO,
+		final JsonGenerator jgen,
+		final SerializerProvider provider)
+		throws IOException
+	{
+		jgen.writeStartObject();
+		if(binaryBodyDTO.getNot() != null && binaryBodyDTO.getNot())
+		{
+			jgen.writeBooleanField("not", binaryBodyDTO.getNot());
+		}
+		if(binaryBodyDTO.getOptional() != null && binaryBodyDTO.getOptional())
+		{
+			jgen.writeBooleanField("optional", binaryBodyDTO.getOptional());
+		}
+		jgen.writeStringField("type", binaryBodyDTO.getType().name());
+		jgen.writeObjectField("base64Bytes", binaryBodyDTO.getBase64Bytes());
+		if(binaryBodyDTO.getContentType() != null)
+		{
+			jgen.writeStringField("contentType", binaryBodyDTO.getContentType());
+		}
+		jgen.writeEndObject();
+	}
 }

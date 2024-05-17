@@ -15,19 +15,17 @@
  */
 package software.xdev.mockserver.serialization;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UncheckedIOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.UncheckedIOException;
 
 
 /**
@@ -47,10 +45,13 @@ public final class JacksonUtils
 	{
 		final StringWriter writer = new StringWriter();
 		
-		try {
+		try
+		{
 			WRITER.writeValue(writer, node);
 			writer.flush();
-		} catch (IOException e) {
+		}
+		catch(final IOException e)
+		{
 			throw new UncheckedIOException(e);
 		}
 		

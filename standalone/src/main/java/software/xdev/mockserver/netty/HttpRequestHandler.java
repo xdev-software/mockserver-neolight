@@ -15,11 +15,34 @@
  */
 package software.xdev.mockserver.netty;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.PROXY_AUTHENTICATE;
+import static io.netty.handler.codec.http.HttpHeaderNames.PROXY_AUTHORIZATION;
+import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpResponseStatus.PROXY_AUTHENTICATION_REQUIRED;
+import static software.xdev.mockserver.exception.ExceptionHandling.closeOnFlush;
+import static software.xdev.mockserver.exception.ExceptionHandling.connectionClosedException;
+import static software.xdev.mockserver.mock.HttpState.PATH_PREFIX;
+import static software.xdev.mockserver.model.HttpResponse.response;
+import static software.xdev.mockserver.model.PortBinding.portBinding;
+import static software.xdev.mockserver.netty.unification.PortUnificationHandler.enableSslUpstreamAndDownstream;
+import static software.xdev.mockserver.netty.unification.PortUnificationHandler.isSslEnabledUpstream;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
+
+import java.net.BindException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.text.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
-import org.apache.commons.text.StringEscapeUtils;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.mock.HttpState;
@@ -35,161 +58,217 @@ import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.serialization.Base64Converter;
 import software.xdev.mockserver.serialization.PortBindingSerializer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.BindException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static io.netty.handler.codec.http.HttpHeaderNames.*;
-import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-import static software.xdev.mockserver.exception.ExceptionHandling.closeOnFlush;
-import static software.xdev.mockserver.exception.ExceptionHandling.connectionClosedException;
-import static software.xdev.mockserver.mock.HttpState.PATH_PREFIX;
-import static software.xdev.mockserver.model.HttpResponse.response;
-import static software.xdev.mockserver.model.PortBinding.portBinding;
-import static software.xdev.mockserver.netty.unification.PortUnificationHandler.enableSslUpstreamAndDownstream;
-import static software.xdev.mockserver.netty.unification.PortUnificationHandler.isSslEnabledUpstream;
 
 @ChannelHandler.Sharable
-public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest> {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);
-    
-    public static final AttributeKey<Boolean> PROXYING = AttributeKey.valueOf("PROXYING");
-    public static final AttributeKey<Set<String>> LOCAL_HOST_HEADERS = AttributeKey.valueOf("LOCAL_HOST_HEADERS");
-    private final ServerConfiguration configuration;
-    private LifeCycle server;
-    private HttpState httpState;
-    private PortBindingSerializer portBindingSerializer;
-    private HttpActionHandler httpActionHandler;
-
-    public HttpRequestHandler(ServerConfiguration configuration, LifeCycle server, HttpState httpState, HttpActionHandler httpActionHandler) {
-        super(false);
-        this.configuration = configuration;
-        this.server = server;
-        this.httpState = httpState;
-        this.portBindingSerializer = new PortBindingSerializer();
-        this.httpActionHandler = httpActionHandler;
-    }
-
-    private static boolean isProxyingRequest(ChannelHandlerContext ctx) {
-        if (ctx != null && ctx.channel() != null && ctx.channel().attr(PROXYING).get() != null) {
-            return ctx.channel().attr(PROXYING).get();
-        }
-        return false;
-    }
-
-    public static void setProxyingRequest(ChannelHandlerContext ctx, Boolean value) {
-        if (ctx != null && ctx.channel() != null) {
-            ctx.channel().attr(PROXYING).set(value);
-        }
-    }
-
-    private static Set<String> getLocalAddresses(ChannelHandlerContext ctx) {
-        if (ctx != null &&
-            ctx.channel().attr(LOCAL_HOST_HEADERS) != null &&
-            ctx.channel().attr(LOCAL_HOST_HEADERS).get() != null) {
-            return ctx.channel().attr(LOCAL_HOST_HEADERS).get();
-        }
-        return new HashSet<>();
-    }
-
-    @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest request) {
-
-        ResponseWriter responseWriter = new NettyResponseWriter(configuration, ctx, httpState.getScheduler());
-        try {
-            if (!httpState.handle(request, responseWriter, false)) {
-
-                if (request.matches("PUT", PATH_PREFIX + "/status", "/status") ||
-                    isNotBlank(configuration.livenessHttpGetPath()) && request.matches("GET", configuration.livenessHttpGetPath())) {
-
-                    responseWriter.writeResponse(request, OK, portBindingSerializer.serialize(portBinding(server.getLocalPorts())), "application/json");
-
-                } else if (request.matches("PUT", PATH_PREFIX + "/bind", "/bind")) {
-
-                    PortBinding requestedPortBindings = portBindingSerializer.deserialize(request.getBodyAsString());
-                    if (requestedPortBindings != null) {
-                        try {
-                            List<Integer> actualPortBindings = server.bindServerPorts(requestedPortBindings.getPorts());
-                            responseWriter.writeResponse(request, OK, portBindingSerializer.serialize(portBinding(actualPortBindings)), "application/json");
-                        } catch (RuntimeException e) {
-                            if (e.getCause() instanceof BindException) {
-                                responseWriter.writeResponse(request, BAD_REQUEST, e.getMessage() + " port already in use", MediaType.create("text", "plain").toString());
-                            } else {
-                                throw e;
-                            }
-                        }
-                    }
-
-                } else if (request.matches("PUT", PATH_PREFIX + "/stop", "/stop")) {
-
-                    ctx.writeAndFlush(response().withStatusCode(OK.code()));
-                    new SchedulerThreadFactory("MockServer Stop").newThread(() -> server.stop()).start();
-
-                } else if (request.getMethod().getValue().equals("CONNECT")) {
-
-                    String username = configuration.proxyAuthenticationUsername();
-                    String password = configuration.proxyAuthenticationPassword();
-                    if (isNotBlank(username)
-                        && isNotBlank(password)
-                        && !request.containsHeader(
-                            PROXY_AUTHORIZATION.toString(),
-                            "Basic " + Base64Converter.bytesToBase64String(
-                                (username + ':' + password).getBytes(StandardCharsets.UTF_8),
-                                StandardCharsets.US_ASCII))) {
-                        HttpResponse response = response()
-                            .withStatusCode(PROXY_AUTHENTICATION_REQUIRED.code())
-                            .withHeader(PROXY_AUTHENTICATE.toString(), "Basic realm=\"" + StringEscapeUtils.escapeJava(configuration.proxyAuthenticationRealm()) + "\", charset=\"UTF-8\"");
-                        ctx.writeAndFlush(response);
-                        LOG.info("Proxy authentication failed so returning response: {} for forwarded request: {}",
-                            response, request);
-                    } else {
-                        setProxyingRequest(ctx, Boolean.TRUE);
-                        // assume SSL for CONNECT request
-                        enableSslUpstreamAndDownstream(ctx.channel());
-                        String[] hostParts = request.getPath().getValue().split(":");
-                        int port = hostParts.length > 1 ? Integer.parseInt(hostParts[1]) : isSslEnabledUpstream(ctx.channel()) ? 443 : 80;
-                        ctx.pipeline().addLast(new HttpConnectHandler(configuration, server, hostParts[0], port));
-                        ctx.pipeline().remove(this);
-                        ctx.fireChannelRead(request);
-                    }
-
-                } else {
-
-                    try {
-                        httpActionHandler.processAction(request, responseWriter, ctx, getLocalAddresses(ctx), isProxyingRequest(ctx), false);
-                    } catch (Exception ex) {
-                        LOG.error("Exception processing request: {}", request, ex);
-                    }
-
-                }
-            }
-        } catch (IllegalArgumentException iae) {
-            LOG.error("Exception processing request: {}", request, iae);
-            // send request without API CORS headers
-            responseWriter.writeResponse(request, BAD_REQUEST, iae.getMessage(), MediaType.create("text", "plain").toString());
-        } catch (Exception ex) {
-            LOG.error("Exception processing {}", request, ex);
-            responseWriter.writeResponse(request, response().withStatusCode(BAD_REQUEST.code()).withBody(ex.getMessage()), true);
-        }
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.flush();
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        if (connectionClosedException(cause)) {
-            LOG.error("Exception caught by {} handler -> closing pipeline {}", server.getClass(), ctx.channel());
-        }
-        closeOnFlush(ctx.channel());
-    }
+public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
+{
+	private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);
+	
+	public static final AttributeKey<Boolean> PROXYING = AttributeKey.valueOf("PROXYING");
+	public static final AttributeKey<Set<String>> LOCAL_HOST_HEADERS = AttributeKey.valueOf("LOCAL_HOST_HEADERS");
+	private final ServerConfiguration configuration;
+	private final LifeCycle server;
+	private final HttpState httpState;
+	private final PortBindingSerializer portBindingSerializer;
+	private final HttpActionHandler httpActionHandler;
+	
+	public HttpRequestHandler(
+		final ServerConfiguration configuration,
+		final LifeCycle server,
+		final HttpState httpState,
+		final HttpActionHandler httpActionHandler)
+	{
+		super(false);
+		this.configuration = configuration;
+		this.server = server;
+		this.httpState = httpState;
+		this.portBindingSerializer = new PortBindingSerializer();
+		this.httpActionHandler = httpActionHandler;
+	}
+	
+	private static boolean isProxyingRequest(final ChannelHandlerContext ctx)
+	{
+		if(ctx != null && ctx.channel() != null && ctx.channel().attr(PROXYING).get() != null)
+		{
+			return ctx.channel().attr(PROXYING).get();
+		}
+		return false;
+	}
+	
+	public static void setProxyingRequest(final ChannelHandlerContext ctx, final Boolean value)
+	{
+		if(ctx != null && ctx.channel() != null)
+		{
+			ctx.channel().attr(PROXYING).set(value);
+		}
+	}
+	
+	private static Set<String> getLocalAddresses(final ChannelHandlerContext ctx)
+	{
+		if(ctx != null &&
+			ctx.channel().attr(LOCAL_HOST_HEADERS) != null &&
+			ctx.channel().attr(LOCAL_HOST_HEADERS).get() != null)
+		{
+			return ctx.channel().attr(LOCAL_HOST_HEADERS).get();
+		}
+		return new HashSet<>();
+	}
+	
+	@Override
+	protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest request)
+	{
+		
+		final ResponseWriter responseWriter =
+			new NettyResponseWriter(this.configuration, ctx, this.httpState.getScheduler());
+		try
+		{
+			if(!this.httpState.handle(request, responseWriter, false))
+			{
+				
+				if(request.matches("PUT", PATH_PREFIX + "/status", "/status") ||
+					isNotBlank(this.configuration.livenessHttpGetPath()) && request.matches(
+						"GET",
+						this.configuration.livenessHttpGetPath()))
+				{
+					
+					responseWriter.writeResponse(
+						request,
+						OK,
+						this.portBindingSerializer.serialize(portBinding(this.server.getLocalPorts())),
+						"application/json");
+				}
+				else if(request.matches("PUT", PATH_PREFIX + "/bind", "/bind"))
+				{
+					
+					final PortBinding requestedPortBindings =
+						this.portBindingSerializer.deserialize(request.getBodyAsString());
+					if(requestedPortBindings != null)
+					{
+						try
+						{
+							final List<Integer> actualPortBindings =
+								this.server.bindServerPorts(requestedPortBindings.getPorts());
+							responseWriter.writeResponse(
+								request,
+								OK,
+								this.portBindingSerializer.serialize(portBinding(actualPortBindings)),
+								"application/json");
+						}
+						catch(final RuntimeException e)
+						{
+							if(e.getCause() instanceof BindException)
+							{
+								responseWriter.writeResponse(
+									request,
+									BAD_REQUEST,
+									e.getMessage() + " port already in use",
+									MediaType.create("text", "plain").toString());
+							}
+							else
+							{
+								throw e;
+							}
+						}
+					}
+				}
+				else if(request.matches("PUT", PATH_PREFIX + "/stop", "/stop"))
+				{
+					
+					ctx.writeAndFlush(response().withStatusCode(OK.code()));
+					new SchedulerThreadFactory("MockServer Stop").newThread(() -> this.server.stop()).start();
+				}
+				else if(request.getMethod().getValue().equals("CONNECT"))
+				{
+					
+					final String username = this.configuration.proxyAuthenticationUsername();
+					final String password = this.configuration.proxyAuthenticationPassword();
+					if(isNotBlank(username)
+						&& isNotBlank(password)
+						&& !request.containsHeader(
+						PROXY_AUTHORIZATION.toString(),
+						"Basic " + Base64Converter.bytesToBase64String(
+							(username + ':' + password).getBytes(StandardCharsets.UTF_8),
+							StandardCharsets.US_ASCII)))
+					{
+						final HttpResponse response = response()
+							.withStatusCode(PROXY_AUTHENTICATION_REQUIRED.code())
+							.withHeader(
+								PROXY_AUTHENTICATE.toString(),
+								"Basic realm=\""
+									+ StringEscapeUtils.escapeJava(this.configuration.proxyAuthenticationRealm())
+									+ "\", charset=\"UTF-8\"");
+						ctx.writeAndFlush(response);
+						LOG.info("Proxy authentication failed so returning response: {} for forwarded request: {}",
+							response, request);
+					}
+					else
+					{
+						setProxyingRequest(ctx, Boolean.TRUE);
+						// assume SSL for CONNECT request
+						enableSslUpstreamAndDownstream(ctx.channel());
+						final String[] hostParts = request.getPath().getValue().split(":");
+						final int port = hostParts.length > 1 ?
+							Integer.parseInt(hostParts[1]) :
+							isSslEnabledUpstream(ctx.channel()) ? 443 : 80;
+						ctx.pipeline().addLast(new HttpConnectHandler(this.configuration,
+							this.server, hostParts[0], port));
+						ctx.pipeline().remove(this);
+						ctx.fireChannelRead(request);
+					}
+				}
+				else
+				{
+					
+					try
+					{
+						this.httpActionHandler.processAction(
+							request,
+							responseWriter,
+							ctx,
+							getLocalAddresses(ctx),
+							isProxyingRequest(ctx),
+							false);
+					}
+					catch(final Exception ex)
+					{
+						LOG.error("Exception processing request: {}", request, ex);
+					}
+				}
+			}
+		}
+		catch(final IllegalArgumentException iae)
+		{
+			LOG.error("Exception processing request: {}", request, iae);
+			// send request without API CORS headers
+			responseWriter.writeResponse(
+				request,
+				BAD_REQUEST,
+				iae.getMessage(),
+				MediaType.create("text", "plain").toString());
+		}
+		catch(final Exception ex)
+		{
+			LOG.error("Exception processing {}", request, ex);
+			responseWriter.writeResponse(
+				request,
+				response().withStatusCode(BAD_REQUEST.code()).withBody(ex.getMessage()),
+				true);
+		}
+	}
+	
+	@Override
+	public void channelReadComplete(final ChannelHandlerContext ctx)
+	{
+		ctx.flush();
+	}
+	
+	@Override
+	public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause)
+	{
+		if(connectionClosedException(cause))
+		{
+			LOG.error("Exception caught by {} handler -> closing pipeline {}", this.server.getClass(), ctx.channel());
+		}
+		closeOnFlush(ctx.channel());
+	}
 }

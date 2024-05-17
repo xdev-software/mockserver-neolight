@@ -20,20 +20,25 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpServerCodec;
 import software.xdev.mockserver.model.HttpError;
 
-public class HttpErrorActionHandler {
 
-    public void handle(HttpError httpError, ChannelHandlerContext ctx) {
-        if (httpError.getResponseBytes() != null) {
-            // write byte directly by skipping over HTTP codec
-            ChannelHandlerContext httpCodecContext = ctx.pipeline().context(HttpServerCodec.class);
-            if (httpCodecContext != null) {
-                httpCodecContext.writeAndFlush(Unpooled.wrappedBuffer(httpError.getResponseBytes())).awaitUninterruptibly();
-            }
-        }
-        if (httpError.getDropConnection() != null && httpError.getDropConnection()) {
-            ctx.disconnect();
-            ctx.close();
-        }
-    }
-
+public class HttpErrorActionHandler
+{
+	public void handle(final HttpError httpError, final ChannelHandlerContext ctx)
+	{
+		if(httpError.getResponseBytes() != null)
+		{
+			// write byte directly by skipping over HTTP codec
+			final ChannelHandlerContext httpCodecContext = ctx.pipeline().context(HttpServerCodec.class);
+			if(httpCodecContext != null)
+			{
+				httpCodecContext.writeAndFlush(Unpooled.wrappedBuffer(httpError.getResponseBytes()))
+					.awaitUninterruptibly();
+			}
+		}
+		if(httpError.getDropConnection() != null && httpError.getDropConnection())
+		{
+			ctx.disconnect();
+			ctx.close();
+		}
+	}
 }

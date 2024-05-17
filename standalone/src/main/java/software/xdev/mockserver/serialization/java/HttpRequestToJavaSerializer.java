@@ -15,127 +15,178 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import org.apache.commons.text.StringEscapeUtils;
-import software.xdev.mockserver.model.*;
-import software.xdev.mockserver.serialization.Base64Converter;
+import static software.xdev.mockserver.character.Character.NEW_LINE;
+import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
+import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 import java.util.List;
 
-import static software.xdev.mockserver.util.StringUtils.isNotBlank;
-import static software.xdev.mockserver.character.Character.NEW_LINE;
-import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
+import org.apache.commons.text.StringEscapeUtils;
 
-public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest> {
+import software.xdev.mockserver.model.BinaryBody;
+import software.xdev.mockserver.model.Cookie;
+import software.xdev.mockserver.model.Header;
+import software.xdev.mockserver.model.HttpRequest;
+import software.xdev.mockserver.model.ObjectWithJsonToString;
+import software.xdev.mockserver.model.Parameter;
+import software.xdev.mockserver.model.ParameterBody;
+import software.xdev.mockserver.model.RegexBody;
+import software.xdev.mockserver.model.StringBody;
+import software.xdev.mockserver.serialization.Base64Converter;
 
-    public String serialize(List<HttpRequest> httpRequests) {
-        StringBuilder output = new StringBuilder();
-        for (HttpRequest httpRequest : httpRequests) {
-            output.append(serialize(0, httpRequest));
-            output.append(";");
-            output.append(NEW_LINE);
-        }
-        return output.toString();
-    }
 
-    @Override
-    public String serialize(int numberOfSpacesToIndent, HttpRequest request) {
-        StringBuilder output = new StringBuilder();
-        if (request != null) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
-            output.append("request()");
-            if (isNotBlank(request.getMethod().getValue())) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                output.append(".withMethod(\"").append(request.getMethod().getValue()).append("\")");
-            }
-            if (isNotBlank(request.getPath().getValue())) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                output.append(".withPath(\"").append(request.getPath().getValue()).append("\")");
-            }
-            outputHeaders(numberOfSpacesToIndent + 1, output, request.getHeaderList());
-            outputCookies(numberOfSpacesToIndent + 1, output, request.getCookieList());
-            outputQueryStringParameter(numberOfSpacesToIndent + 1, output, request.getQueryStringParameterList());
-            if (request.isKeepAlive() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                output.append(".withKeepAlive(").append(request.isKeepAlive().toString()).append(")");
-            }
-            if (request.getProtocol() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                output.append(".withProtocol(Protocol.").append(request.getProtocol().toString()).append(")");
-            }
-            if (request.getSocketAddress() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                output.append(".withSocketAddress(");
-                output.append(new SocketAddressToJavaSerializer().serialize(numberOfSpacesToIndent + 2, request.getSocketAddress()));
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                output.append(")");
-            }
-            if (request.getBody() != null) {
-                if (request.getBody() instanceof RegexBody regexBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    output.append("new RegexBody(\"").append(StringEscapeUtils.escapeJava(regexBody.getValue())).append("\")");
-                    output.append(")");
-                } else if (request.getBody() instanceof StringBody stringBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    output.append("new StringBody(\"").append(StringEscapeUtils.escapeJava(stringBody.getValue())).append("\")");
-                    output.append(")");
-                } else if (request.getBody() instanceof ParameterBody) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(");
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output);
-                    output.append("new ParameterBody(");
-                    List<Parameter> bodyParameters = ((ParameterBody) request.getBody()).getValue().getEntries();
-                    output.append(new ParameterToJavaSerializer().serializeAsJava(numberOfSpacesToIndent + 3, bodyParameters));
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output);
-                    output.append(")");
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(")");
-                } else if (request.getBody() instanceof BinaryBody body) {
-                    appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-                    output.append(".withBody(Base64Converter.base64StringToBytes(\"")
-                        .append(Base64Converter.bytesToBase64String(body.getRawBytes()))
-                        .append("\"))");
-                }
-            }
-        }
-
-        return output.toString();
-    }
-
-    private void outputQueryStringParameter(int numberOfSpacesToIndent, StringBuilder output, List<Parameter> parameters) {
-        if (!parameters.isEmpty()) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withQueryStringParameters(");
-            appendObject(numberOfSpacesToIndent, output, new ParameterToJavaSerializer(), parameters);
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
-        }
-    }
-
-    private void outputCookies(int numberOfSpacesToIndent, StringBuilder output, List<Cookie> cookies) {
-        if (!cookies.isEmpty()) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withCookies(");
-            appendObject(numberOfSpacesToIndent, output, new CookieToJavaSerializer(), cookies);
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
-        }
-    }
-
-    private void outputHeaders(int numberOfSpacesToIndent, StringBuilder output, List<Header> headers) {
-        if (!headers.isEmpty()) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withHeaders(");
-            appendObject(numberOfSpacesToIndent, output, new HeaderToJavaSerializer(), headers);
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
-        }
-    }
-
-    private <T extends ObjectWithJsonToString> void appendObject(
-        int numberOfSpacesToIndent,
-        StringBuilder output,
-        MultiValueToJavaSerializer<T> toJavaSerializer,
-        List<T> objects) {
-        output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
-    }
-
-    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
-        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
-    }
+public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest>
+{
+	public String serialize(final List<HttpRequest> httpRequests)
+	{
+		final StringBuilder output = new StringBuilder();
+		for(final HttpRequest httpRequest : httpRequests)
+		{
+			output.append(this.serialize(0, httpRequest));
+			output.append(";");
+			output.append(NEW_LINE);
+		}
+		return output.toString();
+	}
+	
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final HttpRequest request)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(request != null)
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
+			output.append("request()");
+			if(isNotBlank(request.getMethod().getValue()))
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+				output.append(".withMethod(\"").append(request.getMethod().getValue()).append("\")");
+			}
+			if(isNotBlank(request.getPath().getValue()))
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+				output.append(".withPath(\"").append(request.getPath().getValue()).append("\")");
+			}
+			this.outputHeaders(numberOfSpacesToIndent + 1, output, request.getHeaderList());
+			this.outputCookies(numberOfSpacesToIndent + 1, output, request.getCookieList());
+			this.outputQueryStringParameter(numberOfSpacesToIndent + 1, output, request.getQueryStringParameterList());
+			if(request.isKeepAlive() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+				output.append(".withKeepAlive(").append(request.isKeepAlive().toString()).append(")");
+			}
+			if(request.getProtocol() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+				output.append(".withProtocol(Protocol.").append(request.getProtocol().toString()).append(")");
+			}
+			if(request.getSocketAddress() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+				output.append(".withSocketAddress(");
+				output.append(new SocketAddressToJavaSerializer().serialize(
+					numberOfSpacesToIndent + 2,
+					request.getSocketAddress()));
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+				output.append(")");
+			}
+			if(request.getBody() != null)
+			{
+				if(request.getBody() instanceof final RegexBody regexBody)
+				{
+					this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+					output.append(".withBody(");
+					output.append("new RegexBody(\"")
+						.append(StringEscapeUtils.escapeJava(regexBody.getValue()))
+						.append("\")");
+					output.append(")");
+				}
+				else if(request.getBody() instanceof final StringBody stringBody)
+				{
+					this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+					output.append(".withBody(");
+					output.append("new StringBody(\"")
+						.append(StringEscapeUtils.escapeJava(stringBody.getValue()))
+						.append("\")");
+					output.append(")");
+				}
+				else if(request.getBody() instanceof ParameterBody)
+				{
+					this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+					output.append(".withBody(");
+					this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output);
+					output.append("new ParameterBody(");
+					final List<Parameter> bodyParameters = ((ParameterBody)request.getBody()).getValue().getEntries();
+					output.append(new ParameterToJavaSerializer().serializeAsJava(
+						numberOfSpacesToIndent + 3,
+						bodyParameters));
+					this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output);
+					output.append(")");
+					this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+					output.append(")");
+				}
+				else if(request.getBody() instanceof final BinaryBody body)
+				{
+					this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
+					output.append(".withBody(Base64Converter.base64StringToBytes(\"")
+						.append(Base64Converter.bytesToBase64String(body.getRawBytes()))
+						.append("\"))");
+				}
+			}
+		}
+		
+		return output.toString();
+	}
+	
+	private void outputQueryStringParameter(
+		final int numberOfSpacesToIndent,
+		final StringBuilder output,
+		final List<Parameter> parameters)
+	{
+		if(!parameters.isEmpty())
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output)
+				.append(".withQueryStringParameters(");
+			this.appendObject(numberOfSpacesToIndent, output, new ParameterToJavaSerializer(), parameters);
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+		}
+	}
+	
+	private void outputCookies(
+		final int numberOfSpacesToIndent, final StringBuilder output,
+		final List<Cookie> cookies)
+	{
+		if(!cookies.isEmpty())
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withCookies(");
+			this.appendObject(numberOfSpacesToIndent, output, new CookieToJavaSerializer(), cookies);
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+		}
+	}
+	
+	private void outputHeaders(
+		final int numberOfSpacesToIndent, final StringBuilder output,
+		final List<Header> headers)
+	{
+		if(!headers.isEmpty())
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withHeaders(");
+			this.appendObject(numberOfSpacesToIndent, output, new HeaderToJavaSerializer(), headers);
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+		}
+	}
+	
+	private <T extends ObjectWithJsonToString> void appendObject(
+		final int numberOfSpacesToIndent,
+		final StringBuilder output,
+		final MultiValueToJavaSerializer<T> toJavaSerializer,
+		final List<T> objects)
+	{
+		output.append(toJavaSerializer.serializeAsJava(numberOfSpacesToIndent + 1, objects));
+	}
+	
+	private StringBuilder appendNewLineAndIndent(final int numberOfSpacesToIndent, final StringBuilder output)
+	{
+		return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
+	}
 }

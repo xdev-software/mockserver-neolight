@@ -20,48 +20,55 @@ import java.util.Objects;
 import software.xdev.mockserver.model.ObjectWithJsonToString;
 import software.xdev.mockserver.verify.VerificationTimes;
 
-public class VerificationTimesDTO extends ObjectWithJsonToString implements DTO<VerificationTimes> {
 
-    private int atLeast;
-    private int atMost;
-
-    public VerificationTimesDTO(VerificationTimes times) {
-        atLeast = times.getAtLeast();
-        atMost = times.getAtMost();
-    }
-
-    public VerificationTimesDTO() {
-    }
-
-    public VerificationTimes buildObject() {
-        return VerificationTimes.between(atLeast, atMost);
-    }
-
-    public int getAtLeast() {
-        return atLeast;
-    }
-
-    public int getAtMost() {
-        return atMost;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final VerificationTimesDTO that))
-        {
-            return false;
-        }
-		return getAtLeast() == that.getAtLeast() && getAtMost() == that.getAtMost();
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(getAtLeast(), getAtMost());
-    }
+public class VerificationTimesDTO extends ObjectWithJsonToString implements DTO<VerificationTimes>
+{
+	private int atLeast;
+	private int atMost;
+	
+	public VerificationTimesDTO(final VerificationTimes times)
+	{
+		this.atLeast = times.getAtLeast();
+		this.atMost = times.getAtMost();
+	}
+	
+	public VerificationTimesDTO()
+	{
+	}
+	
+	@Override
+	public VerificationTimes buildObject()
+	{
+		return VerificationTimes.between(this.atLeast, this.atMost);
+	}
+	
+	public int getAtLeast()
+	{
+		return this.atLeast;
+	}
+	
+	public int getAtMost()
+	{
+		return this.atMost;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final VerificationTimesDTO that))
+		{
+			return false;
+		}
+		return this.getAtLeast() == that.getAtLeast() && this.getAtMost() == that.getAtMost();
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(this.getAtLeast(), this.getAtMost());
+	}
 }

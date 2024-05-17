@@ -15,56 +15,67 @@
  */
 package software.xdev.mockserver.model;
 
+import static software.xdev.mockserver.model.NottableString.string;
+import static software.xdev.mockserver.util.StringUtils.isBlank;
+
 import java.util.Objects;
 
-import static software.xdev.mockserver.util.StringUtils.isBlank;
-import static software.xdev.mockserver.model.NottableString.string;
 
-public class KeyAndValue extends ObjectWithJsonToString {
-    private final NottableString name;
-    private final NottableString value;
-    private final int hashCode;
-
-    public KeyAndValue(String name, String value) {
-        this(string(name), string(isBlank(value) ? "" : value));
-    }
-
-    public KeyAndValue(NottableString name, String value) {
-        this(name, string(isBlank(value) ? "" : value));
-    }
-
-    public KeyAndValue(NottableString name, NottableString value) {
-        this.name = name;
-        this.value = value;
-        this.hashCode = Objects.hash(name, value);
-    }
-
-    public NottableString getName() {
-        return name;
-    }
-
-    public NottableString getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (hashCode() != o.hashCode()) {
-            return false;
-        }
-        KeyAndValue that = (KeyAndValue) o;
-        return Objects.equals(name, that.name) &&
-            Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return hashCode;
-    }
+public class KeyAndValue extends ObjectWithJsonToString
+{
+	private final NottableString name;
+	private final NottableString value;
+	private final int hashCode;
+	
+	public KeyAndValue(final String name, final String value)
+	{
+		this(string(name), string(isBlank(value) ? "" : value));
+	}
+	
+	public KeyAndValue(final NottableString name, final String value)
+	{
+		this(name, string(isBlank(value) ? "" : value));
+	}
+	
+	public KeyAndValue(final NottableString name, final NottableString value)
+	{
+		this.name = name;
+		this.value = value;
+		this.hashCode = Objects.hash(name, value);
+	}
+	
+	public NottableString getName()
+	{
+		return this.name;
+	}
+	
+	public NottableString getValue()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(o == null || this.getClass() != o.getClass())
+		{
+			return false;
+		}
+		if(this.hashCode() != o.hashCode())
+		{
+			return false;
+		}
+		final KeyAndValue that = (KeyAndValue)o;
+		return Objects.equals(this.name, that.name) && Objects.equals(this.value, that.value);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.hashCode;
+	}
 }

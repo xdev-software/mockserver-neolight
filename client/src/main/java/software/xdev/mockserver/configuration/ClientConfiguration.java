@@ -15,9 +15,10 @@
  */
 package software.xdev.mockserver.configuration;
 
-
-public class ClientConfiguration extends Configuration {
-    public static ClientConfiguration clientConfiguration() {
-        return new ClientConfiguration();
-    }
+public class ClientConfiguration extends Configuration
+{
+	public static ClientConfiguration clientConfiguration()
+	{
+		return new ClientConfiguration();
+	}
 }

@@ -15,29 +15,34 @@
  */
 package software.xdev.mockserver.serialization.serializers.collections;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import software.xdev.mockserver.model.Cookie;
-import software.xdev.mockserver.model.Cookies;
+import static software.xdev.mockserver.model.NottableString.serialiseNottableString;
 
 import java.io.IOException;
 
-import static software.xdev.mockserver.model.NottableString.serialiseNottableString;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-public class CookiesSerializer extends StdSerializer<Cookies> {
+import software.xdev.mockserver.model.Cookie;
+import software.xdev.mockserver.model.Cookies;
 
-    public CookiesSerializer() {
-        super(Cookies.class);
-    }
 
-    @Override
-    public void serialize(Cookies collection, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        jgen.writeStartObject();
-        for (Cookie cookie : collection.getEntries()) {
-            jgen.writeObjectField(serialiseNottableString(cookie.getName()), cookie.getValue());
-        }
-        jgen.writeEndObject();
-    }
-
+public class CookiesSerializer extends StdSerializer<Cookies>
+{
+	public CookiesSerializer()
+	{
+		super(Cookies.class);
+	}
+	
+	@Override
+	public void serialize(final Cookies collection, final JsonGenerator jgen, final SerializerProvider provider)
+		throws IOException
+	{
+		jgen.writeStartObject();
+		for(final Cookie cookie : collection.getEntries())
+		{
+			jgen.writeObjectField(serialiseNottableString(cookie.getName()), cookie.getValue());
+		}
+		jgen.writeEndObject();
+	}
 }

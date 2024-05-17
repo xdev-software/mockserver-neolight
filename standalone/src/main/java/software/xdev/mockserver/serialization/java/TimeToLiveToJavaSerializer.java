@@ -15,29 +15,40 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.matchers.TimeToLive;
-
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
-public class TimeToLiveToJavaSerializer implements ToJavaSerializer<TimeToLive> {
+import software.xdev.mockserver.matchers.TimeToLive;
 
-    @Override
-    public String serialize(int numberOfSpacesToIndent, TimeToLive timeToLive) {
-        StringBuilder output = new StringBuilder();
-        if (timeToLive != null) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
-            if (timeToLive.isUnlimited()) {
-                output.append("TimeToLive.unlimited()");
-            } else {
-                output.append("TimeToLive.exactly(TimeUnit.").append(timeToLive.getTimeUnit().name()).append(", ").append(timeToLive.getTimeToLive()).append("L)");
-            }
-        }
 
-        return output.toString();
-    }
-
-    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
-        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
-    }
+public class TimeToLiveToJavaSerializer implements ToJavaSerializer<TimeToLive>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final TimeToLive timeToLive)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(timeToLive != null)
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
+			if(timeToLive.isUnlimited())
+			{
+				output.append("TimeToLive.unlimited()");
+			}
+			else
+			{
+				output.append("TimeToLive.exactly(TimeUnit.")
+					.append(timeToLive.getTimeUnit().name())
+					.append(", ")
+					.append(timeToLive.getTimeToLive())
+					.append("L)");
+			}
+		}
+		
+		return output.toString();
+	}
+	
+	private StringBuilder appendNewLineAndIndent(final int numberOfSpacesToIndent, final StringBuilder output)
+	{
+		return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
+	}
 }

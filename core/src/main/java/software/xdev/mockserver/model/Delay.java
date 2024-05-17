@@ -18,67 +18,80 @@ package software.xdev.mockserver.model;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class Delay {
 
-    private final TimeUnit timeUnit;
-    private final long value;
-
-    public static Delay milliseconds(long value) {
-        return new Delay(TimeUnit.MILLISECONDS, value);
-    }
-
-    public static Delay seconds(long value) {
-        return new Delay(TimeUnit.SECONDS, value);
-    }
-
-    public static Delay minutes(long value) {
-        return new Delay(TimeUnit.MINUTES, value);
-    }
-
-    public static Delay delay(TimeUnit timeUnit, long value) {
-        return new Delay(timeUnit, value);
-    }
-
-    public Delay(TimeUnit timeUnit, long value) {
-        this.timeUnit = timeUnit;
-        this.value = value;
-    }
-
-    public TimeUnit getTimeUnit() {
-        return timeUnit;
-    }
-
-    public long getValue() {
-        return value;
-    }
-
-    public void applyDelay() {
-        if (timeUnit != null) {
-            try {
-                timeUnit.sleep(value);
-            } catch (InterruptedException ie) {
-                throw new RuntimeException("InterruptedException while apply delay to response", ie);
-            }
-        }
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final Delay delay))
-        {
-            return false;
-        }
-		return getValue() == delay.getValue() && getTimeUnit() == delay.getTimeUnit();
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(getTimeUnit(), getValue());
-    }
+public class Delay
+{
+	private final TimeUnit timeUnit;
+	private final long value;
+	
+	public static Delay milliseconds(final long value)
+	{
+		return new Delay(TimeUnit.MILLISECONDS, value);
+	}
+	
+	public static Delay seconds(final long value)
+	{
+		return new Delay(TimeUnit.SECONDS, value);
+	}
+	
+	public static Delay minutes(final long value)
+	{
+		return new Delay(TimeUnit.MINUTES, value);
+	}
+	
+	public static Delay delay(final TimeUnit timeUnit, final long value)
+	{
+		return new Delay(timeUnit, value);
+	}
+	
+	public Delay(final TimeUnit timeUnit, final long value)
+	{
+		this.timeUnit = timeUnit;
+		this.value = value;
+	}
+	
+	public TimeUnit getTimeUnit()
+	{
+		return this.timeUnit;
+	}
+	
+	public long getValue()
+	{
+		return this.value;
+	}
+	
+	public void applyDelay()
+	{
+		if(this.timeUnit != null)
+		{
+			try
+			{
+				this.timeUnit.sleep(this.value);
+			}
+			catch(final InterruptedException ie)
+			{
+				throw new RuntimeException("InterruptedException while apply delay to response", ie);
+			}
+		}
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final Delay delay))
+		{
+			return false;
+		}
+		return this.getValue() == delay.getValue() && this.getTimeUnit() == delay.getTimeUnit();
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(this.getTimeUnit(), this.getValue());
+	}
 }

@@ -18,10 +18,10 @@ package software.xdev.mockserver.closurecallback.websocketregistry;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
 
-public interface WebSocketRequestCallback {
 
-    void handle(HttpRequest httpRequest);
-
-    void handleError(HttpResponse httpResponse);
-
+public interface WebSocketRequestCallback
+{
+	void handle(HttpRequest httpRequest);
+	
+	void handleError(HttpResponse httpResponse);
 }

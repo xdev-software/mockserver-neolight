@@ -15,23 +15,27 @@
  */
 package software.xdev.mockserver.serialization;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.nio.charset.Charset;
 import java.util.Base64;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 
-public final class Base64Converter {
-
-    private static final Base64.Encoder ENCODER = Base64.getEncoder();
-
-    public static String bytesToBase64String(byte[] data) {
-        return bytesToBase64String(data, UTF_8);
-    }
-
-    public static String bytesToBase64String(byte[] data, Charset charset) {
-        return new String(ENCODER.encode(data), charset);
-    }
-
-    private Base64Converter() {
-    }
+public final class Base64Converter
+{
+	private static final Base64.Encoder ENCODER = Base64.getEncoder();
+	
+	public static String bytesToBase64String(final byte[] data)
+	{
+		return bytesToBase64String(data, UTF_8);
+	}
+	
+	public static String bytesToBase64String(final byte[] data, final Charset charset)
+	{
+		return new String(ENCODER.encode(data), charset);
+	}
+	
+	private Base64Converter()
+	{
+	}
 }

@@ -15,82 +15,120 @@
  */
 package software.xdev.mockserver.cors;
 
+import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
+import static software.xdev.mockserver.configuration.ServerConfiguration.configuration;
+
 import io.netty.handler.codec.http.HttpHeaderNames;
-import software.xdev.mockserver.configuration.Configuration;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.model.Headers;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpResponse;
 
-import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
-import static software.xdev.mockserver.configuration.ServerConfiguration.configuration;
 
-public class CORSHeaders {
-
-    private static final String ANY_ORIGIN = "*";
-    private static final String NULL_ORIGIN = "null";
-
-    private final String corsAllowOrigin;
-    private final String corsAllowHeaders;
-    private final String corsAllowMethods;
-    private final boolean corsAllowCredentials;
-    private final String corsMaxAge;
-
-    public CORSHeaders(String corsAllowOrigin, String corsAllowHeaders, String corsAllowMethods, boolean corsAllowCredentials, int corsMaxAge) {
-        this(
-            configuration()
-                .corsAllowOrigin(corsAllowOrigin)
-                .corsAllowHeaders(corsAllowHeaders)
-                .corsAllowMethods(corsAllowMethods)
-                .corsAllowCredentials(corsAllowCredentials)
-                .corsMaxAgeInSeconds(corsMaxAge)
-        );
-    }
-
-    public CORSHeaders(ServerConfiguration configuration) {
-        this.corsAllowOrigin = configuration.corsAllowOrigin();
-        this.corsAllowHeaders = configuration.corsAllowHeaders();
-        this.corsAllowMethods = configuration.corsAllowMethods();
-        this.corsAllowCredentials = configuration.corsAllowCredentials();
-        this.corsMaxAge = "" + configuration.corsMaxAgeInSeconds();
-    }
-
-    public static boolean isPreflightRequest(ServerConfiguration configuration, HttpRequest request) {
-        final Headers headers = request.getHeaders();
-        boolean isPreflightRequest = request.getMethod().getValue().equals(OPTIONS.name()) &&
-            headers.containsEntry(HttpHeaderNames.ORIGIN.toString()) &&
-            headers.containsEntry(HttpHeaderNames.ACCESS_CONTROL_REQUEST_METHOD.toString());
-        if (isPreflightRequest) {
-            configuration.enableCORSForAPI(true);
-        }
-        return isPreflightRequest;
-    }
-
-    public void addCORSHeaders(HttpRequest request, HttpResponse response) {
-        String origin = request.getFirstHeader(HttpHeaderNames.ORIGIN.toString());
-        if (NULL_ORIGIN.equals(origin)) {
-            setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(), NULL_ORIGIN);
-        } else if (!origin.isEmpty() && corsAllowCredentials) {
-            setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(), origin);
-            setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString(), "true");
-        } else {
-            setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(), corsAllowOrigin);
-            setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString(), "" + corsAllowCredentials);
-        }
-        setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS.toString(), corsAllowMethods);
-        String allowHeaders = corsAllowHeaders;
-        if (!request.getFirstHeader(HttpHeaderNames.ACCESS_CONTROL_REQUEST_HEADERS.toString()).isEmpty()) {
-            allowHeaders += ", " + request.getFirstHeader(HttpHeaderNames.ACCESS_CONTROL_REQUEST_HEADERS.toString());
-        }
-        setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString(), allowHeaders);
-        setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS.toString(), allowHeaders);
-        setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_MAX_AGE.toString(), corsMaxAge);
-    }
-
-    private void setHeaderIfNotAlreadyExists(HttpResponse response, String name, String value) {
-        if (response.getFirstHeader(name).isEmpty()) {
-            response.withHeader(name, value);
-        }
-    }
-
+public class CORSHeaders
+{
+	private static final String ANY_ORIGIN = "*";
+	private static final String NULL_ORIGIN = "null";
+	
+	private final String corsAllowOrigin;
+	private final String corsAllowHeaders;
+	private final String corsAllowMethods;
+	private final boolean corsAllowCredentials;
+	private final String corsMaxAge;
+	
+	public CORSHeaders(
+		final String corsAllowOrigin,
+		final String corsAllowHeaders,
+		final String corsAllowMethods,
+		final boolean corsAllowCredentials,
+		final int corsMaxAge)
+	{
+		this(
+			configuration()
+				.corsAllowOrigin(corsAllowOrigin)
+				.corsAllowHeaders(corsAllowHeaders)
+				.corsAllowMethods(corsAllowMethods)
+				.corsAllowCredentials(corsAllowCredentials)
+				.corsMaxAgeInSeconds(corsMaxAge)
+		);
+	}
+	
+	public CORSHeaders(final ServerConfiguration configuration)
+	{
+		this.corsAllowOrigin = configuration.corsAllowOrigin();
+		this.corsAllowHeaders = configuration.corsAllowHeaders();
+		this.corsAllowMethods = configuration.corsAllowMethods();
+		this.corsAllowCredentials = configuration.corsAllowCredentials();
+		this.corsMaxAge = "" + configuration.corsMaxAgeInSeconds();
+	}
+	
+	public static boolean isPreflightRequest(final ServerConfiguration configuration, final HttpRequest request)
+	{
+		final Headers headers = request.getHeaders();
+		final boolean isPreflightRequest = request.getMethod().getValue().equals(OPTIONS.name()) &&
+			headers.containsEntry(HttpHeaderNames.ORIGIN.toString()) &&
+			headers.containsEntry(HttpHeaderNames.ACCESS_CONTROL_REQUEST_METHOD.toString());
+		if(isPreflightRequest)
+		{
+			configuration.enableCORSForAPI(true);
+		}
+		return isPreflightRequest;
+	}
+	
+	public void addCORSHeaders(final HttpRequest request, final HttpResponse response)
+	{
+		final String origin = request.getFirstHeader(HttpHeaderNames.ORIGIN.toString());
+		if(NULL_ORIGIN.equals(origin))
+		{
+			this.setHeaderIfNotAlreadyExists(
+				response,
+				HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(),
+				NULL_ORIGIN);
+		}
+		else if(!origin.isEmpty() && this.corsAllowCredentials)
+		{
+			this.setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(), origin);
+			this.setHeaderIfNotAlreadyExists(
+				response,
+				HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString(),
+				"true");
+		}
+		else
+		{
+			this.setHeaderIfNotAlreadyExists(
+				response,
+				HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN.toString(),
+				this.corsAllowOrigin);
+			this.setHeaderIfNotAlreadyExists(
+				response,
+				HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString(),
+				"" + this.corsAllowCredentials);
+		}
+		this.setHeaderIfNotAlreadyExists(
+			response,
+			HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS.toString(),
+			this.corsAllowMethods);
+		String allowHeaders = this.corsAllowHeaders;
+		if(!request.getFirstHeader(HttpHeaderNames.ACCESS_CONTROL_REQUEST_HEADERS.toString()).isEmpty())
+		{
+			allowHeaders += ", " + request.getFirstHeader(HttpHeaderNames.ACCESS_CONTROL_REQUEST_HEADERS.toString());
+		}
+		this.setHeaderIfNotAlreadyExists(
+			response,
+			HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS.toString(),
+			allowHeaders);
+		this.setHeaderIfNotAlreadyExists(
+			response,
+			HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS.toString(),
+			allowHeaders);
+		this.setHeaderIfNotAlreadyExists(response, HttpHeaderNames.ACCESS_CONTROL_MAX_AGE.toString(), this.corsMaxAge);
+	}
+	
+	private void setHeaderIfNotAlreadyExists(final HttpResponse response, final String name, final String value)
+	{
+		if(response.getFirstHeader(name).isEmpty())
+		{
+			response.withHeader(name, value);
+		}
+	}
 }

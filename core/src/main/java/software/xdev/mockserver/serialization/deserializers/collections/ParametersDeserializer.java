@@ -17,14 +17,17 @@ package software.xdev.mockserver.serialization.deserializers.collections;
 
 import software.xdev.mockserver.model.Parameters;
 
-public class ParametersDeserializer extends KeysToMultiValuesDeserializer<Parameters> {
 
-    public ParametersDeserializer() {
-        super(Parameters.class);
-    }
-
-    @Override
-    public Parameters build() {
-        return new Parameters();
-    }
+public class ParametersDeserializer extends KeysToMultiValuesDeserializer<Parameters>
+{
+	public ParametersDeserializer()
+	{
+		super(Parameters.class);
+	}
+	
+	@Override
+	public Parameters build()
+	{
+		return new Parameters();
+	}
 }

@@ -19,113 +19,139 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+
 @SuppressWarnings("unchecked")
-public abstract class KeysAndValuesModifier<T extends KeysAndValues<I, T>, K extends KeysAndValuesModifier<T, K, I>, I extends KeyAndValue> {
-
-    private int hashCode;
-    private T add;
-    private T replace;
-    private List<String> remove;
-
-    abstract T construct(List<I> list);
-
-    abstract T construct(I... array);
-
-    public T getAdd() {
-        return add;
-    }
-
-    public K withAdd(T add) {
-        this.add = add;
-        this.hashCode = 0;
-        return (K) this;
-    }
-
-    public K add(List<I> add) {
-        return withAdd(construct(add));
-    }
-
-    public K add(I... add) {
-        return withAdd(construct(add));
-    }
-
-    public T getReplace() {
-        return replace;
-    }
-
-    public K withReplace(T replace) {
-        this.replace = replace;
-        this.hashCode = 0;
-        return (K) this;
-    }
-
-    public K replace(List<I> replace) {
-        return withReplace(construct(replace));
-    }
-
-    public K replace(I... replace) {
-        return withReplace(construct(replace));
-    }
-
-    public List<String> getRemove() {
-        return remove;
-    }
-
-    public K withRemove(List<String> remove) {
-        this.remove = remove;
-        this.hashCode = 0;
-        return (K) this;
-    }
-
-    public K remove(List<String> remove) {
-        return withRemove(remove);
-    }
-
-    public K remove(String... remove) {
-        return withRemove(Arrays.asList(remove));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (hashCode() != o.hashCode()) {
-            return false;
-        }
-        KeysAndValuesModifier<T, K, I> that = (KeysAndValuesModifier<T, K, I>) o;
-        return Objects.equals(add, that.add) &&
-            Objects.equals(replace, that.replace) &&
-            Objects.equals(remove, that.remove);
-    }
-
-    @Override
-    public int hashCode() {
-        if (hashCode == 0) {
-            hashCode = Objects.hash(add, replace, remove);
-        }
-        return hashCode;
-    }
-
-    public T update(T keysAndValues) {
-        if (replace != null && replace.getEntries() != null && keysAndValues != null) {
-            replace.getEntries().forEach(keysAndValues::replaceEntryIfExists);
-        }
-        if (add != null && add.getEntries() != null) {
-            if (keysAndValues != null) {
-                add.getEntries().forEach(keysAndValues::withEntry);
-            } else {
-                return add.clone();
-            }
-        }
-        if (remove != null && keysAndValues != null) {
-            remove.forEach(keysAndValues::remove);
-        }
-        return keysAndValues;
-    }
-
+public abstract class KeysAndValuesModifier<T extends KeysAndValues<I, T>, K extends KeysAndValuesModifier<T, K, I>,
+	I extends KeyAndValue>
+{
+	private int hashCode;
+	private T add;
+	private T replace;
+	private List<String> remove;
+	
+	abstract T construct(List<I> list);
+	
+	abstract T construct(I... array);
+	
+	public T getAdd()
+	{
+		return this.add;
+	}
+	
+	public K withAdd(final T add)
+	{
+		this.add = add;
+		this.hashCode = 0;
+		return (K)this;
+	}
+	
+	public K add(final List<I> add)
+	{
+		return this.withAdd(this.construct(add));
+	}
+	
+	public K add(final I... add)
+	{
+		return this.withAdd(this.construct(add));
+	}
+	
+	public T getReplace()
+	{
+		return this.replace;
+	}
+	
+	public K withReplace(final T replace)
+	{
+		this.replace = replace;
+		this.hashCode = 0;
+		return (K)this;
+	}
+	
+	public K replace(final List<I> replace)
+	{
+		return this.withReplace(this.construct(replace));
+	}
+	
+	public K replace(final I... replace)
+	{
+		return this.withReplace(this.construct(replace));
+	}
+	
+	public List<String> getRemove()
+	{
+		return this.remove;
+	}
+	
+	public K withRemove(final List<String> remove)
+	{
+		this.remove = remove;
+		this.hashCode = 0;
+		return (K)this;
+	}
+	
+	public K remove(final List<String> remove)
+	{
+		return this.withRemove(remove);
+	}
+	
+	public K remove(final String... remove)
+	{
+		return this.withRemove(Arrays.asList(remove));
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(o == null || this.getClass() != o.getClass())
+		{
+			return false;
+		}
+		if(this.hashCode() != o.hashCode())
+		{
+			return false;
+		}
+		final KeysAndValuesModifier<T, K, I> that = (KeysAndValuesModifier<T, K, I>)o;
+		return Objects.equals(this.add, that.add)
+			&& Objects.equals(this.replace, that.replace)
+			&& Objects.equals(this.remove, that.remove);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		if(this.hashCode == 0)
+		{
+			this.hashCode = Objects.hash(this.add, this.replace, this.remove);
+		}
+		return this.hashCode;
+	}
+	
+	public T update(final T keysAndValues)
+	{
+		if(this.replace != null && this.replace.getEntries() != null && keysAndValues != null)
+		{
+			this.replace.getEntries().forEach(keysAndValues::replaceEntryIfExists);
+		}
+		if(this.add != null && this.add.getEntries() != null)
+		{
+			if(keysAndValues != null)
+			{
+				this.add.getEntries().forEach(keysAndValues::withEntry);
+			}
+			else
+			{
+				return this.add.clone();
+			}
+		}
+		if(this.remove != null && keysAndValues != null)
+		{
+			this.remove.forEach(keysAndValues::remove);
+		}
+		return keysAndValues;
+	}
 }

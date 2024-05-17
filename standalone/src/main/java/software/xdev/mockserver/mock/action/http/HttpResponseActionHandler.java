@@ -17,9 +17,11 @@ package software.xdev.mockserver.mock.action.http;
 
 import software.xdev.mockserver.model.HttpResponse;
 
-public class HttpResponseActionHandler {
 
-    public HttpResponse handle(HttpResponse httpResponse) {
-        return httpResponse.clone();
-    }
+public class HttpResponseActionHandler
+{
+	public HttpResponse handle(final HttpResponse httpResponse)
+	{
+		return httpResponse.clone();
+	}
 }

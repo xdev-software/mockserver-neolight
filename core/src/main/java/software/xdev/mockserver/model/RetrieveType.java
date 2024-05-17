@@ -15,9 +15,10 @@
  */
 package software.xdev.mockserver.model;
 
-public enum RetrieveType {
-    REQUESTS,
-    REQUEST_RESPONSES,
-    RECORDED_EXPECTATIONS,
-    ACTIVE_EXPECTATIONS
+public enum RetrieveType
+{
+	REQUESTS,
+	REQUEST_RESPONSES,
+	RECORDED_EXPECTATIONS,
+	ACTIVE_EXPECTATIONS
 }

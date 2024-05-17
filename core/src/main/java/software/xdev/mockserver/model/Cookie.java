@@ -18,38 +18,46 @@ package software.xdev.mockserver.model;
 import static software.xdev.mockserver.model.NottableOptionalString.optional;
 import static software.xdev.mockserver.model.NottableString.string;
 
-public class Cookie extends KeyAndValue {
 
-    public Cookie(String name, String value) {
-        super(name, value);
-    }
-
-    public Cookie(NottableString name, NottableString value) {
-        super(name, value);
-    }
-
-
-    public Cookie(NottableString name, String value) {
-        super(name, value);
-    }
-
-    public static Cookie cookie(String name, String value) {
-        return new Cookie(name, value);
-    }
-
-    public static Cookie cookie(NottableString name, NottableString value) {
-        return new Cookie(name, value);
-    }
-
-    public static Cookie cookie(NottableString name, String value) {
-        return new Cookie(name, value);
-    }
-
-    public static Cookie optionalCookie(String name, String value) {
-        return new Cookie(optional(name), string(value));
-    }
-
-    public static Cookie optionalCookie(String name, NottableString value) {
-        return new Cookie(optional(name), value);
-    }
+public class Cookie extends KeyAndValue
+{
+	public Cookie(final String name, final String value)
+	{
+		super(name, value);
+	}
+	
+	public Cookie(final NottableString name, final NottableString value)
+	{
+		super(name, value);
+	}
+	
+	public Cookie(final NottableString name, final String value)
+	{
+		super(name, value);
+	}
+	
+	public static Cookie cookie(final String name, final String value)
+	{
+		return new Cookie(name, value);
+	}
+	
+	public static Cookie cookie(final NottableString name, final NottableString value)
+	{
+		return new Cookie(name, value);
+	}
+	
+	public static Cookie cookie(final NottableString name, final String value)
+	{
+		return new Cookie(name, value);
+	}
+	
+	public static Cookie optionalCookie(final String name, final String value)
+	{
+		return new Cookie(optional(name), string(value));
+	}
+	
+	public static Cookie optionalCookie(final String name, final NottableString value)
+	{
+		return new Cookie(optional(name), value);
+	}
 }

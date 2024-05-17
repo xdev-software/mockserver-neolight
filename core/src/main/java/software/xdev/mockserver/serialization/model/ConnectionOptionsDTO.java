@@ -18,141 +18,161 @@ package software.xdev.mockserver.serialization.model;
 import java.util.Objects;
 
 import software.xdev.mockserver.model.ConnectionOptions;
-import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.ObjectWithJsonToString;
 
+
 @SuppressWarnings("UnusedReturnValue")
-public class ConnectionOptionsDTO extends ObjectWithJsonToString implements DTO<ConnectionOptions> {
-
-    private Boolean suppressContentLengthHeader = null;
-    private Integer contentLengthHeaderOverride = null;
-    private Boolean suppressConnectionHeader = null;
-    private Integer chunkSize = null;
-    private Boolean keepAliveOverride = null;
-    private Boolean closeSocket = null;
-    private DelayDTO closeSocketDelay = null;
-
-    public ConnectionOptionsDTO(ConnectionOptions connectionOptions) {
-        if (connectionOptions != null) {
-            suppressContentLengthHeader = connectionOptions.getSuppressContentLengthHeader();
-            contentLengthHeaderOverride = connectionOptions.getContentLengthHeaderOverride();
-            suppressConnectionHeader = connectionOptions.getSuppressConnectionHeader();
-            chunkSize = connectionOptions.getChunkSize();
-            keepAliveOverride = connectionOptions.getKeepAliveOverride();
-            closeSocket = connectionOptions.getCloseSocket();
-            if (connectionOptions.getCloseSocketDelay() != null) {
-                closeSocketDelay = new DelayDTO(connectionOptions.getCloseSocketDelay());
-            }
-        }
-    }
-
-    public ConnectionOptionsDTO() {
-    }
-
-    public ConnectionOptions buildObject() {
-        return new ConnectionOptions()
-            .withSuppressContentLengthHeader(suppressContentLengthHeader)
-            .withContentLengthHeaderOverride(contentLengthHeaderOverride)
-            .withSuppressConnectionHeader(suppressConnectionHeader)
-            .withChunkSize(chunkSize)
-            .withKeepAliveOverride(keepAliveOverride)
-            .withCloseSocket(closeSocket)
-            .withCloseSocketDelay(closeSocketDelay != null ? closeSocketDelay.buildObject() : null);
-    }
-
-    public Boolean getSuppressContentLengthHeader() {
-        return suppressContentLengthHeader;
-    }
-
-    public ConnectionOptionsDTO setSuppressContentLengthHeader(Boolean suppressContentLengthHeader) {
-        this.suppressContentLengthHeader = suppressContentLengthHeader;
-        return this;
-    }
-
-    public Integer getContentLengthHeaderOverride() {
-        return contentLengthHeaderOverride;
-    }
-
-    public ConnectionOptionsDTO setContentLengthHeaderOverride(Integer contentLengthHeaderOverride) {
-        this.contentLengthHeaderOverride = contentLengthHeaderOverride;
-        return this;
-    }
-
-    public Boolean getSuppressConnectionHeader() {
-        return suppressConnectionHeader;
-    }
-
-    public ConnectionOptionsDTO setSuppressConnectionHeader(Boolean suppressConnectionHeader) {
-        this.suppressConnectionHeader = suppressConnectionHeader;
-        return this;
-    }
-
-    public Integer getChunkSize() {
-        return chunkSize;
-    }
-
-    public ConnectionOptionsDTO setChunkSize(Integer chunkSize) {
-        this.chunkSize = chunkSize;
-        return this;
-    }
-
-    public Boolean getKeepAliveOverride() {
-        return keepAliveOverride;
-    }
-
-    public ConnectionOptionsDTO setKeepAliveOverride(Boolean keepAliveOverride) {
-        this.keepAliveOverride = keepAliveOverride;
-        return this;
-    }
-
-    public Boolean getCloseSocket() {
-        return closeSocket;
-    }
-
-    public ConnectionOptionsDTO setCloseSocket(Boolean closeSocket) {
-        this.closeSocket = closeSocket;
-        return this;
-    }
-
-    public DelayDTO getCloseSocketDelay() {
-        return closeSocketDelay;
-    }
-
-    public ConnectionOptionsDTO setCloseSocketDelay(DelayDTO closeSocketDelay) {
-        this.closeSocketDelay = closeSocketDelay;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final ConnectionOptionsDTO that))
-        {
-            return false;
-        }
-		return Objects.equals(getSuppressContentLengthHeader(), that.getSuppressContentLengthHeader())
-            && Objects.equals(getContentLengthHeaderOverride(), that.getContentLengthHeaderOverride())
-            && Objects.equals(getSuppressConnectionHeader(), that.getSuppressConnectionHeader())
-            && Objects.equals(getChunkSize(), that.getChunkSize()) && Objects.equals(
-            getKeepAliveOverride(),
-            that.getKeepAliveOverride()) && Objects.equals(getCloseSocket(), that.getCloseSocket())
-            && Objects.equals(getCloseSocketDelay(), that.getCloseSocketDelay());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(
-            getSuppressContentLengthHeader(),
-            getContentLengthHeaderOverride(),
-            getSuppressConnectionHeader(),
-            getChunkSize(),
-            getKeepAliveOverride(),
-            getCloseSocket(),
-            getCloseSocketDelay());
-    }
+public class ConnectionOptionsDTO extends ObjectWithJsonToString implements DTO<ConnectionOptions>
+{
+	private Boolean suppressContentLengthHeader;
+	private Integer contentLengthHeaderOverride;
+	private Boolean suppressConnectionHeader;
+	private Integer chunkSize;
+	private Boolean keepAliveOverride;
+	private Boolean closeSocket;
+	private DelayDTO closeSocketDelay;
+	
+	public ConnectionOptionsDTO(final ConnectionOptions connectionOptions)
+	{
+		if(connectionOptions != null)
+		{
+			this.suppressContentLengthHeader = connectionOptions.getSuppressContentLengthHeader();
+			this.contentLengthHeaderOverride = connectionOptions.getContentLengthHeaderOverride();
+			this.suppressConnectionHeader = connectionOptions.getSuppressConnectionHeader();
+			this.chunkSize = connectionOptions.getChunkSize();
+			this.keepAliveOverride = connectionOptions.getKeepAliveOverride();
+			this.closeSocket = connectionOptions.getCloseSocket();
+			if(connectionOptions.getCloseSocketDelay() != null)
+			{
+				this.closeSocketDelay = new DelayDTO(connectionOptions.getCloseSocketDelay());
+			}
+		}
+	}
+	
+	public ConnectionOptionsDTO()
+	{
+	}
+	
+	@Override
+	public ConnectionOptions buildObject()
+	{
+		return new ConnectionOptions()
+			.withSuppressContentLengthHeader(this.suppressContentLengthHeader)
+			.withContentLengthHeaderOverride(this.contentLengthHeaderOverride)
+			.withSuppressConnectionHeader(this.suppressConnectionHeader)
+			.withChunkSize(this.chunkSize)
+			.withKeepAliveOverride(this.keepAliveOverride)
+			.withCloseSocket(this.closeSocket)
+			.withCloseSocketDelay(this.closeSocketDelay != null ? this.closeSocketDelay.buildObject() : null);
+	}
+	
+	public Boolean getSuppressContentLengthHeader()
+	{
+		return this.suppressContentLengthHeader;
+	}
+	
+	public ConnectionOptionsDTO setSuppressContentLengthHeader(final Boolean suppressContentLengthHeader)
+	{
+		this.suppressContentLengthHeader = suppressContentLengthHeader;
+		return this;
+	}
+	
+	public Integer getContentLengthHeaderOverride()
+	{
+		return this.contentLengthHeaderOverride;
+	}
+	
+	public ConnectionOptionsDTO setContentLengthHeaderOverride(final Integer contentLengthHeaderOverride)
+	{
+		this.contentLengthHeaderOverride = contentLengthHeaderOverride;
+		return this;
+	}
+	
+	public Boolean getSuppressConnectionHeader()
+	{
+		return this.suppressConnectionHeader;
+	}
+	
+	public ConnectionOptionsDTO setSuppressConnectionHeader(final Boolean suppressConnectionHeader)
+	{
+		this.suppressConnectionHeader = suppressConnectionHeader;
+		return this;
+	}
+	
+	public Integer getChunkSize()
+	{
+		return this.chunkSize;
+	}
+	
+	public ConnectionOptionsDTO setChunkSize(final Integer chunkSize)
+	{
+		this.chunkSize = chunkSize;
+		return this;
+	}
+	
+	public Boolean getKeepAliveOverride()
+	{
+		return this.keepAliveOverride;
+	}
+	
+	public ConnectionOptionsDTO setKeepAliveOverride(final Boolean keepAliveOverride)
+	{
+		this.keepAliveOverride = keepAliveOverride;
+		return this;
+	}
+	
+	public Boolean getCloseSocket()
+	{
+		return this.closeSocket;
+	}
+	
+	public ConnectionOptionsDTO setCloseSocket(final Boolean closeSocket)
+	{
+		this.closeSocket = closeSocket;
+		return this;
+	}
+	
+	public DelayDTO getCloseSocketDelay()
+	{
+		return this.closeSocketDelay;
+	}
+	
+	public ConnectionOptionsDTO setCloseSocketDelay(final DelayDTO closeSocketDelay)
+	{
+		this.closeSocketDelay = closeSocketDelay;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final ConnectionOptionsDTO that))
+		{
+			return false;
+		}
+		return Objects.equals(this.getSuppressContentLengthHeader(), that.getSuppressContentLengthHeader())
+			&& Objects.equals(this.getContentLengthHeaderOverride(), that.getContentLengthHeaderOverride())
+			&& Objects.equals(this.getSuppressConnectionHeader(), that.getSuppressConnectionHeader())
+			&& Objects.equals(this.getChunkSize(), that.getChunkSize())
+			&& Objects.equals(this.getKeepAliveOverride(), that.getKeepAliveOverride())
+			&& Objects.equals(this.getCloseSocket(), that.getCloseSocket())
+			&& Objects.equals(this.getCloseSocketDelay(), that.getCloseSocketDelay());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(
+			this.getSuppressContentLengthHeader(),
+			this.getContentLengthHeaderOverride(),
+			this.getSuppressConnectionHeader(),
+			this.getChunkSize(),
+			this.getKeepAliveOverride(),
+			this.getCloseSocket(),
+			this.getCloseSocketDelay());
+	}
 }

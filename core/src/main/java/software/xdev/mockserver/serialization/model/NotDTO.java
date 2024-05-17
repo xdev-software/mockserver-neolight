@@ -19,40 +19,44 @@ import java.util.Objects;
 
 import software.xdev.mockserver.model.ObjectWithJsonToString;
 
-public class NotDTO extends ObjectWithJsonToString {
 
-    Boolean not;
-
-    public NotDTO(Boolean not) {
-        this.not = not;
-    }
-
-    public NotDTO setNot(Boolean not) {
-        this.not = not;
-        return this;
-    }
-
-    public Boolean getNot() {
-        return not;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final NotDTO notDTO))
-        {
-            return false;
-        }
-		return Objects.equals(getNot(), notDTO.getNot());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hashCode(getNot());
-    }
+public class NotDTO extends ObjectWithJsonToString
+{
+	Boolean not;
+	
+	public NotDTO(final Boolean not)
+	{
+		this.not = not;
+	}
+	
+	public NotDTO setNot(final Boolean not)
+	{
+		this.not = not;
+		return this;
+	}
+	
+	public Boolean getNot()
+	{
+		return this.not;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final NotDTO notDTO))
+		{
+			return false;
+		}
+		return Objects.equals(this.getNot(), notDTO.getNot());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hashCode(this.getNot());
+	}
 }

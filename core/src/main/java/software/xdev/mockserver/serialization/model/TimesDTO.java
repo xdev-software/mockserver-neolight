@@ -19,56 +19,66 @@ import java.util.Objects;
 
 import software.xdev.mockserver.matchers.Times;
 
-public class TimesDTO implements DTO<Times> {
 
-    private int remainingTimes;
-    private boolean unlimited;
-
-    public TimesDTO(Times times) {
-        remainingTimes = times.getRemainingTimes();
-        unlimited = times.isUnlimited();
-    }
-
-    public TimesDTO() {
-    }
-
-    public Times buildObject() {
-        if (unlimited) {
-            return Times.unlimited();
-        } else {
-            return Times.exactly(remainingTimes);
-        }
-    }
-
-    public int getRemainingTimes() {
-        return remainingTimes;
-    }
-
-    public boolean isUnlimited() {
-        return unlimited;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final TimesDTO timesDTO))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return getRemainingTimes() == timesDTO.getRemainingTimes() && isUnlimited() == timesDTO.isUnlimited();
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(super.hashCode(), getRemainingTimes(), isUnlimited());
-    }
+public class TimesDTO implements DTO<Times>
+{
+	private int remainingTimes;
+	private boolean unlimited;
+	
+	public TimesDTO(final Times times)
+	{
+		this.remainingTimes = times.getRemainingTimes();
+		this.unlimited = times.isUnlimited();
+	}
+	
+	public TimesDTO()
+	{
+	}
+	
+	@Override
+	public Times buildObject()
+	{
+		if(this.unlimited)
+		{
+			return Times.unlimited();
+		}
+		else
+		{
+			return Times.exactly(this.remainingTimes);
+		}
+	}
+	
+	public int getRemainingTimes()
+	{
+		return this.remainingTimes;
+	}
+	
+	public boolean isUnlimited()
+	{
+		return this.unlimited;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final TimesDTO timesDTO))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return this.getRemainingTimes() == timesDTO.getRemainingTimes() && this.isUnlimited() == timesDTO.isUnlimited();
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), this.getRemainingTimes(), this.isUnlimited());
+	}
 }

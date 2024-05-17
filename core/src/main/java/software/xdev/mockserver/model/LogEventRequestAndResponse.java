@@ -18,58 +18,64 @@ package software.xdev.mockserver.model;
 import java.util.Objects;
 
 
-public class LogEventRequestAndResponse extends ObjectWithJsonToString {
-
-    private String timestamp;
-    private RequestDefinition httpRequest;
-    private HttpResponse httpResponse;
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public LogEventRequestAndResponse withTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-        return this;
-    }
-
-    public RequestDefinition getHttpRequest() {
-        return httpRequest;
-    }
-
-    public LogEventRequestAndResponse withHttpRequest(RequestDefinition httpRequest) {
-        this.httpRequest = httpRequest;
-        return this;
-    }
-
-    public HttpResponse getHttpResponse() {
-        return httpResponse;
-    }
-
-    public LogEventRequestAndResponse withHttpResponse(HttpResponse httpResponse) {
-        this.httpResponse = httpResponse;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final LogEventRequestAndResponse that))
-        {
-            return false;
-        }
-		return Objects.equals(getTimestamp(), that.getTimestamp()) && Objects.equals(
-            getHttpRequest(),
-            that.getHttpRequest()) && Objects.equals(getHttpResponse(), that.getHttpResponse());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(getTimestamp(), getHttpRequest(), getHttpResponse());
-    }
+public class LogEventRequestAndResponse extends ObjectWithJsonToString
+{
+	private String timestamp;
+	private RequestDefinition httpRequest;
+	private HttpResponse httpResponse;
+	
+	public String getTimestamp()
+	{
+		return timestamp;
+	}
+	
+	public LogEventRequestAndResponse withTimestamp(String timestamp)
+	{
+		this.timestamp = timestamp;
+		return this;
+	}
+	
+	public RequestDefinition getHttpRequest()
+	{
+		return httpRequest;
+	}
+	
+	public LogEventRequestAndResponse withHttpRequest(RequestDefinition httpRequest)
+	{
+		this.httpRequest = httpRequest;
+		return this;
+	}
+	
+	public HttpResponse getHttpResponse()
+	{
+		return httpResponse;
+	}
+	
+	public LogEventRequestAndResponse withHttpResponse(HttpResponse httpResponse)
+	{
+		this.httpResponse = httpResponse;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final LogEventRequestAndResponse that))
+		{
+			return false;
+		}
+		return Objects.equals(getTimestamp(), that.getTimestamp())
+			&& Objects.equals(getHttpRequest(), that.getHttpRequest())
+			&& Objects.equals(getHttpResponse(), that.getHttpResponse());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(getTimestamp(), getHttpRequest(), getHttpResponse());
+	}
 }

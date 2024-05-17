@@ -18,12 +18,15 @@ package software.xdev.mockserver.httpclient;
 /**
  * This exception indicates there was an error while trying to communicate over a socket
  */
-public class SocketConnectionException extends RuntimeException {
-    SocketConnectionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    SocketConnectionException(String message) {
-        super(message);
-    }
+public class SocketConnectionException extends RuntimeException
+{
+	SocketConnectionException(final String message, final Throwable cause)
+	{
+		super(message, cause);
+	}
+	
+	SocketConnectionException(final String message)
+	{
+		super(message);
+	}
 }

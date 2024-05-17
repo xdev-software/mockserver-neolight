@@ -17,50 +17,55 @@ package software.xdev.mockserver.serialization.model;
 
 import java.util.Objects;
 
-public class WebSocketMessageDTO {
 
-    private String type;
-    private String value;
-
-    public String getType() {
-        return type;
-    }
-
-    public WebSocketMessageDTO setType(String type) {
-        this.type = type;
-        return this;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public WebSocketMessageDTO setValue(String value) {
-        this.value = value;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final WebSocketMessageDTO that))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return Objects.equals(getType(), that.getType()) && Objects.equals(getValue(), that.getValue());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(super.hashCode(), getType(), getValue());
-    }
+public class WebSocketMessageDTO
+{
+	private String type;
+	private String value;
+	
+	public String getType()
+	{
+		return this.type;
+	}
+	
+	public WebSocketMessageDTO setType(final String type)
+	{
+		this.type = type;
+		return this;
+	}
+	
+	public String getValue()
+	{
+		return this.value;
+	}
+	
+	public WebSocketMessageDTO setValue(final String value)
+	{
+		this.value = value;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final WebSocketMessageDTO that))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return Objects.equals(this.getType(), that.getType()) && Objects.equals(this.getValue(), that.getValue());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), this.getType(), this.getValue());
+	}
 }

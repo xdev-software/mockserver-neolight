@@ -24,23 +24,35 @@ import io.netty.handler.codec.socksx.v4.Socks4ServerEncoder;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 
+
 @ChannelHandler.Sharable
-public final class Socks4ConnectHandler extends SocksConnectHandler<Socks4CommandRequest> {
-
-    public Socks4ConnectHandler(ServerConfiguration configuration, LifeCycle server, String host, int port) {
-        super(configuration, server, host, port);
-    }
-
-    protected void removeCodecSupport(ChannelHandlerContext ctx) {
-        super.removeCodecSupport(ctx);
-        removeHandler(ctx.pipeline(), Socks4ServerEncoder.class);
-    }
-
-    protected Object successResponse(Object request) {
-        return new DefaultSocks4CommandResponse(Socks4CommandStatus.SUCCESS, host, port);
-    }
-
-    protected Object failureResponse(Object request) {
-        return new DefaultSocks4CommandResponse(Socks4CommandStatus.REJECTED_OR_FAILED, host, port);
-    }
+public final class Socks4ConnectHandler extends SocksConnectHandler<Socks4CommandRequest>
+{
+	public Socks4ConnectHandler(
+		final ServerConfiguration configuration,
+		final LifeCycle server,
+		final String host,
+		final int port)
+	{
+		super(configuration, server, host, port);
+	}
+	
+	@Override
+	protected void removeCodecSupport(final ChannelHandlerContext ctx)
+	{
+		super.removeCodecSupport(ctx);
+		this.removeHandler(ctx.pipeline(), Socks4ServerEncoder.class);
+	}
+	
+	@Override
+	protected Object successResponse(final Object request)
+	{
+		return new DefaultSocks4CommandResponse(Socks4CommandStatus.SUCCESS, this.host, this.port);
+	}
+	
+	@Override
+	protected Object failureResponse(final Object request)
+	{
+		return new DefaultSocks4CommandResponse(Socks4CommandStatus.REJECTED_OR_FAILED, this.host, this.port);
+	}
 }

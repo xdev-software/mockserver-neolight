@@ -15,44 +15,74 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.ConnectionOptions;
-
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
-public class ConnectionOptionsToJavaSerializer implements ToJavaSerializer<ConnectionOptions> {
+import software.xdev.mockserver.model.ConnectionOptions;
 
-    @Override
-    public String serialize(int numberOfSpacesToIndent, ConnectionOptions connectionOptions) {
-        StringBuilder output = new StringBuilder();
-        if (connectionOptions != null) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("connectionOptions()");
-            if (connectionOptions.getSuppressContentLengthHeader() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withSuppressContentLengthHeader(").append(connectionOptions.getSuppressContentLengthHeader()).append(")");
-            }
-            if (connectionOptions.getContentLengthHeaderOverride() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withContentLengthHeaderOverride(").append(connectionOptions.getContentLengthHeaderOverride()).append(")");
-            }
-            if (connectionOptions.getSuppressConnectionHeader() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withSuppressConnectionHeader(").append(connectionOptions.getSuppressConnectionHeader()).append(")");
-            }
-            if (connectionOptions.getChunkSize() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withChunkSize(").append(connectionOptions.getChunkSize()).append(")");
-            }
-            if (connectionOptions.getKeepAliveOverride() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withKeepAliveOverride(").append(connectionOptions.getKeepAliveOverride()).append(")");
-            }
-            if (connectionOptions.getCloseSocket() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withCloseSocket(").append(connectionOptions.getCloseSocket()).append(")");
-            }
-            if (connectionOptions.getCloseSocketDelay() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withCloseSocketDelay(").append(new DelayToJavaSerializer().serialize(0, connectionOptions.getCloseSocketDelay())).append(")");
-            }
-        }
-        return output.toString();
-    }
 
-    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
-        return output.append(NEW_LINE).append("".repeat(numberOfSpacesToIndent));
-    }
+public class ConnectionOptionsToJavaSerializer implements ToJavaSerializer<ConnectionOptions>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final ConnectionOptions connectionOptions)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(connectionOptions != null)
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("connectionOptions()");
+			if(connectionOptions.getSuppressContentLengthHeader() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+						".withSuppressContentLengthHeader(")
+					.append(connectionOptions.getSuppressContentLengthHeader())
+					.append(")");
+			}
+			if(connectionOptions.getContentLengthHeaderOverride() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+						".withContentLengthHeaderOverride(")
+					.append(connectionOptions.getContentLengthHeaderOverride())
+					.append(")");
+			}
+			if(connectionOptions.getSuppressConnectionHeader() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+						".withSuppressConnectionHeader(")
+					.append(connectionOptions.getSuppressConnectionHeader())
+					.append(")");
+			}
+			if(connectionOptions.getChunkSize() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
+					.append(".withChunkSize(")
+					.append(connectionOptions.getChunkSize())
+					.append(")");
+			}
+			if(connectionOptions.getKeepAliveOverride() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+					".withKeepAliveOverride(").append(connectionOptions.getKeepAliveOverride()).append(")");
+			}
+			if(connectionOptions.getCloseSocket() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
+					.append(".withCloseSocket(")
+					.append(connectionOptions.getCloseSocket())
+					.append(")");
+			}
+			if(connectionOptions.getCloseSocketDelay() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+						".withCloseSocketDelay(")
+					.append(new DelayToJavaSerializer().serialize(0, connectionOptions.getCloseSocketDelay()))
+					.append(")");
+			}
+		}
+		return output.toString();
+	}
+	
+	private StringBuilder appendNewLineAndIndent(final int numberOfSpacesToIndent, final StringBuilder output)
+	{
+		return output.append(NEW_LINE).append("".repeat(numberOfSpacesToIndent));
+	}
 }

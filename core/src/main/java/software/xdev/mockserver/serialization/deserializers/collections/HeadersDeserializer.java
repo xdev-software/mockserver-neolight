@@ -17,14 +17,17 @@ package software.xdev.mockserver.serialization.deserializers.collections;
 
 import software.xdev.mockserver.model.Headers;
 
-public class HeadersDeserializer extends KeysToMultiValuesDeserializer<Headers> {
 
-    public HeadersDeserializer() {
-        super(Headers.class);
-    }
-
-    @Override
-    public Headers build() {
-        return new Headers();
-    }
+public class HeadersDeserializer extends KeysToMultiValuesDeserializer<Headers>
+{
+	public HeadersDeserializer()
+	{
+		super(Headers.class);
+	}
+	
+	@Override
+	public Headers build()
+	{
+		return new Headers();
+	}
 }

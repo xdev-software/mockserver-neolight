@@ -15,24 +15,26 @@
  */
 package software.xdev.mockserver.codec;
 
+import java.util.List;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import software.xdev.mockserver.mappers.MockServerHttpResponseToFullHttpResponse;
 import software.xdev.mockserver.model.HttpResponse;
 
-import java.util.List;
 
-public class MockServerHttpToNettyHttpResponseEncoder extends MessageToMessageEncoder<HttpResponse> {
-
-    private final MockServerHttpResponseToFullHttpResponse mockServerHttpResponseToFullHttpResponse;
-
-    public MockServerHttpToNettyHttpResponseEncoder() {
-        mockServerHttpResponseToFullHttpResponse = new MockServerHttpResponseToFullHttpResponse();
-    }
-
-    @Override
-    protected void encode(ChannelHandlerContext ctx, HttpResponse response, List<Object> out) {
-        out.addAll(mockServerHttpResponseToFullHttpResponse.mapMockServerResponseToNettyResponse(response));
-    }
-
+public class MockServerHttpToNettyHttpResponseEncoder extends MessageToMessageEncoder<HttpResponse>
+{
+	private final MockServerHttpResponseToFullHttpResponse mockServerHttpResponseToFullHttpResponse;
+	
+	public MockServerHttpToNettyHttpResponseEncoder()
+	{
+		this.mockServerHttpResponseToFullHttpResponse = new MockServerHttpResponseToFullHttpResponse();
+	}
+	
+	@Override
+	protected void encode(final ChannelHandlerContext ctx, final HttpResponse response, final List<Object> out)
+	{
+		out.addAll(this.mockServerHttpResponseToFullHttpResponse.mapMockServerResponseToNettyResponse(response));
+	}
 }

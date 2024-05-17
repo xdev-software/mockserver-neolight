@@ -18,141 +18,172 @@ package software.xdev.mockserver.serialization.model;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import software.xdev.mockserver.model.*;
+
+import software.xdev.mockserver.model.HttpOverrideForwardedRequest;
+import software.xdev.mockserver.model.HttpRequest;
+import software.xdev.mockserver.model.HttpRequestModifier;
+import software.xdev.mockserver.model.HttpResponse;
+import software.xdev.mockserver.model.HttpResponseModifier;
+
 
 @SuppressWarnings("UnusedReturnValue")
-public class HttpOverrideForwardedRequestDTO implements DTO<HttpOverrideForwardedRequest> {
-
-    @JsonAlias("httpRequest")
-    private HttpRequestDTO requestOverride;
-    private HttpRequestModifierDTO requestModifier;
-    @JsonAlias("httpResponse")
-    private HttpResponseDTO responseOverride;
-    private HttpResponseModifierDTO responseModifier;
-    private DelayDTO delay;
-
-    public HttpOverrideForwardedRequestDTO(HttpOverrideForwardedRequest httpOverrideForwardedRequest) {
-        if (httpOverrideForwardedRequest != null) {
-            HttpRequest overrideHttpRequest = httpOverrideForwardedRequest.getRequestOverride();
-            if (overrideHttpRequest != null) {
-                this.requestOverride = new HttpRequestDTO(overrideHttpRequest);
-            }
-            HttpRequestModifier modifyHttpRequest = httpOverrideForwardedRequest.getRequestModifier();
-            if (modifyHttpRequest != null) {
-                this.requestModifier = new HttpRequestModifierDTO(modifyHttpRequest);
-            }
-            HttpResponse overrideHttpResponse = httpOverrideForwardedRequest.getResponseOverride();
-            if (overrideHttpResponse != null) {
-                this.responseOverride = new HttpResponseDTO(overrideHttpResponse);
-            }
-            HttpResponseModifier modifyHttpResponse = httpOverrideForwardedRequest.getResponseModifier();
-            if (modifyHttpResponse != null) {
-                this.responseModifier = new HttpResponseModifierDTO(modifyHttpResponse);
-            }
-            delay = (httpOverrideForwardedRequest.getDelay() != null ? new DelayDTO(httpOverrideForwardedRequest.getDelay()) : null);
-        }
-    }
-
-    public HttpOverrideForwardedRequestDTO() {
-    }
-
-    public HttpOverrideForwardedRequest buildObject() {
-        HttpRequest overrideHttpRequest = null;
-        if (this.requestOverride != null) {
-            overrideHttpRequest = this.requestOverride.buildObject();
-        }
-        HttpRequestModifier modifyHttpRequest = null;
-        if (this.requestModifier != null) {
-            modifyHttpRequest = this.requestModifier.buildObject();
-        }
-        HttpResponse overrideHttpResponse = null;
-        if (this.responseOverride != null) {
-            overrideHttpResponse = this.responseOverride.buildObject();
-        }
-        HttpResponseModifier modifyHttpResponse = null;
-        if (this.responseModifier != null) {
-            modifyHttpResponse = this.responseModifier.buildObject();
-        }
-        return new HttpOverrideForwardedRequest()
-            .withRequestOverride(overrideHttpRequest)
-            .withRequestModifier(modifyHttpRequest)
-            .withResponseOverride(overrideHttpResponse)
-            .withResponseModifier(modifyHttpResponse)
-            .withDelay((delay != null ? delay.buildObject() : null));
-    }
-
-    public HttpRequestDTO getRequestOverride() {
-        return requestOverride;
-    }
-
-    public HttpOverrideForwardedRequestDTO setRequestOverride(HttpRequestDTO requestOverride) {
-        this.requestOverride = requestOverride;
-        return this;
-    }
-
-    public HttpRequestModifierDTO getRequestModifier() {
-        return requestModifier;
-    }
-
-    public HttpOverrideForwardedRequestDTO setRequestModifier(HttpRequestModifierDTO requestModifier) {
-        this.requestModifier = requestModifier;
-        return this;
-    }
-
-    public HttpResponseDTO getResponseOverride() {
-        return responseOverride;
-    }
-
-    public HttpOverrideForwardedRequestDTO setResponseOverride(HttpResponseDTO responseOverride) {
-        this.responseOverride = responseOverride;
-        return this;
-    }
-
-    public HttpResponseModifierDTO getResponseModifier() {
-        return responseModifier;
-    }
-
-    public HttpOverrideForwardedRequestDTO setResponseModifier(HttpResponseModifierDTO responseModifier) {
-        this.responseModifier = responseModifier;
-        return this;
-    }
-
-    public DelayDTO getDelay() {
-        return delay;
-    }
-
-    public HttpOverrideForwardedRequestDTO setDelay(DelayDTO delay) {
-        this.delay = delay;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final HttpOverrideForwardedRequestDTO that))
-        {
-            return false;
-        }
-		return Objects.equals(getRequestOverride(), that.getRequestOverride())
-            && Objects.equals(getRequestModifier(), that.getRequestModifier())
-            && Objects.equals(getResponseOverride(), that.getResponseOverride())
-            && Objects.equals(getResponseModifier(), that.getResponseModifier())
-            && Objects.equals(getDelay(), that.getDelay());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(
-            getRequestOverride(),
-            getRequestModifier(),
-            getResponseOverride(),
-            getResponseModifier(),
-            getDelay());
-    }
+public class HttpOverrideForwardedRequestDTO implements DTO<HttpOverrideForwardedRequest>
+{
+	@JsonAlias("httpRequest")
+	private HttpRequestDTO requestOverride;
+	private HttpRequestModifierDTO requestModifier;
+	@JsonAlias("httpResponse")
+	private HttpResponseDTO responseOverride;
+	private HttpResponseModifierDTO responseModifier;
+	private DelayDTO delay;
+	
+	public HttpOverrideForwardedRequestDTO(final HttpOverrideForwardedRequest httpOverrideForwardedRequest)
+	{
+		if(httpOverrideForwardedRequest != null)
+		{
+			final HttpRequest overrideHttpRequest = httpOverrideForwardedRequest.getRequestOverride();
+			if(overrideHttpRequest != null)
+			{
+				this.requestOverride = new HttpRequestDTO(overrideHttpRequest);
+			}
+			final HttpRequestModifier modifyHttpRequest = httpOverrideForwardedRequest.getRequestModifier();
+			if(modifyHttpRequest != null)
+			{
+				this.requestModifier = new HttpRequestModifierDTO(modifyHttpRequest);
+			}
+			final HttpResponse overrideHttpResponse = httpOverrideForwardedRequest.getResponseOverride();
+			if(overrideHttpResponse != null)
+			{
+				this.responseOverride = new HttpResponseDTO(overrideHttpResponse);
+			}
+			final HttpResponseModifier modifyHttpResponse = httpOverrideForwardedRequest.getResponseModifier();
+			if(modifyHttpResponse != null)
+			{
+				this.responseModifier = new HttpResponseModifierDTO(modifyHttpResponse);
+			}
+			this.delay = (httpOverrideForwardedRequest.getDelay() != null ?
+				new DelayDTO(httpOverrideForwardedRequest.getDelay()) :
+				null);
+		}
+	}
+	
+	public HttpOverrideForwardedRequestDTO()
+	{
+	}
+	
+	@Override
+	public HttpOverrideForwardedRequest buildObject()
+	{
+		HttpRequest overrideHttpRequest = null;
+		if(this.requestOverride != null)
+		{
+			overrideHttpRequest = this.requestOverride.buildObject();
+		}
+		HttpRequestModifier modifyHttpRequest = null;
+		if(this.requestModifier != null)
+		{
+			modifyHttpRequest = this.requestModifier.buildObject();
+		}
+		HttpResponse overrideHttpResponse = null;
+		if(this.responseOverride != null)
+		{
+			overrideHttpResponse = this.responseOverride.buildObject();
+		}
+		HttpResponseModifier modifyHttpResponse = null;
+		if(this.responseModifier != null)
+		{
+			modifyHttpResponse = this.responseModifier.buildObject();
+		}
+		return new HttpOverrideForwardedRequest()
+			.withRequestOverride(overrideHttpRequest)
+			.withRequestModifier(modifyHttpRequest)
+			.withResponseOverride(overrideHttpResponse)
+			.withResponseModifier(modifyHttpResponse)
+			.withDelay((this.delay != null ? this.delay.buildObject() : null));
+	}
+	
+	public HttpRequestDTO getRequestOverride()
+	{
+		return this.requestOverride;
+	}
+	
+	public HttpOverrideForwardedRequestDTO setRequestOverride(final HttpRequestDTO requestOverride)
+	{
+		this.requestOverride = requestOverride;
+		return this;
+	}
+	
+	public HttpRequestModifierDTO getRequestModifier()
+	{
+		return this.requestModifier;
+	}
+	
+	public HttpOverrideForwardedRequestDTO setRequestModifier(final HttpRequestModifierDTO requestModifier)
+	{
+		this.requestModifier = requestModifier;
+		return this;
+	}
+	
+	public HttpResponseDTO getResponseOverride()
+	{
+		return this.responseOverride;
+	}
+	
+	public HttpOverrideForwardedRequestDTO setResponseOverride(final HttpResponseDTO responseOverride)
+	{
+		this.responseOverride = responseOverride;
+		return this;
+	}
+	
+	public HttpResponseModifierDTO getResponseModifier()
+	{
+		return this.responseModifier;
+	}
+	
+	public HttpOverrideForwardedRequestDTO setResponseModifier(final HttpResponseModifierDTO responseModifier)
+	{
+		this.responseModifier = responseModifier;
+		return this;
+	}
+	
+	public DelayDTO getDelay()
+	{
+		return this.delay;
+	}
+	
+	public HttpOverrideForwardedRequestDTO setDelay(final DelayDTO delay)
+	{
+		this.delay = delay;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final HttpOverrideForwardedRequestDTO that))
+		{
+			return false;
+		}
+		return Objects.equals(this.getRequestOverride(), that.getRequestOverride())
+			&& Objects.equals(this.getRequestModifier(), that.getRequestModifier())
+			&& Objects.equals(this.getResponseOverride(), that.getResponseOverride())
+			&& Objects.equals(this.getResponseModifier(), that.getResponseModifier())
+			&& Objects.equals(this.getDelay(), that.getDelay());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(
+			this.getRequestOverride(),
+			this.getRequestModifier(),
+			this.getResponseOverride(),
+			this.getResponseModifier(),
+			this.getDelay());
+	}
 }
 

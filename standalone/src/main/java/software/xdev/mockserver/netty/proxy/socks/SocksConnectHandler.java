@@ -26,21 +26,30 @@ import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.netty.proxy.relay.RelayConnectHandler;
 
+
 @ChannelHandler.Sharable
-public abstract class SocksConnectHandler<T> extends RelayConnectHandler<T> {
-
-    protected SocksConnectHandler(ServerConfiguration configuration, LifeCycle server, String host, int port) {
-        super(configuration, server, host, port);
-    }
-
-    protected void removeCodecSupport(ChannelHandlerContext ctx) {
-        ChannelPipeline pipeline = ctx.pipeline();
-        removeHandler(pipeline, HttpServerCodec.class);
-        removeHandler(pipeline, HttpContentDecompressor.class);
-        removeHandler(pipeline, HttpObjectAggregator.class);
-        removeHandler(pipeline, MockServerHttpServerCodec.class);
-        if (pipeline.get(this.getClass()) != null) {
-            pipeline.remove(this);
-        }
-    }
+public abstract class SocksConnectHandler<T> extends RelayConnectHandler<T>
+{
+	protected SocksConnectHandler(
+		final ServerConfiguration configuration,
+		final LifeCycle server,
+		final String host,
+		final int port)
+	{
+		super(configuration, server, host, port);
+	}
+	
+	@Override
+	protected void removeCodecSupport(final ChannelHandlerContext ctx)
+	{
+		final ChannelPipeline pipeline = ctx.pipeline();
+		this.removeHandler(pipeline, HttpServerCodec.class);
+		this.removeHandler(pipeline, HttpContentDecompressor.class);
+		this.removeHandler(pipeline, HttpObjectAggregator.class);
+		this.removeHandler(pipeline, MockServerHttpServerCodec.class);
+		if(pipeline.get(this.getClass()) != null)
+		{
+			pipeline.remove(this);
+		}
+	}
 }

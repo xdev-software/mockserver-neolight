@@ -15,58 +15,69 @@
  */
 package software.xdev.mockserver.matchers;
 
-import software.xdev.mockserver.logging.BinaryArrayFormatter;
-
 import java.util.Arrays;
 import java.util.Objects;
 
+import software.xdev.mockserver.logging.BinaryArrayFormatter;
 
-public class BinaryMatcher extends BodyMatcher<byte[]> {
-    private final byte[] matcher;
 
-    BinaryMatcher(byte[] matcher) {
-        this.matcher = matcher;
-    }
-
-    public boolean matches(final MatchDifference context, byte[] matched) {
-        boolean result = false;
-
-        if (matcher == null || matcher.length == 0 || Arrays.equals(matcher, matched)) {
-            result = true;
-        }
-
-        if (!result && context != null) {
-            context.addDifference("binary match failed expected:{}found:{}", BinaryArrayFormatter.byteArrayToString(this.matcher), BinaryArrayFormatter.byteArrayToString(matched));
-        }
-
-        return not != result;
-    }
-
-    public boolean isBlank() {
-        return matcher == null || matcher.length == 0;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final BinaryMatcher that))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return Objects.deepEquals(matcher, that.matcher);
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(super.hashCode(), Arrays.hashCode(matcher));
-    }
+public class BinaryMatcher extends BodyMatcher<byte[]>
+{
+	private final byte[] matcher;
+	
+	BinaryMatcher(final byte[] matcher)
+	{
+		this.matcher = matcher;
+	}
+	
+	@Override
+	public boolean matches(final MatchDifference context, final byte[] matched)
+	{
+		boolean result = false;
+		
+		if(this.matcher == null || this.matcher.length == 0 || Arrays.equals(this.matcher, matched))
+		{
+			result = true;
+		}
+		
+		if(!result && context != null)
+		{
+			context.addDifference(
+				"binary match failed expected:{}found:{}",
+				BinaryArrayFormatter.byteArrayToString(this.matcher),
+				BinaryArrayFormatter.byteArrayToString(matched));
+		}
+		
+		return this.not != result;
+	}
+	
+	@Override
+	public boolean isBlank()
+	{
+		return this.matcher == null || this.matcher.length == 0;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final BinaryMatcher that))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return Objects.deepEquals(this.matcher, that.matcher);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), Arrays.hashCode(this.matcher));
+	}
 }

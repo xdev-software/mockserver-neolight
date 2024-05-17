@@ -15,293 +15,389 @@
  */
 package software.xdev.mockserver.model;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import static software.xdev.mockserver.model.NottableString.deserializeNottableStrings;
+import static software.xdev.mockserver.model.NottableString.serialiseNottableStrings;
+import static software.xdev.mockserver.model.NottableString.string;
 
-import static software.xdev.mockserver.model.NottableString.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends KeysToMultiValues> extends ObjectWithJsonToString {
-
-    private KeyMatchStyle keyMatchStyle = KeyMatchStyle.SUB_SET;
-
-    private final Map<NottableString, List<NottableString>> multimap;
-    private final K k = (K) this;
-
-    protected KeysToMultiValues() {
-        multimap = new LinkedHashMap<>();
-    }
-
-    protected KeysToMultiValues(Map<NottableString, List<NottableString>> multimap) {
-        this.multimap =  new LinkedHashMap<>(multimap);
-    }
-
-    public abstract T build(final NottableString name, final Collection<NottableString> values);
-
-    protected abstract void isModified();
-
-    public KeyMatchStyle getKeyMatchStyle() {
-        return keyMatchStyle;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public KeysToMultiValues<T, K> withKeyMatchStyle(KeyMatchStyle keyMatchStyle) {
-        this.keyMatchStyle = keyMatchStyle;
-        return this;
-    }
-
-    public K withEntries(final Map<String, List<String>> entries) {
-        isModified();
-        multimap.clear();
-        for (String name : entries.keySet()) {
-            for (String value : entries.get(name)) {
-                withEntry(name, value);
-            }
-        }
-        return k;
-    }
-
-    public K withEntries(final List<T> entries) {
-        isModified();
-        multimap.clear();
-        if (entries != null) {
-            for (T entry : entries) {
-                withEntry(entry);
-            }
-        }
-        return k;
-    }
-
-    @SafeVarargs
-    public final K withEntries(final T... entries) {
-        if (arrayIsNotEmpty(entries)) {
-            withEntries(Arrays.asList(entries));
-        }
-        return k;
-    }
-
-    public K withEntry(final T entry) {
-        if (entry != null) {
-            isModified();
-            if (entry.getValues().isEmpty()) {
-                multimap.put(entry.getName(), null);
-            } else {
-                multimap.put(entry.getName(), entry.getValues());
-            }
-        }
-        return k;
-    }
-
-    public K withEntry(final String name, final String... values) {
-        isModified();
-        if (values == null || values.length == 0) {
-            multimap.put(string(name), new ArrayList<>(List.of(string(""))));
-        } else {
-            multimap.put(string(name), deserializeNottableStrings(values));
-        }
-        return k;
-    }
-
-    public K withEntry(final String name, final List<String> values) {
-        isModified();
-        if (values == null || values.isEmpty()) {
-            multimap.remove(string(name));
-        } else {
-            multimap.put(string(name), deserializeNottableStrings(values));
-        }
-        return k;
-    }
-
-    public K withEntry(final NottableString name, final List<NottableString> values) {
-        if (values != null) {
-            isModified();
-            multimap.put(name, values);
-        }
-        return k;
-    }
-
-    public K withEntry(final NottableString name, final NottableString... values) {
-        if (arrayIsNotEmpty(values)) {
-            withEntry(name, Arrays.asList(values));
-        }
-        return k;
-    }
-
-    public boolean remove(final String name) {
-        boolean exists = false;
-        if (name != null) {
-            isModified();
-            for (NottableString key : multimap.keySet().toArray(new NottableString[0])) {
-                if (key.equalsIgnoreCase(name)) {
-                    multimap.remove(key);
-                    exists = true;
-                }
-            }
-        }
-        return exists;
-    }
-
-    public boolean remove(final NottableString name) {
-        boolean exists = false;
-        if (name != null) {
-            isModified();
-            for (NottableString key : multimap.keySet().toArray(new NottableString[0])) {
-                if (key.equalsIgnoreCase(name)) {
-                    multimap.remove(key);
-                    exists = true;
-                }
-            }
-        }
-        return exists;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public K replaceEntry(final T entry) {
-        if (entry != null) {
-            isModified();
-            remove(entry.getName());
-            multimap.put(entry.getName(), entry.getValues());
-        }
-        return k;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public K replaceEntryIfExists(final T entry) {
-        if (entry != null) {
-            isModified();
-            if (remove(entry.getName())) {
-                multimap.put(entry.getName(), entry.getValues());
-            }
-        }
-        return k;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public K replaceEntry(final String name, final String... values) {
-        if (arrayIsNotEmpty(values)) {
-            isModified();
-            remove(name);
-            multimap.put(string(name), deserializeNottableStrings(values));
-        }
-        return k;
-    }
-
-    public List<T> getEntries() {
-        if (!isEmpty()) {
-            ArrayList<T> headers = new ArrayList<>();
-            for (NottableString nottableString : multimap.keySet().toArray(new NottableString[0])) {
-                headers.add(build(nottableString, multimap.get(nottableString)));
-            }
-            return headers;
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    public Set<NottableString> keySet() {
-        return multimap.keySet();
-    }
-
-    public Collection<NottableString> getValues(NottableString key) {
-        return multimap.get(key);
-    }
-
-    public Map<NottableString, List<NottableString>> getMultimap() {
-        return multimap;
-    }
-
-    public List<String> getValues(final String name) {
-        if (!isEmpty() && name != null) {
-            List<String> values = new ArrayList<>();
-            for (NottableString key : multimap.keySet().toArray(new NottableString[0])) {
-                if (key != null && key.equalsIgnoreCase(name)) {
-                    values.addAll(serialiseNottableStrings(multimap.get(key)));
-                }
-            }
-            return values;
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    String getFirstValue(final String name) {
-        if (!isEmpty()) {
-            for (NottableString key : multimap.keySet().toArray(new NottableString[0])) {
-                if (key != null && key.equalsIgnoreCase(name)) {
-                    Collection<NottableString> nottableStrings = multimap.get(key);
-                    if (!nottableStrings.isEmpty()) {
-                        NottableString next = nottableStrings.iterator().next();
-                        if (next != null) {
-                            return next.getValue();
-                        }
-                    }
-                }
-            }
-        }
-        return "";
-    }
-
-    public boolean containsEntry(final String name) {
-        if (!isEmpty()) {
-            for (NottableString key : multimap.keySet().toArray(new NottableString[0])) {
-                if (key != null && key.equalsIgnoreCase(name)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean containsEntry(final String name, final String value) {
-        return containsEntry(string(name), string(value));
-    }
-
-    boolean containsEntry(final NottableString name, final NottableString value) {
-        if (!isEmpty() && name != null && value != null) {
-            for (NottableString entryKey : multimap.keySet().toArray(new NottableString[0])) {
-                if (entryKey != null && entryKey.equalsIgnoreCase(name)) {
-                    Collection<NottableString> nottableStrings = multimap.get(entryKey);
-                    if (nottableStrings != null) {
-                        for (NottableString entryValue : nottableStrings.toArray(new NottableString[0])) {
-                            if (value.equalsIgnoreCase(entryValue)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean isEmpty() {
-        return multimap.isEmpty();
-    }
-
-    public abstract K clone();
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof KeysToMultiValues)) {
-            return false;
-        }
-        KeysToMultiValues<?, ?> that = (KeysToMultiValues<?, ?>) o;
-        return Objects.equals(multimap, that.multimap);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(multimap);
-    }
-    
-    private static boolean arrayIsNotEmpty(Object array) {
-        return !arrayIsEmpty(array);
-    }
-    
-    private static boolean arrayIsEmpty(Object array) {
-        return array == null || Array.getLength(array) == 0;
-    }
+public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends KeysToMultiValues>
+	extends ObjectWithJsonToString
+{
+	private KeyMatchStyle keyMatchStyle = KeyMatchStyle.SUB_SET;
+	
+	private final Map<NottableString, List<NottableString>> multimap;
+	private final K k = (K)this;
+	
+	protected KeysToMultiValues()
+	{
+		this.multimap = new LinkedHashMap<>();
+	}
+	
+	protected KeysToMultiValues(final Map<NottableString, List<NottableString>> multimap)
+	{
+		this.multimap = new LinkedHashMap<>(multimap);
+	}
+	
+	public abstract T build(final NottableString name, final Collection<NottableString> values);
+	
+	protected abstract void isModified();
+	
+	public KeyMatchStyle getKeyMatchStyle()
+	{
+		return this.keyMatchStyle;
+	}
+	
+	@SuppressWarnings("UnusedReturnValue")
+	public KeysToMultiValues<T, K> withKeyMatchStyle(final KeyMatchStyle keyMatchStyle)
+	{
+		this.keyMatchStyle = keyMatchStyle;
+		return this;
+	}
+	
+	public K withEntries(final Map<String, List<String>> entries)
+	{
+		this.isModified();
+		this.multimap.clear();
+		for(final String name : entries.keySet())
+		{
+			for(final String value : entries.get(name))
+			{
+				this.withEntry(name, value);
+			}
+		}
+		return this.k;
+	}
+	
+	public K withEntries(final List<T> entries)
+	{
+		this.isModified();
+		this.multimap.clear();
+		if(entries != null)
+		{
+			for(final T entry : entries)
+			{
+				this.withEntry(entry);
+			}
+		}
+		return this.k;
+	}
+	
+	@SafeVarargs
+	public final K withEntries(final T... entries)
+	{
+		if(arrayIsNotEmpty(entries))
+		{
+			this.withEntries(Arrays.asList(entries));
+		}
+		return this.k;
+	}
+	
+	public K withEntry(final T entry)
+	{
+		if(entry != null)
+		{
+			this.isModified();
+			if(entry.getValues().isEmpty())
+			{
+				this.multimap.put(entry.getName(), null);
+			}
+			else
+			{
+				this.multimap.put(entry.getName(), entry.getValues());
+			}
+		}
+		return this.k;
+	}
+	
+	public K withEntry(final String name, final String... values)
+	{
+		this.isModified();
+		if(values == null || values.length == 0)
+		{
+			this.multimap.put(string(name), new ArrayList<>(List.of(string(""))));
+		}
+		else
+		{
+			this.multimap.put(string(name), deserializeNottableStrings(values));
+		}
+		return this.k;
+	}
+	
+	public K withEntry(final String name, final List<String> values)
+	{
+		this.isModified();
+		if(values == null || values.isEmpty())
+		{
+			this.multimap.remove(string(name));
+		}
+		else
+		{
+			this.multimap.put(string(name), deserializeNottableStrings(values));
+		}
+		return this.k;
+	}
+	
+	public K withEntry(final NottableString name, final List<NottableString> values)
+	{
+		if(values != null)
+		{
+			this.isModified();
+			this.multimap.put(name, values);
+		}
+		return this.k;
+	}
+	
+	public K withEntry(final NottableString name, final NottableString... values)
+	{
+		if(arrayIsNotEmpty(values))
+		{
+			this.withEntry(name, Arrays.asList(values));
+		}
+		return this.k;
+	}
+	
+	public boolean remove(final String name)
+	{
+		boolean exists = false;
+		if(name != null)
+		{
+			this.isModified();
+			for(final NottableString key : this.multimap.keySet().toArray(new NottableString[0]))
+			{
+				if(key.equalsIgnoreCase(name))
+				{
+					this.multimap.remove(key);
+					exists = true;
+				}
+			}
+		}
+		return exists;
+	}
+	
+	public boolean remove(final NottableString name)
+	{
+		boolean exists = false;
+		if(name != null)
+		{
+			this.isModified();
+			for(final NottableString key : this.multimap.keySet().toArray(new NottableString[0]))
+			{
+				if(key.equalsIgnoreCase(name))
+				{
+					this.multimap.remove(key);
+					exists = true;
+				}
+			}
+		}
+		return exists;
+	}
+	
+	@SuppressWarnings("UnusedReturnValue")
+	public K replaceEntry(final T entry)
+	{
+		if(entry != null)
+		{
+			this.isModified();
+			this.remove(entry.getName());
+			this.multimap.put(entry.getName(), entry.getValues());
+		}
+		return this.k;
+	}
+	
+	@SuppressWarnings("UnusedReturnValue")
+	public K replaceEntryIfExists(final T entry)
+	{
+		if(entry != null)
+		{
+			this.isModified();
+			if(this.remove(entry.getName()))
+			{
+				this.multimap.put(entry.getName(), entry.getValues());
+			}
+		}
+		return this.k;
+	}
+	
+	@SuppressWarnings("UnusedReturnValue")
+	public K replaceEntry(final String name, final String... values)
+	{
+		if(arrayIsNotEmpty(values))
+		{
+			this.isModified();
+			this.remove(name);
+			this.multimap.put(string(name), deserializeNottableStrings(values));
+		}
+		return this.k;
+	}
+	
+	public List<T> getEntries()
+	{
+		if(!this.isEmpty())
+		{
+			final ArrayList<T> headers = new ArrayList<>();
+			for(final NottableString nottableString : this.multimap.keySet().toArray(new NottableString[0]))
+			{
+				headers.add(this.build(nottableString, this.multimap.get(nottableString)));
+			}
+			return headers;
+		}
+		else
+		{
+			return Collections.emptyList();
+		}
+	}
+	
+	public Set<NottableString> keySet()
+	{
+		return this.multimap.keySet();
+	}
+	
+	public Collection<NottableString> getValues(final NottableString key)
+	{
+		return this.multimap.get(key);
+	}
+	
+	public Map<NottableString, List<NottableString>> getMultimap()
+	{
+		return this.multimap;
+	}
+	
+	public List<String> getValues(final String name)
+	{
+		if(!this.isEmpty() && name != null)
+		{
+			final List<String> values = new ArrayList<>();
+			for(final NottableString key : this.multimap.keySet().toArray(new NottableString[0]))
+			{
+				if(key != null && key.equalsIgnoreCase(name))
+				{
+					values.addAll(serialiseNottableStrings(this.multimap.get(key)));
+				}
+			}
+			return values;
+		}
+		else
+		{
+			return Collections.emptyList();
+		}
+	}
+	
+	String getFirstValue(final String name)
+	{
+		if(!this.isEmpty())
+		{
+			for(final NottableString key : this.multimap.keySet().toArray(new NottableString[0]))
+			{
+				if(key != null && key.equalsIgnoreCase(name))
+				{
+					final Collection<NottableString> nottableStrings = this.multimap.get(key);
+					if(!nottableStrings.isEmpty())
+					{
+						final NottableString next = nottableStrings.iterator().next();
+						if(next != null)
+						{
+							return next.getValue();
+						}
+					}
+				}
+			}
+		}
+		return "";
+	}
+	
+	public boolean containsEntry(final String name)
+	{
+		if(!this.isEmpty())
+		{
+			for(final NottableString key : this.multimap.keySet().toArray(new NottableString[0]))
+			{
+				if(key != null && key.equalsIgnoreCase(name))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean containsEntry(final String name, final String value)
+	{
+		return this.containsEntry(string(name), string(value));
+	}
+	
+	boolean containsEntry(final NottableString name, final NottableString value)
+	{
+		if(!this.isEmpty() && name != null && value != null)
+		{
+			for(final NottableString entryKey : this.multimap.keySet().toArray(new NottableString[0]))
+			{
+				if(entryKey != null && entryKey.equalsIgnoreCase(name))
+				{
+					final Collection<NottableString> nottableStrings = this.multimap.get(entryKey);
+					if(nottableStrings != null)
+					{
+						for(final NottableString entryValue : nottableStrings.toArray(new NottableString[0]))
+						{
+							if(value.equalsIgnoreCase(entryValue))
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean isEmpty()
+	{
+		return this.multimap.isEmpty();
+	}
+	
+	@Override
+	public abstract K clone();
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof KeysToMultiValues))
+		{
+			return false;
+		}
+		final KeysToMultiValues<?, ?> that = (KeysToMultiValues<?, ?>)o;
+		return Objects.equals(this.multimap, that.multimap);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(this.multimap);
+	}
+	
+	private static boolean arrayIsNotEmpty(final Object array)
+	{
+		return !arrayIsEmpty(array);
+	}
+	
+	private static boolean arrayIsEmpty(final Object array)
+	{
+		return array == null || Array.getLength(array) == 0;
+	}
 }

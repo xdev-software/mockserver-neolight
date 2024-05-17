@@ -17,12 +17,13 @@ package software.xdev.mockserver.serialization.model;
 
 import software.xdev.mockserver.model.RequestDefinition;
 
-public abstract class RequestDefinitionDTO extends NotDTO {
 
-    public RequestDefinitionDTO(Boolean not) {
-        super(not);
-    }
-
-    public abstract RequestDefinition buildObject();
-
+public abstract class RequestDefinitionDTO extends NotDTO
+{
+	protected RequestDefinitionDTO(final Boolean not)
+	{
+		super(not);
+	}
+	
+	public abstract RequestDefinition buildObject();
 }

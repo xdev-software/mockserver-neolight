@@ -17,46 +17,59 @@ package software.xdev.mockserver.model;
 
 import java.util.Objects;
 
-public class RegexBody extends Body<String> {
-    private int hashCode;
-    private final String regex;
 
-    public RegexBody(String regex) {
-        super(Type.REGEX);
-        this.regex = regex;
-    }
-
-    public String getValue() {
-        return regex;
-    }
-
-    public static RegexBody regex(String regex) {
-        return new RegexBody(regex);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (hashCode() != o.hashCode()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        RegexBody regexBody = (RegexBody) o;
-        return Objects.equals(regex, regexBody.regex);
-    }
-
-    @Override
-    public int hashCode() {
-        if (hashCode == 0) {
-            hashCode = Objects.hash(super.hashCode(), regex);
-        }
-        return hashCode;
-    }
+public class RegexBody extends Body<String>
+{
+	private int hashCode;
+	private final String regex;
+	
+	public RegexBody(final String regex)
+	{
+		super(Type.REGEX);
+		this.regex = regex;
+	}
+	
+	@Override
+	public String getValue()
+	{
+		return this.regex;
+	}
+	
+	public static RegexBody regex(final String regex)
+	{
+		return new RegexBody(regex);
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(o == null || this.getClass() != o.getClass())
+		{
+			return false;
+		}
+		if(this.hashCode() != o.hashCode())
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		final RegexBody regexBody = (RegexBody)o;
+		return Objects.equals(this.regex, regexBody.regex);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		if(this.hashCode == 0)
+		{
+			this.hashCode = Objects.hash(super.hashCode(), this.regex);
+		}
+		return this.hashCode;
+	}
 }

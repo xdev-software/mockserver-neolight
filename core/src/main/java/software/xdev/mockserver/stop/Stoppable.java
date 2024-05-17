@@ -17,8 +17,8 @@ package software.xdev.mockserver.stop;
 
 import java.io.Closeable;
 
-public interface Stoppable extends Closeable {
 
-    void stop();
-
+public interface Stoppable extends Closeable
+{
+	void stop();
 }

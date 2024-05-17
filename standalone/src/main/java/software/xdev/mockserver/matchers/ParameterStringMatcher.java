@@ -21,64 +21,75 @@ import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.model.Parameters;
 
-public class ParameterStringMatcher extends BodyMatcher<String> {
-    private final MultiValueMapMatcher matcher;
-    private final ExpandedParameterDecoder formParameterParser;
-    private final Parameters matcherParameters;
-    private final ExpandedParameterDecoder expandedParameterDecoder;
 
-    ParameterStringMatcher(ServerConfiguration configuration, Parameters matcherParameters, boolean controlPlaneMatcher) {
-        this.matcherParameters = matcherParameters;
-        this.matcher = new MultiValueMapMatcher(matcherParameters, controlPlaneMatcher);
-        this.formParameterParser = new ExpandedParameterDecoder(configuration);
-        this.expandedParameterDecoder = new ExpandedParameterDecoder(configuration);
-    }
-
-    public boolean matches(final MatchDifference context, String matched) {
-        boolean result = false;
-
-        Parameters matchedParameters = formParameterParser.retrieveFormParameters(matched, matched != null && matched.contains("?"));
-        expandedParameterDecoder.splitParameters(matcherParameters, matchedParameters);
-        if (matcher.matches(context, matchedParameters)) {
-            result = true;
-        }
-
-        return not != result;
-    }
-
-    public boolean isBlank() {
-        return matcher.isBlank();
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final ParameterStringMatcher that))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return Objects.equals(matcher, that.matcher)
-            && Objects.equals(formParameterParser, that.formParameterParser)
-            && Objects.equals(matcherParameters, that.matcherParameters)
-            && Objects.equals(expandedParameterDecoder, that.expandedParameterDecoder);
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(
-            super.hashCode(),
-            matcher,
-            formParameterParser,
-            matcherParameters,
-            expandedParameterDecoder);
-    }
+public class ParameterStringMatcher extends BodyMatcher<String>
+{
+	private final MultiValueMapMatcher matcher;
+	private final ExpandedParameterDecoder formParameterParser;
+	private final Parameters matcherParameters;
+	private final ExpandedParameterDecoder expandedParameterDecoder;
+	
+	ParameterStringMatcher(
+		final ServerConfiguration configuration, final Parameters matcherParameters,
+		final boolean controlPlaneMatcher)
+	{
+		this.matcherParameters = matcherParameters;
+		this.matcher = new MultiValueMapMatcher(matcherParameters, controlPlaneMatcher);
+		this.formParameterParser = new ExpandedParameterDecoder(configuration);
+		this.expandedParameterDecoder = new ExpandedParameterDecoder(configuration);
+	}
+	
+	@Override
+	public boolean matches(final MatchDifference context, final String matched)
+	{
+		boolean result = false;
+		
+		final Parameters matchedParameters =
+			this.formParameterParser.retrieveFormParameters(matched, matched != null && matched.contains("?"));
+		this.expandedParameterDecoder.splitParameters(this.matcherParameters, matchedParameters);
+		if(this.matcher.matches(context, matchedParameters))
+		{
+			result = true;
+		}
+		
+		return this.not != result;
+	}
+	
+	@Override
+	public boolean isBlank()
+	{
+		return this.matcher.isBlank();
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final ParameterStringMatcher that))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return Objects.equals(this.matcher, that.matcher)
+			&& Objects.equals(this.formParameterParser, that.formParameterParser)
+			&& Objects.equals(this.matcherParameters, that.matcherParameters)
+			&& Objects.equals(this.expandedParameterDecoder, that.expandedParameterDecoder);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(
+			super.hashCode(),
+			this.matcher,
+			this.formParameterParser,
+			this.matcherParameters,
+			this.expandedParameterDecoder);
+	}
 }

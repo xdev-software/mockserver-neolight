@@ -17,25 +17,32 @@ package software.xdev.mockserver.url;
 
 import static software.xdev.mockserver.util.StringUtils.substringBefore;
 
-public final class URLParser {
 
-    private static final String SCHEME_REGEX = "https?://.*";
-    private static final String SCHEME_HOST_AND_PORT_REGEX = "https?://([A-z0-9-_.:]*@)?[A-z0-9-_.]*(:[0-9]*)?";
-
-    public static boolean isFullUrl(String uri) {
-        return uri != null && uri.matches(SCHEME_REGEX);
-    }
-
-    public static String returnPath(String path) {
-        String result;
-        if (URLParser.isFullUrl(path)) {
-            result = path.replaceAll(SCHEME_HOST_AND_PORT_REGEX, "");
-        } else {
-            result = path;
-        }
-        return substringBefore(result, "?");
-    }
-    
-    private URLParser() {
-    }
+public final class URLParser
+{
+	private static final String SCHEME_REGEX = "https?://.*";
+	private static final String SCHEME_HOST_AND_PORT_REGEX = "https?://([A-z0-9-_.:]*@)?[A-z0-9-_.]*(:[0-9]*)?";
+	
+	public static boolean isFullUrl(final String uri)
+	{
+		return uri != null && uri.matches(SCHEME_REGEX);
+	}
+	
+	public static String returnPath(final String path)
+	{
+		final String result;
+		if(URLParser.isFullUrl(path))
+		{
+			result = path.replaceAll(SCHEME_HOST_AND_PORT_REGEX, "");
+		}
+		else
+		{
+			result = path;
+		}
+		return substringBefore(result, "?");
+	}
+	
+	private URLParser()
+	{
+	}
 }

@@ -15,32 +15,44 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.SocketAddress;
-
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer.INDENT_SIZE;
 
-public class SocketAddressToJavaSerializer implements ToJavaSerializer<SocketAddress> {
+import software.xdev.mockserver.model.SocketAddress;
 
-    @Override
-    public String serialize(int numberOfSpacesToIndent, SocketAddress socketAddress) {
-        StringBuilder output = new StringBuilder();
-        if (socketAddress != null) {
-            appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("new SocketAddress()");
-            if (socketAddress.getHost() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withHost(\"").append(socketAddress.getHost()).append("\")");
-            }
-            if (socketAddress.getPort() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withPort(").append(socketAddress.getPort()).append(")");
-            }
-            if (socketAddress.getScheme() != null) {
-                appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withScheme(SocketAddress.Scheme.").append(socketAddress.getScheme()).append(")");
-            }
-        }
-        return output.toString();
-    }
 
-    private StringBuilder appendNewLineAndIndent(int numberOfSpacesToIndent, StringBuilder output) {
-        return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
-    }
+public class SocketAddressToJavaSerializer implements ToJavaSerializer<SocketAddress>
+{
+	@Override
+	public String serialize(final int numberOfSpacesToIndent, final SocketAddress socketAddress)
+	{
+		final StringBuilder output = new StringBuilder();
+		if(socketAddress != null)
+		{
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("new SocketAddress()");
+			if(socketAddress.getHost() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withHost(\"")
+					.append(socketAddress.getHost())
+					.append("\")");
+			}
+			if(socketAddress.getPort() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withPort(")
+					.append(socketAddress.getPort())
+					.append(")");
+			}
+			if(socketAddress.getScheme() != null)
+			{
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
+					".withScheme(SocketAddress.Scheme.").append(socketAddress.getScheme()).append(")");
+			}
+		}
+		return output.toString();
+	}
+	
+	private StringBuilder appendNewLineAndIndent(final int numberOfSpacesToIndent, final StringBuilder output)
+	{
+		return output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent));
+	}
 }

@@ -15,15 +15,15 @@
  */
 package software.xdev.mockserver.serialization.java;
 
-import software.xdev.mockserver.model.ObjectWithJsonToString;
-
 import java.util.List;
 
-public interface MultiValueToJavaSerializer<T extends ObjectWithJsonToString> extends ToJavaSerializer<T> {
+import software.xdev.mockserver.model.ObjectWithJsonToString;
 
-    String serializeAsJava(int numberOfSpacesToIndent, List<T> object);
 
-    @SuppressWarnings("unchecked")
-    String serializeAsJava(int numberOfSpacesToIndent, T... object);
-
+public interface MultiValueToJavaSerializer<T extends ObjectWithJsonToString> extends ToJavaSerializer<T>
+{
+	String serializeAsJava(int numberOfSpacesToIndent, List<T> object);
+	
+	@SuppressWarnings("unchecked")
+	String serializeAsJava(int numberOfSpacesToIndent, T... object);
 }

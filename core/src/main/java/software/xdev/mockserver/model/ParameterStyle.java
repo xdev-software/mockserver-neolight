@@ -15,41 +15,46 @@
  */
 package software.xdev.mockserver.model;
 
-public enum ParameterStyle {
-    // PATH
-    SIMPLE("\\,"),
-    SIMPLE_EXPLODED("\\,"),
-    LABEL("\\,"),
-    LABEL_EXPLODED("\\."),
-    MATRIX("\\,"),
-    MATRIX_EXPLODED(";<name>="),
-    // QUERY
-    FORM_EXPLODED(""),
-    FORM("\\,"),
-    SPACE_DELIMITED_EXPLODED(""),
-    SPACE_DELIMITED("(%20)|\\s|\\+"),
-    PIPE_DELIMITED_EXPLODED(""),
-    PIPE_DELIMITED("\\|"),
-    DEEP_OBJECT("");
-
-    private final String regex;
-    private final boolean exploded;
-
-    ParameterStyle(String regex) {
-        this.regex = regex;
-        this.exploded = !regex.isEmpty();
-    }
-
-    public String getRegex() {
-        return regex;
-    }
-
-    public boolean isExploded() {
-        return exploded;
-    }
-
-    @Override
-    public String toString() {
-        return name() + "(" + regex + "," + Boolean.toString(exploded) + ")";
-    }
+public enum ParameterStyle
+{
+	// PATH
+	SIMPLE("\\,"),
+	SIMPLE_EXPLODED("\\,"),
+	LABEL("\\,"),
+	LABEL_EXPLODED("\\."),
+	MATRIX("\\,"),
+	MATRIX_EXPLODED(";<name>="),
+	// QUERY
+	FORM_EXPLODED(""),
+	FORM("\\,"),
+	SPACE_DELIMITED_EXPLODED(""),
+	SPACE_DELIMITED("(%20)|\\s|\\+"),
+	PIPE_DELIMITED_EXPLODED(""),
+	PIPE_DELIMITED("\\|"),
+	DEEP_OBJECT("");
+	
+	private final String regex;
+	private final boolean exploded;
+	
+	ParameterStyle(final String regex)
+	{
+		this.regex = regex;
+		this.exploded = !regex.isEmpty();
+	}
+	
+	public String getRegex()
+	{
+		return this.regex;
+	}
+	
+	public boolean isExploded()
+	{
+		return this.exploded;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.name() + "(" + this.regex + "," + Boolean.toString(this.exploded) + ")";
+	}
 }

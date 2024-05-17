@@ -15,8 +15,9 @@
  */
 package software.xdev.mockserver.model;
 
-public enum ClearType {
-    LOG,
-    EXPECTATIONS,
-    ALL
+public enum ClearType
+{
+	LOG,
+	EXPECTATIONS,
+	ALL
 }

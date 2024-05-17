@@ -20,52 +20,64 @@ import java.util.List;
 import java.util.Map;
 
 
-public class Parameters extends KeysToMultiValues<Parameter, Parameters> {
-
-    private String rawParameterString;
-
-    public Parameters(List<Parameter> parameters) {
-        withEntries(parameters);
-    }
-
-    public Parameters(Parameter... parameters) {
-        withEntries(parameters);
-    }
-
-    public Parameters(Map<NottableString, List<NottableString>> headers) {
-        super(headers);
-    }
-
-    public static Parameters parameters(Parameter... parameters) {
-        return new Parameters(parameters);
-    }
-
-    @Override
-    public Parameter build(NottableString name, Collection<NottableString> values) {
-        return new Parameter(name, values);
-    }
-
-    protected void isModified() {
-        rawParameterString = null;
-    }
-
-    public Parameters withKeyMatchStyle(KeyMatchStyle keyMatchStyle) {
-        super.withKeyMatchStyle(keyMatchStyle);
-        return this;
-    }
-
-    public String getRawParameterString() {
-        return rawParameterString;
-    }
-
-    public Parameters withRawParameterString(String rawParameterString) {
-        this.rawParameterString = rawParameterString;
-        return this;
-    }
-
-    public Parameters clone() {
-        return new Parameters(getMultimap())
-            .withRawParameterString(rawParameterString);
-    }
-
+public class Parameters extends KeysToMultiValues<Parameter, Parameters>
+{
+	private String rawParameterString;
+	
+	public Parameters(final List<Parameter> parameters)
+	{
+		this.withEntries(parameters);
+	}
+	
+	public Parameters(final Parameter... parameters)
+	{
+		this.withEntries(parameters);
+	}
+	
+	public Parameters(final Map<NottableString, List<NottableString>> headers)
+	{
+		super(headers);
+	}
+	
+	public static Parameters parameters(final Parameter... parameters)
+	{
+		return new Parameters(parameters);
+	}
+	
+	@Override
+	public Parameter build(final NottableString name, final Collection<NottableString> values)
+	{
+		return new Parameter(name, values);
+	}
+	
+	@Override
+	protected void isModified()
+	{
+		this.rawParameterString = null;
+	}
+	
+	@Override
+	public Parameters withKeyMatchStyle(final KeyMatchStyle keyMatchStyle)
+	{
+		super.withKeyMatchStyle(keyMatchStyle);
+		return this;
+	}
+	
+	public String getRawParameterString()
+	{
+		return this.rawParameterString;
+	}
+	
+	public Parameters withRawParameterString(final String rawParameterString)
+	{
+		this.rawParameterString = rawParameterString;
+		return this;
+	}
+	
+	@Override
+	public Parameters clone()
+	{
+		return new Parameters(this.getMultimap())
+			.withRawParameterString(this.rawParameterString);
+	}
 }

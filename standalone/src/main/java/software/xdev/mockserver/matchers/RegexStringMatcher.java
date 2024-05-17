@@ -15,136 +15,181 @@
  */
 package software.xdev.mockserver.matchers;
 
-import software.xdev.mockserver.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import software.xdev.mockserver.model.NottableString;
+import static software.xdev.mockserver.model.NottableString.string;
 
 import java.util.Objects;
 import java.util.regex.PatternSyntaxException;
 
-import static software.xdev.mockserver.model.NottableString.string;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RegexStringMatcher extends BodyMatcher<NottableString> {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(RegexStringMatcher.class);
-    
-    private final NottableString matcher;
-    private final boolean controlPlaneMatcher;
+import software.xdev.mockserver.model.NottableString;
+import software.xdev.mockserver.util.StringUtils;
 
-    public RegexStringMatcher(boolean controlPlaneMatcher) {
-        this.controlPlaneMatcher = controlPlaneMatcher;
-        this.matcher = null;
-    }
 
-    RegexStringMatcher(NottableString matcher, boolean controlPlaneMatcher) {
-        this.controlPlaneMatcher = controlPlaneMatcher;
-        this.matcher = matcher;
-    }
-
-    public boolean matches(String matched) {
-        return matches((MatchDifference) null, string(matched));
-    }
-
-    public boolean matches(final MatchDifference context, NottableString matched) {
-        boolean result = matcher == null || matches(context, matcher, matched);
-        return not != result;
-    }
-
-    public boolean matches(NottableString matcher, NottableString matched) {
-        return matches(null, matcher, matched);
-    }
-
-    public boolean matches(MatchDifference context, NottableString matcher, NottableString matched) {
-        return matchesByNottedStrings(context, matcher, matched);
-    }
-
-    private boolean matchesByNottedStrings(MatchDifference context, NottableString matcher, NottableString matched) {
-        if (matcher.isNot() && matched.isNot()) {
-            // mutual notted control plane match
-            return matchesByStrings(context, matcher, matched);
-        } else {
-            // data plane & control plan match
-            return (matcher.isNot() || matched.isNot()) ^ matchesByStrings(context, matcher, matched);
-        }
-    }
-
-    private boolean matchesByStrings(MatchDifference context, NottableString matcher, NottableString matched) {
-        if (matcher == null) {
-            return true;
-        }
-        final String matcherValue = matcher.getValue();
-        if (StringUtils.isBlank(matcherValue)) {
-            return true;
-        } else {
-            if (matched != null) {
-                final String matchedValue = matched.getValue();
-                if (matchedValue != null) {
-                    // match as exact string
-                    if (matchedValue.equals(matcherValue) || matchedValue.equalsIgnoreCase(matcherValue)) {
-                        return true;
-                    }
-
-                    // match as regex - matcher -> matched (data plane or control plane)
-                    try {
-                        if (matcher.matches(matchedValue)) {
-                            return true;
-                        }
-                    } catch (PatternSyntaxException pse) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
-                        }
-                    }
-                    // match as regex - matched -> matcher (control plane only)
-                    try {
-                        if (controlPlaneMatcher && matched.matches(matcherValue)) {
-                            return true;
-                        } else if (LOG.isDebugEnabled() && matched.matches(matcherValue)) {
-                            LOG.debug("Matcher {} would match {} if matcher was used for control plane", matcher, matched);
-                        }
-                    } catch (PatternSyntaxException pse) {
-                        if (controlPlaneMatcher) {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (context != null) {
-            context.addDifference("string or regex match failed expected:{}found:{}", matcher, matched);
-        }
-
-        return false;
-    }
-
-    public boolean isBlank() {
-        return matcher == null || StringUtils.isBlank(matcher.getValue());
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final RegexStringMatcher that))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return controlPlaneMatcher == that.controlPlaneMatcher && Objects.equals(matcher, that.matcher);
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(super.hashCode(), matcher, controlPlaneMatcher);
-    }
+public class RegexStringMatcher extends BodyMatcher<NottableString>
+{
+	private static final Logger LOG = LoggerFactory.getLogger(RegexStringMatcher.class);
+	
+	private final NottableString matcher;
+	private final boolean controlPlaneMatcher;
+	
+	public RegexStringMatcher(final boolean controlPlaneMatcher)
+	{
+		this.controlPlaneMatcher = controlPlaneMatcher;
+		this.matcher = null;
+	}
+	
+	RegexStringMatcher(final NottableString matcher, final boolean controlPlaneMatcher)
+	{
+		this.controlPlaneMatcher = controlPlaneMatcher;
+		this.matcher = matcher;
+	}
+	
+	public boolean matches(final String matched)
+	{
+		return this.matches((MatchDifference)null, string(matched));
+	}
+	
+	@Override
+	public boolean matches(final MatchDifference context, final NottableString matched)
+	{
+		final boolean result = this.matcher == null || this.matches(context, this.matcher, matched);
+		return this.not != result;
+	}
+	
+	public boolean matches(final NottableString matcher, final NottableString matched)
+	{
+		return this.matches(null, matcher, matched);
+	}
+	
+	public boolean matches(final MatchDifference context, final NottableString matcher, final NottableString matched)
+	{
+		return this.matchesByNottedStrings(context, matcher, matched);
+	}
+	
+	private boolean matchesByNottedStrings(
+		final MatchDifference context,
+		final NottableString matcher,
+		final NottableString matched)
+	{
+		if(matcher.isNot() && matched.isNot())
+		{
+			// mutual notted control plane match
+			return this.matchesByStrings(context, matcher, matched);
+		}
+		else
+		{
+			// data plane & control plan match
+			return (matcher.isNot() || matched.isNot()) ^ this.matchesByStrings(context, matcher, matched);
+		}
+	}
+	
+	private boolean matchesByStrings(
+		final MatchDifference context,
+		final NottableString matcher,
+		final NottableString matched)
+	{
+		if(matcher == null)
+		{
+			return true;
+		}
+		final String matcherValue = matcher.getValue();
+		if(StringUtils.isBlank(matcherValue))
+		{
+			return true;
+		}
+		else
+		{
+			if(matched != null)
+			{
+				final String matchedValue = matched.getValue();
+				if(matchedValue != null)
+				{
+					// match as exact string
+					if(matchedValue.equals(matcherValue) || matchedValue.equalsIgnoreCase(matcherValue))
+					{
+						return true;
+					}
+					
+					// match as regex - matcher -> matched (data plane or control plane)
+					try
+					{
+						if(matcher.matches(matchedValue))
+						{
+							return true;
+						}
+					}
+					catch(final PatternSyntaxException pse)
+					{
+						if(LOG.isDebugEnabled())
+						{
+							LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
+						}
+					}
+					// match as regex - matched -> matcher (control plane only)
+					try
+					{
+						if(this.controlPlaneMatcher && matched.matches(matcherValue))
+						{
+							return true;
+						}
+						else if(LOG.isDebugEnabled() && matched.matches(matcherValue))
+						{
+							LOG.debug(
+								"Matcher {} would match {} if matcher was used for control plane",
+								matcher,
+								matched);
+						}
+					}
+					catch(final PatternSyntaxException pse)
+					{
+						if(this.controlPlaneMatcher)
+						{
+							if(LOG.isDebugEnabled())
+							{
+								LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
+							}
+						}
+					}
+				}
+			}
+		}
+		if(context != null)
+		{
+			context.addDifference("string or regex match failed expected:{}found:{}", matcher, matched);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean isBlank()
+	{
+		return this.matcher == null || StringUtils.isBlank(this.matcher.getValue());
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final RegexStringMatcher that))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return this.controlPlaneMatcher == that.controlPlaneMatcher && Objects.equals(this.matcher, that.matcher);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), this.matcher, this.controlPlaneMatcher);
+	}
 }

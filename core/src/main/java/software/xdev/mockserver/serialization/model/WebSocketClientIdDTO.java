@@ -17,40 +17,43 @@ package software.xdev.mockserver.serialization.model;
 
 import java.util.Objects;
 
-public class WebSocketClientIdDTO {
 
-    private String clientId;
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public WebSocketClientIdDTO setClientId(String clientId) {
-        this.clientId = clientId;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final WebSocketClientIdDTO that))
-        {
-            return false;
-        }
-        if(!super.equals(o))
-        {
-            return false;
-        }
-		return Objects.equals(getClientId(), that.getClientId());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(super.hashCode(), getClientId());
-    }
+public class WebSocketClientIdDTO
+{
+	private String clientId;
+	
+	public String getClientId()
+	{
+		return this.clientId;
+	}
+	
+	public WebSocketClientIdDTO setClientId(final String clientId)
+	{
+		this.clientId = clientId;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final WebSocketClientIdDTO that))
+		{
+			return false;
+		}
+		if(!super.equals(o))
+		{
+			return false;
+		}
+		return Objects.equals(this.getClientId(), that.getClientId());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), this.getClientId());
+	}
 }

@@ -20,78 +20,92 @@ import java.util.Objects;
 
 import software.xdev.mockserver.model.HttpError;
 
-public class HttpErrorDTO implements DTO<HttpError> {
-    private DelayDTO delay;
-    private Boolean dropConnection;
-    private byte[] responseBytes;
 
-    public HttpErrorDTO(HttpError httpError) {
-        if (httpError != null) {
-            if (httpError.getDelay() != null) {
-                delay = new DelayDTO(httpError.getDelay());
-            }
-            dropConnection = httpError.getDropConnection();
-            responseBytes = httpError.getResponseBytes();
-        }
-    }
-
-    public HttpErrorDTO() {
-    }
-
-    public HttpError buildObject() {
-        return new HttpError()
-            .withDelay((delay != null ? delay.buildObject() : null))
-            .withDropConnection(dropConnection)
-            .withResponseBytes(responseBytes);
-    }
-
-    public DelayDTO getDelay() {
-        return delay;
-    }
-
-    public HttpErrorDTO setDelay(DelayDTO host) {
-        this.delay = host;
-        return this;
-    }
-
-    public Boolean getDropConnection() {
-        return dropConnection;
-    }
-
-    public HttpErrorDTO setDropConnection(Boolean port) {
-        this.dropConnection = port;
-        return this;
-    }
-
-    public byte[] getResponseBytes() {
-        return responseBytes;
-    }
-
-    public HttpErrorDTO setResponseBytes(byte[] scheme) {
-        this.responseBytes = scheme;
-        return this;
-    }
-    
-    @Override
-    public boolean equals(final Object o)
-    {
-        if(this == o)
-        {
-            return true;
-        }
-        if(!(o instanceof final HttpErrorDTO that))
-        {
-            return false;
-        }
-		return Objects.equals(getDelay(), that.getDelay()) && Objects.equals(
-            getDropConnection(),
-            that.getDropConnection()) && Objects.deepEquals(getResponseBytes(), that.getResponseBytes());
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(getDelay(), getDropConnection(), Arrays.hashCode(getResponseBytes()));
-    }
+public class HttpErrorDTO implements DTO<HttpError>
+{
+	private DelayDTO delay;
+	private Boolean dropConnection;
+	private byte[] responseBytes;
+	
+	public HttpErrorDTO(final HttpError httpError)
+	{
+		if(httpError != null)
+		{
+			if(httpError.getDelay() != null)
+			{
+				this.delay = new DelayDTO(httpError.getDelay());
+			}
+			this.dropConnection = httpError.getDropConnection();
+			this.responseBytes = httpError.getResponseBytes();
+		}
+	}
+	
+	public HttpErrorDTO()
+	{
+	}
+	
+	@Override
+	public HttpError buildObject()
+	{
+		return new HttpError()
+			.withDelay((this.delay != null ? this.delay.buildObject() : null))
+			.withDropConnection(this.dropConnection)
+			.withResponseBytes(this.responseBytes);
+	}
+	
+	public DelayDTO getDelay()
+	{
+		return this.delay;
+	}
+	
+	public HttpErrorDTO setDelay(final DelayDTO host)
+	{
+		this.delay = host;
+		return this;
+	}
+	
+	public Boolean getDropConnection()
+	{
+		return this.dropConnection;
+	}
+	
+	public HttpErrorDTO setDropConnection(final Boolean port)
+	{
+		this.dropConnection = port;
+		return this;
+	}
+	
+	public byte[] getResponseBytes()
+	{
+		return this.responseBytes;
+	}
+	
+	public HttpErrorDTO setResponseBytes(final byte[] scheme)
+	{
+		this.responseBytes = scheme;
+		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof final HttpErrorDTO that))
+		{
+			return false;
+		}
+		return Objects.equals(this.getDelay(), that.getDelay()) && Objects.equals(
+			this.getDropConnection(),
+			that.getDropConnection()) && Objects.deepEquals(this.getResponseBytes(), that.getResponseBytes());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(this.getDelay(), this.getDropConnection(), Arrays.hashCode(this.getResponseBytes()));
+	}
 }
 

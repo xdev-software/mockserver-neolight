@@ -15,37 +15,38 @@
  */
 package software.xdev.mockserver.matchers;
 
+import java.util.List;
+
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.RequestDefinition;
 
-import java.util.List;
 
-public interface HttpRequestMatcher extends Matcher<RequestDefinition> {
-
-    List<HttpRequest> getHttpRequests();
-
-    boolean matches(final RequestDefinition request);
-
-    boolean matches(MatchDifference context, RequestDefinition httpRequest);
-
-    Expectation getExpectation();
-
-    boolean update(Expectation expectation);
-
-    boolean update(RequestDefinition requestDefinition);
-
-    @SuppressWarnings("UnusedReturnValue")
-    HttpRequestMatcher setResponseInProgress(boolean responseInProgress);
-
-    boolean isResponseInProgress();
-
-    MockServerMatcherNotifier.Cause getSource();
-
-    @SuppressWarnings("UnusedReturnValue")
-    HttpRequestMatcher withSource(MockServerMatcherNotifier.Cause source);
-
-    boolean isActive();
-
+public interface HttpRequestMatcher extends Matcher<RequestDefinition>
+{
+	List<HttpRequest> getHttpRequests();
+	
+	boolean matches(final RequestDefinition request);
+	
+	@Override
+	boolean matches(MatchDifference context, RequestDefinition httpRequest);
+	
+	Expectation getExpectation();
+	
+	boolean update(Expectation expectation);
+	
+	boolean update(RequestDefinition requestDefinition);
+	
+	@SuppressWarnings("UnusedReturnValue")
+	HttpRequestMatcher setResponseInProgress(boolean responseInProgress);
+	
+	boolean isResponseInProgress();
+	
+	MockServerMatcherNotifier.Cause getSource();
+	
+	@SuppressWarnings("UnusedReturnValue")
+	HttpRequestMatcher withSource(MockServerMatcherNotifier.Cause source);
+	
+	boolean isActive();
 }
