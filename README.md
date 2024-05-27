@@ -2,8 +2,12 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/xdev-software/mockserver-neolight/checkBuild.yml?branch=develop)](https://github.com/xdev-software/mockserver-neolight/actions/workflows/checkBuild.yml?query=branch%3Adevelop)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=xdev-software_mockserver-neolight&metric=alert_status)](https://sonarcloud.io/dashboard?id=xdev-software_mockserver-neolight)
 
-# mockserver-neolight
+# MockServer NeoLight
 
+A lightweight rewrite of the abandoned [MockServer project](https://github.com/mock-server/mockserver) with focus on simplicity and maintainability.
+
+> [!NOTE]
+> The full list of changes can be found in the [CHANGELOG](./CHANGELOG.md)
 
 ## Installation
 [Installation guide for the latest release](https://github.com/xdev-software/mockserver-neolight/releases/latest#Installation)
