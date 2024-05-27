@@ -38,7 +38,7 @@ public class BooleanMatcher implements Matcher<Boolean>
 		}
 		else if(matched != null)
 		{
-			result = matched == this.matcher;
+			result = Objects.equals(matched, this.matcher);
 		}
 		
 		if(!result && context != null)

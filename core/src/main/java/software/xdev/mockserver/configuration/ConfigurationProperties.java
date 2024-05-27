@@ -535,7 +535,7 @@ public class ConfigurationProperties
 					: defaultOrEnvironmentVariable);
 			if(propertyValue != null && propertyValue.startsWith("\"") && propertyValue.endsWith("\""))
 			{
-				propertyValue = propertyValue.replaceAll("^\"|\"$", "");
+				propertyValue = propertyValue.replaceAll("(^\")|(\"$)", "");
 			}
 			getPropertyCache().put(systemPropertyKey, propertyValue);
 			return propertyValue;
