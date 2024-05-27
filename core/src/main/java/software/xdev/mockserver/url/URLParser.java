@@ -30,15 +30,9 @@ public final class URLParser
 	
 	public static String returnPath(final String path)
 	{
-		final String result;
-		if(URLParser.isFullUrl(path))
-		{
-			result = path.replaceAll(SCHEME_HOST_AND_PORT_REGEX, "");
-		}
-		else
-		{
-			result = path;
-		}
+		final String result = URLParser.isFullUrl(path)
+			? path.replaceAll(SCHEME_HOST_AND_PORT_REGEX, "")
+			: path;
 		return substringBefore(result, "?");
 	}
 	

@@ -34,14 +34,7 @@ public class BodyDecoderEncoder
 	public ByteBuf bodyToByteBuf(final Body body, final String contentTypeHeader)
 	{
 		final byte[] bytes = this.bodyToBytes(body, contentTypeHeader);
-		if(bytes != null)
-		{
-			return Unpooled.copiedBuffer(bytes);
-		}
-		else
-		{
-			return Unpooled.buffer(0, 0);
-		}
+		return bytes != null ? Unpooled.copiedBuffer(bytes) : Unpooled.buffer(0, 0);
 	}
 	
 	public ByteBuf[] bodyToByteBuf(final Body body, final String contentTypeHeader, final int chunkSize)
@@ -50,63 +43,52 @@ public class BodyDecoderEncoder
 		final ByteBuf[] byteBufs = new ByteBuf[chunks.length];
 		for(int i = 0; i < chunks.length; i++)
 		{
-			if(chunks[i] != null)
-			{
-				byteBufs[i] = Unpooled.copiedBuffer(chunks[i]);
-			}
-			else
-			{
-				byteBufs[i] = Unpooled.buffer(0, 0);
-			}
+			byteBufs[i] = chunks[i] != null ? Unpooled.copiedBuffer(chunks[i]) : Unpooled.buffer(0, 0);
 		}
 		return byteBufs;
 	}
 	
 	public static byte[][] split(final byte[] array, final int chunkSize)
 	{
-		if(chunkSize < array.length)
-		{
-			final int numOfChunks = (array.length + chunkSize - 1) / chunkSize;
-			final byte[][] output = new byte[numOfChunks][];
-			
-			for(int i = 0; i < numOfChunks; ++i)
-			{
-				final int start = i * chunkSize;
-				final int length = Math.min(array.length - start, chunkSize);
-				
-				final byte[] temp = new byte[length];
-				System.arraycopy(array, start, temp, 0, length);
-				output[i] = temp;
-			}
-			return output;
-		}
-		else
+		if(chunkSize >= array.length)
 		{
 			return new byte[][]{array};
 		}
+		
+		final int numOfChunks = (array.length + chunkSize - 1) / chunkSize;
+		final byte[][] output = new byte[numOfChunks][];
+		
+		for(int i = 0; i < numOfChunks; ++i)
+		{
+			final int start = i * chunkSize;
+			final int length = Math.min(array.length - start, chunkSize);
+			
+			final byte[] temp = new byte[length];
+			System.arraycopy(array, start, temp, 0, length);
+			output[i] = temp;
+		}
+		return output;
 	}
 	
 	byte[] bodyToBytes(final Body body, final String contentTypeHeader)
 	{
-		if(body != null)
+		if(body == null)
 		{
-			if(body instanceof BinaryBody)
-			{
-				return body.getRawBytes();
-			}
-			else if(body.getValue() instanceof String)
-			{
-				final Charset contentTypeCharset = MediaType.parse(contentTypeHeader).getCharsetOrDefault();
-				final Charset bodyCharset = body.getCharset(contentTypeCharset);
-				return ((String)body.getValue()).getBytes(
-					bodyCharset != null ? bodyCharset : MediaType.DEFAULT_TEXT_HTTP_CHARACTER_SET);
-			}
-			else
-			{
-				return body.getRawBytes();
-			}
+			return null;
 		}
-		return null;
+		
+		if(body instanceof BinaryBody)
+		{
+			return body.getRawBytes();
+		}
+		else if(body.getValue() instanceof final String bodyString)
+		{
+			final Charset contentTypeCharset = MediaType.parse(contentTypeHeader).getCharsetOrDefault();
+			final Charset bodyCharset = body.getCharset(contentTypeCharset);
+			return bodyString.getBytes(
+				bodyCharset != null ? bodyCharset : MediaType.DEFAULT_TEXT_HTTP_CHARACTER_SET);
+		}
+		return body.getRawBytes();
 	}
 	
 	public BodyWithContentType byteBufToBody(final ByteBuf content, final String contentTypeHeader)
@@ -120,25 +102,21 @@ public class BodyDecoderEncoder
 		return null;
 	}
 	
+	@SuppressWarnings("java:S3358")
 	public BodyWithContentType bytesToBody(final byte[] bodyBytes, final String contentTypeHeader)
 	{
-		if(bodyBytes.length > 0)
+		if(bodyBytes.length == 0)
 		{
-			final MediaType mediaType = MediaType.parse(contentTypeHeader);
-			if(mediaType.isString())
-			{
-				return new StringBody(
-					new String(bodyBytes, mediaType.getCharsetOrDefault()),
-					bodyBytes,
-					false,
-					isNotBlank(contentTypeHeader) ? mediaType : null
-				);
-			}
-			else
-			{
-				return new BinaryBody(bodyBytes, mediaType);
-			}
+			return null;
 		}
-		return null;
+		
+		final MediaType mediaType = MediaType.parse(contentTypeHeader);
+		return mediaType.isString()
+			? new StringBody(
+			new String(bodyBytes, mediaType.getCharsetOrDefault()),
+			bodyBytes,
+			false,
+			isNotBlank(contentTypeHeader) ? mediaType : null)
+			: new BinaryBody(bodyBytes, mediaType);
 	}
 }

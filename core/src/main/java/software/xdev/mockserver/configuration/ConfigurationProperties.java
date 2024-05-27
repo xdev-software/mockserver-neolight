@@ -384,34 +384,32 @@ public class ConfigurationProperties
 	@SuppressWarnings("checkstyle:FinalParameters")
 	protected static void validateHostAndPortAndSetProperty(String hostAndPort, final String mockserverSocksProxy)
 	{
-		if(isNotBlank(hostAndPort))
+		if(isBlank(hostAndPort))
 		{
-			if(hostAndPort.startsWith("/"))
-			{
-				hostAndPort = StringUtils.substringAfter(hostAndPort, "/");
-			}
-			final String errorMessage = "Invalid property value \"" + hostAndPort + "\" for \"" + mockserverSocksProxy
-				+ "\" must include <host>:<port> for example \"127.0.0.1:1090\" or \"localhost:1090\"";
-			try
-			{
-				final URI uri = new URI("https://" + hostAndPort);
-				if(uri.getHost() == null || uri.getPort() == -1)
-				{
-					throw new IllegalArgumentException(errorMessage);
-				}
-				else
-				{
-					setProperty(mockserverSocksProxy, hostAndPort);
-				}
-			}
-			catch(final URISyntaxException ex)
+			clearProperty(mockserverSocksProxy);
+			return;
+		}
+		if(hostAndPort.startsWith("/"))
+		{
+			hostAndPort = StringUtils.substringAfter(hostAndPort, "/");
+		}
+		final String errorMessage = "Invalid property value \"" + hostAndPort + "\" for \"" + mockserverSocksProxy
+			+ "\" must include <host>:<port> for example \"127.0.0.1:1090\" or \"localhost:1090\"";
+		try
+		{
+			final URI uri = new URI("https://" + hostAndPort);
+			if(uri.getHost() == null || uri.getPort() == -1)
 			{
 				throw new IllegalArgumentException(errorMessage);
 			}
+			else
+			{
+				setProperty(mockserverSocksProxy, hostAndPort);
+			}
 		}
-		else
+		catch(final URISyntaxException ex)
 		{
-			clearProperty(mockserverSocksProxy);
+			throw new IllegalArgumentException(errorMessage);
 		}
 	}
 	

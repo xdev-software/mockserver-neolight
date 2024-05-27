@@ -52,51 +52,47 @@ public class HopByHopHeaderFilter
 	
 	public HttpRequest onRequest(final HttpRequest request)
 	{
-		if(request != null)
-		{
-			final Headers headers = new Headers();
-			for(final Header header : request.getHeaderList())
-			{
-				if(!REQUEST_HEADERS_TO_REMOVE.contains(header.getName().getValue().toLowerCase(Locale.ENGLISH)))
-				{
-					headers.withEntry(header);
-				}
-			}
-			final HttpRequest clonedRequest = request.clone();
-			if(!headers.isEmpty())
-			{
-				clonedRequest.withHeaders(headers);
-			}
-			return clonedRequest;
-		}
-		else
+		if(request == null)
 		{
 			return null;
 		}
+		
+		final Headers headers = new Headers();
+		for(final Header header : request.getHeaderList())
+		{
+			if(!REQUEST_HEADERS_TO_REMOVE.contains(header.getName().getValue().toLowerCase(Locale.ENGLISH)))
+			{
+				headers.withEntry(header);
+			}
+		}
+		final HttpRequest clonedRequest = request.clone();
+		if(!headers.isEmpty())
+		{
+			clonedRequest.withHeaders(headers);
+		}
+		return clonedRequest;
 	}
 	
 	public HttpResponse onResponse(final HttpResponse response)
 	{
-		if(response != null)
-		{
-			final Headers headers = new Headers();
-			for(final Header header : response.getHeaderList())
-			{
-				if(!RESPONSE_HEADERS_TO_REMOVE.contains(header.getName().getValue().toLowerCase(Locale.ENGLISH)))
-				{
-					headers.withEntry(header);
-				}
-			}
-			final HttpResponse clonedResponse = response.clone();
-			if(!headers.isEmpty())
-			{
-				clonedResponse.withHeaders(headers);
-			}
-			return clonedResponse;
-		}
-		else
+		if(response == null)
 		{
 			return null;
 		}
+		
+		final Headers headers = new Headers();
+		for(final Header header : response.getHeaderList())
+		{
+			if(!RESPONSE_HEADERS_TO_REMOVE.contains(header.getName().getValue().toLowerCase(Locale.ENGLISH)))
+			{
+				headers.withEntry(header);
+			}
+		}
+		final HttpResponse clonedResponse = response.clone();
+		if(!headers.isEmpty())
+		{
+			clonedResponse.withHeaders(headers);
+		}
+		return clonedResponse;
 	}
 }

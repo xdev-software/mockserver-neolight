@@ -20,16 +20,13 @@ import java.util.UUID;
 
 public final class UUIDService
 {
-	@SuppressWarnings("checkstyle:ExplicitInitialization")
-	static String fixedUuidForTests = null;
+	static String fixedUuidForTests;
 	
 	public static String getUUID()
 	{
-		if(fixedUuidForTests != null)
-		{
-			return fixedUuidForTests;
-		}
-		return UUID.randomUUID().toString();
+		return fixedUuidForTests != null
+			? fixedUuidForTests
+			: UUID.randomUUID().toString();
 	}
 	
 	private UUIDService()

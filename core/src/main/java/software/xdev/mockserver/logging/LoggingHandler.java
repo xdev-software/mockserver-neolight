@@ -66,10 +66,7 @@ public class LoggingHandler extends ChannelDuplexHandler
 		{
 			final int padding = HEXPADDING.length - i;
 			final StringBuilder buf = new StringBuilder(padding * 3);
-			for(int j = 0; j < padding; j++)
-			{
-				buf.append("   ");
-			}
+			buf.append("   ".repeat(Math.max(0, padding)));
 			HEXPADDING[i] = buf.toString();
 		}
 		
@@ -78,10 +75,7 @@ public class LoggingHandler extends ChannelDuplexHandler
 		{
 			final int padding = BYTEPADDING.length - i;
 			final StringBuilder buf = new StringBuilder(padding);
-			for(int j = 0; j < padding; j++)
-			{
-				buf.append(' ');
-			}
+			buf.append(" ".repeat(Math.max(0, padding)));
 			BYTEPADDING[i] = buf.toString();
 		}
 		

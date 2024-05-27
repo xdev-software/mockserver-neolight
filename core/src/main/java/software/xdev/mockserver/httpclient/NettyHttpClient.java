@@ -257,7 +257,7 @@ public class NettyHttpClient
 					}
 					else
 					{
-						throwable.printStackTrace();
+						LOG.error("", throwable);
 						binaryResponseFuture.completeExceptionally(throwable);
 					}
 				});

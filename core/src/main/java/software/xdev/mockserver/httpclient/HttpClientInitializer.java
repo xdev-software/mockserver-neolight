@@ -71,25 +71,23 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel>
 	{
 		final ChannelPipeline pipeline = channel.pipeline();
 		
-		if(this.proxyConfigurations != null)
+		if(this.proxyConfigurations != null && this.proxyConfigurations.containsKey(ProxyConfiguration.Type.SOCKS5))
 		{
-			if(this.proxyConfigurations.containsKey(ProxyConfiguration.Type.SOCKS5))
+			final ProxyConfiguration proxyConfiguration =
+				this.proxyConfigurations.get(ProxyConfiguration.Type.SOCKS5);
+			if(isNotBlank(proxyConfiguration.getUsername()) && isNotBlank(proxyConfiguration.getPassword()))
 			{
-				final ProxyConfiguration proxyConfiguration =
-					this.proxyConfigurations.get(ProxyConfiguration.Type.SOCKS5);
-				if(isNotBlank(proxyConfiguration.getUsername()) && isNotBlank(proxyConfiguration.getPassword()))
-				{
-					pipeline.addLast(new Socks5ProxyHandler(
-						proxyConfiguration.getProxyAddress(),
-						proxyConfiguration.getUsername(),
-						proxyConfiguration.getPassword()));
-				}
-				else
-				{
-					pipeline.addLast(new Socks5ProxyHandler(proxyConfiguration.getProxyAddress()));
-				}
+				pipeline.addLast(new Socks5ProxyHandler(
+					proxyConfiguration.getProxyAddress(),
+					proxyConfiguration.getUsername(),
+					proxyConfiguration.getPassword()));
+			}
+			else
+			{
+				pipeline.addLast(new Socks5ProxyHandler(proxyConfiguration.getProxyAddress()));
 			}
 		}
+		
 		pipeline.addLast(this.httpClientConnectionHandler);
 		
 		// add logging

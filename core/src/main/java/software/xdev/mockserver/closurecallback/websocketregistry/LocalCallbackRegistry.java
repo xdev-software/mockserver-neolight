@@ -72,19 +72,17 @@ public final class LocalCallbackRegistry
 		// if not added to local registry then web socket will be used
 		if(enabled && expectationCallback != null)
 		{
-			if(expectationCallback instanceof ExpectationResponseCallback)
+			if(expectationCallback instanceof final ExpectationResponseCallback callback)
 			{
-				responseCallbackRegistry().put(clientId, (ExpectationResponseCallback)expectationCallback);
+				responseCallbackRegistry().put(clientId, callback);
 			}
-			else if(expectationCallback instanceof ExpectationForwardAndResponseCallback)
+			else if(expectationCallback instanceof final ExpectationForwardAndResponseCallback callback)
 			{
-				forwardAndResponseCallbackRegistry().put(
-					clientId,
-					(ExpectationForwardAndResponseCallback)expectationCallback);
+				forwardAndResponseCallbackRegistry().put(clientId, callback);
 			}
-			else if(expectationCallback instanceof ExpectationForwardCallback)
+			else if(expectationCallback instanceof final ExpectationForwardCallback callback)
 			{
-				forwardCallbackRegistry().put(clientId, (ExpectationForwardCallback)expectationCallback);
+				forwardCallbackRegistry().put(clientId, callback);
 			}
 		}
 	}

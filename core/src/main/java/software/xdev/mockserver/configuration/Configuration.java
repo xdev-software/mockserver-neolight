@@ -16,6 +16,7 @@
 package software.xdev.mockserver.configuration;
 
 import java.net.InetSocketAddress;
+import java.util.Objects;
 
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
@@ -49,11 +50,9 @@ public class Configuration
 	
 	public Integer maxWebSocketExpectations()
 	{
-		if(this.maxWebSocketExpectations == null)
-		{
-			return ConfigurationProperties.maxWebSocketExpectations();
-		}
-		return this.maxWebSocketExpectations;
+		return Objects.requireNonNullElseGet(
+			this.maxWebSocketExpectations,
+			ConfigurationProperties::maxWebSocketExpectations);
 	}
 	
 	/**
@@ -77,11 +76,9 @@ public class Configuration
 	
 	public Integer clientNioEventLoopThreadCount()
 	{
-		if(this.clientNioEventLoopThreadCount == null)
-		{
-			return ConfigurationProperties.clientNioEventLoopThreadCount();
-		}
-		return this.clientNioEventLoopThreadCount;
+		return Objects.requireNonNullElseGet(
+			this.clientNioEventLoopThreadCount,
+			ConfigurationProperties::clientNioEventLoopThreadCount);
 	}
 	
 	/**
@@ -100,11 +97,9 @@ public class Configuration
 	
 	public Integer webSocketClientEventLoopThreadCount()
 	{
-		if(this.webSocketClientEventLoopThreadCount == null)
-		{
-			return ConfigurationProperties.webSocketClientEventLoopThreadCount();
-		}
-		return this.webSocketClientEventLoopThreadCount;
+		return Objects.requireNonNullElseGet(
+			this.webSocketClientEventLoopThreadCount,
+			ConfigurationProperties::webSocketClientEventLoopThreadCount);
 	}
 	
 	/**
@@ -123,11 +118,9 @@ public class Configuration
 	
 	public Long maxFutureTimeoutInMillis()
 	{
-		if(this.maxFutureTimeoutInMillis == null)
-		{
-			return ConfigurationProperties.maxFutureTimeout();
-		}
-		return this.maxFutureTimeoutInMillis;
+		return Objects.requireNonNullElseGet(
+			this.maxFutureTimeoutInMillis,
+			ConfigurationProperties::maxFutureTimeout);
 	}
 	
 	/**
@@ -146,11 +139,7 @@ public class Configuration
 	
 	public Long maxSocketTimeoutInMillis()
 	{
-		if(this.maxSocketTimeoutInMillis == null)
-		{
-			return ConfigurationProperties.maxSocketTimeout();
-		}
-		return this.maxSocketTimeoutInMillis;
+		return Objects.requireNonNullElseGet(this.maxSocketTimeoutInMillis, ConfigurationProperties::maxSocketTimeout);
 	}
 	
 	/**
@@ -168,11 +157,9 @@ public class Configuration
 	
 	public Long socketConnectionTimeoutInMillis()
 	{
-		if(this.socketConnectionTimeoutInMillis == null)
-		{
-			return ConfigurationProperties.socketConnectionTimeout();
-		}
-		return this.socketConnectionTimeoutInMillis;
+		return Objects.requireNonNullElseGet(
+			this.socketConnectionTimeoutInMillis,
+			ConfigurationProperties::socketConnectionTimeout);
 	}
 	
 	/**
@@ -190,11 +177,9 @@ public class Configuration
 	
 	public Boolean forwardBinaryRequestsWithoutWaitingForResponse()
 	{
-		if(this.forwardBinaryRequestsWithoutWaitingForResponse == null)
-		{
-			return ConfigurationProperties.forwardBinaryRequestsWithoutWaitingForResponse();
-		}
-		return this.forwardBinaryRequestsWithoutWaitingForResponse;
+		return Objects.requireNonNullElseGet(
+			this.forwardBinaryRequestsWithoutWaitingForResponse,
+			ConfigurationProperties::forwardBinaryRequestsWithoutWaitingForResponse);
 	}
 	
 	/**
@@ -214,11 +199,9 @@ public class Configuration
 	
 	public Boolean attemptToProxyIfNoMatchingExpectation()
 	{
-		if(this.attemptToProxyIfNoMatchingExpectation == null)
-		{
-			return ConfigurationProperties.attemptToProxyIfNoMatchingExpectation();
-		}
-		return this.attemptToProxyIfNoMatchingExpectation;
+		return Objects.requireNonNullElseGet(
+			this.attemptToProxyIfNoMatchingExpectation,
+			ConfigurationProperties::attemptToProxyIfNoMatchingExpectation);
 	}
 	
 	/**
@@ -239,11 +222,7 @@ public class Configuration
 	
 	public InetSocketAddress forwardHttpProxy()
 	{
-		if(this.forwardHttpProxy == null)
-		{
-			return ConfigurationProperties.forwardHttpProxy();
-		}
-		return this.forwardHttpProxy;
+		return Objects.requireNonNullElseGet(this.forwardHttpProxy, ConfigurationProperties::forwardHttpProxy);
 	}
 	
 	/**
@@ -262,11 +241,7 @@ public class Configuration
 	
 	public InetSocketAddress forwardSocksProxy()
 	{
-		if(this.forwardSocksProxy == null)
-		{
-			return ConfigurationProperties.forwardSocksProxy();
-		}
-		return this.forwardSocksProxy;
+		return Objects.requireNonNullElseGet(this.forwardSocksProxy, ConfigurationProperties::forwardSocksProxy);
 	}
 	
 	/**
@@ -284,11 +259,9 @@ public class Configuration
 	
 	public String forwardProxyAuthenticationUsername()
 	{
-		if(this.forwardProxyAuthenticationUsername == null)
-		{
-			return ConfigurationProperties.forwardProxyAuthenticationUsername();
-		}
-		return this.forwardProxyAuthenticationUsername;
+		return Objects.requireNonNullElseGet(
+			this.forwardProxyAuthenticationUsername,
+			ConfigurationProperties::forwardProxyAuthenticationUsername);
 	}
 	
 	/**
@@ -314,11 +287,9 @@ public class Configuration
 	
 	public String forwardProxyAuthenticationPassword()
 	{
-		if(this.forwardProxyAuthenticationPassword == null)
-		{
-			return ConfigurationProperties.forwardProxyAuthenticationPassword();
-		}
-		return this.forwardProxyAuthenticationPassword;
+		return Objects.requireNonNullElseGet(
+			this.forwardProxyAuthenticationPassword,
+			ConfigurationProperties::forwardProxyAuthenticationPassword);
 	}
 	
 	/**

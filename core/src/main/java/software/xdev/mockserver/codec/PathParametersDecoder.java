@@ -35,42 +35,42 @@ public class PathParametersDecoder
 	
 	public NottableString normalisePathWithParametersForMatching(final HttpRequest matcher)
 	{
-		NottableString result = null;
-		if(matcher.getPath() != null)
+		if(matcher.getPath() == null)
 		{
-			if(matcher.getPathParameters() != null && !matcher.getPathParameters().isEmpty())
+			// Unable to load API spec attribute paths.'/pets/{petId}'. Declared path parameter petId needs to be
+			// defined
+			// as a path parameter in path or operation level
+			return null;
+		}
+		if(matcher.getPathParameters() != null && !matcher.getPathParameters().isEmpty())
+		{
+			final String value = matcher.getPath().getValue();
+			if(value.contains("{"))
 			{
-				final String value = matcher.getPath().getValue();
-				if(value.contains("{"))
+				final List<String> pathParts = new ArrayList<>();
+				for(final String pathPart : matcher.getPath().getValue().split("/"))
 				{
-					final List<String> pathParts = new ArrayList<>();
-					for(final String pathPart : matcher.getPath().getValue().split("/"))
+					final Matcher pathParameterName = PATH_VARIABLE_NAME_PATTERN.matcher(pathPart);
+					if(pathParameterName.matches())
 					{
-						final Matcher pathParameterName = PATH_VARIABLE_NAME_PATTERN.matcher(pathPart);
-						if(pathParameterName.matches())
-						{
-							pathParts.add(".*");
-						}
-						else
-						{
-							pathParts.add(pathPart);
-						}
+						pathParts.add(".*");
 					}
-					result = string(String.join("/", pathParts) + (value.endsWith("/") ? "/" : ""));
+					else
+					{
+						pathParts.add(pathPart);
+					}
 				}
-				else
-				{
-					result = matcher.getPath();
-				}
+				return string(String.join("/", pathParts) + (value.endsWith("/") ? "/" : ""));
 			}
 			else
 			{
-				result = matcher.getPath();
+				return matcher.getPath();
 			}
 		}
-		// Unable to load API spec attribute paths.'/pets/{petId}'. Declared path parameter petId needs to be defined
-		// as a path parameter in path or operation level
-		return result;
+		else
+		{
+			return matcher.getPath();
+		}
 	}
 	
 	public Parameters extractPathParameters(final HttpRequest matcher, final HttpRequest matched)

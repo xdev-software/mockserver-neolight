@@ -17,20 +17,11 @@ package software.xdev.mockserver.time;
 
 public final class EpochService
 {
-	public static final long FIXED_TIME_FOR_TESTS = System.currentTimeMillis();
-	@SuppressWarnings("checkstyle:VisibilityModifier")
-	public static boolean fixedTime;
+	static long fixedTimeForTests = -1;
 	
 	public static long currentTimeMillis()
 	{
-		if(!fixedTime)
-		{
-			return System.currentTimeMillis();
-		}
-		else
-		{
-			return FIXED_TIME_FOR_TESTS;
-		}
+		return fixedTimeForTests > 0 ? fixedTimeForTests : System.currentTimeMillis();
 	}
 	
 	private EpochService()

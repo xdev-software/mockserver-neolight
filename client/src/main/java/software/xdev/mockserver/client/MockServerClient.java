@@ -1508,35 +1508,6 @@ public class MockServerClient implements Stoppable
 	}
 	
 	/**
-	 * Specify one or more expectations, normally this method should not be used directly instead the when(...) and
-	 * response(...) or forward(...) or error(...) methods should be used for example:
-	 * <pre>
-	 * mockServerClient
-	 *  .when(
-	 *      request()
-	 *          .withPath("/some_path")
-	 *          .withBody("some_request_body"),
-	 *      Times.exactly(5),
-	 *      TimeToLive.exactly(TimeUnit.SECONDS, 120)
-	 *  )
-	 *  .respond(
-	 *      response()
-	 *          .withBody("some_response_body")
-	 *          .withHeader("responseName", "responseValue")
-	 *  )
-	 * </pre>
-	 *
-	 * @param expectations one or more expectations
-	 * @return added or updated expectations
-	 * @deprecated this is deprecated due to unclear naming, use method upsert(Expectation... expectations) instead
-	 */
-	@Deprecated
-	public Expectation[] sendExpectation(final Expectation... expectations)
-	{
-		return this.upsert(expectations);
-	}
-	
-	/**
 	 * Retrieve the active expectations match the httpRequest parameter, use null for the parameter to retrieve all
 	 * expectations
 	 *

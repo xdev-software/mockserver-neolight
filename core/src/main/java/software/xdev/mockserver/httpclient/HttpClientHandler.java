@@ -23,6 +23,9 @@ import java.util.List;
 
 import javax.net.ssl.SSLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -34,6 +37,8 @@ import software.xdev.mockserver.model.Message;
 @ChannelHandler.Sharable
 public class HttpClientHandler extends SimpleChannelInboundHandler<Message>
 {
+	private static final Logger LOG = LoggerFactory.getLogger(HttpClientHandler.class);
+	
 	private final List<String> connectionClosedStrings = Arrays.asList(
 		"Broken pipe",
 		"(broken pipe)",
@@ -57,7 +62,7 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<Message>
 	{
 		if(this.isNotSslException(cause) && this.isNotConnectionReset(cause))
 		{
-			cause.printStackTrace();
+			LOG.error("", cause);
 		}
 		ctx.channel().attr(RESPONSE_FUTURE).get().completeExceptionally(cause);
 		ctx.close();
@@ -66,7 +71,7 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<Message>
 	private boolean isNotSslException(final Throwable cause)
 	{
 		return !(cause.getCause() instanceof SSLException
-			|| cause instanceof DecoderException | cause instanceof NotSslRecordException);
+			|| cause instanceof DecoderException || cause instanceof NotSslRecordException);
 	}
 	
 	private boolean isNotConnectionReset(final Throwable cause)
