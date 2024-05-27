@@ -4,7 +4,7 @@
 
 # MockServer NeoLight
 
-A lightweight rewrite of the abandoned [MockServer project](https://github.com/mock-server/mockserver) with focus on simplicity and maintainability.
+A lightweight rewrite of the abandoned [MockServer project](https://github.com/mock-server/mockserver) with focus on simplicity, maintainability and TestContainers.
 
 > [!NOTE]
 > The full list of changes can be found in the [Changelogs](./CHANGELOG.md#100)
