@@ -419,7 +419,7 @@ public class ConfigurationProperties
 	{
 		InetSocketAddress inetSocketAddress = null;
 		final String proxy = readPropertyHierarchically(properties, key, environmentVariableKey, "");
-		if(isNotBlank(proxy))
+		if(proxy != null && proxy.contains(":"))
 		{
 			final String[] proxyParts = proxy.split(":");
 			if(proxyParts.length > 1)
