@@ -91,3 +91,5 @@ jobs:
           gh_pr_up -B "${{ steps.main.outputs.current_branch }}" \
             --title "Update from template" \
             --body "An automated PR to sync changes from the template into this repo"
+
+## Hey GitHub could you please display these actions?
