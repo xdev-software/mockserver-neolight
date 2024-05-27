@@ -19,10 +19,6 @@ on:
       - '.idea/**'
       - 'assets/**'
 
-env:
-  PRIMARY_MAVEN_MODULE: ${{ github.event.repository.name }}
-  DEMO_MAVEN_MODULE: ${{ github.event.repository.name }}-demo
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -67,7 +63,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: demo-files-java-${{ matrix.java }}
-        path: ${{ env.DEMO_MAVEN_MODULE }}/target/${{ env.DEMO_MAVEN_MODULE }}.jar
+        path: standalone/target/standalone.jar
         if-no-files-found: error
 
   code-style:
