@@ -408,25 +408,6 @@ public class EventBus extends MockServerEventLogNotifier
 		);
 	}
 	
-	private void retrieveLogEntries(
-		final RequestDefinition requestDefinition,
-		final Predicate<EventEntry> logEntryPredicate,
-		final Consumer<Stream<EventEntry>> consumer)
-	{
-		this.disruptor.publishEvent(new EventEntry()
-			.setType(RUNNABLE)
-			.setConsumer(() -> {
-				final HttpRequestMatcher httpRequestMatcher =
-					this.matcherBuilder.transformsToMatcher(requestDefinition);
-				consumer.accept(this.eventLog
-					.stream()
-					.filter(logItem -> logItem.matches(httpRequestMatcher))
-					.filter(logEntryPredicate)
-				);
-			})
-		);
-	}
-	
 	private <T> void retrieveLogEntries(
 		final RequestDefinition requestDefinition,
 		final Predicate<EventEntry> logEntryPredicate,

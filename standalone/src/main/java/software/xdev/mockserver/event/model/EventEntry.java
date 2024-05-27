@@ -45,7 +45,7 @@ public class EventEntry implements EventTranslator<EventEntry>
 {
 	private static final RequestDefinition[] EMPTY_REQUEST_DEFINITIONS = new RequestDefinition[0];
 	private static final RequestDefinition[] DEFAULT_REQUESTS_DEFINITIONS = {request()};
-	public static final DateFormat LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	private final DateFormat logDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	private int hashCode;
 	private String id;
 	private String correlationId;
@@ -114,7 +114,7 @@ public class EventEntry implements EventTranslator<EventEntry>
 	{
 		if(this.timestamp == null)
 		{
-			this.timestamp = LOG_DATE_FORMAT.format(new Date(this.epochTime));
+			this.timestamp = this.logDateFormat.format(new Date(this.epochTime));
 		}
 		return this.timestamp;
 	}

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLException;
@@ -40,8 +41,15 @@ import software.xdev.mockserver.httpclient.SocketConnectionException;
 
 public final class ExceptionHandling
 {
+	private static final Predicate<String> IGNORABLE_CLASS_IN_STACK_PRE_CHECK =
+		s -> s.contains("Channel");
+	@SuppressWarnings("java:S5852")
 	private static final Pattern IGNORABLE_CLASS_IN_STACK =
 		Pattern.compile("^.*(?:Socket|Datagram|Sctp|Udt)Channel.*$");
+	
+	private static final Predicate<String> IGNORABLE_ERROR_MESSAGE_PRE_CHECK =
+		s -> s.toLowerCase().contains("connection") || s.toLowerCase().contains("broken");
+	@SuppressWarnings("java:S5852")
 	private static final Pattern IGNORABLE_ERROR_MESSAGE =
 		Pattern.compile("^.*(?:connection.*(?:reset|closed|abort|broken)|broken.*pipe).*$", Pattern.CASE_INSENSITIVE);
 	
@@ -59,6 +67,7 @@ public final class ExceptionHandling
 	/**
 	 * returns true is the exception was caused by the connection being closed
 	 */
+	@SuppressWarnings("java:S1872") // Not always given
 	public static boolean connectionClosedException(final Throwable throwable)
 	{
 		final String message = String.valueOf(throwable.getMessage()).toLowerCase();
@@ -72,7 +81,7 @@ public final class ExceptionHandling
 		
 		// first try to match connection reset / broke peer based on the regex.
 		// This is the fastest way but may fail on different jdk impls or OS's
-		if(IGNORABLE_ERROR_MESSAGE.matcher(message).matches())
+		if(IGNORABLE_ERROR_MESSAGE_PRE_CHECK.test(message) && IGNORABLE_ERROR_MESSAGE.matcher(message).matches())
 		{
 			return false;
 		}
@@ -98,7 +107,8 @@ public final class ExceptionHandling
 			
 			// This will also match against SocketInputStream which is used by openjdk 7 and maybe
 			// also others
-			if(IGNORABLE_CLASS_IN_STACK.matcher(classname).matches())
+			if(IGNORABLE_CLASS_IN_STACK_PRE_CHECK.test(classname)
+				&& IGNORABLE_CLASS_IN_STACK.matcher(classname).matches())
 			{
 				return false;
 			}

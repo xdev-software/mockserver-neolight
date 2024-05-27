@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +44,13 @@ public class ExpandedParameterDecoder
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ExpandedParameterDecoder.class);
 	
+	private static final Predicate<String> QUOTED_PARAMETER_VALUE_PRE_CHECK =
+		s -> s.contains("\"") || s.contains("'");
+	@SuppressWarnings("java:S5852")
 	private static final Pattern QUOTED_PARAMETER_VALUE = Pattern.compile("^\\s*[\"']+(.*)[\"']+\\s*$");
+	private static final Predicate<String> JSON_VALUE_PRE_CHECK =
+		s -> s.contains("{") || s.contains("[");
+	@SuppressWarnings("java:S5852")
 	private static final Pattern JSON_VALUE = Pattern.compile("(?s)^\\s*[{\\[].*[}\\]]\\s*$");
 	
 	private final ServerConfiguration configuration;
@@ -143,8 +150,12 @@ public class ExpandedParameterDecoder
 			final List<NottableString> splitValues = new ArrayList<>();
 			for(final NottableString value : values)
 			{
-				final Matcher quotedValue = QUOTED_PARAMETER_VALUE.matcher(value.getValue());
-				if(quotedValue.matches())
+				final String actualValue = value.getValue();
+				
+				final Matcher quotedValue = QUOTED_PARAMETER_VALUE_PRE_CHECK.test(actualValue)
+					? QUOTED_PARAMETER_VALUE.matcher(actualValue)
+					: null;
+				if(quotedValue != null && quotedValue.matches())
 				{
 					if(value.isOptional())
 					{
@@ -155,9 +166,9 @@ public class ExpandedParameterDecoder
 						splitValues.add(string(quotedValue.group(1), value.isNot()));
 					}
 				}
-				else if(!JSON_VALUE.matcher(value.getValue()).matches())
+				else if(!(JSON_VALUE_PRE_CHECK.test(actualValue) && JSON_VALUE.matcher(actualValue).matches()))
 				{
-					for(final String splitValue : value.getValue().split(style.getRegex().replace("<name>", name)))
+					for(final String splitValue : actualValue.split(style.getRegex().replace("<name>", name)))
 					{
 						if(value.isOptional())
 						{

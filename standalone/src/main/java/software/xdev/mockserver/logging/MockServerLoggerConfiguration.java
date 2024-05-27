@@ -28,7 +28,7 @@ import software.xdev.mockserver.configuration.ServerConfigurationProperties;
 
 public final class MockServerLoggerConfiguration
 {
-	@SuppressWarnings("java:S106") // If logging configuration fails use System.err
+	@SuppressWarnings({"java:S106", "java:S4507"}) // If logging configuration fails use System.err
 	public static void configureLogger()
 	{
 		try

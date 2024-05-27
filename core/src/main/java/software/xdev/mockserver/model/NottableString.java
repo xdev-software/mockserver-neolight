@@ -259,7 +259,7 @@ public class NottableString extends ObjectWithJsonToString implements Comparable
 			{
 				return this.value == null;
 			}
-			final boolean reverse = (that.not != this.not) && (that.not || this.not);
+			final boolean reverse = !Objects.equals(that.not, this.not);
 			if(ignoreCase)
 			{
 				return reverse != that.getValue().equalsIgnoreCase(this.value);
@@ -313,7 +313,7 @@ public class NottableString extends ObjectWithJsonToString implements Comparable
 		}
 		else
 		{
-			final boolean reverse = (two.not != one.not) && (two.not || one.not);
+			final boolean reverse = !Objects.equals(two.not, one.not);
 			return reverse != two.value.equals(one.value);
 		}
 	}
