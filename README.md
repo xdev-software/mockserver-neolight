@@ -7,7 +7,7 @@
 A lightweight rewrite of the abandoned [MockServer project](https://github.com/mock-server/mockserver) with focus on simplicity and maintainability.
 
 > [!NOTE]
-> The full list of changes can be found in the [Changelogs](./CHANGELOG.md)
+> The full list of changes can be found in the [Changelogs](./CHANGELOG.md#100)
 
 ## Installation
 [Installation guide for the latest release](https://github.com/xdev-software/mockserver-neolight/releases/latest#Installation)
