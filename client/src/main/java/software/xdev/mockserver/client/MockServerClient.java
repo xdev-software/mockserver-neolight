@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import software.xdev.mockserver.authentication.AuthenticationException;
-import software.xdev.mockserver.client.MockServerEventBus.EventType;
+import software.xdev.mockserver.client.MockServerClientEventBus.EventType;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
 import software.xdev.mockserver.configuration.ClientConfiguration;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
@@ -86,7 +86,7 @@ public class MockServerClient implements Stoppable
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MockServerClient.class);
 	
-	private static final Map<Integer, MockServerEventBus> EVENT_BUS_MAP = new ConcurrentHashMap<>();
+	private static final Map<Integer, MockServerClientEventBus> EVENT_BUS_MAP = new ConcurrentHashMap<>();
 	private final EventLoopGroup eventLoopGroup;
 	private final String host;
 	private final String contextPath;
@@ -265,11 +265,11 @@ public class MockServerClient implements Stoppable
 		return this;
 	}
 	
-	private MockServerEventBus getMockServerEventBus()
+	private MockServerClientEventBus getMockServerEventBus()
 	{
 		if(EVENT_BUS_MAP.get(this.port()) == null)
 		{
-			EVENT_BUS_MAP.put(this.port(), new MockServerEventBus());
+			EVENT_BUS_MAP.put(this.port(), new MockServerClientEventBus());
 		}
 		return EVENT_BUS_MAP.get(this.port());
 	}

@@ -25,7 +25,7 @@ import java.util.Set;
  * A publish/subscribe communication channel between {@link MockServerClient} and {@link ForwardChainExpectation}
  * instances
  */
-final class MockServerEventBus
+class MockServerClientEventBus
 {
 	private final Map<EventType, Set<SubscriberHandler>> subscribers = new LinkedHashMap<>();
 	

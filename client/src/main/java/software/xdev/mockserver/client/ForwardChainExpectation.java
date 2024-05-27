@@ -20,7 +20,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.util.concurrent.Future;
 
 import io.netty.channel.nio.NioEventLoopGroup;
-import software.xdev.mockserver.client.MockServerEventBus.EventType;
+import software.xdev.mockserver.client.MockServerClientEventBus.EventType;
 import software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient;
 import software.xdev.mockserver.closurecallback.websocketclient.WebSocketException;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
@@ -47,11 +47,11 @@ public class ForwardChainExpectation
 	private final ClientConfiguration configuration;
 	private final MockServerClient mockServerClient;
 	private final Expectation expectation;
-	private final MockServerEventBus mockServerEventBus;
+	private final MockServerClientEventBus mockServerEventBus;
 	
 	ForwardChainExpectation(
 		final ClientConfiguration configuration,
-		final MockServerEventBus mockServerEventBus,
+		final MockServerClientEventBus mockServerEventBus,
 		final MockServerClient mockServerClient,
 		final Expectation expectation)
 	{
