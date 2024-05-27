@@ -43,7 +43,7 @@ public class ExpandedParameterDecoder
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ExpandedParameterDecoder.class);
 	
-	private static final Pattern QUOTED_PARAMETER_VALUE = Pattern.compile("\\s*^[\"']+(.*)[\"']+\\s*$");
+	private static final Pattern QUOTED_PARAMETER_VALUE = Pattern.compile("^\\s*[\"']+(.*)[\"']+\\s*$");
 	private static final Pattern JSON_VALUE = Pattern.compile("(?s)^\\s*[{\\[].*[}\\]]\\s*$");
 	
 	private final ServerConfiguration configuration;
@@ -157,7 +157,7 @@ public class ExpandedParameterDecoder
 				}
 				else if(!JSON_VALUE.matcher(value.getValue()).matches())
 				{
-					for(final String splitValue : value.getValue().split(style.getRegex().replaceAll("<name>", name)))
+					for(final String splitValue : value.getValue().split(style.getRegex().replace("<name>", name)))
 					{
 						if(value.isOptional())
 						{

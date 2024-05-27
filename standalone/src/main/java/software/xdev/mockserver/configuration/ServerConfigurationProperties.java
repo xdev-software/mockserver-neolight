@@ -883,9 +883,9 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 				{
 					LOG.debug("Property file not found on classpath using path [{}]", propertyFile());
 				}
-				try
+				try(final FileInputStream fis = new FileInputStream(propertyFile()))
 				{
-					properties.load(new FileInputStream(propertyFile()));
+					properties.load(fis);
 				}
 				catch(final FileNotFoundException e)
 				{

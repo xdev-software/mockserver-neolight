@@ -219,19 +219,7 @@ public final class Main
 				}
 				MockServerLoggerConfiguration.configureLogger();
 				final Integer[] localPorts = INTEGER_STRING_LIST_PARSER.toArray(parsedArgs.get(serverPort.name()));
-				if(parsedArgs.containsKey(proxyRemotePort.name()))
-				{
-					String remoteHost = parsedArgs.get(proxyRemoteHost.name());
-					if(isBlank(remoteHost))
-					{
-						remoteHost = "localhost";
-					}
-					new MockServer(Integer.parseInt(parsedArgs.get(proxyRemotePort.name())), remoteHost, localPorts);
-				}
-				else
-				{
-					new MockServer(localPorts);
-				}
+				launchMockServer(parsedArgs, localPorts);
 				setPort(localPorts);
 			}
 			else
@@ -247,6 +235,24 @@ public final class Main
 			{
 				new RuntimeException("exception while starting: " + ex.getMessage()).printStackTrace(System.err);
 			}
+		}
+	}
+	
+	@SuppressWarnings("resource") // Launch
+	private static void launchMockServer(final Map<String, String> parsedArgs, final Integer[] localPorts)
+	{
+		if(parsedArgs.containsKey(proxyRemotePort.name()))
+		{
+			String remoteHost = parsedArgs.get(proxyRemoteHost.name());
+			if(isBlank(remoteHost))
+			{
+				remoteHost = "localhost";
+			}
+			new MockServer(Integer.parseInt(parsedArgs.get(proxyRemotePort.name())), remoteHost, localPorts);
+		}
+		else
+		{
+			new MockServer(localPorts);
 		}
 	}
 	
