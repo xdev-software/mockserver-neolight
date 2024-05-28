@@ -22,3 +22,6 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 * Improved performance
   * Removed reflective ``equals`` & ``hashCode``
 * Slimed down dependencies
+
+# 0.x.x
+_Preview releases_
