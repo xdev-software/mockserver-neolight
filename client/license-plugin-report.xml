@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="FORMAT" timestamp="1716897041477">
-    <module artifactId="client" groupId="software.xdev.mockserver" version="0.0.1"/>
+<licensePluginReport goal="FORMAT" timestamp="1716912511451">
+    <module artifactId="client" groupId="software.xdev.mockserver" version="0.0.2"/>
     <files>
         <file path="src/main/java/software/xdev/mockserver/authentication/AuthenticationException.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/client/ClientException.java" result="NOOP"/>

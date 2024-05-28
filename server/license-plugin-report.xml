@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="FORMAT" timestamp="1716897043231">
-    <module artifactId="standalone" groupId="software.xdev.mockserver" version="0.0.1"/>
+<licensePluginReport goal="FORMAT" timestamp="1716912513310">
+    <module artifactId="server" groupId="software.xdev.mockserver" version="0.0.2"/>
     <files>
         <file path="src/main/java/software/xdev/mockserver/cache/Entry.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/cache/LRUCache.java" result="NOOP"/>
@@ -28,6 +28,7 @@
         <file path="src/main/java/software/xdev/mockserver/lifecycle/LifeCycle.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/logging/LoggingMessages.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/logging/MockServerLoggerConfiguration.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/mockserver/logging/StandardOutConsoleHandler.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/mappers/FullHttpRequestToMockServerHttpRequest.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/matchers/AbstractHttpRequestMatcher.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/matchers/BinaryMatcher.java" result="NOOP"/>

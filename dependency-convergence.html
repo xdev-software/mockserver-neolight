@@ -29,7 +29,7 @@
           <ul class="breadcrumb">
         <li id="publishDate">Last Published: 2024-05-28<span class="divider">|</span>
 </li>
-          <li id="projectVersion">Version: 0.0.1</li>
+          <li id="projectVersion">Version: 0.0.2</li>
         <li class="pull-right"><a href="./">MockServer NeoLight</a></li>
           </ul>
         </div>
@@ -41,7 +41,8 @@
    <li class="nav-header">Modules</li>
     <li><a href="client/index.html">client</a></li>
     <li><a href="core/index.html">core</a></li>
-    <li><a href="standalone/index.html">standalone</a></li>
+    <li><a href="server/index.html">server</a></li>
+    <li><a href="testcontainers/index.html">testcontainers</a></li>
    <li class="nav-header">Project Documentation</li>
     <li><a href="project-info.html"><span class="icon-chevron-down"></span>Project Information</a>
      <ul class="nav nav-list">
@@ -69,29 +70,94 @@
 <section>
 <h1>Reactor Dependency Convergence</h1>
 <table class="table table-striped"><caption>
+  <b>Legend:</b>
+</caption>
+<tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
+<td>At least one dependency has a differing version of the dependency or has SNAPSHOT dependencies.</td></tr></table><br />
+<table class="table table-striped"><caption>
   <b>Statistics:</b>
 </caption>
 <tr class="a">
 <th>Number of modules:</th>
-<td>4</td></tr>
+<td>5</td></tr>
 <tr class="b">
 <th>Number of dependencies (NOD):</th>
-<td>21</td></tr>
+<td>42</td></tr>
 <tr class="a">
 <th>Number of unique artifacts (NOA):</th>
-<td>21</td></tr>
+<td>47</td></tr>
 <tr class="b">
 <th>Number of version-conflicting artifacts (NOC):</th>
-<td>0</td></tr>
+<td>3</td></tr>
 <tr class="a">
 <th>Number of SNAPSHOT artifacts (NOS):</th>
 <td>0</td></tr>
 <tr class="b">
 <th>Convergence (NOD/NOA):</th>
-<td><img src="images/icon_success_sml.gif" alt="[Success]" />&#160;<b>100 %</b></td></tr>
+<td><img src="images/icon_error_sml.gif" alt="[Error]" />&#160;<b>89 %</b></td></tr>
 <tr class="a">
 <th>Ready for release (100% convergence and no SNAPSHOTS):</th>
-<td><img src="images/icon_success_sml.gif" alt="[Success]" />&#160;<b>Success</b></td></tr></table></section>
+<td><img src="images/icon_error_sml.gif" alt="[Error]" />&#160;<b>Error</b><br />You do not have 100% convergence.</td></tr></table></section><section>
+<h2>Dependencies used in modules</h2><section>
+<h3>com.fasterxml.jackson.core:jackson-annotations</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
+<td>
+<table class="table table-striped">
+<tr class="b">
+<td>2.10.3</td>
+<td>
+<ol style="list-style-type: decimal;">
+<li>software.xdev.mockserver:testcontainers:jar:0.0.2<br />\-&#160;org.testcontainers:testcontainers:jar:1.19.8:compile<br />&#160;&#160;&#160;\-&#160;com.github.docker-java:docker-java-api:jar:3.3.6:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;com.fasterxml.jackson.core:jackson-annotations:jar:2.10.3:compile<br /></li><br /></ol></td></tr>
+<tr class="a">
+<td>2.17.1</td>
+<td>
+<ol style="list-style-type: decimal;">
+<li>software.xdev.mockserver:testcontainers:jar:0.0.2<br />+-&#160;software.xdev.mockserver:client:jar:0.0.2:test<br />|&#160;&#160;\-&#160;software.xdev.mockserver:core:jar:0.0.2:test<br />|&#160;&#160;&#160;&#160;&#160;\-&#160;com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.17.1:test<br />|&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;com.fasterxml.jackson.core:jackson-annotations:jar:2.17.1:test<br />\-&#160;com.fasterxml.jackson.core:jackson-databind:jar:2.17.1:test<br />&#160;&#160;&#160;\-&#160;com.fasterxml.jackson.core:jackson-annotations:jar:2.17.1:compile<br /></li><br /></ol></td></tr></table></td></tr></table></section><section>
+<h3>org.slf4j:slf4j-api</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
+<td>
+<table class="table table-striped">
+<tr class="b">
+<td>1.7.25</td>
+<td>
+<ol style="list-style-type: decimal;">
+<li>software.xdev.mockserver:testcontainers:jar:0.0.2<br />\-&#160;org.testcontainers:testcontainers:jar:1.19.8:compile<br />&#160;&#160;&#160;\-&#160;com.github.docker-java:docker-java-transport-zerodep:jar:3.3.6:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.slf4j:slf4j-api:jar:1.7.25:compile<br /></li><br /></ol></td></tr>
+<tr class="a">
+<td>1.7.30</td>
+<td>
+<ol style="list-style-type: decimal;">
+<li>software.xdev.mockserver:testcontainers:jar:0.0.2<br />\-&#160;org.testcontainers:testcontainers:jar:1.19.8:compile<br />&#160;&#160;&#160;\-&#160;com.github.docker-java:docker-java-api:jar:3.3.6:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.slf4j:slf4j-api:jar:1.7.30:compile<br /></li><br /></ol></td></tr>
+<tr class="b">
+<td>1.7.36</td>
+<td>
+<ol style="list-style-type: decimal;">
+<li>software.xdev.mockserver:testcontainers:jar:0.0.2<br />\-&#160;org.testcontainers:testcontainers:jar:1.19.8:compile<br />&#160;&#160;&#160;\-&#160;org.slf4j:slf4j-api:jar:1.7.36:compile<br /></li><br /></ol></td></tr>
+<tr class="a">
+<td>2.0.13</td>
+<td>
+<ol style="list-style-type: decimal;">
+<li>software.xdev.mockserver:testcontainers:jar:0.0.2<br />+-&#160;org.slf4j:slf4j-api:jar:2.0.13:compile<br />+-&#160;software.xdev.mockserver:client:jar:0.0.2:test<br />|&#160;&#160;\-&#160;software.xdev.mockserver:core:jar:0.0.2:test<br />|&#160;&#160;&#160;&#160;&#160;\-&#160;org.slf4j:slf4j-api:jar:2.0.13:test<br />+-&#160;org.slf4j:slf4j-simple:jar:2.0.13:test<br />|&#160;&#160;\-&#160;org.slf4j:slf4j-api:jar:2.0.13:test<br />\-&#160;software.xdev:testcontainers-advanced-imagebuilder:jar:1.0.1:test<br />&#160;&#160;&#160;\-&#160;org.slf4j:slf4j-api:jar:2.0.13:test<br /></li><br /></ol></td></tr></table></td></tr></table></section><section>
+<h3>org.testcontainers:testcontainers</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
+<td>
+<table class="table table-striped">
+<tr class="b">
+<td>1.19.7</td>
+<td>
+<ol style="list-style-type: decimal;">
+<li>software.xdev.mockserver:testcontainers:jar:0.0.2<br />\-&#160;software.xdev:testcontainers-advanced-imagebuilder:jar:1.0.1:test<br />&#160;&#160;&#160;\-&#160;org.testcontainers:testcontainers:jar:1.19.7:test<br /></li><br /></ol></td></tr>
+<tr class="a">
+<td>1.19.8</td>
+<td>
+<ol style="list-style-type: decimal;">
+<li>software.xdev.mockserver:testcontainers:jar:0.0.2<br />\-&#160;org.testcontainers:testcontainers:jar:1.19.8:compile<br /></li><br /></ol></td></tr></table></td></tr></table></section></section>
         </main>
       </div>
     </div>
