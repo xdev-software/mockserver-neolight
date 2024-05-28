@@ -224,6 +224,7 @@
 						<!-- https://stackoverflow.com/a/1335121 -->
 						<descriptor>src/main/assembly/standalone.xml</descriptor>
 					</descriptors>
+					<finalName>${project.artifactId}</finalName>
 				</configuration>
 				<executions>
 					<execution>
