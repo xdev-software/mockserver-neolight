@@ -258,10 +258,8 @@ public class MockServerClient implements Stoppable
 		{
 			throw new IllegalArgumentException("Request with default properties can not be null");
 		}
-		else
-		{
-			this.requestOverride = requestOverride;
-		}
+		
+		this.requestOverride = requestOverride;
 		return this;
 	}
 	
