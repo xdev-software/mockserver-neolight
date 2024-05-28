@@ -59,10 +59,10 @@ jobs:
           exit 1
         fi
 
-    - name: Upload demo files
+    - name: Upload standalone JAR
       uses: actions/upload-artifact@v4
       with:
-        name: demo-files-java-${{ matrix.java }}
+        name: standalone-${{ matrix.java }}
         path: standalone/target/standalone.jar
         if-no-files-found: error
 
