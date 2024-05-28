@@ -1,6 +1,7 @@
 # 1.0.0
 _Initial release_
 
+## Fork
 Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/mockserver), designed for maintainability and working with Testcontainers
 * Copied over original code of the following modules with minimalistic dependencies:
   * client-java -> client
@@ -25,6 +26,8 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * Removed reflective ``equals`` & ``hashCode``
 * Slimed down dependencies
 * Updated dependencies (fixes various CVEs)
+* [Docker] Use ``eclipse-temurin`` instead of ``distroless``
+  * The overall image is now roughly 2x smaller
 
 ### Fixes the following issues from the [original project](https://github.com/mock-server/mockserver)
 
@@ -34,6 +37,13 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 > * io.netty 4.1.89.Final is using unsupported JDK internal APIs [#1812](https://github.com/mock-server/mockserver/issues/1812)
 > *  MockServerClient.verify(RequestDefinition requestDefinition, VerificationTimes times) not works correctly after update to 5.14.0 [#1524](https://github.com/mock-server/mockserver/issues/1524) 
 > * ... and probably many more
+
+## Testcontainers
+Created a fork of [testcontainers/mockserver](https://java.testcontainers.org/modules/mockserver) that
+* fixes the problem that the docker/containerimage is not useable as
+  * Testcontainers [requires that the used image is always provided by original project](https://github.com/testcontainers/testcontainers-java/blob/6658a2c0a880d01c6d402ea9a4cb5f72eb15083c/modules/mockserver/src/main/java/org/testcontainers/containers/MockServerContainer.java#L37)
+  * The launch arguments are slightly different now (due to usage of ``eclipse-temurin`` instead of ``distroless`` as base image)
+* If no version/[tag](https://docs.docker.com/glossary/#tag) is specified it tries to automatically detect the used Mockserver version from the classpath.<br/>This way it should be easier to tackle incompatibilities between client and server.
 
 # 0.x.x
 _Preview releases_
