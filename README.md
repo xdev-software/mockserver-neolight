@@ -12,6 +12,42 @@ A lightweight rewrite of the abandoned [MockServer project](https://github.com/m
 ## Installation
 [Installation guide for the latest release](https://github.com/xdev-software/mockserver-neolight/releases/latest#Installation)
 
+<table>
+  <tr>
+    <th>Module</th>
+    <th>Distribution</th>
+  </tr>
+  <tr>
+    <td>client</td>
+    <td>
+      <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/client">
+        <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/client?logo=apache%20maven"/>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>standalone</td>
+    <td>
+      <a href="https://hub.docker.com/r/xdevsoftware/mockserver">
+        <img src="https://img.shields.io/docker/v/xdevsoftware/mockserver?sort=semver&logo=docker&label=DockerHub"/>
+        <img src="https://img.shields.io/docker/pulls/xdevsoftware/mockserver?logo=docker&label=pulls"/>
+      </a>
+      <br/>
+      <a href="https://github.com/xdev-software/mockserver-neolight/pkgs/container/mockserver-neolight">
+        <img src="https://img.shields.io/badge/ghcr.io-available-blue?logo=docker"/>
+      </a>
+      <br/>
+      <a href="https://github.com/xdev-software/mockserver-neolight/releases/latest">
+        <img src="https://img.shields.io/github/v/release/xdev-software/mockserver-neolight?logo=apache%20maven&label=github"/>
+      </a>
+      <br/>
+      <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/standalone">
+        <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/standalone?logo=apache%20maven"/>
+      </a>
+    </td>
+  </tr>
+</table>
+
 ## Support
 If you need support as soon as possible and you can't wait for any pull request, feel free to use [our support](https://xdev.software/en/services/support).
 
