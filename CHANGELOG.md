@@ -8,17 +8,17 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
   * netty -> standalone
 * Brought code into a maintainable state
   * Removed about 75% of the original code
-* Removed everything that is not core functionality:
-  * Metrics
-  * MemoryTracing
-  * Templating-Engines
-  * all body matching that requires an external lib (XPATH, JSON, XML, OpenAPI, ...)
-  * Versioncheck
-  * Persistence of expectations to disk
-  * Dashboard (contains self-built webfrontend)
-  * parts of Logging
-  * TLS/SSL MitM (did never work with TLS 1.3+ and HTTP2+ anyway) 
-  * JWT + mDNS auth
+  * Removed everything that is not core functionality:
+    * Metrics
+    * MemoryTracing
+    * Templating-Engines
+    * all body matching that requires an external lib (XPATH, JSON, XML, OpenAPI, ...)
+    * Versioncheck
+    * Persistence of expectations to disk
+    * Dashboard (contains self-built webfrontend)
+    * parts of Logging
+    * TLS/SSL MitM (did never work with TLS 1.3+ and HTTP2+ anyway) 
+    * JWT + mDNS auth
 * Split configuration into corresponding modules
 * Split Logs and Events (e.g. request received) into independent subsystems
 * Improved performance on various places
