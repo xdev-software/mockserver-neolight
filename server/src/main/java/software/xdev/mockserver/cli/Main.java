@@ -49,7 +49,7 @@ public final class Main
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 	
 	static final String USAGE = String.join(NEW_LINE, List.of(
-		"   java -jar <path to mockserver.jar> -serverPort <port> [-proxyRemotePort <port>] [-proxyRemoteHost "
+		"   java -jar <path to server-standalone.jar> -serverPort <port> [-proxyRemotePort <port>] [-proxyRemoteHost "
 			+ "<hostname>] [-logLevel <level>] ",
 		"                                                                                                             "
 			+ "              ",
@@ -109,7 +109,7 @@ public final class Main
 			+ "              ",
 		"                                                                                                             "
 			+ "              ",
-		"   i.e. java -jar ./mockserver.jar -serverPort 1080 -proxyRemotePort 80 -proxyRemoteHost www.mock-server.com "
+		"   i.e. java -jar ./server-standalone.jar -serverPort 1080 -proxyRemotePort 80 -proxyRemoteHost example.org "
 			+ "-logLevel WARN",
 		"                                                                                                             "
 			+ "              "

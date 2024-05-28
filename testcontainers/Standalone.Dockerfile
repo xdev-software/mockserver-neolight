@@ -22,7 +22,7 @@ USER ${userName}
 # Copying context is prepared by Testcontainers
 COPY --chown=${userName}:${groupName} . ./
 
-ARG mvncmd='clean package -pl "standalone" -am -T2C -Dmaven.test.skip'
+ARG mvncmd='clean package -pl "server" -am -T2C -Dmaven.test.skip'
 
 RUN echo "Executing '$mvncmd'"
 RUN chmod +x ./mvnw \
@@ -52,6 +52,6 @@ EXPOSE 1080
 
 USER ${user}
 
-COPY --from=build-env --chown=${user}:${group} build/standalone/target/standalone.jar ${APP_DIR}/standalone.jar
+COPY --from=build-env --chown=${user}:${group} build/server/target/server-standalone.jar ${APP_DIR}/server-standalone.jar
 
-CMD java ${JAVA_OPTS} -jar /opt/app/standalone.jar -serverPort 1080
+CMD java ${JAVA_OPTS} -jar /opt/app/server-standalone.jar -serverPort 1080

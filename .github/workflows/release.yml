@@ -139,27 +139,24 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
 
     - name: Publish to Apache Maven Central
-      run: ./mvnw -B deploy -pl "client,testcontainers" -am -Possrh
+      run: ./mvnw -B deploy -pl "client,server,testcontainers" -am -Possrh
       env:
         MAVEN_CENTRAL_USERNAME: ${{ secrets.S01_OSS_SONATYPE_MAVEN_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.S01_OSS_SONATYPE_MAVEN_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
     
-    - name: Build standalone
-      run: ./mvnw -B package -pl "standalone" -am
-
-    - name: Upload standalone JAR
+    - name: Upload server standalone JAR
       uses: actions/upload-artifact@v4
       with:
-        name: standalone
-        path: standalone/target/standalone.jar
+        name: server-standalone
+        path: server/target/server-standalone.jar
         if-no-files-found: error
 
     - name: Upload Release assets
       uses: shogo82148/actions-upload-release-asset@v1
       with:
         upload_url: ${{ needs.prepare-release.outputs.upload_url }}
-        asset_path: standalone/target/standalone.jar
+        asset_path: server/target/server-standalone.jar
 
   publish-docker:
     runs-on: ubuntu-latest
@@ -178,11 +175,11 @@ jobs:
         git config --global user.name "GitHub Actions"
         git pull
 
-    - name: Download standalone JAR
+    - name: Download server JAR
       uses: actions/download-artifact@v4
       with:
-        name: standalone
-        path: standalone/target
+        name: server-standalone
+        path: server/target
 
     - uses: docker/setup-qemu-action@v3
 
@@ -217,7 +214,7 @@ jobs:
     - uses: docker/build-push-action@v5
       id: push
       with:
-        context: ./standalone
+        context: ./server
         push: true
         platforms: linux/amd64,linux/arm64
         tags: ${{ steps.meta.outputs.tags }}

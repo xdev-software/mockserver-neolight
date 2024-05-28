@@ -29,8 +29,8 @@ class MockServerContainerTest
 	@BeforeAll
 	static void buildImage()
 	{
-		image = DockerImageName.parse(new AdvancedImageFromDockerFile("mockserver-standalone-dynamically-built")
-			.withLoggerForBuild(LoggerFactory.getLogger("container.build.mockserver-standalone"))
+		image = DockerImageName.parse(new AdvancedImageFromDockerFile("mockserver")
+			.withLoggerForBuild(LoggerFactory.getLogger("container.build.mockserver"))
 			.withAdditionalIgnoreLines(
 				// Ignore files that aren't related to the built code
 				".git/**",

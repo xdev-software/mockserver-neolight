@@ -31,7 +31,7 @@ WIP
     </td>
   </tr>
   <tr>
-    <td>standalone</td>
+    <td>server</td>
     <td>
       <a href="https://hub.docker.com/r/xdevsoftware/mockserver">
         <img src="https://img.shields.io/docker/v/xdevsoftware/mockserver?sort=semver&logo=docker&label=DockerHub"/>

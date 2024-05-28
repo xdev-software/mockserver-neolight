@@ -21,7 +21,7 @@
 	<modules>
 		<module>client</module>
 		<module>core</module>
-		<module>standalone</module>
+		<module>server</module>
 		<module>testcontainers</module>
 	</modules>
 

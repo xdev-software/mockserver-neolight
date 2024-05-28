@@ -59,11 +59,11 @@ jobs:
           exit 1
         fi
 
-    - name: Upload standalone JAR
+    - name: Upload standalone server JAR
       uses: actions/upload-artifact@v4
       with:
-        name: standalone-${{ matrix.java }}
-        path: standalone/target/standalone.jar
+        name: server-${{ matrix.java }}
+        path: server/target/server-standalone.jar
         if-no-files-found: error
 
     # Build docker
@@ -73,7 +73,7 @@ jobs:
 
     - uses: docker/build-push-action@v5
       with:
-        context: ./standalone
+        context: ./server
         push: false
         tags: mockserver-standalone:experimental
         platforms: linux/amd64,linux/arm64
