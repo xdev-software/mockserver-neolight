@@ -21,6 +21,6 @@ EXPOSE 1080
 
 USER ${user}
 
-COPY --chown=${user}:${group} target/mockserver-standalone.jar ${APP_DIR}/mockserver-standalone.jar
+COPY --chown=${user}:${group} target/standalone.jar ${APP_DIR}/standalone.jar
 
-CMD java ${JAVA_OPTS} -jar /opt/app/mockserver-standalone.jar -serverPort 1080
+CMD java ${JAVA_OPTS} -jar /opt/app/standalone.jar -serverPort 1080
