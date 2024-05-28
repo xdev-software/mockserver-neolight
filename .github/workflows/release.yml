@@ -113,7 +113,9 @@ jobs:
           * [GitHub Packages (ghcr.io)](https://github.com/xdev-software/mockserver-neolight/pkgs/container/mockserver-neolight)
 
           #### JAR
-          If you don't like to use the docker image, the executable jar is also available at in the release assets below
+          If you don't like to use the docker image, the executable jar is also available 
+          * at [Maven Central](https://repo1.maven.org/maven2/software/xdev/mockserver/server/${{ steps.version.outputs.release }}/server-${{ steps.version.outputs.release }}-standalone.jar)
+          * or in the release assets below
 
   publish-maven:
     runs-on: ubuntu-latest
