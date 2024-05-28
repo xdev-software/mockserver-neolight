@@ -37,6 +37,10 @@ jobs:
   publish-docker:
     runs-on: ubuntu-latest
     needs: publish-maven
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
     steps:
     - uses: actions/checkout@v4
 
