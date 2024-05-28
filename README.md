@@ -42,8 +42,8 @@ WIP
         <img src="https://img.shields.io/badge/ghcr.io-available-blue?logo=docker"/>
       </a>
       <br/>
-      <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/standalone">
-        <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/standalone?logo=apache%20maven"/>
+      <a href="https://github.com/xdev-software/mockserver-neolight/releases/latest">
+        <img src="https://img.shields.io/github/v/release/xdev-software/mockserver-neolight?logo=apache%20maven&label=github"/>
       </a>
     </td>
   </tr>
