@@ -48,7 +48,7 @@ jobs:
     - name: Download server JAR
       uses: actions/download-artifact@v4
       with:
-        name: server
+        name: server-standalone
         path: server/target
 
     - uses: docker/setup-qemu-action@v3
