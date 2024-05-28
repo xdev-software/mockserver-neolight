@@ -293,7 +293,7 @@ public abstract class LifeCycle implements Stoppable
 		if(LOG.isInfoEnabled())
 		{
 			LOG.info(
-				"started on port {}",
+				"started on port{}",
 				ports.size() == 1 ? ": " + ports.get(0) : "s: " + ports);
 		}
 	}

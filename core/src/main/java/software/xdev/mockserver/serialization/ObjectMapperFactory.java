@@ -15,6 +15,7 @@
  */
 package software.xdev.mockserver.serialization;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -261,7 +262,7 @@ public final class ObjectMapperFactory
 		final JsonSerializer[] replacementJsonSerializers,
 		final boolean serialiseDefaultValues)
 	{
-		final List<JsonSerializer> jsonSerializers = Arrays.asList(
+		final List<JsonSerializer> jsonSerializers = new ArrayList<>(List.of(
 			// times
 			new TimesSerializer(),
 			new TimesDTOSerializer(),
@@ -291,7 +292,7 @@ public final class ObjectMapperFactory
 			new HeadersSerializer(),
 			new ParametersSerializer(),
 			new CookiesSerializer()
-		);
+		));
 		customizers().stream()
 			.flatMap(c -> c.additionalSerializers().stream())
 			.forEach(jsonSerializers::add);

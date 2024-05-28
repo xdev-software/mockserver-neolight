@@ -16,7 +16,7 @@
 package software.xdev.mockserver.configuration;
 
 import java.net.InetSocketAddress;
-import java.util.Objects;
+import java.util.function.Supplier;
 
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
@@ -50,7 +50,7 @@ public class Configuration
 	
 	public Integer maxWebSocketExpectations()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.maxWebSocketExpectations,
 			ConfigurationProperties::maxWebSocketExpectations);
 	}
@@ -76,7 +76,7 @@ public class Configuration
 	
 	public Integer clientNioEventLoopThreadCount()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.clientNioEventLoopThreadCount,
 			ConfigurationProperties::clientNioEventLoopThreadCount);
 	}
@@ -97,7 +97,7 @@ public class Configuration
 	
 	public Integer webSocketClientEventLoopThreadCount()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.webSocketClientEventLoopThreadCount,
 			ConfigurationProperties::webSocketClientEventLoopThreadCount);
 	}
@@ -118,7 +118,7 @@ public class Configuration
 	
 	public Long maxFutureTimeoutInMillis()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.maxFutureTimeoutInMillis,
 			ConfigurationProperties::maxFutureTimeout);
 	}
@@ -139,7 +139,7 @@ public class Configuration
 	
 	public Long maxSocketTimeoutInMillis()
 	{
-		return Objects.requireNonNullElseGet(this.maxSocketTimeoutInMillis, ConfigurationProperties::maxSocketTimeout);
+		return ifNullReturn(this.maxSocketTimeoutInMillis, ConfigurationProperties::maxSocketTimeout);
 	}
 	
 	/**
@@ -157,7 +157,7 @@ public class Configuration
 	
 	public Long socketConnectionTimeoutInMillis()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.socketConnectionTimeoutInMillis,
 			ConfigurationProperties::socketConnectionTimeout);
 	}
@@ -177,7 +177,7 @@ public class Configuration
 	
 	public Boolean forwardBinaryRequestsWithoutWaitingForResponse()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.forwardBinaryRequestsWithoutWaitingForResponse,
 			ConfigurationProperties::forwardBinaryRequestsWithoutWaitingForResponse);
 	}
@@ -199,7 +199,7 @@ public class Configuration
 	
 	public Boolean attemptToProxyIfNoMatchingExpectation()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.attemptToProxyIfNoMatchingExpectation,
 			ConfigurationProperties::attemptToProxyIfNoMatchingExpectation);
 	}
@@ -222,7 +222,7 @@ public class Configuration
 	
 	public InetSocketAddress forwardHttpProxy()
 	{
-		return Objects.requireNonNullElseGet(this.forwardHttpProxy, ConfigurationProperties::forwardHttpProxy);
+		return ifNullReturn(this.forwardHttpProxy, ConfigurationProperties::forwardHttpProxy);
 	}
 	
 	/**
@@ -241,7 +241,7 @@ public class Configuration
 	
 	public InetSocketAddress forwardSocksProxy()
 	{
-		return Objects.requireNonNullElseGet(this.forwardSocksProxy, ConfigurationProperties::forwardSocksProxy);
+		return ifNullReturn(this.forwardSocksProxy, ConfigurationProperties::forwardSocksProxy);
 	}
 	
 	/**
@@ -259,7 +259,7 @@ public class Configuration
 	
 	public String forwardProxyAuthenticationUsername()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.forwardProxyAuthenticationUsername,
 			ConfigurationProperties::forwardProxyAuthenticationUsername);
 	}
@@ -287,7 +287,7 @@ public class Configuration
 	
 	public String forwardProxyAuthenticationPassword()
 	{
-		return Objects.requireNonNullElseGet(
+		return ifNullReturn(
 			this.forwardProxyAuthenticationPassword,
 			ConfigurationProperties::forwardProxyAuthenticationPassword);
 	}
@@ -311,5 +311,10 @@ public class Configuration
 	{
 		this.forwardProxyAuthenticationPassword = forwardProxyAuthenticationPassword;
 		return this;
+	}
+	
+	protected static <T> T ifNullReturn(final T value, final Supplier<T> otherSupplier)
+	{
+		return value != null ? value : otherSupplier.get();
 	}
 }
