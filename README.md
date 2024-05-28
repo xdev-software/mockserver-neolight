@@ -45,6 +45,17 @@ WIP
       <a href="https://github.com/xdev-software/mockserver-neolight/releases/latest">
         <img src="https://img.shields.io/github/v/release/xdev-software/mockserver-neolight?logo=apache%20maven&label=github"/>
       </a>
+      <br/>
+      <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/server">
+        <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/server?logo=apache%20maven"/>
+    </td>
+  </tr>
+  <tr>
+    <td>testcontainers</td>
+    <td>
+      <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/testcontainers">
+        <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/testcontainers?logo=apache%20maven"/>
+      </a>
     </td>
   </tr>
 </table>
