@@ -76,7 +76,10 @@ public class PathParametersDecoder
 	public Parameters extractPathParameters(final HttpRequest matcher, final HttpRequest matched)
 	{
 		final Parameters parsedParameters =
-			matched.getPathParameters() != null ? matched.getPathParameters() : new Parameters();
+			matched.getPathParameters() != null
+				// https://github.com/mock-server/mockserver/pull/1791
+				? matched.getPathParameters().clone()
+				: new Parameters();
 		if(matcher.getPathParameters() != null && !matcher.getPathParameters().isEmpty())
 		{
 			final String[] matcherPathParts = this.getPathParts(matcher.getPath());

@@ -32,6 +32,7 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 > * ARM image doesn't include ARM binaries [#1568](https://github.com/mock-server/mockserver/issues/1568)
 > * Add any Shell to Docker Container [#1593](https://github.com/mock-server/mockserver/issues/1593)
 > * io.netty 4.1.89.Final is using unsupported JDK internal APIs [#1812](https://github.com/mock-server/mockserver/issues/1812)
+> *  MockServerClient.verify(RequestDefinition requestDefinition, VerificationTimes times) not works correctly after update to 5.14.0 [#1524](https://github.com/mock-server/mockserver/issues/1524) 
 > * ... and probably many more
 
 # 0.x.x
