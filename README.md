@@ -1,4 +1,4 @@
-[![Latest version](https://img.shields.io/maven-central/v/software.xdev/mockserver-neolight?logo=apache%20maven)](https://mvnrepository.com/artifact/software.xdev/mockserver-neolight)
+[![Latest version](https://img.shields.io/maven-central/v/software.xdev.mockserver/client?logo=apache%20maven)](https://mvnrepository.com/artifact/software.xdev.mockserver/client)
 [![Build](https://img.shields.io/github/actions/workflow/status/xdev-software/mockserver-neolight/checkBuild.yml?branch=develop)](https://github.com/xdev-software/mockserver-neolight/actions/workflows/checkBuild.yml?query=branch%3Adevelop)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=xdev-software_mockserver-neolight&metric=alert_status)](https://sonarcloud.io/dashboard?id=xdev-software_mockserver-neolight)
 
