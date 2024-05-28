@@ -113,9 +113,7 @@ jobs:
           * [GitHub Packages (ghcr.io)](https://github.com/xdev-software/mockserver-neolight/pkgs/container/mockserver-neolight)
 
           #### JAR
-          The executable jar is available at
-          * [Maven Central](https://repo1.maven.org/maven2/software/xdev/mockserver/standalone/${{ steps.version.outputs.release }}/standalone-${{ steps.version.outputs.release }}.jar)
-          * in the release assets below
+          If you don't like to use the docker image, the executable jar is also available at in the release assets below
 
   publish-maven:
     runs-on: ubuntu-latest
@@ -141,12 +139,15 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
 
     - name: Publish to Apache Maven Central
-      run: ./mvnw -B deploy -pl "client,standalone" -am -Possrh
+      run: ./mvnw -B deploy -pl "client" -am -Possrh
       env:
         MAVEN_CENTRAL_USERNAME: ${{ secrets.S01_OSS_SONATYPE_MAVEN_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.S01_OSS_SONATYPE_MAVEN_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
     
+    - name: Build standalone
+      run: ./mvnw -B package -pl "standalone" -am
+
     - name: Upload standalone JAR
       uses: actions/upload-artifact@v4
       with:
