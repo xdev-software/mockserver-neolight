@@ -72,8 +72,8 @@ jobs:
     - uses: docker/setup-buildx-action@v3
 
     - uses: docker/build-push-action@v5
-      working-directory: standalone
       with:
+        context: ./standalone
         push: false
         tags: mockserver-standalone:experimental
         cache-from: type=gha
