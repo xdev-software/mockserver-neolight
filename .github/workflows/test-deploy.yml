@@ -3,11 +3,8 @@ name: Test Deployment
 on:
   workflow_dispatch:
 
-env:
-  PRIMARY_MAVEN_MODULE: ${{ github.event.repository.name }}
-
 jobs:
-  publish_central: # Publish the code to central
+  publish-maven:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -24,9 +21,15 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
 
     - name: Publish to OSSRH
-      run: ../mvnw -B deploy -Possrh
-      working-directory: ${{ env.PRIMARY_MAVEN_MODULE }}
+      run: ./mvnw -B deploy -pl "client,standalone" -am -Possrh
       env:
         MAVEN_CENTRAL_USERNAME: ${{ secrets.S01_OSS_SONATYPE_MAVEN_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.S01_OSS_SONATYPE_MAVEN_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+    - name: Upload standalone JAR
+      uses: actions/upload-artifact
+      with:
+        name: standalone
+        path: standalone/target/standalone.jar
+        if-no-files-found: error
