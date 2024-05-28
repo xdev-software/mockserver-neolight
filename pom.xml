@@ -9,6 +9,10 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<name>MockServer NeoLight</name>
+	<description>A lightweight rewrite of the MockServer project with focus on simplicity, maintainability and Testcontainers</description>
+	<url>https://github.com/xdev-software/mockserver-neolight</url>
+
 	<organization>
 		<name>XDEV Software</name>
 		<url>https://xdev.software</url>
@@ -27,6 +31,23 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>4.0.0-M14</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>3.5.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
 	<profiles>
 		<profile>

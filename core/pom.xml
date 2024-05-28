@@ -9,7 +9,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>mockserver-neolight-core</name>
+	<name>core</name>
 	<description>MockServer NeoLight Core</description>
 	<url>https://github.com/xdev-software/mockserver-neolight</url>
 
