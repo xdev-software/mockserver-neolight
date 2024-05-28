@@ -66,6 +66,19 @@ jobs:
         path: standalone/target/standalone.jar
         if-no-files-found: error
 
+    # Build docker
+    - uses: docker/setup-qemu-action@v3
+
+    - uses: docker/setup-buildx-action@v3
+
+    - uses: docker/build-push-action@v5
+      working-directory: standalone
+      with:
+        push: false
+        tags: mockserver-standalone:experimental
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
   code-style:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'pull_request' || !startsWith(github.head_ref, 'renovate/') }}
