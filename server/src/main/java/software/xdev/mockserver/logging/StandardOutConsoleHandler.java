@@ -19,7 +19,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
 
-// Used by MockServerLoggerConfiguration
+@SuppressWarnings({"java:S3551", "unused"}) // Used by MockServerLoggerConfiguration
 public class StandardOutConsoleHandler extends StreamHandler
 {
 	@SuppressWarnings("java:S106")
