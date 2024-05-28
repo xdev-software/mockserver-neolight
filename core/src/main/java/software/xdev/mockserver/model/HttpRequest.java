@@ -164,7 +164,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	/**
 	 * Specify remote address by attempting to derive it from the host header and / or the specified port
 	 *
-	 * @param isSecure true if the request was made with TLS or SSL
 	 * @param host     the remote host or ip to send request to
 	 * @param port     the remote port to send request to
 	 */
