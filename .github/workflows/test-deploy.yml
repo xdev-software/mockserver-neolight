@@ -36,6 +36,7 @@ jobs:
 
   publish-docker:
     runs-on: ubuntu-latest
+    needs: publish-maven
     steps:
     - uses: actions/checkout@v4
 
