@@ -10,6 +10,10 @@ A lightweight rewrite of the abandoned [MockServer project](https://github.com/m
 > [!NOTE]
 > The full list of changes can be found in the [Changelogs](./CHANGELOG.md#100)
 
+## Usage
+
+WIP
+
 ## Installation
 [Installation guide for the latest release](https://github.com/xdev-software/mockserver-neolight/releases/latest#Installation)
 
