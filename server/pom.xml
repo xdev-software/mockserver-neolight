@@ -220,10 +220,10 @@
 							<Multi-Release>true</Multi-Release>
 						</manifestEntries>
 					</archive>
-					<descriptorRefs>
+					<descriptors>
 						<!-- https://stackoverflow.com/a/1335121 -->
-						<descriptorRef>src/main/assembly/server.xml</descriptorRef>
-					</descriptorRefs>
+						<descriptor>src/main/assembly/standalone.xml</descriptor>
+					</descriptors>
 				</configuration>
 				<executions>
 					<execution>
