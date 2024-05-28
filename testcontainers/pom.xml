@@ -5,12 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>software.xdev.mockserver</groupId>
-	<artifactId>core</artifactId>
+	<artifactId>testcontainers</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>core</name>
-	<description>MockServer NeoLight Core</description>
+	<name>testcontainers</name>
+	<description>MockServer NeoLight Testcontainers Module</description>
 	<url>https://github.com/xdev-software/mockserver-neolight</url>
 
 	<scm>
@@ -47,6 +47,9 @@
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<!-- by default run no tests as Docker is required -->
+		<skipTests>true</skipTests>
 	</properties>
 
 	<repositories>
@@ -84,52 +87,52 @@
 		</repository>
 	</distributionManagement>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.fasterxml.jackson</groupId>
-				<artifactId>jackson-bom</artifactId>
-				<version>2.17.1</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-bom</artifactId>
-				<version>4.1.110.Final</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<dependencies>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>1.19.8</version>
+			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
-
+		<!-- Testcontainers is using outdated v1 -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>2.0.13</version>
 		</dependency>
 
+		<!-- Tests -->
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-transport</artifactId>
+			<groupId>software.xdev.mockserver</groupId>
+			<artifactId>client</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-codec-http2</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.10.2</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-handler-proxy</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>2.0.13</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>software.xdev</groupId>
+			<artifactId>testcontainers-advanced-imagebuilder</artifactId>
+			<version>1.0.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Force a Jackson version that is not from the last decade (Testcontainers brings 2.10) -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.17.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -191,23 +194,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.4.1</version>
-				<configuration>
-					<archive>
-						<manifestSections>
-							<manifestSection>
-								<name>Mockserver-Info</name>
-								<manifestEntries>
-									<Version>${project.version}</Version>
-								</manifestEntries>
-							</manifestSection>
-						</manifestSections>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.6.3</version>
 				<executions>
@@ -238,9 +224,24 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<skipTests>${skipTests}</skipTests>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
+		<profile>
+			<id>run-integration-tests</id>
+			<properties>
+				<skipTests>false</skipTests>
+			</properties>
+		</profile>
 		<profile>
 			<id>ossrh</id>
 			<build>

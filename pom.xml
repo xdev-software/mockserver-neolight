@@ -22,6 +22,7 @@
 		<module>client</module>
 		<module>core</module>
 		<module>standalone</module>
+		<module>testcontainers</module>
 	</modules>
 
 	<licenses>
