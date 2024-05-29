@@ -30,6 +30,7 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 * Updated dependencies (fixes various CVEs)
 * [Docker] Use ``eclipse-temurin`` instead of ``distroless``
   * The overall image is now roughly 2x smaller
+* Compiles now with Java 17+
 
 ### Fixes the following issues from the [original project](https://github.com/mock-server/mockserver)
 
