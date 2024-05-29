@@ -8,7 +8,7 @@
 A lightweight rewrite of the abandoned [MockServer project](https://github.com/mock-server/mockserver) with focus on simplicity, maintainability and [Testcontainers](https://java.testcontainers.org/).
 
 > [!NOTE]
-> The full list of changes can be found in the [Changelog](./CHANGELOG.md#100)<br/>
+> The full list of changes can be found in the [changelog](./CHANGELOG.md#100)<br/>
 > You may also have a look at the [comparison with other frameworks](./docs/COMPARISON.md).
 
 ## Usage
