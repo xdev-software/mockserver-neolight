@@ -35,7 +35,6 @@ public final class SocksDetector
 {
 	private SocksDetector()
 	{
-		throw new UnsupportedOperationException();
 	}
 	
 	public static boolean isSocks4(final ByteBuf msg, final int actualReadableBytes)

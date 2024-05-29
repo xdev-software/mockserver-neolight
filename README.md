@@ -17,23 +17,23 @@ A lightweight rewrite of the abandoned [MockServer project](https://github.com/m
 Besides a few differences the usage is mostly identical to the original project.
 
 ```java
-try(final MockServerContainer container = new MockServerContainer())
+try(MockServerContainer container = new MockServerContainer())
 {
   container.start();
   
-  try(final MockServerClient client = new MockServerClient(
+  try(MockServerClient client = new MockServerClient(
     container.getHost(),
     container.getServerPort()))
   {
-    final String expectedResponse = "Test";
+    String expectedResponse = "Test";
     // Setup the expectation
-    client.when(request().withPath("/test").withMethod("GET"))
+    client.when(request("/test").withMethod("GET"))
       .respond(response().withBody(expectedResponse));
     
-    final HttpClient httpClient = HttpClient.newHttpClient();
+    HttpClient httpClient = HttpClient.newHttpClient();
     
-    // Do the request
-    final HttpResponse<String> resp = httpClient.send(
+    // Execute request
+    HttpResponse<String> resp = httpClient.send(
       HttpRequest.newBuilder()
         .uri(URI.create(container.getEndpoint() + "/test"))
         .GET()
@@ -44,6 +44,66 @@ try(final MockServerContainer container = new MockServerContainer())
   }
 }
 ```
+
+<details><summary>Example using forwarding/recording</summary>
+
+```java
+try(MockServerContainer container = new MockServerContainer())
+{
+  container.start();
+  
+  try(MockServerClient client = new MockServerClient(
+    container.getHost(),
+    container.getServerPort()))
+  {
+    // Setup the forwarding
+    client.when(request("/"))
+      .forward(HttpForward.forward().withHost("my-nginx.local"));
+    
+    HttpClient httpClient = HttpClient.newHttpClient();
+    
+    // Execute request
+    HttpResponse<String> resp = httpClient.send(
+      HttpRequest.newBuilder()
+        .uri(URI.create(container.getEndpoint() + "/"))
+        .GET()
+        .build(),
+      HttpResponse.BodyHandlers.ofString());
+    
+    assertTrue(resp.body().contains("Welcome to nginx!"));
+    
+    // You can also retrieve requests, expectations and responses
+    String recorded =
+      client.retrieveRecordedRequestsAndResponses(request("/"), Format.JSON);
+    // or generate the code for writing them
+    String codeToGenerateExpectation =
+      client.retrieveRecordedExpectations(request("/"), Format.JAVA);
+  }
+}
+```
+
+The returned ``codeToGenerateExpectation`` will look like this:
+```java
+new MockServerClient("localhost", 1080)
+.when(
+        request()
+                .withMethod("GET")
+                .withPath("/")
+                ...,
+        Times.once(),
+        TimeToLive.unlimited(),
+        0
+)
+.respond(
+        response()
+                .withStatusCode(200)
+                .withReasonPhrase("OK")
+                .withHeaders(...)
+                .withBody("<!DOCTYPE html>\n<html>\n<head>\n<title>Welcome to nginx!</title>...")
+);
+```
+
+</details>
 
 <details><summary>Required dependencies in <code>pom.xml</code></summary>
 
