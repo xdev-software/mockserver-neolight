@@ -1,6 +1,6 @@
 # Comparison of similar frameworks
 
-This list contains a comparison with the most popular and open source [API simulation tools](https://en.wikipedia.org/wiki/Comparison_of_API_simulation_tools)
+This list contains a comparison with the most popular open source [API simulation tools](https://en.wikipedia.org/wiki/Comparison_of_API_simulation_tools)
 
 <details><summary>Chosen criteria</summary>
 
