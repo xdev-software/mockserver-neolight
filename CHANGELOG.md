@@ -32,6 +32,7 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 * [Docker] Use ``eclipse-temurin`` instead of ``distroless``
   * The overall image is now roughly 2x smaller
 * Compiles now with Java 17+
+* No longer catches critical ``Errors`` such as ``OutOfMemoryError`` or ``NoClassDefFoundError``
 
 ### Migration guide
 * Change all occurrences of ``org.mockserver`` to ``software.xdev.mockserver``
