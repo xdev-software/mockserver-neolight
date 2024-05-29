@@ -22,6 +22,7 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
     * JWT + mDNS auth
 * Split configuration into corresponding modules
 * Split Logs and Events (e.g. request received) into independent subsystems
+  * Client no longer messes up logging
 * Improved performance on various places
   * Removed reflective ``equals`` & ``hashCode``
 * Slimed down dependencies
@@ -31,6 +32,9 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 * [Docker] Use ``eclipse-temurin`` instead of ``distroless``
   * The overall image is now roughly 2x smaller
 * Compiles now with Java 17+
+
+### Migration guide
+* Change all occurrences of ``org.mockserver`` to ``software.xdev.mockserver``
 
 ### Fixes the following issues from the [original project](https://github.com/mock-server/mockserver)
 
