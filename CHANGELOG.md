@@ -1,7 +1,7 @@
 # 1.0.0
 _Initial release_
 
-## Fork
+## MockServer
 Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/mockserver), designed for maintainability and working with Testcontainers
 * Copied over original code of the following modules with minimalistic dependencies:
   * client-java -> client
@@ -31,12 +31,12 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 
 ### Fixes the following issues from the [original project](https://github.com/mock-server/mockserver)
 
-> * Removed useless/Minimize dependencies of ``mockserver-client-java`` [#1494](https://github.com/mock-server/mockserver/issues/1494)
-> * ARM image doesn't include ARM binaries [#1568](https://github.com/mock-server/mockserver/issues/1568)
-> * Add any Shell to Docker Container [#1593](https://github.com/mock-server/mockserver/issues/1593)
-> * io.netty 4.1.89.Final is using unsupported JDK internal APIs [#1812](https://github.com/mock-server/mockserver/issues/1812)
-> *  MockServerClient.verify(RequestDefinition requestDefinition, VerificationTimes times) not works correctly after update to 5.14.0 [#1524](https://github.com/mock-server/mockserver/issues/1524) 
-> * ... and probably many more
+* Removed useless/Minimize dependencies of ``mockserver-client-java`` [#1494](https://github.com/mock-server/mockserver/issues/1494)
+* ARM image doesn't include ARM binaries [#1568](https://github.com/mock-server/mockserver/issues/1568)
+* Add any Shell to Docker Container [#1593](https://github.com/mock-server/mockserver/issues/1593)
+* io.netty 4.1.89.Final is using unsupported JDK internal APIs [#1812](https://github.com/mock-server/mockserver/issues/1812)
+*  MockServerClient.verify(RequestDefinition requestDefinition, VerificationTimes times) not works correctly after update to 5.14.0 [#1524](https://github.com/mock-server/mockserver/issues/1524) 
+* ... and probably many more
 
 ## Testcontainers
 Created a fork of [testcontainers/mockserver](https://java.testcontainers.org/modules/mockserver) that
