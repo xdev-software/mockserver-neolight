@@ -26,7 +26,7 @@ try(MockServerContainer container = new MockServerContainer())
     container.getServerPort()))
   {
     String expectedResponse = "Test";
-    // Setup the expectation
+    // Setup expectation
     client.when(request("/test").withMethod("GET"))
       .respond(response().withBody(expectedResponse));
     
@@ -56,7 +56,7 @@ try(MockServerContainer container = new MockServerContainer())
     container.getHost(),
     container.getServerPort()))
   {
-    // Setup the forwarding
+    // Setup forwarding
     client.when(request("/"))
       .forward(HttpForward.forward().withHost("my-nginx.local"));
     
