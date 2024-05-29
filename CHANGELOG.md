@@ -4,9 +4,9 @@ _Initial release_
 ## MockServer
 Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/mockserver), designed for maintainability and working with Testcontainers
 * Copied over original code of the following modules with minimalistic dependencies:
-  * client-java -> client
-  * core -> core
-  * netty -> server
+  * client-java → client
+  * core → core
+  * netty → server
 * Brought code into a maintainable state
   * Removed about 75% of the original code
   * Removed everything that is not core functionality:
@@ -22,12 +22,19 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
     * JWT + mDNS auth
 * Split configuration into corresponding modules
 * Split Logs and Events (e.g. request received) into independent subsystems
+  * Client no longer messes up logging
 * Improved performance on various places
   * Removed reflective ``equals`` & ``hashCode``
 * Slimed down dependencies
+  * Standalone Server Jar is now 6x smaller (42MB → 6MB)
+  * Reduced client dependencies by 60% (~42 → 17)
 * Updated dependencies (fixes various CVEs)
 * [Docker] Use ``eclipse-temurin`` instead of ``distroless``
   * The overall image is now roughly 2x smaller
+* Compiles now with Java 17+
+
+### Migration guide
+* Change all occurrences of ``org.mockserver`` to ``software.xdev.mockserver``
 
 ### Fixes the following issues from the [original project](https://github.com/mock-server/mockserver)
 

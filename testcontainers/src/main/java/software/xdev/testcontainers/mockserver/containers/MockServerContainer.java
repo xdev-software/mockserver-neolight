@@ -49,6 +49,11 @@ public class MockServerContainer extends GenericContainer<MockServerContainer>
 		this(MockServerUtils.getClasspathMockserverVersion());
 	}
 	
+	public MockServerContainer withArgOverride(final String args)
+	{
+		return this.withEnv("ARGS", args);
+	}
+	
 	public String getEndpoint()
 	{
 		return String.format("http://%s:%d", this.getHost(), this.getServerPort());
