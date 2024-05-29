@@ -25,6 +25,8 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 * Improved performance on various places
   * Removed reflective ``equals`` & ``hashCode``
 * Slimed down dependencies
+  * Standalone Server Jar is now 6x smaller (42MB → 6MB)
+  * Reduced client dependencies by 60% (~42 → 17)
 * Updated dependencies (fixes various CVEs)
 * [Docker] Use ``eclipse-temurin`` instead of ``distroless``
   * The overall image is now roughly 2x smaller
