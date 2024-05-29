@@ -1,3 +1,3 @@
 # Client
 
-Client to configure the [Server](../server/)
+The dedicated client to configure the [server](../server/)
