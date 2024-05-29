@@ -105,6 +105,16 @@ jobs:
           </dependency>
           ```
 
+          ### Testcontainers Integration
+          Add the following lines to your pom:
+          ```XML
+          <dependency>
+             <groupId>software.xdev.mockserver</groupId>
+             <artifactId>testcontainers</artifactId>
+             <version>${{ steps.version.outputs.release }}</version>
+          </dependency>
+          ```
+
           ### Standalone/Server
 
           #### Docker

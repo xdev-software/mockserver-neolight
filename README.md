@@ -8,11 +8,67 @@
 A lightweight rewrite of the abandoned [MockServer project](https://github.com/mock-server/mockserver) with focus on simplicity, maintainability and [Testcontainers](https://java.testcontainers.org/).
 
 > [!NOTE]
-> The full list of changes can be found in the [Changelogs](./CHANGELOG.md#100)
+> The full list of changes can be found in the [Changelog](./CHANGELOG.md#100)
+> You may also have a look at the [comparison with other frameworks](./docs/COMPARISON.md).
 
 ## Usage
 
-WIP
+### In combination with Testcontainers
+Besides a few differences the usage is mostly identical to the original project.
+
+```java
+try(final MockServerContainer container = new MockServerContainer())
+{
+  container.start();
+  
+  try(final MockServerClient client = new MockServerClient(
+    container.getHost(),
+    container.getServerPort()))
+  {
+    final String expectedResponse = "Test";
+    // Setup the expectation
+    client.when(request().withPath("/test").withMethod("GET"))
+      .respond(response().withBody(expectedResponse));
+    
+    final HttpClient httpClient = HttpClient.newHttpClient();
+    
+    // Do the request
+    final HttpResponse<String> resp = httpClient.send(
+      HttpRequest.newBuilder()
+        .uri(URI.create(container.getEndpoint() + "/test"))
+        .GET()
+        .build(),
+      HttpResponse.BodyHandlers.ofString());
+    
+    assertEquals(expectedResponse, resp.body());
+  }
+}
+```
+
+<details><summary>Required dependencies in <code>pom.xml</code></summary>
+
+```xml
+<dependency>
+   <groupId>software.xdev.mockserver</groupId>
+   <artifactId>client</artifactId>
+   <version>...</version>
+   <scope>test</scope>
+</dependency>
+<dependency>
+   <groupId>software.xdev.mockserver</groupId>
+   <artifactId>testcontainers</artifactId>
+   <version>...</version>
+   <scope>test</scope>
+</dependency>
+```
+
+</details>
+
+### Further documentation
+* [Original project](https://www.mock-server.com/)
+* [Testcontainers Mockserver module](https://java.testcontainers.org/modules/mockserver/)
+
+MockServer also works really well together with a network failure simulation tools such as [ToxiProxy](https://java.testcontainers.org/modules/toxiproxy/).
 
 ## Installation
 [Installation guide for the latest release](https://github.com/xdev-software/mockserver-neolight/releases/latest#Installation)
@@ -20,10 +76,10 @@ WIP
 <table>
   <tr>
     <th>Module</th>
-    <th>Distribution</th>
+    <th>Distribution via</th>
   </tr>
   <tr>
-    <td>client</td>
+    <td><a href="./client/">client</a></td>
     <td>
       <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/client">
         <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/client?logo=apache%20maven"/>
@@ -31,7 +87,7 @@ WIP
     </td>
   </tr>
   <tr>
-    <td>server</td>
+    <td><a href="./server/">server</a></td>
     <td>
       <a href="https://hub.docker.com/r/xdevsoftware/mockserver">
         <img src="https://img.shields.io/docker/v/xdevsoftware/mockserver?sort=semver&logo=docker&label=DockerHub"/>
@@ -51,7 +107,7 @@ WIP
     </td>
   </tr>
   <tr>
-    <td>testcontainers</td>
+    <td><a href="./testcontainers/">testcontainers</a></td>
     <td>
       <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/testcontainers">
         <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/testcontainers?logo=apache%20maven"/>
