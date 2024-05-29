@@ -23,9 +23,7 @@ This list contains a comparison with the most popular open source [API simulatio
     </tr>
     <tr>
         <td>
-            <a href="https://github.com/xdev-software/mockserver-neolight">
-                MockServer NeoLight
-            </a>
+            MockServer NeoLight
         </td>
         <td>
             ✔ Same as MockServer below
