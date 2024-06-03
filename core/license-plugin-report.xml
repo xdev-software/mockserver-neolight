@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="FORMAT" timestamp="1716984144277">
-    <module artifactId="core" groupId="software.xdev.mockserver" version="0.0.4"/>
+<licensePluginReport goal="FORMAT" timestamp="1717427423740">
+    <module artifactId="core" groupId="software.xdev.mockserver" version="1.0.0"/>
     <files>
         <file path="src/main/java/software/xdev/mockserver/character/Character.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/closurecallback/websocketclient/WebSocketClient.java" result="NOOP"/>
