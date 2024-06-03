@@ -32,10 +32,10 @@ This list contains a comparison with the most popular open source [API simulatio
             ✔ Split into a optimized client and server module
         </td>
         <td>
-            ✔ <a href="../testcontainers/">Yes</a>
+            ✔ <a href="./testcontainers/">Yes</a>
         </td>
         <td>
-            ✔ <a href="../README.md#support">Yes</a>
+            ✔ <a href="./README.md#support">Yes</a>
         </td>
     </tr>
     <tr>
