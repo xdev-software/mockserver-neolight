@@ -16,13 +16,13 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
     * all body matching that requires an external lib (XPATH, JSON, XML, OpenAPI, ...)
     * Versioncheck
     * Persistence of expectations to disk
-    * Dashboard (contains self-built webfrontend)
-    * parts of Logging
+    * Dashboard (contained self-built webfrontend)
+    * parts of logging
     * TLS/SSL MitM (did never work with TLS 1.3+ and HTTP2+ anyway) 
     * JWT + mDNS auth
 * Split configuration into corresponding modules
 * Split Logs and Events (e.g. request received) into independent subsystems
-  * Client no longer messes up logging
+  * Client no longer messes up logging by reconfiguring JUL dynamically
 * Improved performance on various places
   * Removed reflective ``equals`` & ``hashCode``
 * Slimed down dependencies
@@ -32,12 +32,12 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 * [Docker] Use ``eclipse-temurin`` instead of ``distroless``
   * The overall image is now roughly 2x smaller
 * Compiles now with Java 17+
+* No longer catches critical ``Errors`` such as ``OutOfMemoryError`` or ``NoClassDefFoundError``
 
 ### Migration guide
 * Change all occurrences of ``org.mockserver`` to ``software.xdev.mockserver``
 
 ### Fixes the following issues from the [original project](https://github.com/mock-server/mockserver)
-
 * Removed useless/Minimize dependencies of ``mockserver-client-java`` [#1494](https://github.com/mock-server/mockserver/issues/1494)
 * ARM image doesn't include ARM binaries [#1568](https://github.com/mock-server/mockserver/issues/1568)
 * Add any Shell to Docker Container [#1593](https://github.com/mock-server/mockserver/issues/1593)
