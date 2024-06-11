@@ -24,7 +24,7 @@ public final class LoggingMessages
 	public static final String NO_MATCH_RESPONSE_NO_EXPECTATION_MESSAGE_FORMAT =
 		"no expectation for: {} returning response: {}";
 	public static final String NO_MATCH_RESPONSE_ERROR_MESSAGE_FORMAT =
-		"error:{}handling request: {} returning response: {}";
+		"error:{} handling request: {} returning response: {}";
 	public static final String VERIFICATION_REQUESTS_MESSAGE_FORMAT = "verifying requests that match: {}";
 	public static final String VERIFICATION_REQUEST_SEQUENCES_MESSAGE_FORMAT = "verifying sequence that match: {}";
 	
