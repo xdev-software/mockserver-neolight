@@ -1,3 +1,7 @@
+# 1.0.1
+* Fix ``proxyRemoteHost`` being ignored
+* Improved some log messages
+
 # 1.0.0
 _Initial release_
 
