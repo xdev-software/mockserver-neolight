@@ -382,7 +382,7 @@ public class HttpActionHandler
 								else
 								{
 									LOG.info(
-										"Returning response: {} for forwarded request in json:{}",
+										"Returning response: {} for forwarded request in json: {}",
 										request,
 										response);
 									this.logEvent(new EventEntry()
