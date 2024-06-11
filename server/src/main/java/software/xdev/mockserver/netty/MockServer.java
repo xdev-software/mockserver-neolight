@@ -168,7 +168,7 @@ public class MockServer extends LifeCycle
 			throw new IllegalArgumentException("You must specify a remote hostname");
 		}
 		
-		this.remoteSocket = new InetSocketAddress(isBlank(remoteHost) ? remoteHost : "localhost", remotePort);
+		this.remoteSocket = new InetSocketAddress(!isBlank(remoteHost) ? remoteHost : "localhost", remotePort);
 		if(proxyConfigurations != null && LOG.isInfoEnabled())
 		{
 			LOG.info("Using proxy configuration for forwarded requests: {}", proxyConfigurations);
