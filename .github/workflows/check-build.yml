@@ -19,10 +19,6 @@ on:
       - '.idea/**'
       - 'assets/**'
 
-env:
-  PRIMARY_MAVEN_MODULE: ${{ github.event.repository.name }}
-  DEMO_MAVEN_MODULE: ${{ github.event.repository.name }}-demo
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,7 +39,7 @@ jobs:
         cache: 'maven'
       
     - name: Build with Maven
-      run: ./mvnw -B clean package
+      run: ./mvnw -B clean package -P run-integration-tests
       
     - name: Check for uncommited changes
       run: |
@@ -63,12 +59,26 @@ jobs:
           exit 1
         fi
 
-    - name: Upload demo files
+    - name: Upload standalone server JAR
       uses: actions/upload-artifact@v4
       with:
-        name: demo-files-java-${{ matrix.java }}
-        path: ${{ env.DEMO_MAVEN_MODULE }}/target/${{ env.DEMO_MAVEN_MODULE }}.jar
+        name: server-${{ matrix.java }}
+        path: server/target/server-standalone.jar
         if-no-files-found: error
+
+    # Build docker
+    - uses: docker/setup-qemu-action@v3
+
+    - uses: docker/setup-buildx-action@v3
+
+    - uses: docker/build-push-action@v5
+      with:
+        context: ./server
+        push: false
+        tags: mockserver-standalone:experimental
+        platforms: linux/amd64,linux/arm64
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
   code-style:
     runs-on: ubuntu-latest
