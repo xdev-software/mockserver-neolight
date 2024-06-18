@@ -1,4 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "rebaseWhen": "behind-base-branch"
+  "rebaseWhen": "behind-base-branch",
+  "packageRules": [
+    {
+      "description": "Java LTS 21",
+      "packagePattern": "^eclipse-temurin",
+      "datasources": [
+        "docker"
+      ],
+      "allowedVersions": "/^21\\-alpine$/"
+    }
+  ]
 }
