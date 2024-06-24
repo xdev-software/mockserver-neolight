@@ -33,6 +33,7 @@ public class HttpRequestSerializer extends StdSerializer<HttpRequest>
 		super(HttpRequest.class);
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
 	public void serialize(final HttpRequest httpRequest, final JsonGenerator jgen, final SerializerProvider provider)
 		throws IOException

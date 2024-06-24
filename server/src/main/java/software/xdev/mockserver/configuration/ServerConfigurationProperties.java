@@ -255,7 +255,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 			properties,
 			MOCKSERVER_DISABLE_SYSTEM_OUT,
 			"MOCKSERVER_DISABLE_SYSTEM_OUT",
-			"" + false));
+			String.valueOf(false)));
 	}
 	
 	/**
@@ -265,7 +265,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void disableSystemOut(final boolean disable)
 	{
-		setProperty(MOCKSERVER_DISABLE_SYSTEM_OUT, "" + disable);
+		setProperty(MOCKSERVER_DISABLE_SYSTEM_OUT, String.valueOf(disable));
 		configureLogger();
 	}
 	
@@ -275,7 +275,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 			properties,
 			MOCKSERVER_DISABLE_LOGGING,
 			"MOCKSERVER_DISABLE_LOGGING",
-			"" + false));
+			String.valueOf(false)));
 	}
 	
 	/**
@@ -287,7 +287,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void disableLogging(final boolean disable)
 	{
-		setProperty(MOCKSERVER_DISABLE_LOGGING, "" + disable);
+		setProperty(MOCKSERVER_DISABLE_LOGGING, String.valueOf(disable));
 		configureLogger();
 	}
 	
@@ -297,7 +297,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 			properties,
 			MOCKSERVER_DETAILED_MATCH_FAILURES,
 			"MOCKSERVER_DETAILED_MATCH_FAILURES",
-			"" + true));
+			String.valueOf(true)));
 	}
 	
 	/**
@@ -309,7 +309,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void detailedMatchFailures(final boolean enable)
 	{
-		setProperty(MOCKSERVER_DETAILED_MATCH_FAILURES, "" + enable);
+		setProperty(MOCKSERVER_DETAILED_MATCH_FAILURES, String.valueOf(enable));
 	}
 	
 	public static int maxExpectations()
@@ -330,7 +330,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void maxExpectations(final int count)
 	{
-		setProperty(MOCKSERVER_MAX_EXPECTATIONS, "" + count);
+		setProperty(MOCKSERVER_MAX_EXPECTATIONS, String.valueOf(count));
 	}
 	
 	public static int maxLogEntries()
@@ -353,7 +353,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void maxLogEntries(final int count)
 	{
-		setProperty(MOCKSERVER_MAX_LOG_ENTRIES, "" + count);
+		setProperty(MOCKSERVER_MAX_LOG_ENTRIES, String.valueOf(count));
 	}
 	
 	// scalability
@@ -372,7 +372,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void nioEventLoopThreadCount(final int count)
 	{
-		setProperty(MOCKSERVER_NIO_EVENT_LOOP_THREAD_COUNT, "" + count);
+		setProperty(MOCKSERVER_NIO_EVENT_LOOP_THREAD_COUNT, String.valueOf(count));
 	}
 	
 	public static int actionHandlerThreadCount()
@@ -399,7 +399,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void actionHandlerThreadCount(final int count)
 	{
-		setProperty(MOCKSERVER_ACTION_HANDLER_THREAD_COUNT, "" + count);
+		setProperty(MOCKSERVER_ACTION_HANDLER_THREAD_COUNT, String.valueOf(count));
 	}
 	
 	public static boolean matchersFailFast()
@@ -408,7 +408,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 			properties,
 			MOCKSERVER_MATCHERS_FAIL_FAST,
 			"MOCKSERVER_MATCHERS_FAIL_FAST",
-			"" + true));
+			String.valueOf(true)));
 	}
 	
 	/**
@@ -420,7 +420,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void matchersFailFast(final boolean enable)
 	{
-		setProperty(MOCKSERVER_MATCHERS_FAIL_FAST, "" + enable);
+		setProperty(MOCKSERVER_MATCHERS_FAIL_FAST, String.valueOf(enable));
 	}
 	
 	// socket
@@ -435,7 +435,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void alwaysCloseSocketConnections(final boolean alwaysClose)
 	{
-		setProperty(MOCKSERVER_ALWAYS_CLOSE_SOCKET_CONNECTIONS, "" + alwaysClose);
+		setProperty(MOCKSERVER_ALWAYS_CLOSE_SOCKET_CONNECTIONS, String.valueOf(alwaysClose));
 	}
 	
 	public static boolean alwaysCloseSocketConnections()
@@ -486,7 +486,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void maxInitialLineLength(final int length)
 	{
-		setProperty(MOCKSERVER_MAX_INITIAL_LINE_LENGTH, "" + length);
+		setProperty(MOCKSERVER_MAX_INITIAL_LINE_LENGTH, String.valueOf(length));
 	}
 	
 	public static int maxHeaderSize()
@@ -503,7 +503,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void maxHeaderSize(final int size)
 	{
-		setProperty(MOCKSERVER_MAX_HEADER_SIZE, "" + size);
+		setProperty(MOCKSERVER_MAX_HEADER_SIZE, String.valueOf(size));
 	}
 	
 	public static int maxChunkSize()
@@ -520,7 +520,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void maxChunkSize(final int size)
 	{
-		setProperty(MOCKSERVER_MAX_CHUNK_SIZE, "" + size);
+		setProperty(MOCKSERVER_MAX_CHUNK_SIZE, String.valueOf(size));
 	}
 	
 	/**
@@ -533,7 +533,9 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void useSemicolonAsQueryParameterSeparator(final boolean useAsQueryParameterSeparator)
 	{
-		setProperty(MOCKSERVER_USE_SEMICOLON_AS_QUERY_PARAMETER_SEPARATOR, "" + useAsQueryParameterSeparator);
+		setProperty(
+			MOCKSERVER_USE_SEMICOLON_AS_QUERY_PARAMETER_SEPARATOR,
+			String.valueOf(useAsQueryParameterSeparator));
 	}
 	
 	public static boolean useSemicolonAsQueryParameterSeparator()
@@ -556,7 +558,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void assumeAllRequestsAreHttp(final boolean assumeAllRequestsAreHttp)
 	{
-		setProperty(MOCKSERVER_ASSUME_ALL_REQUESTS_ARE_HTTP, "" + assumeAllRequestsAreHttp);
+		setProperty(MOCKSERVER_ASSUME_ALL_REQUESTS_ARE_HTTP, String.valueOf(assumeAllRequestsAreHttp));
 	}
 	
 	public static boolean assumeAllRequestsAreHttp()
@@ -589,7 +591,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void enableCORSForAPI(final boolean enable)
 	{
-		setProperty(MOCKSERVER_ENABLE_CORS_FOR_API, "" + enable);
+		setProperty(MOCKSERVER_ENABLE_CORS_FOR_API, String.valueOf(enable));
 	}
 	
 	public static boolean enableCORSForAllResponses()
@@ -610,7 +612,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void enableCORSForAllResponses(final boolean enable)
 	{
-		setProperty(MOCKSERVER_ENABLE_CORS_FOR_ALL_RESPONSES, "" + enable);
+		setProperty(MOCKSERVER_ENABLE_CORS_FOR_ALL_RESPONSES, String.valueOf(enable));
 	}
 	
 	public static String corsAllowOrigin()
@@ -692,7 +694,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void corsAllowCredentials(final boolean allow)
 	{
-		setProperty(MOCKSERVER_CORS_ALLOW_CREDENTIALS, "" + allow);
+		setProperty(MOCKSERVER_CORS_ALLOW_CREDENTIALS, String.valueOf(allow));
 	}
 	
 	public static int corsMaxAgeInSeconds()
@@ -709,7 +711,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	 */
 	public static void corsMaxAgeInSeconds(final int ageInSeconds)
 	{
-		setProperty(MOCKSERVER_CORS_MAX_AGE_IN_SECONDS, "" + ageInSeconds);
+		setProperty(MOCKSERVER_CORS_MAX_AGE_IN_SECONDS, String.valueOf(ageInSeconds));
 	}
 	
 	// verification
@@ -734,7 +736,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	{
 		setProperty(
 			MOCKSERVER_MAXIMUM_NUMBER_OF_REQUESTS_TO_RETURN_IN_VERIFICATION_FAILURE,
-			"" + maximumNumberOfRequestToReturnInVerification);
+			String.valueOf(maximumNumberOfRequestToReturnInVerification));
 	}
 	
 	// proxy
@@ -858,7 +860,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 		setProperty(MOCKSERVER_LIVENESS_HTTP_GET_PATH, livenessPath);
 	}
 	
-	@SuppressWarnings("ConstantConditions")
+	@SuppressWarnings({"ConstantConditions", "PMD.CognitiveComplexity"})
 	private static Properties readPropertyFile()
 	{
 		final Properties properties = new Properties();
@@ -909,7 +911,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 		{
 			final Enumeration<?> propertyNames = properties.propertyNames();
 			
-			final StringBuilder propertiesLogDump = new StringBuilder();
+			final StringBuilder propertiesLogDump = new StringBuilder(50);
 			propertiesLogDump.append("Reading properties from property file [")
 				.append(propertyFile())
 				.append("]:")

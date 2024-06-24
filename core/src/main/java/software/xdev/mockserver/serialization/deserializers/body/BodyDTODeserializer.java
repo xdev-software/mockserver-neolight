@@ -52,6 +52,7 @@ import software.xdev.mockserver.serialization.model.RegexBodyDTO;
 import software.xdev.mockserver.serialization.model.StringBodyDTO;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BodyDTODeserializer.class);
@@ -75,7 +76,12 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 		super(BodyDTO.class);
 	}
 	
-	@SuppressWarnings("checkstyle:MethodLength")
+	@SuppressWarnings({
+		"checkstyle:MethodLength",
+		"PMD.CognitiveComplexity",
+		"PMD.NPathComplexity",
+		"PMD.CyclomaticComplexity",
+		"PMD.NcssCount"})
 	@Override
 	public BodyDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
 	{
@@ -137,24 +143,23 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							valueJsonValue = String.valueOf(entry.getValue());
 						}
 					}
-					if(this.containsIgnoreCase(key, "rawBytes", "base64Bytes"))
+					if(this.containsIgnoreCase(key, "rawBytes", "base64Bytes")
+						&& entry.getValue() instanceof final String s)
 					{
-						if(entry.getValue() instanceof final String s)
+						try
 						{
-							try
+							rawBytes = BASE64_DECODER.decode(s);
+						}
+						catch(final Exception ex)
+						{
+							if(LOG.isDebugEnabled())
 							{
-								rawBytes = BASE64_DECODER.decode(s);
-							}
-							catch(final Exception ex)
-							{
-								if(LOG.isDebugEnabled())
-								{
-									LOG.debug("Invalid base64 encoded rawBytes with value \"{}\"",
-										entry.getValue(), ex);
-								}
+								LOG.debug("Invalid base64 encoded rawBytes with value \"{}\"",
+									entry.getValue(), ex);
 							}
 						}
 					}
+					
 					if(key.equalsIgnoreCase("not"))
 					{
 						not = Boolean.parseBoolean(String.valueOf(entry.getValue()));

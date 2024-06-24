@@ -39,20 +39,21 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
 {
 	public String serialize(final List<HttpRequest> httpRequests)
 	{
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder output = new StringBuilder(50);
 		for(final HttpRequest httpRequest : httpRequests)
 		{
-			output.append(this.serialize(0, httpRequest));
-			output.append(";");
-			output.append(NEW_LINE);
+			output.append(this.serialize(0, httpRequest))
+				.append(';')
+				.append(NEW_LINE);
 		}
 		return output.toString();
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public String serialize(final int numberOfSpacesToIndent, final HttpRequest request)
 	{
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder output = new StringBuilder(50);
 		if(request != null)
 		{
 			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
@@ -73,42 +74,38 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
 			if(request.isKeepAlive() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-				output.append(".withKeepAlive(").append(request.isKeepAlive().toString()).append(")");
+				output.append(".withKeepAlive(").append(request.isKeepAlive().toString()).append(')');
 			}
 			if(request.getProtocol() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-				output.append(".withProtocol(Protocol.").append(request.getProtocol().toString()).append(")");
+				output.append(".withProtocol(Protocol.").append(request.getProtocol().toString()).append(')');
 			}
 			if(request.getSocketAddress() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-				output.append(".withSocketAddress(");
-				output.append(new SocketAddressToJavaSerializer().serialize(
-					numberOfSpacesToIndent + 2,
-					request.getSocketAddress()));
+				output.append(".withSocketAddress(")
+					.append(new SocketAddressToJavaSerializer().serialize(
+						numberOfSpacesToIndent + 2,
+						request.getSocketAddress()));
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-				output.append(")");
+				output.append(')');
 			}
 			if(request.getBody() != null)
 			{
 				if(request.getBody() instanceof final RegexBody regexBody)
 				{
 					this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-					output.append(".withBody(");
-					output.append("new RegexBody(\"")
+					output.append(".withBody(new RegexBody(\"")
 						.append(StringEscapeUtils.escapeJava(regexBody.getValue()))
-						.append("\")");
-					output.append(")");
+						.append("\"))");
 				}
 				else if(request.getBody() instanceof final StringBody stringBody)
 				{
 					this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-					output.append(".withBody(");
-					output.append("new StringBody(\"")
+					output.append(".withBody(new StringBody(\"")
 						.append(StringEscapeUtils.escapeJava(stringBody.getValue()))
-						.append("\")");
-					output.append(")");
+						.append("\"))");
 				}
 				else if(request.getBody() instanceof ParameterBody)
 				{
@@ -121,9 +118,9 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
 						numberOfSpacesToIndent + 3,
 						bodyParameters));
 					this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output);
-					output.append(")");
+					output.append(')');
 					this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output);
-					output.append(")");
+					output.append(')');
 				}
 				else if(request.getBody() instanceof final BinaryBody body)
 				{
@@ -148,7 +145,7 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
 			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output)
 				.append(".withQueryStringParameters(");
 			this.appendObject(numberOfSpacesToIndent, output, new ParameterToJavaSerializer(), parameters);
-			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 		}
 	}
 	
@@ -160,7 +157,7 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
 		{
 			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withCookies(");
 			this.appendObject(numberOfSpacesToIndent, output, new CookieToJavaSerializer(), cookies);
-			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 		}
 	}
 	
@@ -172,7 +169,7 @@ public class HttpRequestToJavaSerializer implements ToJavaSerializer<HttpRequest
 		{
 			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withHeaders(");
 			this.appendObject(numberOfSpacesToIndent, output, new HeaderToJavaSerializer(), headers);
-			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 		}
 	}
 	

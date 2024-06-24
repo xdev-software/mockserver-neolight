@@ -72,6 +72,7 @@ import software.xdev.mockserver.netty.websocketregistry.CallbackWebSocketServerH
 import software.xdev.mockserver.util.StringUtils;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class PortUnificationHandler extends ReplayingDecoder<Void>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(PortUnificationHandler.class);
@@ -377,6 +378,7 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 		return portExtension;
 	}
 	
+	@SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 	private Set<String> calculateLocalAddresses(final InetSocketAddress localAddress, final String portExtension)
 	{
 		final InetAddress socketAddress = localAddress.getAddress();

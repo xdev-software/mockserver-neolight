@@ -77,6 +77,7 @@ public class HttpForwardObjectCallbackActionHandler extends HttpForwardAction
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private void handleLocally(
 		final HttpActionHandler actionHandler,
 		final HttpObjectCallback httpObjectCallback,
@@ -173,6 +174,7 @@ public class HttpForwardObjectCallbackActionHandler extends HttpForwardAction
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private void handleViaWebSocket(
 		final HttpActionHandler actionHandler,
 		final HttpObjectCallback httpObjectCallback,
@@ -287,6 +289,7 @@ public class HttpForwardObjectCallbackActionHandler extends HttpForwardAction
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private void handleResponseViaWebSocket(
 		final HttpRequest request,
 		final HttpForwardActionResult responseFuture,

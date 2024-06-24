@@ -89,13 +89,12 @@ public abstract class KeysAndValues<T extends KeyAndValue, K extends KeysAndValu
 	
 	public K replaceEntryIfExists(final T entry)
 	{
-		if(entry != null)
+		if(entry != null
+			&& this.remove(entry.getName()))
 		{
-			if(this.remove(entry.getName()))
-			{
-				this.map.put(entry.getName(), entry.getValue());
-			}
+			this.map.put(entry.getName(), entry.getValue());
 		}
+		
 		return (K)this;
 	}
 	

@@ -88,6 +88,7 @@ public class NettyResponseWriter extends ResponseWriter
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private void disconnectAndCloseChannel(final ChannelFuture future)
 	{
 		future

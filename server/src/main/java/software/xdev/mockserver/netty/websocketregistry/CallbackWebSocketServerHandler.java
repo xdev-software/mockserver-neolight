@@ -105,6 +105,7 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
 		ctx.flush();
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private void upgradeChannel(final ChannelHandlerContext ctx, final FullHttpRequest httpRequest)
 	{
 		this.handshaker = new WebSocketServerHandshakerFactory(

@@ -127,6 +127,7 @@ public final class Main
 	 *                  mode, - "-proxyRemoteHost"  followed by the optional proxyRemoteHost port (ignored unless
 	 *                  proxyRemotePort is specified) - "-logLevel"         followed by the log level
 	 */
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	public static void main(final String... arguments)
 	{
 		try
@@ -171,19 +172,17 @@ public final class Main
 								parsedArgument.name(),
 								envVarArgs.get(parsedArgument.longEnvironmentVariableName()));
 						}
-						else if(isNotBlank(System.getenv(parsedArgument.shortEnvironmentVariableName())))
+						else if(isNotBlank(System.getenv(parsedArgument.shortEnvironmentVariableName()))
+							&& !(parsedArgument == serverPort
+							&& "1080".equals(System.getenv(serverPort.shortEnvironmentVariableName()))
+							&& ConfigurationProperties.properties.containsKey(serverPort.systemPropertyName())))
 						{
-							if(!(parsedArgument == serverPort
-								&& "1080".equals(System.getenv(serverPort.shortEnvironmentVariableName()))
-								&& ConfigurationProperties.properties.containsKey(serverPort.systemPropertyName())))
-							{
-								envVarArgs.put(
-									parsedArgument.shortEnvironmentVariableName(),
-									System.getenv(parsedArgument.shortEnvironmentVariableName()));
-								parsedArgs.put(
-									parsedArgument.name(),
-									envVarArgs.get(parsedArgument.shortEnvironmentVariableName()));
-							}
+							envVarArgs.put(
+								parsedArgument.shortEnvironmentVariableName(),
+								System.getenv(parsedArgument.shortEnvironmentVariableName()));
+							parsedArgs.put(
+								parsedArgument.name(),
+								envVarArgs.get(parsedArgument.shortEnvironmentVariableName()));
 						}
 					}
 				}
@@ -266,6 +265,7 @@ public final class Main
 			+ "\n]";
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private static Map<String, String> parseArguments(final String... arguments)
 	{
 		final Map<String, String> parsedArguments = new HashMap<>();

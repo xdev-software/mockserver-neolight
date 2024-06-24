@@ -63,17 +63,12 @@ public class ExactStringMatcher extends BodyMatcher<NottableString>
 	@Override
 	public boolean matches(final MatchDifference context, final NottableString matched)
 	{
-		boolean result = false;
-		
 		if(this.matcher == null)
 		{
 			return true;
 		}
 		
-		if(matched != null && matches(this.matcher.getValue(), matched.getValue(), false))
-		{
-			result = true;
-		}
+		final boolean result = matched != null && matches(this.matcher.getValue(), matched.getValue(), false);
 		
 		if(!result && context != null)
 		{

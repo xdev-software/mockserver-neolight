@@ -123,6 +123,7 @@ public class LogEventRequestAndResponseSerializer
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public LogEventRequestAndResponse[] deserializeArray(final String jsonHttpRequestAndHttpResponse)
 	{
 		final List<LogEventRequestAndResponse> httpRequestAndHttpResponses = new ArrayList<>();

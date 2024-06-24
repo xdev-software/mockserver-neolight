@@ -94,7 +94,7 @@ public class ConfigurationProperties
 	 */
 	public static void maxWebSocketExpectations(final int count)
 	{
-		setProperty(MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS, "" + count);
+		setProperty(MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS, String.valueOf(count));
 	}
 	
 	public static int clientNioEventLoopThreadCount()
@@ -115,7 +115,7 @@ public class ConfigurationProperties
 	 */
 	public static void clientNioEventLoopThreadCount(final int count)
 	{
-		setProperty(MOCKSERVER_CLIENT_NIO_EVENT_LOOP_THREAD_COUNT, "" + count);
+		setProperty(MOCKSERVER_CLIENT_NIO_EVENT_LOOP_THREAD_COUNT, String.valueOf(count));
 	}
 	
 	public static int webSocketClientEventLoopThreadCount()
@@ -136,7 +136,7 @@ public class ConfigurationProperties
 	 */
 	public static void webSocketClientEventLoopThreadCount(final int count)
 	{
-		setProperty(MOCKSERVER_WEB_SOCKET_CLIENT_EVENT_LOOP_THREAD_COUNT, "" + count);
+		setProperty(MOCKSERVER_WEB_SOCKET_CLIENT_EVENT_LOOP_THREAD_COUNT, String.valueOf(count));
 	}
 	
 	public static long maxFutureTimeout()
@@ -157,7 +157,7 @@ public class ConfigurationProperties
 	 */
 	public static void maxFutureTimeout(final long milliseconds)
 	{
-		setProperty(MOCKSERVER_MAX_FUTURE_TIMEOUT, "" + milliseconds);
+		setProperty(MOCKSERVER_MAX_FUTURE_TIMEOUT, String.valueOf(milliseconds));
 	}
 	
 	// socket
@@ -179,7 +179,7 @@ public class ConfigurationProperties
 	 */
 	public static void maxSocketTimeout(final long milliseconds)
 	{
-		setProperty(MOCKSERVER_MAX_SOCKET_TIMEOUT, "" + milliseconds);
+		setProperty(MOCKSERVER_MAX_SOCKET_TIMEOUT, String.valueOf(milliseconds));
 	}
 	
 	public static long socketConnectionTimeout()
@@ -199,7 +199,7 @@ public class ConfigurationProperties
 	 */
 	public static void socketConnectionTimeout(final long milliseconds)
 	{
-		setProperty(MOCKSERVER_SOCKET_CONNECTION_TIMEOUT, "" + milliseconds);
+		setProperty(MOCKSERVER_SOCKET_CONNECTION_TIMEOUT, String.valueOf(milliseconds));
 	}
 	
 	/**
@@ -214,7 +214,7 @@ public class ConfigurationProperties
 	{
 		setProperty(
 			MOCKSERVER_FORWARD_BINARY_REQUESTS_WITHOUT_WAITING_FOR_RESPONSE,
-			"" + forwardBinaryRequestsAsynchronously);
+			String.valueOf(forwardBinaryRequestsAsynchronously));
 	}
 	
 	public static boolean forwardBinaryRequestsWithoutWaitingForResponse()
@@ -234,7 +234,7 @@ public class ConfigurationProperties
 			properties,
 			MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION,
 			"MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION",
-			"" + true));
+			"true"));
 	}
 	
 	/**
@@ -248,7 +248,7 @@ public class ConfigurationProperties
 	 */
 	public static void attemptToProxyIfNoMatchingExpectation(final boolean enable)
 	{
-		setProperty(MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION, "" + enable);
+		setProperty(MOCKSERVER_ATTEMPT_TO_PROXY_IF_NO_MATCHING_EXPECTATION, String.valueOf(enable));
 	}
 	
 	public static InetSocketAddress forwardHttpProxy()
@@ -409,7 +409,7 @@ public class ConfigurationProperties
 		}
 		catch(final URISyntaxException ex)
 		{
-			throw new IllegalArgumentException(errorMessage);
+			throw new IllegalArgumentException(errorMessage, ex);
 		}
 	}
 	
@@ -448,14 +448,14 @@ public class ConfigurationProperties
 				properties,
 				key,
 				environmentVariableKey,
-				"" + defaultValue));
+				String.valueOf(defaultValue)));
 		}
 		catch(final NumberFormatException nfe)
 		{
 			LOG.error(
 				"NumberFormatException converting {} with value [{}]",
 				key,
-				readPropertyHierarchically(properties, key, environmentVariableKey, "" + defaultValue),
+				readPropertyHierarchically(properties, key, environmentVariableKey, String.valueOf(defaultValue)),
 				nfe);
 			return defaultValue;
 		}
@@ -472,14 +472,14 @@ public class ConfigurationProperties
 				properties,
 				key,
 				environmentVariableKey,
-				"" + defaultValue));
+				String.valueOf(defaultValue)));
 		}
 		catch(final NumberFormatException nfe)
 		{
 			LOG.error(
 				"NumberFormatException converting {} with value [{}]",
 				key,
-				readPropertyHierarchically(properties, key, environmentVariableKey, "" + defaultValue),
+				readPropertyHierarchically(properties, key, environmentVariableKey, String.valueOf(defaultValue)),
 				nfe);
 			return defaultValue;
 		}

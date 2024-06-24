@@ -77,6 +77,7 @@ public class NottableStringMultiMap
 		return this.keyMatchStyle;
 	}
 	
+	@SuppressWarnings("PMD")
 	public boolean containsAll(final MatchDifference context, final NottableStringMultiMap subset)
 	{
 		switch(subset.keyMatchStyle)

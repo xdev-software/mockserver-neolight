@@ -32,12 +32,12 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 {
 	public String serialize(final List<HttpRequestModifier> httpRequestModifiers)
 	{
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder output = new StringBuilder(50);
 		for(final HttpRequestModifier httpRequestModifier : httpRequestModifiers)
 		{
-			output.append(this.serialize(0, httpRequestModifier));
-			output.append(";");
-			output.append(NEW_LINE);
+			output.append(this.serialize(0, httpRequestModifier))
+				.append(';')
+				.append(NEW_LINE);
 		}
 		return output.toString();
 	}
@@ -45,7 +45,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 	@Override
 	public String serialize(final int numberOfSpacesToIndent, final HttpRequestModifier request)
 	{
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder output = new StringBuilder(20);
 		if(request != null)
 		{
 			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
@@ -72,7 +72,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 					output,
 					request.getQueryStringParameters().getReplace());
 				this.outputList(numberOfSpacesToIndent, output, request.getQueryStringParameters().getRemove());
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 			if(request.getHeaders() != null)
 			{
@@ -81,7 +81,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 				this.outputHeaders(numberOfSpacesToIndent, output, request.getHeaders().getAdd());
 				this.outputHeaders(numberOfSpacesToIndent, output, request.getHeaders().getReplace());
 				this.outputList(numberOfSpacesToIndent, output, request.getHeaders().getRemove());
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 			if(request.getCookies() != null)
 			{
@@ -90,7 +90,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 				this.outputCookies(numberOfSpacesToIndent, output, request.getCookies().getAdd());
 				this.outputCookies(numberOfSpacesToIndent, output, request.getCookies().getReplace());
 				this.outputList(numberOfSpacesToIndent, output, request.getCookies().getRemove());
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 		}
 		
@@ -155,7 +155,7 @@ public class HttpRequestModifierToJavaSerializer implements ToJavaSerializer<Htt
 			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output)
 				.append("List.of(")
 				.append(add.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(",")))
-				.append(")");
+				.append(')');
 		}
 		else
 		{

@@ -47,6 +47,7 @@ public class HashMapMatcher extends NotMatcher<KeysAndValues<? extends KeyAndVal
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public boolean matches(
 		final MatchDifference context,

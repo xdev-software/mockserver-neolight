@@ -51,6 +51,7 @@ public class MultiValueMapMatcher
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public boolean matches(
 		final MatchDifference context,

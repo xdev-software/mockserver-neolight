@@ -132,6 +132,7 @@ public class ExpectationSerializer implements Serializer<Expectation>
 		return this.deserializeArray(jsonExpectations, allowEmpty, (s, expectation) -> expectation);
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public Expectation[] deserializeArray(
 		final String jsonExpectations,
 		final boolean allowEmpty,

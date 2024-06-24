@@ -85,6 +85,7 @@ public class RegexStringMatcher extends BodyMatcher<NottableString>
 		}
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	private boolean matchesByStrings(
 		final MatchDifference context,
 		final NottableString matcher,
@@ -144,12 +145,10 @@ public class RegexStringMatcher extends BodyMatcher<NottableString>
 					}
 					catch(final PatternSyntaxException pse)
 					{
-						if(this.controlPlaneMatcher)
+						if(this.controlPlaneMatcher
+							&& LOG.isDebugEnabled())
 						{
-							if(LOG.isDebugEnabled())
-							{
-								LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
-							}
+							LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
 						}
 					}
 				}

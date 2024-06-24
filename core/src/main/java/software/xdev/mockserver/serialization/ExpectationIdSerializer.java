@@ -111,6 +111,7 @@ public class ExpectationIdSerializer implements Serializer<ExpectationId>
 		return ExpectationId.class;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public ExpectationId[] deserializeArray(final String jsonExpectationIds)
 	{
 		final List<ExpectationId> expectationIds = new ArrayList<>();

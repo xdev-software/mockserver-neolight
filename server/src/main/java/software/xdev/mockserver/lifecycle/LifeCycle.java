@@ -74,6 +74,7 @@ public abstract class LifeCycle implements Stoppable
 		this.httpState = new HttpState(this.configuration, this.scheduler);
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public CompletableFuture<String> stopAsync()
 	{
 		if(!this.stopFuture.isDone() && this.stopping.compareAndSet(false, true))
@@ -226,6 +227,7 @@ public abstract class LifeCycle implements Stoppable
 		return this.bindPorts(this.serverServerBootstrap, requestedPortBindings, this.serverChannelFutures);
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.PreserveStackTrace"})
 	private List<Integer> bindPorts(
 		final ServerBootstrap serverBootstrap,
 		final List<Integer> requestedPortBindings,

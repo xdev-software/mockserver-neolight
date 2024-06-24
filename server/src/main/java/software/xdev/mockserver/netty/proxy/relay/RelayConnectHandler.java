@@ -70,6 +70,7 @@ public abstract class RelayConnectHandler<T> extends SimpleChannelInboundHandler
 		this.port = port;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public void channelRead0(final ChannelHandlerContext proxyClientCtx, final T request)
 	{

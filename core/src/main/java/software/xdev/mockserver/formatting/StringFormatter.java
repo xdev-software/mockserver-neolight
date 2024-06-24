@@ -78,7 +78,7 @@ public final class StringFormatter
 				logMessage.append(NEW_LINE);
 				if(!messageParts[messagePartIndex + 1].startsWith(" "))
 				{
-					logMessage.append(" ");
+					logMessage.append(' ');
 				}
 			}
 		}

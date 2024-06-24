@@ -39,6 +39,7 @@ public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
 		super(TimeToLiveDTO.class);
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public TimeToLiveDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
 	{

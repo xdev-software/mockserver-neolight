@@ -33,6 +33,7 @@ public class PathParametersDecoder
 {
 	private static final Pattern PATH_VARIABLE_NAME_PATTERN = Pattern.compile("\\{[.;]?([^*]+)\\*?}");
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public NottableString normalisePathWithParametersForMatching(final HttpRequest matcher)
 	{
 		if(matcher.getPath() == null)
@@ -73,6 +74,7 @@ public class PathParametersDecoder
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public Parameters extractPathParameters(final HttpRequest matcher, final HttpRequest matched)
 	{
 		final Parameters parsedParameters =

@@ -33,17 +33,19 @@ import software.xdev.mockserver.serialization.Base64Converter;
 
 public class HttpResponseToJavaSerializer implements ToJavaSerializer<HttpResponse>
 {
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public String serialize(final int numberOfSpacesToIndent, final HttpResponse httpResponse)
 	{
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder output = new StringBuilder(50);
 		if(httpResponse != null)
 		{
-			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append("response()");
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output)
+				.append("response()");
 			if(httpResponse.getStatusCode() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
-					.append(".withStatusCode(").append(httpResponse.getStatusCode()).append(")");
+					.append(".withStatusCode(").append(httpResponse.getStatusCode()).append(')');
 			}
 			if(httpResponse.getReasonPhrase() != null)
 			{
@@ -75,7 +77,7 @@ public class HttpResponseToJavaSerializer implements ToJavaSerializer<HttpRespon
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
 					.append(".withDelay(")
-					.append(new DelayToJavaSerializer().serialize(0, httpResponse.getDelay())).append(")");
+					.append(new DelayToJavaSerializer().serialize(0, httpResponse.getDelay())).append(')');
 			}
 			if(httpResponse.getConnectionOptions() != null)
 			{
@@ -85,7 +87,7 @@ public class HttpResponseToJavaSerializer implements ToJavaSerializer<HttpRespon
 					numberOfSpacesToIndent + 2,
 					httpResponse.getConnectionOptions()));
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
-					.append(")");
+					.append(')');
 			}
 		}
 		
@@ -100,7 +102,7 @@ public class HttpResponseToJavaSerializer implements ToJavaSerializer<HttpRespon
 		{
 			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withCookies(");
 			this.appendObject(numberOfSpacesToIndent + 1, output, new CookieToJavaSerializer(), cookies);
-			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 		}
 	}
 	
@@ -112,7 +114,7 @@ public class HttpResponseToJavaSerializer implements ToJavaSerializer<HttpRespon
 		{
 			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".withHeaders(");
 			this.appendObject(numberOfSpacesToIndent + 1, output, new HeaderToJavaSerializer(), headers);
-			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 		}
 	}
 	

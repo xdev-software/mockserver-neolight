@@ -23,14 +23,14 @@ public class DelayToJavaSerializer implements ToJavaSerializer<Delay>
 	@Override
 	public String serialize(final int numberOfSpacesToIndent, final Delay delay)
 	{
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder output = new StringBuilder(24);
 		if(delay != null)
 		{
 			output.append("new Delay(TimeUnit.")
 				.append(delay.getTimeUnit().name())
 				.append(", ")
 				.append(delay.getValue())
-				.append(")");
+				.append(')');
 		}
 		return output.toString();
 	}

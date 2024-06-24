@@ -122,13 +122,10 @@ public class LRUCache<K, V>
 	
 	public void delete(final K key)
 	{
-		if(allCachesEnabled && key != null)
+		if(allCachesEnabled && key != null && this.map.containsKey(key))
 		{
-			if(this.map.containsKey(key))
-			{
-				this.map.remove(key);
-				this.queue.remove(key);
-			}
+			this.map.remove(key);
+			this.queue.remove(key);
 		}
 	}
 	

@@ -33,6 +33,7 @@ public class VerificationTimesDTODeserializer extends StdDeserializer<Verificati
 		super(VerificationTimesDTO.class);
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public VerificationTimesDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
 		throws IOException

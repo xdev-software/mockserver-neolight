@@ -23,6 +23,7 @@ import software.xdev.mockserver.model.ConnectionOptions;
 
 public class ConnectionOptionsToJavaSerializer implements ToJavaSerializer<ConnectionOptions>
 {
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public String serialize(final int numberOfSpacesToIndent, final ConnectionOptions connectionOptions)
 	{
@@ -35,47 +36,47 @@ public class ConnectionOptionsToJavaSerializer implements ToJavaSerializer<Conne
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
 						".withSuppressContentLengthHeader(")
 					.append(connectionOptions.getSuppressContentLengthHeader())
-					.append(")");
+					.append(')');
 			}
 			if(connectionOptions.getContentLengthHeaderOverride() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
 						".withContentLengthHeaderOverride(")
 					.append(connectionOptions.getContentLengthHeaderOverride())
-					.append(")");
+					.append(')');
 			}
 			if(connectionOptions.getSuppressConnectionHeader() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
 						".withSuppressConnectionHeader(")
 					.append(connectionOptions.getSuppressConnectionHeader())
-					.append(")");
+					.append(')');
 			}
 			if(connectionOptions.getChunkSize() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
 					.append(".withChunkSize(")
 					.append(connectionOptions.getChunkSize())
-					.append(")");
+					.append(')');
 			}
 			if(connectionOptions.getKeepAliveOverride() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
-					".withKeepAliveOverride(").append(connectionOptions.getKeepAliveOverride()).append(")");
+					".withKeepAliveOverride(").append(connectionOptions.getKeepAliveOverride()).append(')');
 			}
 			if(connectionOptions.getCloseSocket() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
 					.append(".withCloseSocket(")
 					.append(connectionOptions.getCloseSocket())
-					.append(")");
+					.append(')');
 			}
 			if(connectionOptions.getCloseSocketDelay() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
 						".withCloseSocketDelay(")
 					.append(new DelayToJavaSerializer().serialize(0, connectionOptions.getCloseSocketDelay()))
-					.append(")");
+					.append(')');
 			}
 		}
 		return output.toString();

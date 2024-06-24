@@ -41,6 +41,7 @@ import software.xdev.mockserver.time.EpochService;
 import software.xdev.mockserver.uuid.UUIDService;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class EventEntry implements EventTranslator<EventEntry>
 {
 	private static final RequestDefinition[] EMPTY_REQUEST_DEFINITIONS = new RequestDefinition[0];

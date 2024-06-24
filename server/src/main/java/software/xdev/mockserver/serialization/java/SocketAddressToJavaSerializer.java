@@ -40,12 +40,12 @@ public class SocketAddressToJavaSerializer implements ToJavaSerializer<SocketAdd
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withPort(")
 					.append(socketAddress.getPort())
-					.append(")");
+					.append(')');
 			}
 			if(socketAddress.getScheme() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
-					".withScheme(SocketAddress.Scheme.").append(socketAddress.getScheme()).append(")");
+					".withScheme(SocketAddress.Scheme.").append(socketAddress.getScheme()).append(')');
 			}
 		}
 		return output.toString();

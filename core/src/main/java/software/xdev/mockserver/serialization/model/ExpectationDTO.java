@@ -31,6 +31,7 @@ import software.xdev.mockserver.model.ObjectWithJsonToString;
 import software.xdev.mockserver.model.RequestDefinition;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expectation>
 {
 	private String id;
@@ -47,6 +48,7 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
 	private software.xdev.mockserver.serialization.model.TimesDTO times;
 	private TimeToLiveDTO timeToLive;
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	public ExpectationDTO(final Expectation expectation)
 	{
 		if(expectation != null)
@@ -120,6 +122,7 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
 	{
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
 	public Expectation buildObject()
 	{

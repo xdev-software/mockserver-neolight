@@ -61,11 +61,7 @@ public class KeyToMultiValue extends ObjectWithJsonToString
 		}
 		else
 		{
-			this.values = new LinkedList<>();
-			for(final NottableString value : values)
-			{
-				this.values.add(value);
-			}
+			this.values = new LinkedList<>(Arrays.asList(values));
 		}
 	}
 	

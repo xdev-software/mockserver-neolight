@@ -43,7 +43,7 @@ public class CookieToJavaSerializer implements MultiValueToJavaSerializer<Cookie
 			output.append(this.serialize(numberOfSpacesToIndent, cookies.get(i)));
 			if(i < (cookies.size() - 1))
 			{
-				output.append(",");
+				output.append(',');
 			}
 		}
 		return output.toString();

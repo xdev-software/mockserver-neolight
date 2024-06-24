@@ -35,7 +35,7 @@ import software.xdev.mockserver.model.RequestDefinition;
 import software.xdev.mockserver.uuid.UUIDService;
 
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "PMD.GodClass"})
 public class Expectation extends ObjectWithJsonToString
 {
 	private static final AtomicInteger EXPECTATION_COUNTER = new AtomicInteger(0);
@@ -460,6 +460,7 @@ public class Expectation extends ObjectWithJsonToString
 		return this;
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.CyclomaticComplexity"})
 	private void validationErrors(final String actionDescription, final Action.Type actionType)
 	{
 		if(actionType != Action.Type.RESPONSE && this.httpResponse != null)

@@ -155,6 +155,7 @@ public class RequestDefinitionSerializer implements Serializer<RequestDefinition
 		return RequestDefinition.class;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public RequestDefinition[] deserializeArray(final String jsonRequestDefinitions)
 	{
 		final List<RequestDefinition> requestDefinitions = new ArrayList<>();

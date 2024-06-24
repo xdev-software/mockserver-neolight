@@ -73,6 +73,7 @@ import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class HttpState
 {
 	private static final Logger LOG = LoggerFactory.getLogger(HttpState.class);
@@ -211,7 +212,7 @@ public class HttpState
 				+ "\" is not a valid value for \"type\" parameter, only the following values are supported "
 				+ Arrays.stream(ClearType.values())
 				.map(input -> input.name().toLowerCase())
-				.collect(Collectors.toList()));
+				.collect(Collectors.toList()), iae);
 		}
 	}
 	
@@ -280,7 +281,13 @@ public class HttpState
 		this.requestMatchers.postProcess(expectation);
 	}
 	
-	@SuppressWarnings({"checkstyle:MethodLength", "checkstyle:MagicNumber"})
+	@SuppressWarnings({
+		"checkstyle:MethodLength",
+		"checkstyle:MagicNumber",
+		"PMD.NcssCount",
+		"PMD.CognitiveComplexity",
+		"PMD.CyclomaticComplexity",
+		"PMD.PreserveStackTrace"})
 	public HttpResponse retrieve(final HttpRequest request)
 	{
 		final String logCorrelationId = UUIDService.getUUID();
@@ -533,9 +540,9 @@ public class HttpState
 		this.eventBus.verify(verificationSequence, resultConsumer);
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public boolean handle(final HttpRequest request, final ResponseWriter responseWriter, final boolean warDeployment)
 	{
-		
 		request.withLogCorrelationId(UUIDService.getUUID());
 		setPort(request);
 		

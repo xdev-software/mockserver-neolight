@@ -34,6 +34,7 @@ public class StringBodyDTOSerializer extends StdSerializer<StringBodyDTO>
 		this.serialiseDefaultValues = serialiseDefaultValues;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public void serialize(
 		final StringBodyDTO stringBodyDTO,

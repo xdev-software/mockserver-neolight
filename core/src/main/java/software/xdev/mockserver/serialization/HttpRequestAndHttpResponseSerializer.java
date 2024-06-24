@@ -127,6 +127,7 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 		return HttpRequestAndHttpResponse.class;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public HttpRequestAndHttpResponse[] deserializeArray(final String jsonHttpRequests)
 	{
 		final List<HttpRequestAndHttpResponse> httpRequests = new ArrayList<>();

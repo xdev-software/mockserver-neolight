@@ -28,12 +28,12 @@ import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.serialization.model.WebSocketMessageDTO;
 
 
-@SuppressWarnings({"rawtypes", "unchecked", "FieldMayBeFinal"})
+@SuppressWarnings({"rawtypes", "unchecked", "PMD"})
 public class WebSocketMessageSerializer
 {
-	private ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-	private Map<Class, Serializer> serializers;
+	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
+	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
+	private final Map<Class, Serializer> serializers;
 	
 	public WebSocketMessageSerializer()
 	{
