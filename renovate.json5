@@ -3,6 +3,14 @@
   "rebaseWhen": "behind-base-branch",
   "packageRules": [
     {
+      "description": "Ignore project internal dependencies",
+      "packagePattern": "^software.xdev.mockserver",
+      "datasources": [
+        "maven"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Java LTS 21",
       "packagePattern": "^eclipse-temurin",
       "datasources": [
