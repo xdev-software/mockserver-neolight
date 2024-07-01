@@ -1,0 +1,38 @@
+{
+  "title": "verification sequence",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "expectationIds": {
+      "type": "array",
+      "additionalProperties": false,
+      "items": {
+        "$ref": "#/definitions/expectationId"
+      }
+    },
+    "httpRequests": {
+      "type": "array",
+      "additionalProperties": false,
+      "items": {
+        "$ref": "#/definitions/requestDefinition"
+      }
+    },
+    "maximumNumberOfRequestToReturnInVerificationFailure": {
+      "type": "integer"
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "expectationIds"
+      ]
+    },
+    {
+      "required": [
+        "httpRequests"
+      ]
+    }
+  ],
+  "definitions": {
+  }
+}

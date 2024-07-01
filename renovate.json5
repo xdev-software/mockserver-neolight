@@ -4,11 +4,19 @@
   "packageRules": [
     {
       "description": "Ignore project internal dependencies",
-      "packagePattern": "^software.xdev:template-placeholder",
+      "packagePattern": "^software.xdev.mockserver",
       "datasources": [
         "maven"
       ],
       "enabled": false
+    },
+    {
+      "description": "Java LTS 21",
+      "packagePattern": "^eclipse-temurin",
+      "datasources": [
+        "docker"
+      ],
+      "allowedVersions": "/^21\\-alpine$/"
     }
   ]
 }
