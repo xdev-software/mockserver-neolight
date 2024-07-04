@@ -34,9 +34,9 @@ public class HttpResponseModifierToJavaSerializer implements ToJavaSerializer<Ht
 		final StringBuilder output = new StringBuilder();
 		for(final HttpResponseModifier httpResponseModifier : httpResponseModifiers)
 		{
-			output.append(this.serialize(0, httpResponseModifier));
-			output.append(";");
-			output.append(NEW_LINE);
+			output.append(this.serialize(0, httpResponseModifier))
+				.append(';')
+				.append(NEW_LINE);
 		}
 		return output.toString();
 	}
@@ -44,7 +44,7 @@ public class HttpResponseModifierToJavaSerializer implements ToJavaSerializer<Ht
 	@Override
 	public String serialize(final int numberOfSpacesToIndent, final HttpResponseModifier response)
 	{
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder output = new StringBuilder(18);
 		if(response != null)
 		{
 			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output);
@@ -56,7 +56,7 @@ public class HttpResponseModifierToJavaSerializer implements ToJavaSerializer<Ht
 				this.outputHeaders(numberOfSpacesToIndent, output, response.getHeaders().getAdd());
 				this.outputHeaders(numberOfSpacesToIndent, output, response.getHeaders().getReplace());
 				this.outputList(numberOfSpacesToIndent, output, response.getHeaders().getRemove());
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 			if(response.getCookies() != null)
 			{
@@ -65,7 +65,7 @@ public class HttpResponseModifierToJavaSerializer implements ToJavaSerializer<Ht
 				this.outputCookies(numberOfSpacesToIndent, output, response.getCookies().getAdd());
 				this.outputCookies(numberOfSpacesToIndent, output, response.getCookies().getReplace());
 				this.outputList(numberOfSpacesToIndent, output, response.getCookies().getRemove());
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 		}
 		
@@ -109,7 +109,7 @@ public class HttpResponseModifierToJavaSerializer implements ToJavaSerializer<Ht
 			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output)
 				.append("List.of(")
 				.append(add.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(",")))
-				.append(")");
+				.append(')');
 		}
 		else
 		{

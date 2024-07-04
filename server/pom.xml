@@ -91,7 +91,7 @@
 			<dependency>
 				<groupId>io.netty</groupId>
 				<artifactId>netty-bom</artifactId>
-				<version>4.1.110.Final</version>
+				<version>4.1.111.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -140,7 +140,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>3.5.0</version>
+					<version>3.6.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -317,7 +317,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>3.3.1</version>
+						<version>3.4.0</version>
 						<dependencies>
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
@@ -339,6 +339,47 @@
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<id>pmd</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<version>3.23.0</version>
+						<configuration>
+							<includeTests>true</includeTests>
+							<printFailingErrors>true</printFailingErrors>
+							<rulesets>
+								<ruleset>../.config/pmd/ruleset.xml</ruleset>
+							</rulesets>
+						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>net.sourceforge.pmd</groupId>
+								<artifactId>pmd-core</artifactId>
+								<version>7.3.0</version>
+							</dependency>
+							<dependency>
+								<groupId>net.sourceforge.pmd</groupId>
+								<artifactId>pmd-java</artifactId>
+								<version>7.3.0</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+			<reporting>
+				<plugins>
+					<!-- Required for reporting -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jxr-plugin</artifactId>
+						<version>3.4.0</version>
+					</plugin>
+				</plugins>
+			</reporting>
 		</profile>
 	</profiles>
 </project>

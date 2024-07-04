@@ -112,7 +112,7 @@ public class CircularConcurrentLinkedDeque<E> extends ConcurrentLinkedDeque<E>
 		}
 		else
 		{
-			while(this.size() > 0)
+			while(!this.isEmpty())
 			{
 				this.onEvictCallback.accept(super.poll());
 			}

@@ -19,9 +19,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,8 @@ public final class MockServerUtils
 	
 	public static final String DEFAULT_VERSION = "latest";
 	private static String cachedVersion;
+	
+	static final String MOCKSERVER_VERSION_SNAPSHOT_ALLOWED_KEY = "MOCKSERVER_VERSION_SNAPSHOT_ALLOWED";
 	
 	private MockServerUtils()
 	{
@@ -110,13 +114,22 @@ public final class MockServerUtils
 			);
 		}
 		
-		if(foundVersion.endsWith("-SNAPSHOT"))
+		if(foundVersion.endsWith("-SNAPSHOT") && !isSnapshotVersionAllowed())
 		{
 			LOG.warn("Found version is a SNAPSHOT - will use default {}", DEFAULT_VERSION);
 			return DEFAULT_VERSION;
 		}
 		
 		return foundVersion;
+	}
+	
+	static boolean isSnapshotVersionAllowed()
+	{
+		return Stream.of(
+				System.getenv(MOCKSERVER_VERSION_SNAPSHOT_ALLOWED_KEY),
+				System.getProperty(MOCKSERVER_VERSION_SNAPSHOT_ALLOWED_KEY))
+			.filter(Objects::nonNull)
+			.anyMatch(s -> Boolean.parseBoolean(s) || "1".equals(s));
 	}
 	
 	/**

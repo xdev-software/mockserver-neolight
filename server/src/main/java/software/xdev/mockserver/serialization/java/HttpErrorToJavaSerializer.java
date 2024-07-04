@@ -36,13 +36,13 @@ public class HttpErrorToJavaSerializer implements ToJavaSerializer<HttpError>
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
 					.append(".withDelay(")
 					.append(new DelayToJavaSerializer().serialize(0, httpError.getDelay()))
-					.append(")");
+					.append(')');
 			}
 			if(httpError.getDropConnection() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
 					.append(".withDropConnection(").append(httpError.getDropConnection())
-					.append(")");
+					.append(')');
 			}
 			if(httpError.getResponseBytes() != null)
 			{

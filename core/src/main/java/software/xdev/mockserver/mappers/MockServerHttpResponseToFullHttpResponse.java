@@ -132,6 +132,7 @@ public class MockServerHttpResponseToFullHttpResponse
 			httpResponse.getFirstHeader(CONTENT_TYPE.toString()));
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private void setHeaders(final HttpResponse httpResponse, final DefaultHttpResponse response, final ByteBuf body)
 	{
 		if(httpResponse.getHeaderMultimap() != null)
@@ -149,13 +150,11 @@ public class MockServerHttpResponseToFullHttpResponse
 		}
 		
 		// Content-Type
-		if(isBlank(httpResponse.getFirstHeader(CONTENT_TYPE.toString())))
+		if(isBlank(httpResponse.getFirstHeader(CONTENT_TYPE.toString()))
+			&& httpResponse.getBody() != null
+			&& httpResponse.getBody().getContentType() != null)
 		{
-			if(httpResponse.getBody() != null
-				&& httpResponse.getBody().getContentType() != null)
-			{
-				response.headers().set(CONTENT_TYPE, httpResponse.getBody().getContentType());
-			}
+			response.headers().set(CONTENT_TYPE, httpResponse.getBody().getContentType());
 		}
 		
 		// Content-Length

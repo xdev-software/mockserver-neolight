@@ -39,7 +39,7 @@ public class HttpClassCallbackToJavaSerializer implements ToJavaSerializer<HttpC
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDelay(")
 					.append(new DelayToJavaSerializer().serialize(0, httpClassCallback.getDelay()))
-					.append(")");
+					.append(')');
 			}
 		}
 		

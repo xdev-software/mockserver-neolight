@@ -33,13 +33,14 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 		final StringBuilder output = new StringBuilder();
 		for(final Expectation expectation : expectations)
 		{
-			output.append(this.serialize(0, expectation));
-			output.append(NEW_LINE);
-			output.append(NEW_LINE);
+			output.append(this.serialize(0, expectation))
+				.append(NEW_LINE)
+				.append(NEW_LINE);
 		}
 		return output.toString();
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
 	public String serialize(final int numberOfSpacesToIndent, final Expectation expectation)
 	{
@@ -56,7 +57,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 					numberOfSpacesToIndent + 1,
 					(HttpRequest)requestDefinition));
 			}
-			output.append(",");
+			output.append(',');
 			if(expectation.getTimes() != null)
 			{
 				output.append(new TimesToJavaSerializer().serialize(
@@ -67,7 +68,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append("null");
 			}
-			output.append(",");
+			output.append(',');
 			if(expectation.getTimeToLive() != null)
 			{
 				output.append(new TimeToLiveToJavaSerializer().serialize(
@@ -78,18 +79,18 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append("null");
 			}
-			output.append(",");
+			output.append(',');
 			this.appendNewLineAndIndent(
 				(numberOfSpacesToIndent + 1) * INDENT_SIZE,
 				output).append(expectation.getPriority());
-			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+			this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 			if(expectation.getHttpResponse() != null)
 			{
 				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(".respond(");
 				output.append(new HttpResponseToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 1,
 					expectation.getHttpResponse()));
-				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 			}
 			if(expectation.getHttpResponseClassCallback() != null)
 			{
@@ -97,7 +98,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 				output.append(new HttpClassCallbackToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 1,
 					expectation.getHttpResponseClassCallback()));
-				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 			}
 			if(expectation.getHttpResponseObjectCallback() != null)
 			{
@@ -110,7 +111,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 				output.append(new HttpForwardToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 1,
 					expectation.getHttpForward()));
-				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 			}
 			if(expectation.getHttpOverrideForwardedRequest() != null)
 			{
@@ -118,7 +119,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 				output.append(new HttpOverrideForwardedRequestToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 1,
 					expectation.getHttpOverrideForwardedRequest()));
-				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 			}
 			if(expectation.getHttpForwardClassCallback() != null)
 			{
@@ -126,7 +127,7 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 				output.append(new HttpClassCallbackToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 1,
 					expectation.getHttpForwardClassCallback()));
-				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 			}
 			if(expectation.getHttpForwardObjectCallback() != null)
 			{
@@ -139,9 +140,9 @@ public class ExpectationToJavaSerializer implements ToJavaSerializer<Expectation
 				output.append(new HttpErrorToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 1,
 					expectation.getHttpError()));
-				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent(numberOfSpacesToIndent * INDENT_SIZE, output).append(')');
 			}
-			output.append(";");
+			output.append(';');
 		}
 		return output.toString();
 	}

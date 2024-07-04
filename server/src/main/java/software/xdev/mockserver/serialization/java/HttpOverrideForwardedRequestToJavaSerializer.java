@@ -38,7 +38,7 @@ public class HttpOverrideForwardedRequestToJavaSerializer implements ToJavaSeria
 				output.append(new HttpRequestToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 2,
 					httpForward.getRequestOverride()));
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 			if(httpForward.getRequestModifier() != null)
 			{
@@ -47,7 +47,7 @@ public class HttpOverrideForwardedRequestToJavaSerializer implements ToJavaSeria
 				output.append(new HttpRequestModifierToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 2,
 					httpForward.getRequestModifier()));
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 			if(httpForward.getResponseOverride() != null)
 			{
@@ -56,7 +56,7 @@ public class HttpOverrideForwardedRequestToJavaSerializer implements ToJavaSeria
 				output.append(new HttpResponseToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 2,
 					httpForward.getResponseOverride()));
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 			if(httpForward.getResponseModifier() != null)
 			{
@@ -65,13 +65,14 @@ public class HttpOverrideForwardedRequestToJavaSerializer implements ToJavaSeria
 				output.append(new HttpResponseModifierToJavaSerializer().serialize(
 					numberOfSpacesToIndent + 2,
 					httpForward.getResponseModifier()));
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(')');
 			}
 			if(httpForward.getDelay() != null)
 			{
-				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDelay(");
-				output.append(new DelayToJavaSerializer().serialize(0, httpForward.getDelay()));
-				output.append(")");
+				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output)
+					.append(".withDelay(")
+					.append(new DelayToJavaSerializer().serialize(0, httpForward.getDelay()))
+					.append(')');
 			}
 		}
 		return output.toString();

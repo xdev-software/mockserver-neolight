@@ -40,18 +40,18 @@ public class HttpForwardToJavaSerializer implements ToJavaSerializer<HttpForward
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withPort(")
 					.append(httpForward.getPort())
-					.append(")");
+					.append(')');
 			}
 			if(httpForward.getScheme() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(
-					".withScheme(HttpForward.Scheme.").append(httpForward.getScheme()).append(")");
+					".withScheme(HttpForward.Scheme.").append(httpForward.getScheme()).append(')');
 			}
 			if(httpForward.getDelay() != null)
 			{
 				this.appendNewLineAndIndent((numberOfSpacesToIndent + 1) * INDENT_SIZE, output).append(".withDelay(")
 					.append(new DelayToJavaSerializer().serialize(0, httpForward.getDelay()))
-					.append(")");
+					.append(')');
 			}
 		}
 		return output.toString();

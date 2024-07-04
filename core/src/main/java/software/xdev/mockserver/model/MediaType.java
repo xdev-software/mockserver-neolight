@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "PMD.GodClass"})
 public class MediaType
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MediaType.class);
@@ -99,6 +99,7 @@ public class MediaType
 	public static final MediaType JPEG = new MediaType("image", "jpeg");
 	public static final MediaType PNG = new MediaType("image", "png");
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public static MediaType parse(final String mediaTypeHeader)
 	{
 		if(isNotBlank(mediaTypeHeader))

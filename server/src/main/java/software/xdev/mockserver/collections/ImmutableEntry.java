@@ -154,6 +154,7 @@ public class ImmutableEntry extends Pair<NottableString, NottableString>
 		return matches;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public static boolean listsEqualWithOptionals(
 		final RegexStringMatcher regexStringMatcher,
 		final List<ImmutableEntry> matcher,
@@ -208,7 +209,6 @@ public class ImmutableEntry extends Pair<NottableString, NottableString>
 		final Set<NottableString> matchedKeys,
 		final NottableString matcherItem)
 	{
-		final boolean result = false;
 		for(final NottableString matchedKey : matchedKeys)
 		{
 			if(regexStringMatcher.matches(matchedKey, matcherItem))
@@ -216,6 +216,6 @@ public class ImmutableEntry extends Pair<NottableString, NottableString>
 				return true;
 			}
 		}
-		return result;
+		return false;
 	}
 }

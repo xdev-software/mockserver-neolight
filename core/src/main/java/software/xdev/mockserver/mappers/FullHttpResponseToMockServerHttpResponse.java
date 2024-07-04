@@ -90,6 +90,7 @@ public class FullHttpResponseToMockServerHttpResponse
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private void setCookies(final HttpResponse httpResponse)
 	{
 		final Cookies cookies = new Cookies();

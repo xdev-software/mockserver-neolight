@@ -692,6 +692,7 @@ public class HttpResponse extends Action<HttpResponse> implements HttpMessage<Ht
 			.withStreamId(this.streamId);
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	public HttpResponse update(final HttpResponse responseOverride, final HttpResponseModifier responseModifier)
 	{
 		if(responseOverride != null)

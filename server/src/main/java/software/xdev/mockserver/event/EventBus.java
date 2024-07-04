@@ -223,6 +223,7 @@ public class EventBus extends MockServerEventLogNotifier
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void clear(final RequestDefinition requestDefinition)
 	{
 		final CompletableFuture<String> future = new CompletableFuture<>();
@@ -457,6 +458,7 @@ public class EventBus extends MockServerEventLogNotifier
 		return result;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void verify(final Verification verification, final Consumer<String> resultConsumer)
 	{
 		final String logCorrelationId = UUIDService.getUUID();
@@ -536,6 +538,7 @@ public class EventBus extends MockServerEventLogNotifier
 		return result;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void verify(final VerificationSequence verificationSequence, final Consumer<String> resultConsumer)
 	{
 		if(verificationSequence != null)

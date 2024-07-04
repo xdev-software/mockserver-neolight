@@ -129,6 +129,7 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		return upsertedExpectation;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void update(final Expectation[] expectations, final Cause cause)
 	{
 		final AtomicInteger numberOfChanges = new AtomicInteger(0);

@@ -67,11 +67,9 @@ public final class ExceptionHandling
 	/**
 	 * returns true is the exception was caused by the connection being closed
 	 */
-	@SuppressWarnings("java:S1872") // Not always given
+	@SuppressWarnings({"java:S1872", "PMD.CognitiveComplexity", "PMD.NPathComplexity"}) // Not always given
 	public static boolean connectionClosedException(final Throwable throwable)
 	{
-		final String message = String.valueOf(throwable.getMessage()).toLowerCase();
-		
 		// is ssl exception
 		if(throwable.getCause() instanceof SSLException || throwable instanceof DecoderException
 			|| throwable instanceof NotSslRecordException)
@@ -79,6 +77,7 @@ public final class ExceptionHandling
 			return false;
 		}
 		
+		final String message = String.valueOf(throwable.getMessage()).toLowerCase();
 		// first try to match connection reset / broke peer based on the regex.
 		// This is the fastest way but may fail on different jdk impls or OS's
 		if(IGNORABLE_ERROR_MESSAGE_PRE_CHECK.test(message) && IGNORABLE_ERROR_MESSAGE.matcher(message).matches())

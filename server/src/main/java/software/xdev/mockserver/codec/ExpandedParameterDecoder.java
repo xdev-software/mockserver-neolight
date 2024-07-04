@@ -112,6 +112,7 @@ public class ExpandedParameterDecoder
 		return null;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void splitParameters(final Parameters matcher, final Parameters matched)
 	{
 		if(matcher != null && matched != null)
@@ -140,6 +141,7 @@ public class ExpandedParameterDecoder
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public List<NottableString> splitOnDelimiter(
 		final ParameterStyle style,
 		final String name,

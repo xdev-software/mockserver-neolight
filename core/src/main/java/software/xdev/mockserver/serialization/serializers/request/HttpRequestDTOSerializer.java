@@ -33,6 +33,7 @@ public class HttpRequestDTOSerializer extends StdSerializer<HttpRequestDTO>
 		super(HttpRequestDTO.class);
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
 	public void serialize(final HttpRequestDTO httpRequest, final JsonGenerator jgen,
 		final SerializerProvider provider)

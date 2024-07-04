@@ -76,12 +76,10 @@ public final class SocksDetector
 			return -1;
 		}
 		
-		if(socks4a)
+		if(socks4a
+			&& -1 == (i = consumeHostname(msg, i)))
 		{
-			if(-1 == (i = consumeHostname(msg, i)))
-			{
-				return -1;
-			}
+			return -1;
 		}
 		
 		return i;

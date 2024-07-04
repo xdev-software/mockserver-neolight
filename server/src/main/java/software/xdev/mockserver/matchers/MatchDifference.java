@@ -70,15 +70,16 @@ public class MatchDifference
 	
 	public MatchDifference addDifference(final Field fieldName, final String messageFormat, final Object... arguments)
 	{
-		if(this.detailedMatchFailures)
+		if(this.detailedMatchFailures
+			&& isNotBlank(messageFormat)
+			&& arguments != null
+			&& fieldName != null)
 		{
-			if(isNotBlank(messageFormat) && arguments != null && fieldName != null)
-			{
-				this.differences
-					.computeIfAbsent(fieldName, key -> new ArrayList<>())
-					.add(formatLogMessage(1, messageFormat, arguments));
-			}
+			this.differences
+				.computeIfAbsent(fieldName, key -> new ArrayList<>())
+				.add(formatLogMessage(1, messageFormat, arguments));
 		}
+		
 		return this;
 	}
 	

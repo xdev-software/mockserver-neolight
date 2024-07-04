@@ -59,7 +59,7 @@ public class CORSHeaders
 		this.corsAllowHeaders = configuration.corsAllowHeaders();
 		this.corsAllowMethods = configuration.corsAllowMethods();
 		this.corsAllowCredentials = configuration.corsAllowCredentials();
-		this.corsMaxAge = "" + configuration.corsMaxAgeInSeconds();
+		this.corsMaxAge = String.valueOf(configuration.corsMaxAgeInSeconds());
 	}
 	
 	public static boolean isPreflightRequest(final ServerConfiguration configuration, final HttpRequest request)
@@ -102,7 +102,7 @@ public class CORSHeaders
 			this.setHeaderIfNotAlreadyExists(
 				response,
 				HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString(),
-				"" + this.corsAllowCredentials);
+				String.valueOf(this.corsAllowCredentials));
 		}
 		this.setHeaderIfNotAlreadyExists(
 			response,

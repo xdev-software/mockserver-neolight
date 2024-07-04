@@ -30,7 +30,7 @@ public class ParameterToJavaSerializer implements MultiValueToJavaSerializer<Par
 	@Override
 	public String serialize(final int numberOfSpacesToIndent, final Parameter parameter)
 	{
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder output = new StringBuilder(20);
 		output.append(NEW_LINE).append(" ".repeat(numberOfSpacesToIndent * INDENT_SIZE));
 		final String serializedKey = NottableStringToJavaSerializer.serialize(parameter.getName(), false);
 		output.append("new Parameter(").append(serializedKey);
@@ -38,7 +38,7 @@ public class ParameterToJavaSerializer implements MultiValueToJavaSerializer<Par
 		{
 			output.append(", ").append(NottableStringToJavaSerializer.serialize(value, serializedKey.endsWith(")")));
 		}
-		output.append(")");
+		output.append(')');
 		return output.toString();
 	}
 	
@@ -51,7 +51,7 @@ public class ParameterToJavaSerializer implements MultiValueToJavaSerializer<Par
 			output.append(this.serialize(numberOfSpacesToIndent, parameters.get(i)));
 			if(i < (parameters.size() - 1))
 			{
-				output.append(",");
+				output.append(',');
 			}
 		}
 		return output.toString();

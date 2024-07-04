@@ -91,8 +91,8 @@ public class ParameterBody extends Body<Parameters>
 			final Parameter parameter = bodyParameters.get(i);
 			if(parameter.getValues().isEmpty())
 			{
-				body.append(parameter.getName().getValue());
-				body.append('=');
+				body.append(parameter.getName().getValue())
+					.append('=');
 			}
 			else
 			{
@@ -100,9 +100,9 @@ public class ParameterBody extends Body<Parameters>
 				for(int j = 0; j < values.size(); j++)
 				{
 					final String value = values.get(j).getValue();
-					body.append(parameter.getName().getValue());
-					body.append('=');
-					body.append(URLEncoder.encode(value, StandardCharsets.UTF_8));
+					body.append(parameter.getName().getValue())
+						.append('=')
+						.append(URLEncoder.encode(value, StandardCharsets.UTF_8));
 					if(j < (values.size() - 1))
 					{
 						body.append('&');

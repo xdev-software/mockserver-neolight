@@ -81,7 +81,7 @@ public class NettyHttpClient
 		this.forwardProxyClient = forwardProxyClient;
 	}
 	
-	public CompletableFuture<HttpResponse> sendRequest(final HttpRequest httpRequest) throws SocketConnectionException
+	public CompletableFuture<HttpResponse> sendRequest(final HttpRequest httpRequest)
 	{
 		return this.sendRequest(httpRequest, httpRequest.socketAddressFromHostHeader());
 	}
@@ -89,16 +89,15 @@ public class NettyHttpClient
 	public CompletableFuture<HttpResponse> sendRequest(
 		final HttpRequest httpRequest,
 		final InetSocketAddress remoteAddress)
-		throws SocketConnectionException
 	{
 		return this.sendRequest(httpRequest, remoteAddress, this.configuration.socketConnectionTimeoutInMillis());
 	}
 	
-	@SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:FinalParameters"})
+	@SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:FinalParameters", "PMD.CognitiveComplexity"})
 	public CompletableFuture<HttpResponse> sendRequest(
 		final HttpRequest httpRequest,
 		InetSocketAddress remoteAddress,
-		final Long connectionTimeoutMillis) throws SocketConnectionException
+		final Long connectionTimeoutMillis)
 	{
 		if(!this.eventLoopGroup.isShuttingDown())
 		{
@@ -192,12 +191,12 @@ public class NettyHttpClient
 		}
 	}
 	
-	@SuppressWarnings({"checkstyle:FinalParameters", "checkstyle:MagicNumber"})
+	@SuppressWarnings({"checkstyle:FinalParameters", "checkstyle:MagicNumber", "PMD.CognitiveComplexity"})
 	public CompletableFuture<BinaryMessage> sendRequest(
 		final BinaryMessage binaryRequest,
 		final boolean isSecure,
 		InetSocketAddress remoteAddress,
-		final Long connectionTimeoutMillis) throws SocketConnectionException
+		final Long connectionTimeoutMillis)
 	{
 		if(!this.eventLoopGroup.isShuttingDown())
 		{
@@ -272,6 +271,7 @@ public class NettyHttpClient
 		}
 	}
 	
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	public HttpResponse sendRequest(
 		final HttpRequest httpRequest,
 		final long timeout,

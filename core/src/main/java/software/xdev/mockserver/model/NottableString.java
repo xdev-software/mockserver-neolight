@@ -81,8 +81,8 @@ public class NottableString extends ObjectWithJsonToString implements Comparable
 	{
 		if(this.isOptional() || this.not)
 		{
-			return (this.isOptional() ? "" + OPTIONAL_CHAR : "")
-				+ (this.not ? "" + NOT_CHAR : "")
+			return (this.isOptional() ? String.valueOf(OPTIONAL_CHAR) : "")
+				+ (this.not ? String.valueOf(NOT_CHAR) : "")
 				+ (!this.isBlank ? this.value : EMPTY_STRING);
 		}
 		else if(this.isBlank)

@@ -126,6 +126,7 @@ public class WebSocketClient<T extends HttpMessage>
 		return registrationFuture;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	void receivedTextWebSocketFrame(final TextWebSocketFrame textWebSocketFrame)
 	{
 		try

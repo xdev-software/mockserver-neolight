@@ -38,7 +38,7 @@ public class HeaderToJavaSerializer implements MultiValueToJavaSerializer<Header
 		{
 			output.append(", ").append(NottableStringToJavaSerializer.serialize(value, serializedKey.endsWith(")")));
 		}
-		output.append(")");
+		output.append(')');
 		return output.toString();
 	}
 	
@@ -51,7 +51,7 @@ public class HeaderToJavaSerializer implements MultiValueToJavaSerializer<Header
 			output.append(this.serialize(numberOfSpacesToIndent, headers.get(i)));
 			if(i < (headers.size() - 1))
 			{
-				output.append(",");
+				output.append(',');
 			}
 		}
 		return output.toString();

@@ -68,7 +68,7 @@ import software.xdev.mockserver.responsewriter.ResponseWriter;
 import software.xdev.mockserver.scheduler.Scheduler;
 
 
-@SuppressWarnings({"rawtypes", "FieldMayBeFinal"})
+@SuppressWarnings({"rawtypes", "PMD.GodClass"})
 public class HttpActionHandler
 {
 	private static final Logger LOG = LoggerFactory.getLogger(HttpActionHandler.class);
@@ -88,8 +88,8 @@ public class HttpActionHandler
 	private HttpErrorActionHandler httpErrorActionHandler;
 	
 	// forwarding
-	private NettyHttpClient httpClient;
-	private HopByHopHeaderFilter hopByHopHeaderFilter = new HopByHopHeaderFilter();
+	private final NettyHttpClient httpClient;
+	private final HopByHopHeaderFilter hopByHopHeaderFilter = new HopByHopHeaderFilter();
 	
 	public HttpActionHandler(
 		final ServerConfiguration configuration,
@@ -103,7 +103,11 @@ public class HttpActionHandler
 		this.httpClient = new NettyHttpClient(configuration, eventLoopGroup, proxyConfigurations, true);
 	}
 	
-	@SuppressWarnings("checkstyle:MethodLength")
+	@SuppressWarnings({
+		"checkstyle:MethodLength",
+		"PMD.NcssCount",
+		"PMD.CognitiveComplexity",
+		"PMD.CyclomaticComplexity"})
 	public void processAction(
 		final HttpRequest request,
 		final ResponseWriter responseWriter,

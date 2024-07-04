@@ -90,6 +90,7 @@ public final class ProxyConfiguration extends ObjectWithJsonToString
 		return proxyConfiguration(type, address, null, null);
 	}
 	
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	public static ProxyConfiguration proxyConfiguration(
 		final Type type,
 		final String address,

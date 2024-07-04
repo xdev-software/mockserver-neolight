@@ -81,7 +81,7 @@ import software.xdev.mockserver.verify.VerificationSequence;
 import software.xdev.mockserver.verify.VerificationTimes;
 
 
-@SuppressWarnings({"UnusedReturnValue", "FieldMayBeFinal"})
+@SuppressWarnings({"UnusedReturnValue", "FieldMayBeFinal", "PMD.GodClass", "PMD.CyclomaticComplexity"})
 public class MockServerClient implements Stoppable
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MockServerClient.class);
@@ -97,14 +97,14 @@ public class MockServerClient implements Stoppable
 	private ClientConfiguration configuration;
 	private ProxyConfiguration proxyConfiguration;
 	private NettyHttpClient nettyHttpClient;
-	private RequestDefinitionSerializer requestDefinitionSerializer = new RequestDefinitionSerializer();
-	private ExpectationIdSerializer expectationIdSerializer = new ExpectationIdSerializer();
-	private LogEventRequestAndResponseSerializer httpRequestResponseSerializer =
+	private final RequestDefinitionSerializer requestDefinitionSerializer = new RequestDefinitionSerializer();
+	private final ExpectationIdSerializer expectationIdSerializer = new ExpectationIdSerializer();
+	private final LogEventRequestAndResponseSerializer httpRequestResponseSerializer =
 		new LogEventRequestAndResponseSerializer();
-	private PortBindingSerializer portBindingSerializer = new PortBindingSerializer();
-	private ExpectationSerializer expectationSerializer = new ExpectationSerializer();
-	private VerificationSerializer verificationSerializer = new VerificationSerializer();
-	private VerificationSequenceSerializer verificationSequenceSerializer = new VerificationSequenceSerializer();
+	private final PortBindingSerializer portBindingSerializer = new PortBindingSerializer();
+	private final ExpectationSerializer expectationSerializer = new ExpectationSerializer();
+	private final VerificationSerializer verificationSerializer = new VerificationSerializer();
+	private final VerificationSequenceSerializer verificationSequenceSerializer = new VerificationSequenceSerializer();
 	private final CompletableFuture<MockServerClient> stopFuture = new CompletableFuture<>();
 	
 	/**
@@ -112,7 +112,7 @@ public class MockServerClient implements Stoppable
 	 *
 	 * @param portFuture the port for the MockServer to communicate with
 	 */
-	@SuppressWarnings("checkstyle:FinalParameters")
+	@SuppressWarnings({"checkstyle:FinalParameters", "PMD.AvoidUsingHardCodedIP"})
 	public MockServerClient(ClientConfiguration configuration, final CompletableFuture<Integer> portFuture)
 	{
 		if(configuration == null)
@@ -336,7 +336,11 @@ public class MockServerClient implements Stoppable
 		return this.nettyHttpClient;
 	}
 	
-	@SuppressWarnings({"checkstyle:FinalParameters", "checkstyle:MagicNumber"})
+	@SuppressWarnings({
+		"checkstyle:FinalParameters",
+		"checkstyle:MagicNumber",
+		"PMD.CognitiveComplexity",
+		"PMD.NPathComplexity"})
 	private HttpResponse sendRequest(
 		HttpRequest request,
 		final boolean ignoreErrors,
@@ -363,18 +367,15 @@ public class MockServerClient implements Stoppable
 					ignoreErrors
 				);
 				
-				if(response != null)
+				if(response != null && response.getStatusCode() != null)
 				{
-					if(response.getStatusCode() != null)
+					if(response.getStatusCode() == BAD_REQUEST.code())
 					{
-						if(response.getStatusCode() == BAD_REQUEST.code())
-						{
-							throw new IllegalArgumentException(response.getBodyAsString());
-						}
-						else if(response.getStatusCode() == UNAUTHORIZED.code())
-						{
-							throw new AuthenticationException(response.getBodyAsString());
-						}
+						throw new IllegalArgumentException(response.getBodyAsString());
+					}
+					else if(response.getStatusCode() == UNAUTHORIZED.code())
+					{
+						throw new AuthenticationException(response.getBodyAsString());
 					}
 				}
 				
@@ -393,7 +394,7 @@ public class MockServerClient implements Stoppable
 				{
 					throw new IllegalStateException(
 						this.getClass().getSimpleName() + " has already been closed, please create new "
-							+ this.getClass().getSimpleName() + " instance");
+							+ this.getClass().getSimpleName() + " instance", rex);
 				}
 				else
 				{
@@ -478,6 +479,7 @@ public class MockServerClient implements Stoppable
 	/**
 	 * Returns whether server MockServer has started, by polling the MockServer a configurable amount of times
 	 */
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public boolean hasStarted(final int attempts, final long timeout, final TimeUnit timeUnit)
 	{
 		try
@@ -575,7 +577,7 @@ public class MockServerClient implements Stoppable
 	/**
 	 * Stop MockServer gracefully (only support for Netty version, not supported for WAR version)
 	 */
-	@SuppressWarnings("checkstyle:MagicNumber")
+	@SuppressWarnings({"checkstyle:MagicNumber", "PMD.CognitiveComplexity"})
 	public CompletableFuture<MockServerClient> stop(final boolean ignoreFailure)
 	{
 		if(!this.stopFuture.isDone())
@@ -1453,7 +1455,7 @@ public class MockServerClient implements Stoppable
 	 * @param expectations one or more expectations to create or update (if the id field matches)
 	 * @return upserted expectations
 	 */
-	@SuppressWarnings("checkstyle:MagicNumber")
+	@SuppressWarnings({"checkstyle:MagicNumber", "PMD.CognitiveComplexity"})
 	public Expectation[] upsert(final Expectation... expectations)
 	{
 		if(expectations != null)

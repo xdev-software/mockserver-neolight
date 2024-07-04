@@ -91,6 +91,7 @@ public class HttpForwardClassCallbackActionHandler extends HttpForwardAction
 		return null;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private HttpForwardActionResult invokeCallbackMethod(
 		final HttpClassCallback httpClassCallback,
 		final HttpRequest httpRequest)

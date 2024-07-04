@@ -97,7 +97,7 @@ public class MockServerHttpRequestToFullHttpRequest
 		}
 	}
 	
-	@SuppressWarnings("HttpUrlsUsage")
+	@SuppressWarnings({"HttpUrlsUsage", "PMD.CognitiveComplexity"})
 	public String getURI(
 		final HttpRequest httpRequest,
 		final Map<ProxyConfiguration.Type, ProxyConfiguration> proxyConfigurations)
@@ -161,6 +161,7 @@ public class MockServerHttpRequestToFullHttpRequest
 		}
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	private void setHeader(final HttpRequest httpRequest, final FullHttpRequest request)
 	{
 		for(final Header header : httpRequest.getHeaderList())
@@ -210,13 +211,11 @@ public class MockServerHttpRequestToFullHttpRequest
 			request.headers().set(CONNECTION, CLOSE);
 		}
 		
-		if(!request.headers().contains(CONTENT_TYPE))
+		if(!request.headers().contains(CONTENT_TYPE)
+			&& httpRequest.getBody() != null
+			&& httpRequest.getBody().getContentType() != null)
 		{
-			if(httpRequest.getBody() != null
-				&& httpRequest.getBody().getContentType() != null)
-			{
-				request.headers().set(CONTENT_TYPE, httpRequest.getBody().getContentType());
-			}
+			request.headers().set(CONTENT_TYPE, httpRequest.getBody().getContentType());
 		}
 	}
 }

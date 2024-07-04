@@ -309,13 +309,14 @@ public class LoggingHandler extends ChannelDuplexHandler
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private String formatByteBuf(final String eventName, final ByteBuf buf)
 	{
 		final int length = buf.readableBytes();
 		final int rows = length / 16 + (length % 15 == 0 ? 0 : 1) + 4;
 		final StringBuilder dump = new StringBuilder(rows * 80 + eventName.length() + 16);
 		
-		dump.append(eventName).append('(').append(length).append('B').append(')')
+		dump.append(eventName).append('(').append(length).append("B)")
 			.append(NEW_LINE)
 			.append("         +-------------------------------------------------+")
 			.append(NEW_LINE)
@@ -333,8 +334,8 @@ public class LoggingHandler extends ChannelDuplexHandler
 			final int relIdxMod16 = relIdx & 15;
 			if(relIdxMod16 == 0)
 			{
-				dump.append(NEW_LINE);
-				dump.append(Long.toHexString(relIdx & 0xFFFFFFFFL | 0x100000000L));
+				dump.append(NEW_LINE)
+					.append(Long.toHexString(relIdx & 0xFFFFFFFFL | 0x100000000L));
 				dump.setCharAt(dump.length() - 9, '|');
 				dump.append('|');
 			}
@@ -362,14 +363,14 @@ public class LoggingHandler extends ChannelDuplexHandler
 		if((i - startIndex & 15) != 0)
 		{
 			final int remainder = length & 15;
-			dump.append(HEXPADDING[remainder]);
-			dump.append(" |");
+			dump.append(HEXPADDING[remainder])
+				.append(" |");
 			for(int j = i - remainder; j < i; j++)
 			{
 				dump.append(BYTE2CHAR[buf.getUnsignedByte(j)]);
 			}
-			dump.append(BYTEPADDING[remainder]);
-			dump.append('|');
+			dump.append(BYTEPADDING[remainder])
+				.append('|');
 		}
 		
 		dump.append(NEW_LINE).append("+--------+-------------------------------------------------+----------------+");

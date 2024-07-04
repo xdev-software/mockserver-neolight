@@ -128,6 +128,7 @@ public class Scheduler
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private Delay addDelays(final Delay... delays)
 	{
 		if(delays == null || delays.length == 0)
@@ -174,6 +175,7 @@ public class Scheduler
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void submit(
 		final HttpForwardActionResult future,
 		final Runnable command,
@@ -252,6 +254,7 @@ public class Scheduler
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void submit(
 		final HttpForwardActionResult future,
 		final BiConsumer<HttpResponse, Throwable> consumer,

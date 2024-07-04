@@ -59,7 +59,7 @@ import software.xdev.mockserver.serialization.model.BodyDTO;
 import software.xdev.mockserver.util.StringUtils;
 
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "PMD.GodClass"})
 public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 {
 	private static final Logger LOG = LoggerFactory.getLogger(HttpRequestPropertiesMatcher.class);
@@ -228,6 +228,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		this.protocolMatcher = new ExactStringMatcher(protocol != null ? string(protocol.name()) : null);
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public boolean matches(final MatchDifference context, final RequestDefinition requestDefinition)
 	{
@@ -273,7 +274,12 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		}
 	}
 	
-	@SuppressWarnings("checkstyle:MethodLength")
+	@SuppressWarnings({
+		"checkstyle:MethodLength",
+		"PMD.CognitiveComplexity",
+		"PMD.NPathComplexity",
+		"PMD.CyclomaticComplexity",
+		"PMD.NcssCount"})
 	private boolean matches(
 		final MatchDifference context,
 		final HttpRequest request,
@@ -494,6 +500,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		return false;
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	private boolean failFast(
 		final Matcher<?> matcher,
 		final MatchDifference context,
@@ -516,27 +523,26 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 					.append(String.join(NEW_LINE, context.getDifferences(fieldName)));
 			}
 		}
-		if(!fieldMatches)
+		if(!fieldMatches
+			&& !this.controlPlaneMatcher)
 		{
-			if(!this.controlPlaneMatcher)
+			if(matchDifferenceCount.getHttpRequest().isNot())
 			{
-				if(matchDifferenceCount.getHttpRequest().isNot())
-				{
-					becauseBuilder
-						.append(REQUEST_NOT_OPERATOR_IS_ENABLED);
-				}
-				if(this.httpRequest.isNot())
-				{
-					becauseBuilder
-						.append(EXPECTATION_REQUEST_NOT_OPERATOR_IS_ENABLED);
-				}
-				if(this.not)
-				{
-					becauseBuilder
-						.append(EXPECTATION_REQUEST_MATCHER_NOT_OPERATOR_IS_ENABLED);
-				}
+				becauseBuilder
+					.append(REQUEST_NOT_OPERATOR_IS_ENABLED);
+			}
+			if(this.httpRequest.isNot())
+			{
+				becauseBuilder
+					.append(EXPECTATION_REQUEST_NOT_OPERATOR_IS_ENABLED);
+			}
+			if(this.not)
+			{
+				becauseBuilder
+					.append(EXPECTATION_REQUEST_MATCHER_NOT_OPERATOR_IS_ENABLED);
 			}
 		}
+		
 		// update match difference and potentially fail fast
 		if(!fieldMatches)
 		{
@@ -566,6 +572,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		return count % 2 != 0;
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private boolean bodyMatches(final MatchDifference context, final HttpRequest request)
 	{
 		boolean bodyMatches;

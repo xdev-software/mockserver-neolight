@@ -106,6 +106,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object>
 		}
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public void channelRead0(final ChannelHandlerContext ctx, final Object msg)
 	{

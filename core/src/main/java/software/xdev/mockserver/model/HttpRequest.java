@@ -35,7 +35,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
-@SuppressWarnings({"rawtypes", "UnusedReturnValue"})
+@SuppressWarnings({"rawtypes", "UnusedReturnValue", "PMD.CyclomaticComplexity"})
 public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRequest, Body>
 {
 	private int hashCode;
@@ -1245,6 +1245,7 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 			.withRemoteAddress(this.remoteAddress);
 	}
 	
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	public HttpRequest update(final HttpRequest requestOverride, final HttpRequestModifier requestModifier)
 	{
 		if(requestOverride != null)
@@ -1318,6 +1319,7 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 		return this;
 	}
 	
+	@SuppressWarnings({"PMD.NPathComplexity"})
 	@Override
 	public boolean equals(final Object o)
 	{

@@ -37,6 +37,7 @@ public class NottableStringDeserializer extends StdDeserializer<NottableString>
 		super(NottableString.class);
 	}
 	
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public NottableString deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
 	{
