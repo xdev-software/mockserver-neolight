@@ -11,6 +11,16 @@
       "enabled": false
     },
     {
+      "description": "Group net.sourceforge.pmd",
+      "matchPackagePatterns": [
+        "^net.sourceforge.pmd"
+      ],
+      "datasources": [
+        "maven"
+      ],
+      "groupName": "net.sourceforge.pmd"
+    },
+    {
       "description": "Java LTS 21",
       "packagePattern": "^eclipse-temurin",
       "datasources": [
