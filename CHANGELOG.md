@@ -1,3 +1,8 @@
+# 1.0.2
+* Various minor code optimizations
+* [Testcontainers] Added flag ``MOCKSERVER_VERSION_SNAPSHOT_ALLOWED`` to allow usage of Snapshot Container images
+* Updated dependencies
+
 # 1.0.1
 * Fix ``proxyRemoteHost`` being ignored
 * Improved some log messages
