@@ -93,7 +93,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-pmd-plugin</artifactId>
-						<version>3.23.0</version>
+						<version>3.24.0</version>
 						<configuration>
 							<includeTests>true</includeTests>
 							<printFailingErrors>true</printFailingErrors>
@@ -105,12 +105,12 @@
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-core</artifactId>
-								<version>7.3.0</version>
+								<version>7.4.0</version>
 							</dependency>
 							<dependency>
 								<groupId>net.sourceforge.pmd</groupId>
 								<artifactId>pmd-java</artifactId>
-								<version>7.3.0</version>
+								<version>7.4.0</version>
 							</dependency>
 						</dependencies>
 					</plugin>

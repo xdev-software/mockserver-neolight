@@ -21,7 +21,7 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
 
     - name: Publish to OSSRH
-      run: ./mvnw -B deploy -pl "client,server,testcontainers" -am -Possrh
+      run: ./mvnw -B deploy -pl "client,server,testcontainers" -am -Possrh -DskipTests
       env:
         MAVEN_CENTRAL_USERNAME: ${{ secrets.S01_OSS_SONATYPE_MAVEN_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.S01_OSS_SONATYPE_MAVEN_TOKEN }}
