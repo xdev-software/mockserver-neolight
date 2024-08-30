@@ -17,6 +17,7 @@ package software.xdev.testcontainers.mockserver.containers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Objects;
@@ -104,7 +105,10 @@ public final class MockServerUtils
 			return DEFAULT_VERSION;
 		}
 		
-		final String foundVersion = versions.iterator().next();
+		// Multiple versions? -> Use highest
+		final String foundVersion = versions.stream()
+			.max(Comparator.naturalOrder())
+			.orElseThrow();
 		if(versions.size() > 1)
 		{
 			LOG.warn(

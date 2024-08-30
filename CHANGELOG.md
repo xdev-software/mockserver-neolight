@@ -1,3 +1,6 @@
+# 1.0.4
+* Automatic version detection: If multiple versions are found it now uses the "highest" version
+
 # 1.0.3
 * Updated dependencies
 
