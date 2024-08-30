@@ -27,6 +27,16 @@
         "docker"
       ],
       "allowedVersions": "/^21\\-alpine$/"
+    },
+    {
+      "description": "Group org.slf4j",
+      "matchPackagePatterns": [
+        "^org.slf4j"
+      ],
+      "datasources": [
+        "maven"
+      ],
+      "groupName": "org.slf4j"
     }
   ]
 }
