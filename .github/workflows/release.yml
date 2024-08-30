@@ -259,7 +259,7 @@ jobs:
         cache: 'maven'
 
     - name: Build site
-      run: ./mvnw -B site -DskipTests
+      run: ./mvnw -B compile site -DskipTests -T2C
 
     - name: Aggregate site
       run: |

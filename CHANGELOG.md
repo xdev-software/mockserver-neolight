@@ -1,3 +1,6 @@
+# 1.0.3
+* Updated dependencies
+
 # 1.0.2
 * Various minor code optimizations
 * [Testcontainers] Added flag ``MOCKSERVER_VERSION_SNAPSHOT_ALLOWED`` to allow usage of Snapshot Container images
