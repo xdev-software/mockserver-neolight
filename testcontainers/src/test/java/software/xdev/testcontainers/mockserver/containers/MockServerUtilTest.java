@@ -25,7 +25,7 @@ class MockServerUtilTest
 	void checkVersionDetection()
 	{
 		Assertions.assertEquals(
-			"1.2.3",
+			"9999.2.3",
 			MockServerUtils.determineClasspathMockserverVersion());
 	}
 }
