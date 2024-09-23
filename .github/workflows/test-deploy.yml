@@ -86,7 +86,7 @@ jobs:
         platforms: linux/amd64,linux/arm64
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        outputs: type=image,compression=zstd
+        outputs: type=image,compression=zstd,force-compression=true
 
     - name: Generate artifact attestation (ghcr.io)
       uses: actions/attest-build-provenance@v1
