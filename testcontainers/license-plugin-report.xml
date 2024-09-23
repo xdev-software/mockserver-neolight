@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="FORMAT" timestamp="1725004924377">
-    <module artifactId="testcontainers" groupId="software.xdev.mockserver" version="1.0.4"/>
+<licensePluginReport goal="FORMAT" timestamp="1727079445046">
+    <module artifactId="testcontainers" groupId="software.xdev.mockserver" version="1.0.5"/>
     <files>
         <file path="src/main/java/software/xdev/testcontainers/mockserver/containers/MockServerContainer.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/testcontainers/mockserver/containers/MockServerUtils.java" result="NOOP"/>
