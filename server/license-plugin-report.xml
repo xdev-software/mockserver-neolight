@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="FORMAT" timestamp="1727083356938">
-    <module artifactId="server" groupId="software.xdev.mockserver" version="1.0.6"/>
+<licensePluginReport goal="FORMAT" timestamp="1729764390067">
+    <module artifactId="server" groupId="software.xdev.mockserver" version="1.0.7"/>
     <files>
         <file path="src/main/java/software/xdev/mockserver/cache/Entry.java" result="NOOP"/>
         <file path="src/main/java/software/xdev/mockserver/cache/LRUCache.java" result="NOOP"/>
