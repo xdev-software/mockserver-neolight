@@ -1,3 +1,6 @@
+# 1.0.7
+* Updated dependencies
+
 # 1.0.6
 * Use ``zstd`` as compression for images #94
 
