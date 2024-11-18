@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.mockserver</groupId>
 	<artifactId>testcontainers</artifactId>
-	<version>1.0.8-SNAPSHOT</version>
+	<version>1.0.8</version>
 	<packaging>jar</packaging>
 
 	<name>testcontainers</name>
