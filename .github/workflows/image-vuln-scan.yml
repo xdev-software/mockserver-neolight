@@ -23,10 +23,6 @@ jobs:
         uses: aquasecurity/trivy-action@0.29.0
         with:
           image-ref: ${{ env.TRIVYY_IMAGE_REF }}
-        env:
-          # https://github.com/aquasecurity/trivy/discussions/7668
-          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,aquasec/trivy-db,ghcr.io/aquasecurity/trivy-db
-          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,aquasec/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
 
       - name: Scan - Relevant
         id: scan_relevant
@@ -38,9 +34,6 @@ jobs:
           output: reported.txt
         env:
           TRIVY_DISABLE_VEX_NOTICE: 1
-          # https://github.com/aquasecurity/trivy/discussions/7668
-          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,aquasec/trivy-db,ghcr.io/aquasecurity/trivy-db
-          TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,aquasec/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
 
       - name: Find already existing issue
         id: find-issue
