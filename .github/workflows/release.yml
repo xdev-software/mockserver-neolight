@@ -238,7 +238,7 @@ jobs:
         outputs: type=image,compression=zstd,force-compression=true
 
     - name: Generate artifact attestation (ghcr.io)
-      uses: actions/attest-build-provenance@v1
+      uses: actions/attest-build-provenance@v2
       with:
         subject-name: ghcr.io/${{ github.repository }}
         subject-digest: ${{ steps.push.outputs.digest }}
