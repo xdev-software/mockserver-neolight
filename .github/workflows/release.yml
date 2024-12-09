@@ -4,9 +4,6 @@ on:
   push:
     branches: [ master ]
 
-env:
-  PRIMARY_MAVEN_MODULE: ${{ github.event.repository.name }}
-
 permissions:
   contents: write
   pull-requests: write
@@ -51,7 +48,8 @@ jobs:
     needs: [check-code]
     timeout-minutes: 10
     outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      version: ${{ steps.version.outputs.release }}
     steps:
     - uses: actions/checkout@v4
       
@@ -74,10 +72,9 @@ jobs:
     - name: Get version
       id: version
       run: |
-        version=$(../mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+        version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
         echo "release=$version" >> $GITHUB_OUTPUT
         echo "releasenumber=${version//[!0-9]/}" >> $GITHUB_OUTPUT
-      working-directory: ${{ env.PRIMARY_MAVEN_MODULE }}
   
     - name: Commit and Push
       run: |
@@ -88,7 +85,7 @@ jobs:
         git push origin --tags
     
     - name: Create Release
-      id: create_release
+      id: create-release
       uses: shogo82148/actions-create-release@v1
       with:
         tag_name: v${{ steps.version.outputs.release }}
@@ -99,14 +96,38 @@ jobs:
           See [Changelog#v${{ steps.version.outputs.release }}](https://github.com/${{ github.repository }}/blob/develop/CHANGELOG.md#${{ steps.version.outputs.releasenumber }}) for more information.
 
           ## Installation
+
+          ### Client
           Add the following lines to your pom:
           ```XML
           <dependency>
-             <groupId>software.xdev</groupId>
-             <artifactId>${{ env.PRIMARY_MAVEN_MODULE }}</artifactId>
+             <groupId>software.xdev.mockserver</groupId>
+             <artifactId>client</artifactId>
              <version>${{ steps.version.outputs.release }}</version>
           </dependency>
           ```
+
+          ### Testcontainers Integration
+          Add the following lines to your pom:
+          ```XML
+          <dependency>
+             <groupId>software.xdev.mockserver</groupId>
+             <artifactId>testcontainers</artifactId>
+             <version>${{ steps.version.outputs.release }}</version>
+          </dependency>
+          ```
+
+          ### Standalone/Server
+
+          #### Docker
+          Download the image from
+          * [DockerHub](https://hub.docker.com/r/xdevsoftware/mockserver/tags?name=${{ steps.version.outputs.release }})
+          * [GitHub Packages (ghcr.io)](https://github.com/xdev-software/mockserver-neolight/pkgs/container/mockserver-neolight)
+
+          #### JAR
+          If you don't like to use the docker image, the executable jar is also available 
+          * at [Maven Central](https://repo1.maven.org/maven2/software/xdev/mockserver/server/${{ steps.version.outputs.release }}/server-${{ steps.version.outputs.release }}-standalone.jar)
+          * or in the release assets below
 
   publish-maven:
     runs-on: ubuntu-latest
@@ -133,16 +154,99 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
 
     - name: Publish to Apache Maven Central
-      run: ../mvnw -B deploy -Possrh -DskipTests
+      run: ./mvnw -B deploy -pl "client,server,testcontainers" -am -Possrh -DskipTests
       env:
         MAVEN_CENTRAL_USERNAME: ${{ secrets.S01_OSS_SONATYPE_MAVEN_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.S01_OSS_SONATYPE_MAVEN_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      working-directory: ${{ env.PRIMARY_MAVEN_MODULE }}
+    
+    - name: Upload server standalone JAR
+      uses: actions/upload-artifact@v4
+      with:
+        name: server-standalone
+        path: server/target/server-standalone.jar
+        if-no-files-found: error
+
+    - name: Upload Release assets
+      uses: shogo82148/actions-upload-release-asset@v1
+      with:
+        upload_url: ${{ needs.prepare-release.outputs.upload_url }}
+        asset_path: server/target/server-standalone.jar
+
+  publish-docker:
+    runs-on: ubuntu-latest
+    needs: [prepare-release, publish-maven]
+    timeout-minutes: 15
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Init Git and pull
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git pull
+
+    - name: Download server JAR
+      uses: actions/download-artifact@v4
+      with:
+        name: server-standalone
+        path: server/target
+
+    - uses: docker/setup-qemu-action@v3
+
+    - uses: docker/setup-buildx-action@v3
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Login to ghcr.io
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/mockserver
+          ghcr.io/${{ github.repository }}
+        tags: |
+          type=semver,pattern={{version}},value=${{ needs.prepare-release.outputs.version }}
+          type=semver,pattern={{major}}.{{minor}},value=${{ needs.prepare-release.outputs.version }}
+          type=semver,pattern={{major}},value=${{ needs.prepare-release.outputs.version }}
+          latest
+
+    - uses: docker/build-push-action@v6
+      id: push
+      with:
+        context: ./server
+        push: true
+        platforms: linux/amd64,linux/arm64
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        outputs: type=image,compression=zstd,force-compression=true
+
+    - name: Generate artifact attestation (ghcr.io)
+      uses: actions/attest-build-provenance@v2
+      with:
+        subject-name: ghcr.io/${{ github.repository }}
+        subject-digest: ${{ steps.push.outputs.digest }}
+        push-to-registry: true
 
   publish-pages:
     runs-on: ubuntu-latest
-    needs: [prepare-release]
+    needs: [publish-maven]
     timeout-minutes: 15
     steps:
     - uses: actions/checkout@v4
@@ -161,18 +265,26 @@ jobs:
         cache: 'maven'
 
     - name: Build site
-      run: ../mvnw -B compile site -DskipTests -T2C
-      working-directory: ${{ env.PRIMARY_MAVEN_MODULE }}
+      run: ./mvnw -B compile site -DskipTests -T2C
+
+    - name: Aggregate site
+      run: |
+        modules=($(grep -ozP '(?<=module>)[^<]+' 'pom.xml' | tr -d '\0'))
+        for m in "${modules[@]}"
+        do
+            echo "$m/target/site -> ./target/site/$m"
+            cp -r $m/target/site ./target/site/$m
+        done
 
     - name: Deploy to Github pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./${{ env.PRIMARY_MAVEN_MODULE }}/target/site
+        publish_dir: ./target/site
 
   after-release:
     runs-on: ubuntu-latest
-    needs: [publish-maven]
+    needs: [publish-maven, publish-docker]
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@v4
