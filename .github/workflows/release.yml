@@ -281,6 +281,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./target/site
+        force_orphan: true
 
   after-release:
     runs-on: ubuntu-latest
