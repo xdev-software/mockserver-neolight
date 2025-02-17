@@ -1,26 +1,12 @@
-# Stage 1: Build the dummy app
-FROM eclipse-temurin:21-jdk-alpine AS build-env
+# Stage 1: Build the app
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 RUN apk add --no-cache git bash
 
-# Create non root user
-ARG userName=limitedbuild
-ARG groupName=limitedbuild
-ARG userId=1000
-
-RUN addgroup --system ${groupName} \
-	&& adduser --uid ${userId} --system --disabled-password --shell /bin/bash ${userName} \
-	&& adduser ${userName} ${groupName}
-
-# Create build dir
-RUN mkdir /build \
-    && chown ${userName}:${groupName} /build
-WORKDIR /build
-
-USER ${userName}
+WORKDIR /builder
 
 # Copying context is prepared by Testcontainers
-COPY --chown=${userName}:${groupName} . ./
+COPY . ./
 
 ARG mvncmd='clean package -pl "server" -am -T2C -Dmaven.test.skip'
 
@@ -47,7 +33,7 @@ EXPOSE 1080
 
 USER ${user}
 
-COPY --from=build-env --chown=${user}:${group} build/server/target/server-standalone.jar ${APP_DIR}/server-standalone.jar
+COPY --from=builder --chown=${user}:${group} builder/server/target/server-standalone.jar ${APP_DIR}/server-standalone.jar
 
 # MaxRAMPercentage: Default value is 25% -> we want to use available memory optimal -> increased, but enough is left for other RAM usages like e.g. Metaspace
 # Min/MaxHeapFreeRatio: Default values cause container reserved memory not to shrink properly/waste memory -> decreased
