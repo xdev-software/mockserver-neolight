@@ -59,12 +59,31 @@ This list contains a comparison with the most popular open source [API simulatio
     </tr>
     <tr>
         <td>
+            <a href="https://github.com/microcks/microcks">
+                Microcks
+            </a>
+        </td>
+        <td>
+            ✔ Provides a Java API that is used to create responses for certain requests. <sup><a href="https://microcks.io/documentation/references/examples/">Docs</a></sup>
+        </td>
+        <td>
+            ✔ Split into modules.<br/>❓ <a href="https://github.com/microcks/microcks-java-client">Client</a> is OpenAPI generated and currently in "alpha" stage.
+        </td>
+        <td>
+            ✔ <a href="https://testcontainers.com/modules/microcks/">Yes</a> (but only native support for file based responses)
+        </td>
+        <td>
+            ✔ Active<br/>❓ Developed by a company (with the same name) but only "community" support seems to be provided
+        </td>
+    </tr>
+    <tr>
+        <td>
             <a href="https://github.com/wiremock/wiremock">
                 WireMock
             </a>
         </td>
         <td>
-            ✔ Provides a Java API that is used to create responses for certain requests. As an alternative you can also use files to do the same <sup><a href="https://wiremock.org/docs/quickstart/java-junit/">Docs</a></sup>
+            ✔ Provides a Java API that is used to create responses for certain requests. <sup><a href="https://www.mock-server.com/">Docs</a> <a href="https://java.testcontainers.org/modules/mockserver/">Testcontainer-Docs</a></sup>
         </td>
         <td>
             ❌ Monolithic - all client/server code in one module
@@ -116,4 +135,4 @@ This list contains a comparison with the most popular open source [API simulatio
     </tr>
 </table>
 
-<sub>All values as of 2024-05</sub>
+<sub>All values as of 2025-02</sub>
