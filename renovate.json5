@@ -37,6 +37,17 @@
         "maven"
       ],
       "groupName": "org.slf4j"
+    },
+    {
+      "description": "Group com.fasterxml.jackson",
+      "matchPackagePatterns": [
+        "^com.fasterxml.jackson:jackson-bom",
+        "^com.fasterxml.jackson.core:jackson-databind"
+      ],
+      "datasources": [
+        "maven"
+      ],
+      "groupName": "com.fasterxml.jackson"
     }
   ]
 }
