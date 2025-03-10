@@ -1,3 +1,6 @@
+# 1.0.12
+* Updated dependencies
+
 # 1.0.11
 * Rebuild to update underlying packages and flush out some CVEs
 
