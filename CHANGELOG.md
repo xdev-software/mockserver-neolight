@@ -1,8 +1,11 @@
+# 1.0.13
+* Rebuild to get rid of CVE-2024-8176
+
 # 1.0.12
 * Updated dependencies
 
 # 1.0.11
-* Rebuild to update underlying packages and flush out some CVEs
+* Rebuild to get rid of CVE-2024-12797
 
 # 1.0.10
 * Updated dependencies
