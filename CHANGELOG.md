@@ -1,5 +1,11 @@
+# 1.0.14
+* Remove not needed alpine packages from (Docker) image
+  * This get's rid of CVE-2024-8176
+  * Overall image is now ~15MB smaller
+* Use [CDS](https://docs.oracle.com/en/java/javase/17/vm/class-data-sharing.html) to speed up boot
+
 # 1.0.13
-* Rebuild to get rid of CVE-2024-8176
+* ~~Rebuild to get rid of CVE-2024-8176~~
 
 # 1.0.12
 * Updated dependencies
