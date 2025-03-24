@@ -5,7 +5,7 @@
 * Use [CDS](https://docs.oracle.com/en/java/javase/17/vm/class-data-sharing.html) to speed up boot
 
 # 1.0.13
-* Rebuild to get rid of CVE-2024-8176
+* ~~Rebuild to get rid of CVE-2024-8176~~
 
 # 1.0.12
 * Updated dependencies
