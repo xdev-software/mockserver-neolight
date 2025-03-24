@@ -127,7 +127,7 @@ public final class Main
 	 *                  mode, - "-proxyRemoteHost"  followed by the optional proxyRemoteHost port (ignored unless
 	 *                  proxyRemotePort is specified) - "-logLevel"         followed by the log level
 	 */
-	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity", "resource"})
 	public static void main(final String... arguments)
 	{
 		try
@@ -218,8 +218,14 @@ public final class Main
 				}
 				MockServerLoggerConfiguration.configureLogger();
 				final Integer[] localPorts = INTEGER_STRING_LIST_PARSER.toArray(parsedArgs.get(serverPort.name()));
-				launchMockServer(parsedArgs, localPorts);
+				
+				final MockServer mockServer = launchMockServer(parsedArgs, localPorts);
 				setPort(localPorts);
+				
+				if(System.getProperty("exit-immediately-after-start") != null)
+				{
+					mockServer.stop();
+				}
 			}
 			else
 			{
@@ -237,8 +243,7 @@ public final class Main
 		}
 	}
 	
-	@SuppressWarnings("resource") // Launch
-	private static void launchMockServer(final Map<String, String> parsedArgs, final Integer[] localPorts)
+	private static MockServer launchMockServer(final Map<String, String> parsedArgs, final Integer[] localPorts)
 	{
 		if(parsedArgs.containsKey(proxyRemotePort.name()))
 		{
@@ -247,12 +252,9 @@ public final class Main
 			{
 				remoteHost = "localhost";
 			}
-			new MockServer(Integer.parseInt(parsedArgs.get(proxyRemotePort.name())), remoteHost, localPorts);
+			return new MockServer(Integer.parseInt(parsedArgs.get(proxyRemotePort.name())), remoteHost, localPorts);
 		}
-		else
-		{
-			new MockServer(localPorts);
-		}
+		return new MockServer(localPorts);
 	}
 	
 	static String formatArgsForLog(final Map<String, String> args)
