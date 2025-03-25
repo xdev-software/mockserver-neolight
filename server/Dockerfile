@@ -4,7 +4,7 @@ FROM eclipse-temurin:21-jre-alpine AS jre-base
 # Build the JRE ourself and exclude stuff from Eclipse-Temurin that we don't need
 #
 # Derived from https://github.com/adoptium/containers/blob/91ea190c462741d2c64ed2f8f0a0efdb3e77c49d/21/jre/alpine/3.21/Dockerfile
-FROM alpine:3 AS jre-minimized
+FROM alpine:20250108 AS jre-minimized
 
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
