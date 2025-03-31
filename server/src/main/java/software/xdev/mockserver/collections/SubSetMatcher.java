@@ -43,7 +43,7 @@ public final class SubSetMatcher
 			final boolean optionalAndNotPresent =
 				subsetItem.isOptional() && !containsKey(regexStringMatcher, subsetItem, superset);
 			final boolean nottedAndPresent = nottedAndPresent(regexStringMatcher, subsetItem, superset);
-			if((!optionalAndNotPresent && subsetItemMatchingIndexes.isEmpty()) || nottedAndPresent)
+			if(!optionalAndNotPresent && subsetItemMatchingIndexes.isEmpty() || nottedAndPresent)
 			{
 				result = false;
 				break;

@@ -52,7 +52,6 @@ import software.xdev.mockserver.model.HttpObjectCallback;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.RequestDefinition;
 import software.xdev.mockserver.scheduler.Scheduler;
-import software.xdev.mockserver.uuid.UUIDService;
 
 
 public class RequestMatchers extends MockServerMatcherNotifier
@@ -192,7 +191,7 @@ public class RequestMatchers extends MockServerMatcherNotifier
 				.forEach(key -> {
 					numberOfChanges.getAndIncrement();
 					final HttpRequestMatcher httpRequestMatcher = httpRequestMatchersByKey.get(key);
-					this.removeHttpRequestMatcher(httpRequestMatcher, cause, false, UUIDService.getUUID());
+					this.removeHttpRequestMatcher(httpRequestMatcher, cause, false);
 				});
 			if(numberOfChanges.get() > 0)
 			{
@@ -224,8 +223,7 @@ public class RequestMatchers extends MockServerMatcherNotifier
 			.forEach(httpRequestMatcher -> this.removeHttpRequestMatcher(
 				httpRequestMatcher,
 				cause,
-				false,
-				UUIDService.getUUID()));
+				false));
 		this.expectationRequestDefinitions.clear();
 		this.notifyListeners(this, cause);
 	}
@@ -254,9 +252,7 @@ public class RequestMatchers extends MockServerMatcherNotifier
 				}
 				else if(!httpRequestMatcher.isResponseInProgress() && !httpRequestMatcher.isActive())
 				{
-					this.scheduler.submit(() -> this.removeHttpRequestMatcher(
-						httpRequestMatcher,
-						UUIDService.getUUID()));
+					this.scheduler.submit(() -> this.removeHttpRequestMatcher(httpRequestMatcher));
 				}
 				if(remainingMatchesDecremented)
 				{
@@ -287,7 +283,7 @@ public class RequestMatchers extends MockServerMatcherNotifier
 				}
 				if(clearHttpRequestMatcher.matches(request))
 				{
-					this.removeHttpRequestMatcher(httpRequestMatcher, requestDefinition.getLogCorrelationId());
+					this.removeHttpRequestMatcher(httpRequestMatcher);
 				}
 			});
 			if(LOG.isInfoEnabled())
@@ -301,13 +297,13 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		}
 	}
 	
-	public void clear(final ExpectationId expectationId, final String logCorrelationId)
+	public void clear(final ExpectationId expectationId)
 	{
 		if(expectationId != null)
 		{
 			this.httpRequestMatchers
 				.getByKey(expectationId.getId())
-				.ifPresent(httpRequestMatcher -> this.removeHttpRequestMatcher(httpRequestMatcher, logCorrelationId));
+				.ifPresent(this::removeHttpRequestMatcher);
 			if(LOG.isInfoEnabled())
 			{
 				LOG.info("Cleared expectations that have id: {}", expectationId.getId());
@@ -329,7 +325,7 @@ public class RequestMatchers extends MockServerMatcherNotifier
 				.ifPresent(httpRequestMatcher -> {
 					if(!expectation.isActive())
 					{
-						this.removeHttpRequestMatcher(httpRequestMatcher, UUIDService.getUUID());
+						this.removeHttpRequestMatcher(httpRequestMatcher);
 					}
 					httpRequestMatcher.setResponseInProgress(false);
 				});
@@ -337,17 +333,16 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		return expectation;
 	}
 	
-	private void removeHttpRequestMatcher(final HttpRequestMatcher httpRequestMatcher, final String logCorrelationId)
+	private void removeHttpRequestMatcher(final HttpRequestMatcher httpRequestMatcher)
 	{
-		this.removeHttpRequestMatcher(httpRequestMatcher, Cause.API, true, logCorrelationId);
+		this.removeHttpRequestMatcher(httpRequestMatcher, Cause.API, true);
 	}
 	
 	@SuppressWarnings("rawtypes")
 	private void removeHttpRequestMatcher(
 		final HttpRequestMatcher httpRequestMatcher,
 		final Cause cause,
-		final boolean notifyAndUpdateMetrics,
-		final String logCorrelationId)
+		final boolean notifyAndUpdateMetrics)
 	{
 		if(this.httpRequestMatchers.remove(httpRequestMatcher))
 		{

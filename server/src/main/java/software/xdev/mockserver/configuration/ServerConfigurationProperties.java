@@ -143,8 +143,8 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 	
 	private static String propertyFile()
 	{
-		if(isNotBlank(System.getProperty(MOCKSERVER_PROPERTY_FILE)) && System.getProperty(MOCKSERVER_PROPERTY_FILE)
-			.equals("/config/mockserver.properties"))
+		if(isNotBlank(System.getProperty(MOCKSERVER_PROPERTY_FILE))
+			&& "/config/mockserver.properties".equals(System.getProperty(MOCKSERVER_PROPERTY_FILE)))
 		{
 			return isBlank(System.getenv("MOCKSERVER_PROPERTY_FILE"))
 				? System.getProperty(MOCKSERVER_PROPERTY_FILE)
@@ -169,21 +169,16 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 			MOCKSERVER_LOG_LEVEL,
 			"MOCKSERVER_LOG_LEVEL",
 			DEFAULT_LOG_LEVEL).toUpperCase();
-		if(isNotBlank(logLevel))
-		{
-			if(getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(logLevel).equals("OFF"))
-			{
-				return null;
-			}
-			else
-			{
-				return Level.valueOf(getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(logLevel));
-			}
-		}
-		else
+		if(isBlank(logLevel))
 		{
 			return Level.INFO;
 		}
+		
+		if("OFF".equals(getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(logLevel)))
+		{
+			return null;
+		}
+		return Level.valueOf(getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(logLevel));
 	}
 	
 	public static String javaLoggerLogLevel()
@@ -193,21 +188,16 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 			MOCKSERVER_LOG_LEVEL,
 			"MOCKSERVER_LOG_LEVEL",
 			DEFAULT_LOG_LEVEL).toUpperCase();
-		if(isNotBlank(logLevel))
-		{
-			if(getSLF4JOrJavaLoggerToJavaLoggerLevelMapping().get(logLevel).equals("OFF"))
-			{
-				return "OFF";
-			}
-			else
-			{
-				return getSLF4JOrJavaLoggerToJavaLoggerLevelMapping().get(logLevel);
-			}
-		}
-		else
+		if(isBlank(logLevel))
 		{
 			return "INFO";
 		}
+		
+		if("OFF".equals(getSLF4JOrJavaLoggerToJavaLoggerLevelMapping().get(logLevel)))
+		{
+			return "OFF";
+		}
+		return getSLF4JOrJavaLoggerToJavaLoggerLevelMapping().get(logLevel);
 	}
 	
 	/**
@@ -230,23 +220,6 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 			setProperty(MOCKSERVER_LOG_LEVEL, level);
 		}
 		configureLogger();
-	}
-	
-	public static void temporaryLogLevel(final String level, final Runnable runnable)
-	{
-		final Level originalLogLevel = logLevel();
-		try
-		{
-			logLevel(level);
-			runnable.run();
-		}
-		finally
-		{
-			if(originalLogLevel != null)
-			{
-				logLevel(originalLogLevel.name());
-			}
-		}
 	}
 	
 	public static boolean disableSystemOut()

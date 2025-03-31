@@ -89,7 +89,7 @@ public final class SocksDetector
 	{
 		// consume the username (maximum 256 characters to not wait for the 0 endlessly if none comes)
 		final int j = i + 256;
-		while((i < j) && (msg.getByte(i) != 0))
+		while(i < j && msg.getByte(i) != 0)
 		{
 			i++;
 		}
@@ -114,7 +114,7 @@ public final class SocksDetector
 		
 		// consume the remaining hostname (maximum 256 characters to not wait for the 0 endlessly if none comes)
 		final int j = i + 256;
-		while((++i < j) && (msg.getByte(i) != 0))
+		while(++i < j && msg.getByte(i) != 0)
 		{
 			// Imported from upstream
 		}

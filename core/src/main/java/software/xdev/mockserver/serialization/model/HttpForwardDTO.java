@@ -58,7 +58,7 @@ public class HttpForwardDTO implements DTO<HttpForward>
 		return new HttpForward()
 			.withHost(this.host)
 			.withPort(this.port != null ? this.port : 80)
-			.withScheme((this.scheme != null ? this.scheme : HttpForward.Scheme.HTTP))
+			.withScheme(this.scheme != null ? this.scheme : HttpForward.Scheme.HTTP)
 			.withDelay(delay);
 	}
 	

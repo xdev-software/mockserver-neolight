@@ -49,7 +49,7 @@ public class WebSocketMessageSerializer
 		if(this.serializers.containsKey(message.getClass()))
 		{
 			final WebSocketMessageDTO value = new WebSocketMessageDTO().setType(message.getClass().getName())
-				.setValue(this.serializers.get(message.getClass()).serialize((message)));
+				.setValue(this.serializers.get(message.getClass()).serialize(message));
 			return this.objectWriter.writeValueAsString(value);
 		}
 		else

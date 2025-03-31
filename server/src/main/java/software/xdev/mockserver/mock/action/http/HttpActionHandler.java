@@ -286,8 +286,6 @@ public class HttpActionHandler
 						}), synchronous, action.getDelay());
 					break;
 				}
-				default:
-					throw new UnsupportedOperationException();
 			}
 		}
 		else if(CORSHeaders.isPreflightRequest(this.configuration, request) && (this.configuration.enableCORSForAPI()

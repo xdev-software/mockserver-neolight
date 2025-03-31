@@ -92,7 +92,7 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>>
 			{
 				LOG.error(
 					"Serialising parameter body into json string for javascript template {}",
-					(isNotBlank(ex.getMessage()) ? " " + ex.getMessage() : ""),
+					isNotBlank(ex.getMessage()) ? " " + ex.getMessage() : "",
 					ex);
 				return "";
 			}

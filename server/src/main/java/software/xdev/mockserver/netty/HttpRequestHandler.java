@@ -176,7 +176,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 					ctx.writeAndFlush(response().withStatusCode(OK.code()));
 					new SchedulerThreadFactory("MockServer Stop").newThread(this.server::stop).start();
 				}
-				else if(request.getMethod().getValue().equals("CONNECT"))
+				else if("CONNECT".equals(request.getMethod().getValue()))
 				{
 					final String username = this.configuration.proxyAuthenticationUsername();
 					final String password = this.configuration.proxyAuthenticationPassword();

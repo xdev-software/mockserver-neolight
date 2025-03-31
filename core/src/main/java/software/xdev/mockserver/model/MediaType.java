@@ -323,13 +323,13 @@ public class MediaType
 		return other != null
 			// both are wildcard types, or
 			&& (this.type == null || other.type == null
-			|| this.type.equals(MEDIA_TYPE_WILDCARD) || other.type.equals(MEDIA_TYPE_WILDCARD)
+			|| MEDIA_TYPE_WILDCARD.equals(this.type) || MEDIA_TYPE_WILDCARD.equals(other.type)
 			// same types, wildcard sub-types, or
-			|| (this.type.equalsIgnoreCase(other.type) && (this.subtype == null || other.subtype == null))
-			|| (this.type.equalsIgnoreCase(other.type) && (this.subtype.equals(MEDIA_TYPE_WILDCARD)
-			|| other.subtype.equals(MEDIA_TYPE_WILDCARD)))
+			|| this.type.equalsIgnoreCase(other.type) && (this.subtype == null || other.subtype == null)
+			|| this.type.equalsIgnoreCase(other.type)
+			&& (MEDIA_TYPE_WILDCARD.equals(this.subtype) || MEDIA_TYPE_WILDCARD.equals(other.subtype))
 			// same types & sub-types
-			|| (this.type.equalsIgnoreCase(other.type) && this.subtype.equalsIgnoreCase(other.subtype)));
+			|| this.type.equalsIgnoreCase(other.type) && this.subtype.equalsIgnoreCase(other.subtype));
 	}
 	
 	public boolean isJson()

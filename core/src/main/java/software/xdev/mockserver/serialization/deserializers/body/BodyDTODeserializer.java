@@ -57,19 +57,17 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BodyDTODeserializer.class);
 	
-	private static final Map<String, Body.Type> FIELD_NAME_TO_TYPE = new HashMap<>();
+	private static final Map<String, Body.Type> FIELD_NAME_TO_TYPE = new HashMap<>(Map.ofEntries(
+		// NOTE: Key is always lowercase!
+		Map.entry("base64bytes", Body.Type.BINARY),
+		Map.entry("parameters", Body.Type.PARAMETERS),
+		Map.entry("regex", Body.Type.REGEX),
+		Map.entry("string", Body.Type.STRING)
+	));
 	private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
 	private static ObjectWriter objectWriter;
 	private static ObjectMapper objectMapper;
 	private static ObjectWriter jsonBodyObjectWriter;
-	
-	static
-	{
-		FIELD_NAME_TO_TYPE.put("base64Bytes".toLowerCase(), Body.Type.BINARY);
-		FIELD_NAME_TO_TYPE.put("parameters".toLowerCase(), Body.Type.PARAMETERS);
-		FIELD_NAME_TO_TYPE.put("regex".toLowerCase(), Body.Type.REGEX);
-		FIELD_NAME_TO_TYPE.put("string".toLowerCase(), Body.Type.STRING);
-	}
 	
 	public BodyDTODeserializer()
 	{
@@ -96,8 +94,8 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 		Charset charset = null;
 		boolean subString = false;
 		Parameters parameters = null;
-		Map<String, ParameterStyle> parameterStyles = null;
-		Map<String, String> namespacePrefixes = null;
+		Map<String, ParameterStyle> parameterStyles;
+		Map<String, String> namespacePrefixes;
 		if(currentToken == JsonToken.START_OBJECT)
 		{
 			@SuppressWarnings("unchecked")
@@ -106,7 +104,7 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 			{
 				if(entry.getKey() instanceof final String key)
 				{
-					if(key.equalsIgnoreCase("type"))
+					if("type".equalsIgnoreCase(key))
 					{
 						try
 						{
@@ -160,15 +158,15 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 						}
 					}
 					
-					if(key.equalsIgnoreCase("not"))
+					if("not".equalsIgnoreCase(key))
 					{
 						not = Boolean.parseBoolean(String.valueOf(entry.getValue()));
 					}
-					if(key.equalsIgnoreCase("optional"))
+					if("optional".equalsIgnoreCase(key))
 					{
 						optional = Boolean.parseBoolean(String.valueOf(entry.getValue()));
 					}
-					if(key.equalsIgnoreCase("subString"))
+					if("optional".equalsIgnoreCase(key))
 					{
 						try
 						{
@@ -183,7 +181,7 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							}
 						}
 					}
-					if(key.equalsIgnoreCase("parameterStyles") && entry.getValue() instanceof Map)
+					if("parameterStyles".equalsIgnoreCase(key) && entry.getValue() instanceof Map)
 					{
 						try
 						{
@@ -204,7 +202,7 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							}
 						}
 					}
-					if(key.equalsIgnoreCase("namespacePrefixes") && entry.getValue() instanceof Map)
+					if("namespacePrefixes".equalsIgnoreCase(key) && entry.getValue() instanceof Map)
 					{
 						try
 						{
@@ -225,7 +223,7 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							}
 						}
 					}
-					if(key.equalsIgnoreCase("contentType"))
+					if("contentType".equalsIgnoreCase(key))
 					{
 						try
 						{
@@ -248,7 +246,7 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							}
 						}
 					}
-					if(key.equalsIgnoreCase("charset"))
+					if("charset".equalsIgnoreCase(key))
 					{
 						try
 						{
@@ -271,7 +269,7 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							}
 						}
 					}
-					if(key.equalsIgnoreCase("parameters"))
+					if("parameters".equalsIgnoreCase(key))
 					{
 						if(objectMapper == null)
 						{
@@ -331,8 +329,6 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							result = new StringBodyDTO(new StringBody(valueJsonValue, rawBytes, subString, null), not);
 							break;
 						}
-					default:
-						throw new UnsupportedOperationException();
 				}
 			}
 		}

@@ -26,6 +26,7 @@ import java.util.logging.LogManager;
 import software.xdev.mockserver.configuration.ServerConfigurationProperties;
 
 
+@SuppressWarnings({"PMD.SystemPrintln", "PMD.AvoidPrintStackTrace"})
 public final class MockServerLoggerConfiguration
 {
 	@SuppressWarnings({"java:S106", "java:S4507"}) // If logging configuration fails use System.err
