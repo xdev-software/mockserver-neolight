@@ -341,8 +341,6 @@ public final class Main
 									+ "\"FINE\", \"INFO\", \"WARNING\", \"SEVERE\", \"OFF\"";
 							}
 							break;
-						default:
-							throw new UnsupportedOperationException();
 					}
 					if(errorMessage.isEmpty())
 					{

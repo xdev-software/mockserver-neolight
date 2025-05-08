@@ -166,8 +166,8 @@ public class MockServerHttpResponseToFullHttpResponse
 			final boolean addContentLength =
 				connectionOptions == null || !Boolean.TRUE.equals(connectionOptions.getSuppressContentLengthHeader());
 			final boolean chunkedEncoding =
-				(connectionOptions != null && connectionOptions.getChunkSize() != null) || response.headers()
-					.contains(HttpHeaderNames.TRANSFER_ENCODING);
+				connectionOptions != null && connectionOptions.getChunkSize() != null
+					|| response.headers().contains(HttpHeaderNames.TRANSFER_ENCODING);
 			if(overrideContentLength)
 			{
 				response.headers().set(CONTENT_LENGTH, connectionOptions.getContentLengthHeaderOverride());

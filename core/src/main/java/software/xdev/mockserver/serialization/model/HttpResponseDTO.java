@@ -45,10 +45,10 @@ public class HttpResponseDTO implements DTO<HttpResponse>
 			this.body = BodyWithContentTypeDTO.createWithContentTypeDTO(httpResponse.getBody());
 			this.headers = httpResponse.getHeaders();
 			this.cookies = httpResponse.getCookies();
-			this.delay = (httpResponse.getDelay() != null ? new DelayDTO(httpResponse.getDelay()) : null);
-			this.connectionOptions = (httpResponse.getConnectionOptions() != null
+			this.delay = httpResponse.getDelay() != null ? new DelayDTO(httpResponse.getDelay()) : null;
+			this.connectionOptions = httpResponse.getConnectionOptions() != null
 				? new ConnectionOptionsDTO(httpResponse.getConnectionOptions())
-				: null);
+				: null;
 		}
 	}
 	
@@ -61,7 +61,7 @@ public class HttpResponseDTO implements DTO<HttpResponse>
 			.withBody(this.body != null ? this.body.buildObject() : null)
 			.withHeaders(this.headers)
 			.withCookies(this.cookies)
-			.withDelay((this.delay != null ? this.delay.buildObject() : null))
+			.withDelay(this.delay != null ? this.delay.buildObject() : null)
 			.withConnectionOptions(this.connectionOptions != null ? this.connectionOptions.buildObject() : null);
 	}
 	

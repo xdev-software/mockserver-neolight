@@ -40,7 +40,7 @@ public class StringBody extends BodyWithContentType<String>
 	
 	public StringBody(final String value, final Charset charset)
 	{
-		this(value, null, false, (charset != null ? DEFAULT_CONTENT_TYPE.withCharset(charset) : null));
+		this(value, null, false, charset != null ? DEFAULT_CONTENT_TYPE.withCharset(charset) : null);
 	}
 	
 	public StringBody(final String value, final MediaType contentType)
@@ -86,7 +86,7 @@ public class StringBody extends BodyWithContentType<String>
 	
 	public static StringBody subString(final String body, final Charset charset)
 	{
-		return new StringBody(body, null, true, (charset != null ? DEFAULT_CONTENT_TYPE.withCharset(charset) : null));
+		return new StringBody(body, null, true, charset != null ? DEFAULT_CONTENT_TYPE.withCharset(charset) : null);
 	}
 	
 	public static StringBody subString(final String body, final MediaType contentType)

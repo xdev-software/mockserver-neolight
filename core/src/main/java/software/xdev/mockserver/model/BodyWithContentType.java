@@ -56,7 +56,7 @@ public abstract class BodyWithContentType<T> extends Body<T>
 	@Override
 	public String getContentType()
 	{
-		return (this.contentType != null ? this.contentType.toString() : null);
+		return this.contentType != null ? this.contentType.toString() : null;
 	}
 	
 	@Override

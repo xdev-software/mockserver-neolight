@@ -27,7 +27,6 @@ import software.xdev.mockserver.model.HttpResponse;
 
 public class CORSHeaders
 {
-	private static final String ANY_ORIGIN = "*";
 	private static final String NULL_ORIGIN = "null";
 	
 	private final String corsAllowOrigin;

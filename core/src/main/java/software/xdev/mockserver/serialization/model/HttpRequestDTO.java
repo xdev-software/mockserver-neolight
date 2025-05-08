@@ -76,7 +76,7 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
 			.withPath(this.path)
 			.withPathParameters(this.pathParameters)
 			.withQueryStringParameters(this.queryStringParameters)
-			.withBody((this.body != null ? Not.not(this.body.buildObject(), this.body.getNot()) : null))
+			.withBody(this.body != null ? Not.not(this.body.buildObject(), this.body.getNot()) : null)
 			.withHeaders(this.headers)
 			.withCookies(this.cookies)
 			.withProtocol(this.protocol)

@@ -77,9 +77,9 @@ public class HttpClientHandler extends SimpleChannelInboundHandler<Message>
 	private boolean isNotConnectionReset(final Throwable cause)
 	{
 		return this.connectionClosedStrings.stream().noneMatch(connectionClosedString ->
-			(isNotBlank(cause.getMessage()) && cause.getMessage().contains(connectionClosedString))
-				|| (cause.getCause() != null && isNotBlank(cause.getCause().getMessage()) && cause.getCause()
-				.getMessage()
-				.contains(connectionClosedString)));
+			isNotBlank(cause.getMessage()) && cause.getMessage().contains(connectionClosedString)
+				|| cause.getCause() != null
+				&& isNotBlank(cause.getCause().getMessage())
+				&& cause.getCause().getMessage().contains(connectionClosedString));
 	}
 }

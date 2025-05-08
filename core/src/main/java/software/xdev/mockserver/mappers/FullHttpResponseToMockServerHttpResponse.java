@@ -96,7 +96,7 @@ public class FullHttpResponseToMockServerHttpResponse
 		final Cookies cookies = new Cookies();
 		for(final Header header : httpResponse.getHeaderList())
 		{
-			if(header.getName().getValue().equalsIgnoreCase("Set-Cookie"))
+			if("Set-Cookie".equalsIgnoreCase(header.getName().getValue()))
 			{
 				for(final NottableString cookieHeader : header.getValues())
 				{
@@ -107,7 +107,7 @@ public class FullHttpResponseToMockServerHttpResponse
 					cookies.withEntry(new Cookie(name, value));
 				}
 			}
-			if(header.getName().getValue().equalsIgnoreCase("Cookie"))
+			if("Cookie".equalsIgnoreCase(header.getName().getValue()))
 			{
 				for(final NottableString cookieHeader : header.getValues())
 				{

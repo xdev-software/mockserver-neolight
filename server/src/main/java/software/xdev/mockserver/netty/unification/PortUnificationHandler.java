@@ -366,8 +366,8 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 	private String calculatePortExtension(final InetSocketAddress inetSocketAddress, final boolean sslEnabledUpstream)
 	{
 		final String portExtension;
-		if(((inetSocketAddress.getPort() == 443) && sslEnabledUpstream)
-			|| ((inetSocketAddress.getPort() == 80) && !sslEnabledUpstream))
+		if(inetSocketAddress.getPort() == 443 && sslEnabledUpstream
+			|| inetSocketAddress.getPort() == 80 && !sslEnabledUpstream)
 		{
 			portExtension = "";
 		}

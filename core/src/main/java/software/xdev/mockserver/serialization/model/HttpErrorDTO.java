@@ -48,7 +48,7 @@ public class HttpErrorDTO implements DTO<HttpError>
 	public HttpError buildObject()
 	{
 		return new HttpError()
-			.withDelay((this.delay != null ? this.delay.buildObject() : null))
+			.withDelay(this.delay != null ? this.delay.buildObject() : null)
 			.withDropConnection(this.dropConnection)
 			.withResponseBytes(this.responseBytes);
 	}

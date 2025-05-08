@@ -1,3 +1,6 @@
+# 1.0.15
+* Updated dependencies
+
 # 1.0.14
 * Remove not needed alpine packages from (Docker) image
   * This get's rid of CVE-2024-8176

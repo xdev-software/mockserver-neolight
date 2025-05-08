@@ -29,6 +29,14 @@
       "allowedVersions": "/^21\\-alpine$/"
     },
     {
+      "description": "Alpine - Ignore YYYYMMDD releases",
+      "packagePattern": "^alpine",
+      "datasources": [
+        "docker"
+      ],
+      "allowedVersions": "<=100"
+    },
+    {
       "description": "Group org.slf4j",
       "matchPackagePatterns": [
         "^org.slf4j"

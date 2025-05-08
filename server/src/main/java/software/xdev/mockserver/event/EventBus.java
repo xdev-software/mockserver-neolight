@@ -661,6 +661,7 @@ public class EventBus extends MockServerEventLogNotifier
 		}
 	}
 	
+	@SuppressWarnings("PMD.UnusedFormalParameter")
 	private void verificationSequenceSuccessMessage(
 		final VerificationSequence verificationSequence,
 		final Consumer<String> resultConsumer,
@@ -674,6 +675,7 @@ public class EventBus extends MockServerEventLogNotifier
 		resultConsumer.accept(failureMessage);
 	}
 	
+	@SuppressWarnings("PMD.UnusedFormalParameter")
 	private String verificationSequenceFailureMessage(
 		final VerificationSequence verificationSequence,
 		final String logCorrelationId,
@@ -711,6 +713,7 @@ public class EventBus extends MockServerEventLogNotifier
 		return failureMessage;
 	}
 	
+	@SuppressWarnings("PMD.UnusedFormalParameter")
 	private void verificationSequenceExceptionHandler(
 		final VerificationSequence verificationSequence,
 		final Consumer<String> resultConsumer,

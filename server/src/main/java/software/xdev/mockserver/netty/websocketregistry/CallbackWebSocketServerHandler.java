@@ -72,8 +72,8 @@ public class CallbackWebSocketServerHandler extends ChannelInboundHandlerAdapter
 		boolean release = true;
 		try
 		{
-			if(msg instanceof final FullHttpRequest fullHttpRequest && fullHttpRequest.uri()
-				.equals(UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI))
+			if(msg instanceof final FullHttpRequest fullHttpRequest
+				&& UPGRADE_CHANNEL_FOR_CALLBACK_WEB_SOCKET_URI.equals(fullHttpRequest.uri()))
 			{
 				this.upgradeChannel(ctx, fullHttpRequest);
 				ctx.channel().attr(CHANNEL_UPGRADED_FOR_CALLBACK_WEB_SOCKET).set(true);

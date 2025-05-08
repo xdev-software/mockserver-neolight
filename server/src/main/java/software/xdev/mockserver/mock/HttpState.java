@@ -158,7 +158,7 @@ public class HttpState
 			{
 				expectationId = this.getExpectationIdSerializer().deserialize(body);
 			}
-			catch(final Throwable throwable)
+			catch(final Exception throwable)
 			{
 				// assume not expectationId
 				requestDefinition = this.getRequestDefinitionSerializer().deserialize(body);
@@ -184,7 +184,7 @@ public class HttpState
 				case EXPECTATIONS:
 					if(expectationId != null)
 					{
-						this.requestMatchers.clear(expectationId, logCorrelationId);
+						this.requestMatchers.clear(expectationId);
 					}
 					else
 					{
@@ -195,15 +195,13 @@ public class HttpState
 					this.eventBus.clear(requestDefinition);
 					if(expectationId != null)
 					{
-						this.requestMatchers.clear(expectationId, logCorrelationId);
+						this.requestMatchers.clear(expectationId);
 					}
 					else
 					{
 						this.requestMatchers.clear(requestDefinition);
 					}
 					break;
-				default:
-					throw new UnsupportedOperationException();
 			}
 		}
 		catch(final IllegalArgumentException iae)
@@ -287,7 +285,8 @@ public class HttpState
 		"PMD.NcssCount",
 		"PMD.CognitiveComplexity",
 		"PMD.CyclomaticComplexity",
-		"PMD.PreserveStackTrace"})
+		"PMD.PreserveStackTrace",
+		"PMD.SwitchDensity"})
 	public HttpResponse retrieve(final HttpRequest request)
 	{
 		final String logCorrelationId = UUIDService.getUUID();
@@ -351,8 +350,6 @@ public class HttpState
 										}
 									);
 								break;
-							default:
-								throw new UnsupportedOperationException();
 						}
 						break;
 					}
@@ -387,8 +384,6 @@ public class HttpState
 										}
 									);
 								break;
-							default:
-								throw new UnsupportedOperationException();
 						}
 						break;
 					}
@@ -430,8 +425,6 @@ public class HttpState
 										}
 									);
 								break;
-							default:
-								throw new UnsupportedOperationException();
 						}
 						break;
 					}
@@ -451,8 +444,6 @@ public class HttpState
 									this.getExpectationSerializer().serialize(expectations),
 									MediaType.JSON_UTF_8);
 								break;
-							default:
-								throw new UnsupportedOperationException();
 						}
 						if(LOG.isInfoEnabled())
 						{
@@ -465,8 +456,6 @@ public class HttpState
 						httpResponseFuture.complete(response);
 						break;
 					}
-					default:
-						throw new UnsupportedOperationException();
 				}
 				
 				try
@@ -558,115 +547,83 @@ public class HttpState
 			
 			if(request.matchesPath(PATH_PREFIX + "/expectation", "/expectation"))
 			{
-				
-				if(this.controlPlaneRequestAuthenticated(request, responseWriter))
+				final List<Expectation> upsertedExpectations = new ArrayList<>();
+				for(final Expectation expectation : this.getExpectationSerializer().deserializeArray(
+					request.getBodyAsJsonOrXmlString(),
+					false))
 				{
-					final List<Expectation> upsertedExpectations = new ArrayList<>();
-					for(final Expectation expectation : this.getExpectationSerializer().deserializeArray(
-						request.getBodyAsJsonOrXmlString(),
-						false))
+					if(!warDeployment || this.validateSupportedFeatures(expectation, request, responseWriter))
 					{
-						if(!warDeployment || this.validateSupportedFeatures(expectation, request, responseWriter))
-						{
-							upsertedExpectations.addAll(this.add(expectation));
-						}
+						upsertedExpectations.addAll(this.add(expectation));
 					}
-					
-					responseWriter.writeResponse(
-						request,
-						response()
-							.withStatusCode(CREATED.code())
-							.withBody(
-								this.getExpectationSerializer().serialize(upsertedExpectations),
-								MediaType.JSON_UTF_8),
-						true);
 				}
+				
+				responseWriter.writeResponse(
+					request,
+					response()
+						.withStatusCode(CREATED.code())
+						.withBody(
+							this.getExpectationSerializer().serialize(upsertedExpectations),
+							MediaType.JSON_UTF_8),
+					true);
 				canHandle.complete(true);
 			}
 			else if(request.matchesPath(PATH_PREFIX + "/clear", "/clear"))
 			{
-				
-				if(this.controlPlaneRequestAuthenticated(request, responseWriter))
-				{
-					this.clear(request);
-					responseWriter.writeResponse(request, OK);
-				}
+				this.clear(request);
+				responseWriter.writeResponse(request, OK);
 				canHandle.complete(true);
 			}
 			else if(request.matchesPath(PATH_PREFIX + "/reset", "/reset"))
 			{
-				
-				if(this.controlPlaneRequestAuthenticated(request, responseWriter))
-				{
-					this.reset();
-					responseWriter.writeResponse(request, OK);
-				}
+				this.reset();
+				responseWriter.writeResponse(request, OK);
 				canHandle.complete(true);
 			}
 			else if(request.matchesPath(PATH_PREFIX + "/retrieve", "/retrieve"))
 			{
-				
-				if(this.controlPlaneRequestAuthenticated(request, responseWriter))
-				{
-					responseWriter.writeResponse(request, this.retrieve(request), true);
-				}
+				responseWriter.writeResponse(request, this.retrieve(request), true);
 				canHandle.complete(true);
 			}
 			else if(request.matchesPath(PATH_PREFIX + "/verify", "/verify"))
 			{
-				
-				if(this.controlPlaneRequestAuthenticated(request, responseWriter))
-				{
-					this.verify(
-						this.getVerificationSerializer().deserialize(request.getBodyAsJsonOrXmlString()),
-						result -> {
-							if(isEmpty(result))
-							{
-								responseWriter.writeResponse(request, ACCEPTED);
-							}
-							else
-							{
-								responseWriter.writeResponse(
-									request,
-									NOT_ACCEPTABLE,
-									result,
-									MediaType.create("text", "plain").toString());
-							}
-							canHandle.complete(true);
-						});
-				}
-				else
-				{
-					canHandle.complete(true);
-				}
+				this.verify(
+					this.getVerificationSerializer().deserialize(request.getBodyAsJsonOrXmlString()),
+					result -> {
+						if(isEmpty(result))
+						{
+							responseWriter.writeResponse(request, ACCEPTED);
+						}
+						else
+						{
+							responseWriter.writeResponse(
+								request,
+								NOT_ACCEPTABLE,
+								result,
+								MediaType.create("text", "plain").toString());
+						}
+						canHandle.complete(true);
+					});
 			}
 			else if(request.matchesPath(PATH_PREFIX + "/verifySequence", "/verifySequence"))
 			{
-				
-				if(this.controlPlaneRequestAuthenticated(request, responseWriter))
-				{
-					this.verify(
-						this.getVerificationSequenceSerializer().deserialize(request.getBodyAsJsonOrXmlString()),
-						result -> {
-							if(isEmpty(result))
-							{
-								responseWriter.writeResponse(request, ACCEPTED);
-							}
-							else
-							{
-								responseWriter.writeResponse(
-									request,
-									NOT_ACCEPTABLE,
-									result,
-									MediaType.create("text", "plain").toString());
-							}
-							canHandle.complete(true);
-						});
-				}
-				else
-				{
-					canHandle.complete(true);
-				}
+				this.verify(
+					this.getVerificationSequenceSerializer().deserialize(request.getBodyAsJsonOrXmlString()),
+					result -> {
+						if(isEmpty(result))
+						{
+							responseWriter.writeResponse(request, ACCEPTED);
+						}
+						else
+						{
+							responseWriter.writeResponse(
+								request,
+								NOT_ACCEPTABLE,
+								result,
+								MediaType.create("text", "plain").toString());
+						}
+						canHandle.complete(true);
+					});
 			}
 			else
 			{
@@ -688,11 +645,6 @@ public class HttpState
 			
 			return false;
 		}
-	}
-	
-	private boolean controlPlaneRequestAuthenticated(final HttpRequest request, final ResponseWriter responseWriter)
-	{
-		return true;
 	}
 	
 	@SuppressWarnings("rawtypes")

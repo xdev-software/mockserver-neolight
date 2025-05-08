@@ -77,7 +77,10 @@ public class HttpResponseModifierToJavaSerializer implements ToJavaSerializer<Ht
 		if(headers != null && !headers.isEmpty())
 		{
 			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("headers(");
-			this.appendObject((numberOfSpacesToIndent + 2), output, new HeaderToJavaSerializer(),
+			this.appendObject(
+				numberOfSpacesToIndent + 2,
+				output,
+				new HeaderToJavaSerializer(),
 				headers.getEntries());
 			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("),");
 		}
@@ -92,7 +95,10 @@ public class HttpResponseModifierToJavaSerializer implements ToJavaSerializer<Ht
 		if(cookies != null && !cookies.isEmpty())
 		{
 			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("cookies(");
-			this.appendObject((numberOfSpacesToIndent + 2), output, new CookieToJavaSerializer(),
+			this.appendObject(
+				numberOfSpacesToIndent + 2,
+				output,
+				new CookieToJavaSerializer(),
 				cookies.getEntries());
 			this.appendNewLineAndIndent((numberOfSpacesToIndent + 2) * INDENT_SIZE, output).append("),");
 		}

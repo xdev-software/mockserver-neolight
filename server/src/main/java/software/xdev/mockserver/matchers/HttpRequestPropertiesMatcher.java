@@ -196,8 +196,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 					final BinaryBody binaryBody = (BinaryBody)body;
 					bodyMatcher = new BinaryMatcher(binaryBody.getValue());
 					break;
-				default:
-					throw new UnsupportedOperationException();
 			}
 			if(body.isNot())
 			{
@@ -567,7 +565,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		int count = 0;
 		for(final boolean input : inputs)
 		{
-			count += (input ? 1 : 0);
+			count += input ? 1 : 0;
 		}
 		return count % 2 != 0;
 	}

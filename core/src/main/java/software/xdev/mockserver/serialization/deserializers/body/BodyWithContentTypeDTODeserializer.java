@@ -46,14 +46,12 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BodyWithContentTypeDTODeserializer.class);
 	
-	private static final Map<String, Body.Type> FIELD_NAME_TO_TYPE = new HashMap<>();
+	private static final Map<String, Body.Type> FIELD_NAME_TO_TYPE = new HashMap<>(Map.ofEntries(
+		// NOTE: Key is always lowercase
+		Map.entry("base64bytes", Body.Type.BINARY),
+		Map.entry("string", Body.Type.STRING)
+	));
 	private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
-	
-	static
-	{
-		FIELD_NAME_TO_TYPE.put("base64Bytes".toLowerCase(), Body.Type.BINARY);
-		FIELD_NAME_TO_TYPE.put("string".toLowerCase(), Body.Type.STRING);
-	}
 	
 	public BodyWithContentTypeDTODeserializer()
 	{
@@ -88,7 +86,7 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 			{
 				if(entry.getKey() instanceof final String key)
 				{
-					if(key.equalsIgnoreCase("type"))
+					if("type".equalsIgnoreCase(key))
 					{
 						try
 						{
@@ -129,15 +127,15 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 						}
 					}
 					
-					if(key.equalsIgnoreCase("not"))
+					if("not".equalsIgnoreCase(key))
 					{
 						not = Boolean.parseBoolean(String.valueOf(entry.getValue()));
 					}
-					if(key.equalsIgnoreCase("optional"))
+					if("optional".equalsIgnoreCase(key))
 					{
 						optional = Boolean.parseBoolean(String.valueOf(entry.getValue()));
 					}
-					if(key.equalsIgnoreCase("contentType"))
+					if("contentType".equalsIgnoreCase(key))
 					{
 						try
 						{
@@ -160,7 +158,7 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 							}
 						}
 					}
-					if(key.equalsIgnoreCase("charset"))
+					if("charset".equalsIgnoreCase(key))
 					{
 						try
 						{

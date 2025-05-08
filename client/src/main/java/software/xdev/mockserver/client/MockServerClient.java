@@ -1151,7 +1151,7 @@ public class MockServerClient implements Stoppable
 	{
 		RequestDefinition[] requestDefinitions = new RequestDefinition[0];
 		final String recordedRequests = this.retrieveRecordedRequests(requestDefinition, Format.JSON);
-		if(isNotBlank(recordedRequests) && !recordedRequests.equals("[]"))
+		if(isNotBlank(recordedRequests) && !"[]".equals(recordedRequests))
 		{
 			requestDefinitions = this.requestDefinitionSerializer.deserializeArray(recordedRequests);
 		}
@@ -1198,7 +1198,7 @@ public class MockServerClient implements Stoppable
 	public LogEventRequestAndResponse[] retrieveRecordedRequestsAndResponses(final RequestDefinition requestDefinition)
 	{
 		final String recordedRequests = this.retrieveRecordedRequestsAndResponses(requestDefinition, Format.JSON);
-		if(isNotBlank(recordedRequests) && !recordedRequests.equals("[]"))
+		if(isNotBlank(recordedRequests) && !"[]".equals(recordedRequests))
 		{
 			return this.httpRequestResponseSerializer.deserializeArray(recordedRequests);
 		}
@@ -1247,7 +1247,7 @@ public class MockServerClient implements Stoppable
 	public Expectation[] retrieveRecordedExpectations(final RequestDefinition requestDefinition)
 	{
 		final String recordedExpectations = this.retrieveRecordedExpectations(requestDefinition, Format.JSON);
-		if(isNotBlank(recordedExpectations) && !recordedExpectations.equals("[]"))
+		if(isNotBlank(recordedExpectations) && !"[]".equals(recordedExpectations))
 		{
 			return this.expectationSerializer.deserializeArray(recordedExpectations, true);
 		}
@@ -1518,7 +1518,7 @@ public class MockServerClient implements Stoppable
 	public Expectation[] retrieveActiveExpectations(final RequestDefinition requestDefinition)
 	{
 		final String activeExpectations = this.retrieveActiveExpectations(requestDefinition, Format.JSON);
-		if(isNotBlank(activeExpectations) && !activeExpectations.equals("[]"))
+		if(isNotBlank(activeExpectations) && !"[]".equals(activeExpectations))
 		{
 			return this.expectationSerializer.deserializeArray(activeExpectations, true);
 		}

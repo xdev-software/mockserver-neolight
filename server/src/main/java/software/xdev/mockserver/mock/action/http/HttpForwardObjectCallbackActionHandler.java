@@ -117,7 +117,7 @@ public class HttpForwardObjectCallbackActionHandler extends HttpForwardAction
 								request,
 								httpObjectCallback);
 						}
-						catch(final Throwable ex2)
+						catch(final Exception ex2)
 						{
 							if(LOG.isWarnEnabled())
 							{
