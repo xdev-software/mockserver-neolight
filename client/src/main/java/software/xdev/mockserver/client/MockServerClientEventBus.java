@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.client;
 
-import java.util.LinkedHashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,13 +25,19 @@ import java.util.Set;
  * A publish/subscribe communication channel between {@link MockServerClient} and {@link ForwardChainExpectation}
  * instances
  */
-class MockServerClientEventBus
+public class MockServerClientEventBus
 {
-	private final Map<EventType, Set<SubscriberHandler>> subscribers = new LinkedHashMap<>();
+	protected final Map<EventType, Set<SubscriberHandler>> subscribers = new EnumMap<>(EventType.class);
 	
-	void publish(final EventType event)
+	protected void publish(final EventType event)
 	{
-		for(final SubscriberHandler subscriber : this.subscribers.get(event))
+		final Set<SubscriberHandler> subscriberHandlers = this.subscribers.get(event);
+		if(subscriberHandlers == null)
+		{
+			return;
+		}
+		
+		for(final SubscriberHandler subscriber : subscriberHandlers)
 		{
 			subscriber.handle();
 		}
@@ -45,13 +51,13 @@ class MockServerClientEventBus
 		}
 	}
 	
-	enum EventType
+	public enum EventType
 	{
 		STOP, RESET
 	}
 	
 	
-	interface SubscriberHandler
+	public interface SubscriberHandler
 	{
 		void handle();
 	}
