@@ -1,3 +1,6 @@
+# 1.0.16
+* Fix NPE in ``MockServerClientEventBus`` #214 @rongzhou-tomo
+
 # 1.0.15
 * Updated dependencies
 
