@@ -132,7 +132,6 @@ public class MockServerHttpResponseToFullHttpResponse
 			httpResponse.getFirstHeader(CONTENT_TYPE.toString()));
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
 	private void setHeaders(final HttpResponse httpResponse, final DefaultHttpResponse response, final ByteBuf body)
 	{
 		if(httpResponse.getHeaderMultimap() != null)
@@ -149,15 +148,26 @@ public class MockServerHttpResponseToFullHttpResponse
 				);
 		}
 		
-		// Content-Type
+		setContentTypeHeader(httpResponse, response);
+		setContentLengthHeader(httpResponse, response, body);
+		setHTTP2ExtensionHeaders(httpResponse, response);
+	}
+	
+	protected static void setContentTypeHeader(final HttpResponse httpResponse, final DefaultHttpResponse response)
+	{
 		if(isBlank(httpResponse.getFirstHeader(CONTENT_TYPE.toString()))
 			&& httpResponse.getBody() != null
 			&& httpResponse.getBody().getContentType() != null)
 		{
 			response.headers().set(CONTENT_TYPE, httpResponse.getBody().getContentType());
 		}
-		
-		// Content-Length
+	}
+	
+	protected static void setContentLengthHeader(
+		final HttpResponse httpResponse,
+		final DefaultHttpResponse response,
+		final ByteBuf body)
+	{
 		final ConnectionOptions connectionOptions = httpResponse.getConnectionOptions();
 		if(isBlank(httpResponse.getFirstHeader(CONTENT_LENGTH.toString())))
 		{
@@ -181,8 +191,10 @@ public class MockServerHttpResponseToFullHttpResponse
 				response.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
 			}
 		}
-		
-		// HTTP2 extension headers
+	}
+	
+	protected static void setHTTP2ExtensionHeaders(final HttpResponse httpResponse, final DefaultHttpResponse response)
+	{
 		final Integer streamId = httpResponse.getStreamId();
 		if(streamId != null)
 		{

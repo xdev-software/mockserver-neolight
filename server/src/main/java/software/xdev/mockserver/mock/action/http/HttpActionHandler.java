@@ -107,7 +107,9 @@ public class HttpActionHandler
 		"checkstyle:MethodLength",
 		"PMD.NcssCount",
 		"PMD.CognitiveComplexity",
-		"PMD.CyclomaticComplexity"})
+		"PMD.CyclomaticComplexity",
+		"PMD.NPathComplexity"
+	})
 	public void processAction(
 		final HttpRequest request,
 		final ResponseWriter responseWriter,

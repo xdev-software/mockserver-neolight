@@ -34,6 +34,7 @@ public class StringBodySerializer extends StdSerializer<StringBody>
 		this.serialiseDefaultValues = serialiseDefaultValues;
 	}
 	
+	@SuppressWarnings("PMD.NPathComplexity")
 	@Override
 	public void serialize(final StringBody stringBody, final JsonGenerator jgen, final SerializerProvider provider)
 		throws IOException
