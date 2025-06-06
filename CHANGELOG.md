@@ -1,3 +1,7 @@
+# 1.0.18
+* Updated dependencies
+* Fix ``subString`` matching not working as expected #231
+
 # 1.0.17
 * Migrated deployment to _Sonatype Maven Central Portal_ [#155](https://github.com/xdev-software/standard-maven-template/issues/155)
 * Updated dependencies
