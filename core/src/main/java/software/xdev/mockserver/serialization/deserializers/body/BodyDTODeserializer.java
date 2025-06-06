@@ -166,7 +166,7 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 					{
 						optional = Boolean.parseBoolean(String.valueOf(entry.getValue()));
 					}
-					if("optional".equalsIgnoreCase(key))
+					if("subString".equalsIgnoreCase(key))
 					{
 						try
 						{
