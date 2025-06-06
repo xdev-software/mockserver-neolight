@@ -166,44 +166,36 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 	
 	private BodyMatcher buildBodyMatcher(final Body body)
 	{
-		BodyMatcher bodyMatcher = null;
-		if(body != null)
+		if(body == null)
 		{
-			switch(body.getType())
-			{
-				case STRING:
-					final StringBody stringBody = (StringBody)body;
-					if(stringBody.isSubString())
-					{
-						bodyMatcher = new SubStringMatcher(string(stringBody.getValue()));
-					}
-					else
-					{
-						bodyMatcher = new ExactStringMatcher(string(stringBody.getValue()));
-					}
-					break;
-				case REGEX:
-					final RegexBody regexBody = (RegexBody)body;
-					bodyMatcher = new RegexStringMatcher(string(regexBody.getValue()), this.controlPlaneMatcher);
-					break;
-				case PARAMETERS:
-					final ParameterBody parameterBody = (ParameterBody)body;
-					bodyMatcher =
-						new ParameterStringMatcher(this.configuration, parameterBody.getValue(),
-							this.controlPlaneMatcher);
-					break;
-				case BINARY:
-					final BinaryBody binaryBody = (BinaryBody)body;
-					bodyMatcher = new BinaryMatcher(binaryBody.getValue());
-					break;
-			}
-			if(body.isNot())
-			{
-				// noinspection ConstantConditions
-				bodyMatcher = notMatcher(bodyMatcher);
-			}
+			return null;
 		}
-		return bodyMatcher;
+		
+		final BodyMatcher matcher = this.determineBodyMatcherByType(body);
+		return body.isNot() ? notMatcher(matcher) : matcher;
+	}
+	
+	private BodyMatcher determineBodyMatcherByType(final Body body)
+	{
+		return switch(body.getType())
+		{
+			case STRING:
+				final StringBody stringBody = (StringBody)body;
+				final NottableString string = string(stringBody.getValue());
+				yield stringBody.isSubString() ? new SubStringMatcher(string) : new ExactStringMatcher(string);
+			case REGEX:
+				final RegexBody regexBody = (RegexBody)body;
+				yield new RegexStringMatcher(string(regexBody.getValue()), this.controlPlaneMatcher);
+			case PARAMETERS:
+				final ParameterBody parameterBody = (ParameterBody)body;
+				yield new ParameterStringMatcher(
+					this.configuration,
+					parameterBody.getValue(),
+					this.controlPlaneMatcher);
+			case BINARY:
+				final BinaryBody binaryBody = (BinaryBody)body;
+				yield new BinaryMatcher(binaryBody.getValue());
+		};
 	}
 	
 	private void withHeaders(final Headers headers)
