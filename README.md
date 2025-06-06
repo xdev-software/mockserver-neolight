@@ -124,11 +124,11 @@ new MockServerClient("localhost", 1080)
 
 </details>
 
-### Further documentation
+### Further related documentation
 * [Original project](https://www.mock-server.com/)
-* [Testcontainers Mockserver module](https://java.testcontainers.org/modules/mockserver/)
+* [Testcontainers (original) Mockserver module](https://java.testcontainers.org/modules/mockserver/)
 
-MockServer also works really well together with a network failure simulation tools such as [ToxiProxy](https://java.testcontainers.org/modules/toxiproxy/).
+Note: MockServer also works really well together with a network failure simulation tools such as [ToxiProxy](https://java.testcontainers.org/modules/toxiproxy/).
 
 ## Installation
 [Installation guide for the latest release](https://github.com/xdev-software/mockserver-neolight/releases/latest#Installation)
