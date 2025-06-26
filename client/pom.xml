@@ -155,7 +155,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>flatten-maven-plugin</artifactId>
-						<version>1.7.0</version>
+						<version>1.7.1</version>
 						<configuration>
 							<flattenMode>ossrh</flattenMode>
 						</configuration>
@@ -217,7 +217,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>10.25.0</version>
+								<version>10.26.0</version>
 							</dependency>
 						</dependencies>
 						<configuration>
@@ -242,7 +242,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-pmd-plugin</artifactId>
-						<version>3.26.0</version>
+						<version>3.27.0</version>
 						<configuration>
 							<includeTests>true</includeTests>
 							<printFailingErrors>true</printFailingErrors>
