@@ -40,6 +40,7 @@ import software.xdev.mockserver.client.MockServerClient;
 import software.xdev.mockserver.model.Format;
 import software.xdev.mockserver.model.HttpForward;
 import software.xdev.testcontainers.imagebuilder.AdvancedImageFromDockerFile;
+import software.xdev.testcontainers.imagebuilder.compat.DockerfileCOPYParentsEmulator;
 
 
 @SuppressWarnings("resource") // HttpClient close does not exist on Java 17!
@@ -52,7 +53,7 @@ class MockServerContainerTest
 	{
 		image = DockerImageName.parse(new AdvancedImageFromDockerFile("mockserver")
 			.withLoggerForBuild(LoggerFactory.getLogger("container.build.mockserver"))
-			.withAdditionalIgnoreLines(
+			.withPostGitIgnoreLines(
 				// Ignore files that aren't related to the built code
 				".git/**",
 				".config/**",
@@ -61,13 +62,15 @@ class MockServerContainerTest
 				".run/**",
 				"assets/**",
 				"docs/**",
-				".md",
-				".cmd",
+				"Dockerfile",
+				"*.md",
+				"*.cmd",
 				"/renovate.json5",
 				"/client/src/**",
 				"/testcontainers/src/**")
 			.withDockerFilePath(Paths.get("../testcontainers/Standalone.Dockerfile"))
 			.withBaseDir(Paths.get("../"))
+			.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
 			.get());
 	}
 	

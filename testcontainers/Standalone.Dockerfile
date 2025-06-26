@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1-labs
 ARG JAVA_VERSION=21
 FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine AS jre-base
 
@@ -35,18 +36,27 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 FROM eclipse-temurin:${JAVA_VERSION}-jdk-alpine AS builder
 
-RUN apk add --no-cache git bash
+RUN apk add --no-cache bash
 
 WORKDIR /builder
 
-# Copying context is prepared by Testcontainers
+# Copy & Cache wrapper
+COPY --parents mvnw .mvn/** ./
+RUN ./mvnw --version
+
+# Copy & Cache poms/dependencies
+COPY --parents **/pom.xml ./
+# Resolve jars so that they can be cached and don't need to be downloaded when a Java file changes
+ARG MAVEN_GO_OFFLINE_COMMAND='./mvnw -B dependency:go-offline -pl server -am -DincludeScope=runtime -T2C'
+RUN echo "Executing '$MAVEN_GO_OFFLINE_COMMAND'"
+RUN ${MAVEN_GO_OFFLINE_COMMAND}
+
+# Copying all other files
 COPY . ./
-
-ARG mvncmd='clean package -pl "server" -am -T2C -Dmaven.test.skip'
-
-RUN echo "Executing '$mvncmd'"
-RUN chmod +x ./mvnw \
-  && ./mvnw -B ${mvncmd}
+# Run the actual build
+ARG MAVEN_BUILD_COMMAND='./mvnw -B package -pl "server" -am -T2C -Dmaven.test.skip'
+RUN echo "Executing '$MAVEN_BUILD_COMMAND'"
+RUN ${MAVEN_BUILD_COMMAND}
 
 
 FROM jre-minimized
