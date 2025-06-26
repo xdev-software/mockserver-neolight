@@ -1,9 +1,0 @@
-{
-  "title": "protocol matcher",
-  "enum": [
-    "HTTP_1_1",
-    "HTTP_2"
-  ],
-  "definitions": {
-  }
-}

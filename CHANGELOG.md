@@ -1,3 +1,7 @@
+# 1.0.19
+* Removed unused resources from ``core``
+* Updated dependencies
+
 # 1.0.18
 * Updated dependencies
 * Fix ``subString`` matching not working as expected #231
