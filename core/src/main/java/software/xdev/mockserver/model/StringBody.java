@@ -27,8 +27,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class StringBody extends BodyWithContentType<String>
 {
-	private int hashCode;
 	public static final MediaType DEFAULT_CONTENT_TYPE = MediaType.create("text", "plain");
+	
+	private int hashCode;
 	private final boolean subString;
 	private final String value;
 	private final byte[] rawBytes;
@@ -54,14 +55,9 @@ public class StringBody extends BodyWithContentType<String>
 		this.value = isNotBlank(value) ? value : "";
 		this.subString = subString;
 		
-		if(rawBytes == null && value != null)
-		{
-			this.rawBytes = value.getBytes(this.determineCharacterSet(contentType, DEFAULT_TEXT_HTTP_CHARACTER_SET));
-		}
-		else
-		{
-			this.rawBytes = rawBytes;
-		}
+		this.rawBytes = rawBytes == null && value != null
+			? value.getBytes(this.determineCharacterSet(contentType, DEFAULT_TEXT_HTTP_CHARACTER_SET))
+			: rawBytes;
 	}
 	
 	public static StringBody exact(final String body)
