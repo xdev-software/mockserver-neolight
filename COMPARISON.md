@@ -83,7 +83,7 @@ This list contains a comparison with the most popular open source [API simulatio
             </a>
         </td>
         <td>
-            ✔ Provides a Java API that is used to create responses for certain requests. <sup><a href="https://www.mock-server.com/">Docs</a> <a href="https://java.testcontainers.org/modules/mockserver/">Testcontainer-Docs</a></sup>
+            ✔ Provides a Java API that is used to create responses for certain requests. <sup><a href="https://wiremock.org/docs/">Docs</a> <a href="https://testcontainers.com/modules/wiremock/">Testcontainer-Docs</a></sup>
         </td>
         <td>
             ❌ Monolithic - all client/server code in one module
