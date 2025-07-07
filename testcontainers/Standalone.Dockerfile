@@ -2,10 +2,21 @@
 ARG JAVA_VERSION=21
 FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine AS jre-base
 
+
+# Force upgrade to get rid of CVEs
+# See also https://stackoverflow.com/a/76440791
+FROM alpine:3 AS alpine-upgraded
+
+RUN apk upgrade --no-cache
+
+
 # Build the JRE ourself and exclude stuff from Eclipse-Temurin that we don't need
 #
 # Derived from https://github.com/adoptium/containers/blob/91ea190c462741d2c64ed2f8f0a0efdb3e77c49d/21/jre/alpine/3.21/Dockerfile
-FROM alpine:3 AS jre-minimized
+FROM scratch AS jre-minimized
+
+COPY --from=alpine-upgraded / /
+CMD ["/bin/sh"]
 
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
