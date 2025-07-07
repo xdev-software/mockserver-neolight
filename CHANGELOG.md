@@ -1,10 +1,10 @@
 # 1.1.1
-Fix broken release
-
-# 1.1.0
 * Add BOM #211
 * Now also publishing maven to GitHub packages
 * Updated dependencies
+
+# 1.1.0
+_broken release_
 
 # 1.0.19
 * Removed unused resources from ``core``
