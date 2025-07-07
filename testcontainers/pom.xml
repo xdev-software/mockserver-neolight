@@ -10,7 +10,7 @@
 	<packaging>jar</packaging>
 
 	<name>testcontainers</name>
-	<description>MockServer NeoLight Testcontainers Module</description>
+	<description>MockServer NeoLight - Testcontainers</description>
 	<url>https://github.com/xdev-software/mockserver-neolight</url>
 
 	<scm>

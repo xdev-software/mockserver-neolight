@@ -10,7 +10,7 @@
 	<packaging>jar</packaging>
 
 	<name>core</name>
-	<description>MockServer NeoLight Core</description>
+	<description>MockServer NeoLight - Core</description>
 	<url>https://github.com/xdev-software/mockserver-neolight</url>
 
 	<scm>

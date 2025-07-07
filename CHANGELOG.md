@@ -1,5 +1,6 @@
 # 1.0.20
-* Now also publishing to GitHub packages
+* Add BOM #211
+* Now also publishing maven to GitHub packages
 * Updated dependencies
 
 # 1.0.19
