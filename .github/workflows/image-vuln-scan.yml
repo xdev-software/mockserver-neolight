@@ -30,7 +30,7 @@ jobs:
         with:
           image-ref: ${{ env.TRIVYY_IMAGE_REF }}
           exit-code: 1
-          severity: 'HIGH,CRITICAL'
+          severity: 'HIGH,CRITICAL,UNKNOWN'
           output: reported.txt
         env:
           TRIVY_DISABLE_VEX_NOTICE: 1
