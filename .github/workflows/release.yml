@@ -147,21 +147,6 @@ jobs:
         java-version: '17'
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Only import once
-    
-    - name: Publish to Central Portal
-      run: ../mvnw -B deploy -P publish -DskipTests -DaltDeploymentRepository=github::https://maven.pkg.github.com/${{ github.repository }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      working-directory: ${{ env.PRIMARY_MAVEN_MODULE }}
-
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with: # running setup-java overwrites the settings.xml
-        distribution: 'temurin'
-        java-version: '17'
-        gpg-passphrase: MAVEN_GPG_PASSPHRASE
-        gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Only import once
 
     - name: Publish to GitHub Packages
       run: |
