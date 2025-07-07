@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1751877101730">
+    <module artifactId="client" groupId="software.xdev.mockserver" version="1.1.1"/>
+    <files>
+        <file path="src/main/java/software/xdev/mockserver/authentication/AuthenticationException.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/mockserver/client/ClientException.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/mockserver/client/ForwardChainExpectation.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/mockserver/client/MockServerClient.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/mockserver/client/MockServerClientEventBus.java" result="NOOP"/>
+        <file path="src/main/java/software/xdev/mockserver/configuration/ClientConfiguration.java" result="NOOP"/>
+    </files>
+</licensePluginReport>
