@@ -1,3 +1,7 @@
+# 1.0.20
+* Now also publishing to GitHub packages
+* Updated dependencies
+
 # 1.0.19
 * Removed unused resources from ``core``
 * Updated dependencies
