@@ -1,3 +1,6 @@
+# 1.1.1
+Fix broken release
+
 # 1.1.0
 * Add BOM #211
 * Now also publishing maven to GitHub packages
