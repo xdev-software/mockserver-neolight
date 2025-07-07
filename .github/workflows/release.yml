@@ -129,7 +129,7 @@ jobs:
     needs: [prepare-release]
     timeout-minutes: 60
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
     - uses: actions/checkout@v4
