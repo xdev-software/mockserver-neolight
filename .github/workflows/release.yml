@@ -128,9 +128,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare-release]
     timeout-minutes: 60
-    permissions:
-      contents: write
-      packages: write
     steps:
     - uses: actions/checkout@v4
     
@@ -145,6 +142,8 @@ jobs:
       with: # running setup-java overwrites the settings.xml
         distribution: 'temurin'
         java-version: '17'
+        server-id: github-central
+        server-password: PACKAGES_CENTRAL_TOKEN
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Only import once
 
@@ -155,9 +154,9 @@ jobs:
         modules+=($(echo $dependency_management_block | grep -oP '(?<=<artifactId>)[^<]+'))
         printf -v modules_joined '%s,' "${modules[@]}"
         modules_arg=$(echo "${modules_joined%,}")
-        ./mvnw -B deploy -pl "$modules_arg" -am -T2C -P publish -DskipTests -DaltDeploymentRepository=github::https://maven.pkg.github.com/${{ github.repository }}
+        ./mvnw -B deploy -pl "$modules_arg" -am -T2C -P publish -DskipTests -DaltDeploymentRepository=github-central::https://maven.pkg.github.com/xdev-software/central
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PACKAGES_CENTRAL_TOKEN: ${{ secrets.PACKAGES_CENTRAL_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
   
     - name: Set up JDK
