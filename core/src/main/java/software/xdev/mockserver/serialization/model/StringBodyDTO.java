@@ -18,6 +18,8 @@ package software.xdev.mockserver.serialization.model;
 import java.util.Arrays;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import software.xdev.mockserver.model.StringBody;
 
 
@@ -50,6 +52,7 @@ public class StringBodyDTO extends BodyWithContentTypeDTO
 		return this.subString;
 	}
 	
+	@JsonIgnore
 	public byte[] getRawBytes()
 	{
 		return this.rawBytes;
