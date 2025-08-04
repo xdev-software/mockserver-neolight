@@ -4,7 +4,7 @@
   "packageRules": [
     {
       "description": "Ignore project internal dependencies",
-      "packagePattern": "^software.xdev:template-placeholder",
+      "packagePattern": "^software.xdev.mockserver",
       "datasources": [
         "maven"
       ],
@@ -19,6 +19,43 @@
         "maven"
       ],
       "groupName": "net.sourceforge.pmd"
+    },
+    {
+      "description": "Java LTS 21",
+      "packagePattern": "^eclipse-temurin",
+      "datasources": [
+        "docker"
+      ],
+      "allowedVersions": "/^21\\-alpine$/"
+    },
+    {
+      "description": "Alpine - Ignore YYYYMMDD releases",
+      "packagePattern": "^alpine",
+      "datasources": [
+        "docker"
+      ],
+      "allowedVersions": "<=100"
+    },
+    {
+      "description": "Group org.slf4j",
+      "matchPackagePatterns": [
+        "^org.slf4j"
+      ],
+      "datasources": [
+        "maven"
+      ],
+      "groupName": "org.slf4j"
+    },
+    {
+      "description": "Group com.fasterxml.jackson",
+      "matchPackagePatterns": [
+        "^com.fasterxml.jackson:jackson-bom",
+        "^com.fasterxml.jackson.core:jackson-databind"
+      ],
+      "datasources": [
+        "maven"
+      ],
+      "groupName": "com.fasterxml.jackson"
     }
   ]
 }
