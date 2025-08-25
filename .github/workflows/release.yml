@@ -205,7 +205,7 @@ jobs:
       attestations: write
       id-token: write
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Init Git and pull
       run: |
