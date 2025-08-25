@@ -4,10 +4,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>software.xdev</groupId>
-	<artifactId>template-placeholder-root</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<groupId>software.xdev.mockserver</groupId>
+	<artifactId>root</artifactId>
+	<version>1.1.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
+
+	<name>MockServer NeoLight</name>
+	<description>A lightweight rewrite of the MockServer project with focus on simplicity, maintainability and Testcontainers</description>
+	<url>https://github.com/xdev-software/mockserver-neolight</url>
 
 	<organization>
 		<name>XDEV Software</name>
@@ -15,8 +19,11 @@
 	</organization>
 
 	<modules>
-		<module>template-placeholder</module>
-		<module>template-placeholder-demo</module>
+		<module>bom</module>
+		<module>client</module>
+		<module>core</module>
+		<module>server</module>
+		<module>testcontainers</module>
 	</modules>
 
 	<properties>
@@ -31,6 +38,23 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>4.0.0-M16</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>3.9.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
 	<profiles>
 		<profile>
