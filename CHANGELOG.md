@@ -1,3 +1,6 @@
+# 1.1.2
+* Updated dependencies
+
 # 1.1.1
 * Add BOM #211
 * Now also publishing maven to GitHub packages
