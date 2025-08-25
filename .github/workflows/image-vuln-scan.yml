@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true # Ignore errors, we create an issue instead
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Scan - Full
         uses: aquasecurity/trivy-action@0.32.0
