@@ -1,3 +1,7 @@
+# 1.1.3
+* Fixed some deprecations
+* Updated dependencies
+
 # 1.1.2
 * Updated dependencies
 
