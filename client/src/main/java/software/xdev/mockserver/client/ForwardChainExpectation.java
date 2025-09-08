@@ -19,7 +19,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.util.concurrent.Future;
 
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import software.xdev.mockserver.client.MockServerClientEventBus.EventType;
 import software.xdev.mockserver.closurecallback.websocketclient.WebSocketClient;
 import software.xdev.mockserver.closurecallback.websocketclient.WebSocketException;
@@ -306,9 +307,10 @@ public class ForwardChainExpectation
 			LocalCallbackRegistry.registerCallback(clientId, expectationCallback);
 			LocalCallbackRegistry.registerCallback(clientId, expectationForwardResponseCallback);
 			final WebSocketClient<T> webSocketClient = new WebSocketClient<>(
-				new NioEventLoopGroup(
+				new MultiThreadIoEventLoopGroup(
 					this.configuration.webSocketClientEventLoopThreadCount(),
-					new SchedulerThreadFactory(WebSocketClient.class.getSimpleName() + "-eventLoop")),
+					new SchedulerThreadFactory(WebSocketClient.class.getSimpleName() + "-eventLoop"),
+					NioIoHandler.newFactory()),
 				clientId
 			);
 			final Future<String> register = webSocketClient.registerExpectationCallback(

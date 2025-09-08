@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +49,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.IoEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import software.xdev.mockserver.authentication.AuthenticationException;
 import software.xdev.mockserver.client.MockServerClientEventBus.EventType;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
@@ -87,6 +91,8 @@ public class MockServerClient implements Stoppable
 	private static final Logger LOG = LoggerFactory.getLogger(MockServerClient.class);
 	
 	private static final Map<Integer, MockServerClientEventBus> EVENT_BUS_MAP = new ConcurrentHashMap<>();
+	private static ExecutorService stopExecutorService;
+	
 	private final EventLoopGroup eventLoopGroup;
 	private final String host;
 	private final String contextPath;
@@ -218,20 +224,12 @@ public class MockServerClient implements Stoppable
 		this.eventLoopGroup = this.eventLoopGroup();
 	}
 	
-	private NioEventLoopGroup eventLoopGroup()
+	private IoEventLoopGroup eventLoopGroup()
 	{
-		return new NioEventLoopGroup(
+		return new MultiThreadIoEventLoopGroup(
 			this.configuration.clientNioEventLoopThreadCount(),
-			new SchedulerThreadFactory(this.getClass().getSimpleName() + "-eventLoop"));
-	}
-	
-	/**
-	 * @deprecated use withProxyConfiguration which is more consistent with MockServer API style
-	 */
-	@Deprecated
-	public MockServerClient setProxyConfiguration(final ProxyConfiguration proxyConfiguration)
-	{
-		return this.withProxyConfiguration(proxyConfiguration);
+			new SchedulerThreadFactory(this.getClass().getSimpleName() + "-eventLoop"),
+			NioIoHandler.newFactory());
 	}
 	
 	/**
@@ -241,15 +239,6 @@ public class MockServerClient implements Stoppable
 	{
 		this.proxyConfiguration = proxyConfiguration;
 		return this;
-	}
-	
-	/**
-	 * @deprecated use withRequestOverride which is more consistent with MockServer API style
-	 */
-	@Deprecated
-	public MockServerClient setRequestOverride(final HttpRequest requestOverride)
-	{
-		return this.withRequestOverride(requestOverride);
 	}
 	
 	public MockServerClient withRequestOverride(final HttpRequest requestOverride)
@@ -580,11 +569,16 @@ public class MockServerClient implements Stoppable
 	@SuppressWarnings({"checkstyle:MagicNumber", "PMD.CognitiveComplexity"})
 	public CompletableFuture<MockServerClient> stop(final boolean ignoreFailure)
 	{
-		if(!this.stopFuture.isDone())
+		if(this.stopFuture.isDone())
 		{
-			this.getMockServerEventBus().publish(EventType.STOP);
-			this.removeMockServerEventBus();
-			new SchedulerThreadFactory("ClientStop").newThread(() -> {
+			return this.stopFuture;
+		}
+		
+		this.getMockServerEventBus().publish(EventType.STOP);
+		this.removeMockServerEventBus();
+		
+		CompletableFuture.runAsync(
+			() -> {
 				try
 				{
 					this.sendRequest(request().withMethod("PUT").withPath(this.calculatePath("stop")), false);
@@ -615,9 +609,17 @@ public class MockServerClient implements Stoppable
 					this.eventLoopGroup.shutdownGracefully();
 				}
 				this.stopFuture.complete(this.clientClass.cast(this));
-			}).start();
-		}
+			}, stopExecutorService());
 		return this.stopFuture;
+	}
+	
+	protected static ExecutorService stopExecutorService()
+	{
+		if(stopExecutorService == null)
+		{
+			stopExecutorService = Executors.newCachedThreadPool(new SchedulerThreadFactory("ClientStop"));
+		}
+		return stopExecutorService;
 	}
 	
 	@Override

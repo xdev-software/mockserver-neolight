@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -164,7 +165,7 @@ public final class ObjectMapperFactory
 	
 	public static ObjectMapper buildObjectMapperWithoutRemovingEmptyValues()
 	{
-		return new ObjectMapper(JsonFactory.builder()
+		return JsonMapper.builder(JsonFactory.builder()
 			// relax parsing
 			.configure(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS, true)
 			.configure(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true)
@@ -191,16 +192,17 @@ public final class ObjectMapperFactory
 			// use arrays
 			.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true)
 			// consistent json output
-			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+			.build();
 	}
 	
 	public static ObjectMapper buildObjectMapperWithOnlyConfigurationDefaults()
 	{
 		return buildObjectMapperWithoutRemovingEmptyValues()
 			// remove empty values from JSON
-			.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT)
-			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-			.setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+			.setDefaultPropertyInclusion(JsonInclude.Include.NON_DEFAULT)
+			.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
+			.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY)
 			// add support for java date time serialisation and de-serialisation
 			.registerModule(new JavaTimeModule());
 	}

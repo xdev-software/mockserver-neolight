@@ -96,7 +96,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.19.2</version>
+			<version>2.20.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -282,7 +282,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>11.0.0</version>
+								<version>11.0.1</version>
 							</dependency>
 						</dependencies>
 						<configuration>
@@ -309,6 +309,7 @@
 						<artifactId>maven-pmd-plugin</artifactId>
 						<version>3.27.0</version>
 						<configuration>
+							<analysisCache>true</analysisCache>
 							<includeTests>true</includeTests>
 							<printFailingErrors>true</printFailingErrors>
 							<rulesets>

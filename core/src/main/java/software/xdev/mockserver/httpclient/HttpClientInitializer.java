@@ -29,9 +29,9 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.proxy.Socks5ProxyHandler;
+import software.xdev.mockserver.codec.LimitedHttpContentDecompressor;
 import software.xdev.mockserver.codec.MockServerBinaryClientCodec;
 import software.xdev.mockserver.codec.MockServerHttpClientCodec;
 import software.xdev.mockserver.logging.LoggingHandler;
@@ -110,7 +110,7 @@ public class HttpClientInitializer extends ChannelInitializer<SocketChannel>
 	private void configureHttp1Pipeline(final ChannelPipeline pipeline)
 	{
 		pipeline.addLast(new HttpClientCodec());
-		pipeline.addLast(new HttpContentDecompressor());
+		pipeline.addLast(new LimitedHttpContentDecompressor());
 		pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
 		pipeline.addLast(new MockServerHttpClientCodec(this.proxyConfigurations));
 		pipeline.addLast(this.httpClientHandler);
