@@ -28,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -40,7 +39,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOutboundInvoker;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.mock.HttpState;
 import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
@@ -49,6 +49,7 @@ import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.stop.Stoppable;
 
 
+@SuppressWarnings("PMD.AvoidUnmanagedThreads") // WebServer that manages channels with threads
 public abstract class LifeCycle implements Stoppable
 {
 	private static final Logger LOG = LoggerFactory.getLogger(LifeCycle.class);
@@ -58,34 +59,33 @@ public abstract class LifeCycle implements Stoppable
 	private final ServerConfiguration configuration;
 	protected ServerBootstrap serverServerBootstrap;
 	private final List<Future<Channel>> serverChannelFutures = new ArrayList<>();
-	private final CompletableFuture<String> stopFuture = new CompletableFuture<>();
+	private final CompletableFuture<Void> stopFuture = new CompletableFuture<>();
 	private final AtomicBoolean stopping = new AtomicBoolean(false);
 	private final Scheduler scheduler;
 	
 	protected LifeCycle(final ServerConfiguration configuration)
 	{
 		this.configuration = configuration != null ? configuration : configuration();
-		this.bossGroup =
-			new NioEventLoopGroup(5, new SchedulerThreadFactory(this.getClass().getSimpleName() + "-bossEventLoop"));
-		this.workerGroup = new NioEventLoopGroup(
+		this.bossGroup = new MultiThreadIoEventLoopGroup(
+			5,
+			new SchedulerThreadFactory(this.getClass().getSimpleName() + "-bossEventLoop"),
+			NioIoHandler.newFactory());
+		this.workerGroup = new MultiThreadIoEventLoopGroup(
 			this.configuration.nioEventLoopThreadCount(),
-			new SchedulerThreadFactory(this.getClass().getSimpleName() + "-workerEventLoop"));
+			new SchedulerThreadFactory(this.getClass().getSimpleName() + "-workerEventLoop"),
+			NioIoHandler.newFactory());
 		this.scheduler = new Scheduler(this.configuration);
 		this.httpState = new HttpState(this.configuration, this.scheduler);
 	}
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")
-	public CompletableFuture<String> stopAsync()
+	public CompletableFuture<Void> stopAsync()
 	{
 		if(!this.stopFuture.isDone() && this.stopping.compareAndSet(false, true))
 		{
-			final String message = "stopped for port" + (this.getLocalPorts().size() == 1
-				? ": " + this.getLocalPorts().get(0)
-				: "s: " + this.getLocalPorts());
-			if(LOG.isInfoEnabled())
-			{
-				LOG.info(message);
-			}
+			final List<Integer> localPorts = this.getLocalPorts();
+			LOG.info("Stopped for port{}", localPorts.size() == 1 ? ": " + localPorts.get(0) : "s: " + localPorts);
+			
 			new SchedulerThreadFactory("Stop").newThread(() -> {
 				final List<ChannelFuture> collect = this.serverChannelFutures
 					.stream()
@@ -101,7 +101,7 @@ public abstract class LifeCycle implements Stoppable
 						}
 					})
 					.map(ChannelOutboundInvoker::disconnect)
-					.collect(Collectors.toList());
+					.toList();
 				try
 				{
 					for(final ChannelFuture channelFuture : collect)
@@ -125,7 +125,7 @@ public abstract class LifeCycle implements Stoppable
 				this.bossGroup.terminationFuture().syncUninterruptibly();
 				this.workerGroup.terminationFuture().syncUninterruptibly();
 				
-				this.stopFuture.complete(message);
+				this.stopFuture.complete(null);
 			}).start();
 		}
 		return this.stopFuture;
@@ -241,7 +241,8 @@ public abstract class LifeCycle implements Stoppable
 			{
 				final CompletableFuture<Channel> channelOpened = new CompletableFuture<>();
 				channelFutures.add(channelOpened);
-				new SchedulerThreadFactory("MockServer thread for port: " + portToBind, false).newThread(() -> {
+				new SchedulerThreadFactory("MockServer thread for port: " + portToBind, false)
+					.newThread(() -> {
 					try
 					{
 						final InetSocketAddress inetSocketAddress;
@@ -275,13 +276,13 @@ public abstract class LifeCycle implements Stoppable
 					}
 				}).start();
 				
-				actualPortBindings.add(((InetSocketAddress)channelOpened.get(
-					this.configuration.maxFutureTimeoutInMillis(),
-					MILLISECONDS).localAddress()).getPort());
+				actualPortBindings.add(((InetSocketAddress)channelOpened
+					.get(this.configuration.maxFutureTimeoutInMillis(), MILLISECONDS).localAddress())
+					.getPort());
 			}
 			catch(final Exception e)
 			{
-				throw new RuntimeException(
+				throw new IllegalStateException(
 					"Exception while binding MockServer to port " + portToBind,
 					e instanceof ExecutionException ? e.getCause() : e);
 			}

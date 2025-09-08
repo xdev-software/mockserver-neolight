@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -87,6 +89,8 @@ public class MockServerClient implements Stoppable
 	private static final Logger LOG = LoggerFactory.getLogger(MockServerClient.class);
 	
 	private static final Map<Integer, MockServerClientEventBus> EVENT_BUS_MAP = new ConcurrentHashMap<>();
+	private static ExecutorService stopExecutorService;
+	
 	private final EventLoopGroup eventLoopGroup;
 	private final String host;
 	private final String contextPath;
@@ -580,11 +584,16 @@ public class MockServerClient implements Stoppable
 	@SuppressWarnings({"checkstyle:MagicNumber", "PMD.CognitiveComplexity"})
 	public CompletableFuture<MockServerClient> stop(final boolean ignoreFailure)
 	{
-		if(!this.stopFuture.isDone())
+		if(this.stopFuture.isDone())
 		{
-			this.getMockServerEventBus().publish(EventType.STOP);
-			this.removeMockServerEventBus();
-			new SchedulerThreadFactory("ClientStop").newThread(() -> {
+			return this.stopFuture;
+		}
+		
+		this.getMockServerEventBus().publish(EventType.STOP);
+		this.removeMockServerEventBus();
+		
+		CompletableFuture.runAsync(
+			() -> {
 				try
 				{
 					this.sendRequest(request().withMethod("PUT").withPath(this.calculatePath("stop")), false);
@@ -615,9 +624,17 @@ public class MockServerClient implements Stoppable
 					this.eventLoopGroup.shutdownGracefully();
 				}
 				this.stopFuture.complete(this.clientClass.cast(this));
-			}).start();
-		}
+			}, stopExecutorService());
 		return this.stopFuture;
+	}
+	
+	protected static ExecutorService stopExecutorService()
+	{
+		if(stopExecutorService == null)
+		{
+			stopExecutorService = Executors.newCachedThreadPool(new SchedulerThreadFactory("ClientStop"));
+		}
+		return stopExecutorService;
 	}
 	
 	@Override

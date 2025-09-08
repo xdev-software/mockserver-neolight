@@ -114,7 +114,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<HttpRequest>
 		return new HashSet<>();
 	}
 	
-	@SuppressWarnings({"checkstyle:MagicNumber", "PMD.CognitiveComplexity"})
+	@SuppressWarnings({"checkstyle:MagicNumber", "PMD.CognitiveComplexity", "PMD.AvoidUnmanagedThreads"})
 	@Override
 	protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest request)
 	{
