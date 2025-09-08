@@ -38,9 +38,9 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import software.xdev.mockserver.codec.LimitedHttpContentDecompressor;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.logging.LoggingHandler;
@@ -123,7 +123,7 @@ public abstract class RelayConnectHandler<T> extends SimpleChannelInboundHandler
 										RelayConnectHandler.this.configuration.maxInitialLineLength(),
 										RelayConnectHandler.this.configuration.maxHeaderSize(),
 										RelayConnectHandler.this.configuration.maxChunkSize()));
-									pipelineToMockServer.addLast(new HttpContentDecompressor());
+									pipelineToMockServer.addLast(new LimitedHttpContentDecompressor());
 									pipelineToMockServer.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
 									
 									pipelineToMockServer.addLast(
@@ -142,7 +142,7 @@ public abstract class RelayConnectHandler<T> extends SimpleChannelInboundHandler
 										RelayConnectHandler.this.configuration.maxInitialLineLength(),
 										RelayConnectHandler.this.configuration.maxHeaderSize(),
 										RelayConnectHandler.this.configuration.maxChunkSize()));
-									pipelineToProxyClient.addLast(new HttpContentDecompressor());
+									pipelineToProxyClient.addLast(new LimitedHttpContentDecompressor());
 									pipelineToProxyClient.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
 									
 									pipelineToProxyClient.addLast(

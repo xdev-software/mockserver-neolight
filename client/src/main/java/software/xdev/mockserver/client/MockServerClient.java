@@ -49,7 +49,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.IoEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import software.xdev.mockserver.authentication.AuthenticationException;
 import software.xdev.mockserver.client.MockServerClientEventBus.EventType;
 import software.xdev.mockserver.closurecallback.websocketregistry.LocalCallbackRegistry;
@@ -222,11 +224,12 @@ public class MockServerClient implements Stoppable
 		this.eventLoopGroup = this.eventLoopGroup();
 	}
 	
-	private NioEventLoopGroup eventLoopGroup()
+	private IoEventLoopGroup eventLoopGroup()
 	{
-		return new NioEventLoopGroup(
+		return new MultiThreadIoEventLoopGroup(
 			this.configuration.clientNioEventLoopThreadCount(),
-			new SchedulerThreadFactory(this.getClass().getSimpleName() + "-eventLoop"));
+			new SchedulerThreadFactory(this.getClass().getSimpleName() + "-eventLoop"),
+			NioIoHandler.newFactory());
 	}
 	
 	/**

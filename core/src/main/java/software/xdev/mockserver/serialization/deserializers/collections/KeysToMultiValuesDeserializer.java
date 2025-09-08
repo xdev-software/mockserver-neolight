@@ -80,7 +80,7 @@ public abstract class KeysToMultiValuesDeserializer<T extends KeysToMultiValues<
 					NottableString[] values = null;
 					while(token != JsonToken.END_OBJECT)
 					{
-						final String fieldName = jsonParser.getCurrentName();
+						final String fieldName = jsonParser.currentName();
 						if("values".equals(fieldName))
 						{
 							jsonParser.nextToken();

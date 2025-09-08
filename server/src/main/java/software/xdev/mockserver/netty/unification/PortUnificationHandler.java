@@ -47,7 +47,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ReplayingDecoder;
-import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.socksx.v4.Socks4ServerDecoder;
@@ -56,6 +55,7 @@ import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.AttributeKey;
+import software.xdev.mockserver.codec.LimitedHttpContentDecompressor;
 import software.xdev.mockserver.codec.MockServerHttpServerCodec;
 import software.xdev.mockserver.codec.PreserveHeadersNettyRemoves;
 import software.xdev.mockserver.configuration.ServerConfiguration;
@@ -237,7 +237,7 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 	
 	private boolean isTls(final ByteBuf buf)
 	{
-		return SslHandler.isEncrypted(buf);
+		return SslHandler.isEncrypted(buf, false);
 	}
 	
 	private void enableTls(final ChannelHandlerContext ctx, final ByteBuf msg)
@@ -276,7 +276,7 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 				this.configuration.maxChunkSize()
 			));
 			this.addLastIfNotPresent(pipeline, this.preserveHeadersNettyRemoves);
-			this.addLastIfNotPresent(pipeline, new HttpContentDecompressor());
+			this.addLastIfNotPresent(pipeline, new LimitedHttpContentDecompressor());
 			this.addLastIfNotPresent(pipeline, this.httpContentLengthRemover);
 			this.addLastIfNotPresent(pipeline, new HttpObjectAggregator(Integer.MAX_VALUE));
 			this.addLastIfNotPresent(pipeline, new CallbackWebSocketServerHandler(this.httpState));
