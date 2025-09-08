@@ -1,8 +1,8 @@
 # Comparison of similar frameworks
 
-This list contains a comparison with the most popular open source [API simulation tools](https://en.wikipedia.org/wiki/Comparison_of_API_simulation_tools)
+This list contains a comparison with the most popular open source API simulation tools
 
-<details><summary>Chosen criteria</summary>
+<details><summary>Chosen criteria & Sources</summary>
 
 | Criteria | Reason |
 | --- | --- |
@@ -10,6 +10,10 @@ This list contains a comparison with the most popular open source [API simulatio
 | Modularity | Monolithic/Non-modular packaging causes bloat and problems such as <ul><li>Possible introduction of vulnerabilities</li><li>Dependency conflicts</li><li>Performance degeneration</li><li>Confusion (which classes/methods need to be used)</li></ul>
 | Testcontainers Integration | Testcontainers is the defacto standard for running integration tests. It utilizes containers, is highly flexible and has widespread use in the Java ecosystem. |
 | Activity & Support | Unmaintained software won't get fixes for incompatibilities, issues, vulnerabilities, ... |
+
+Sources:
+* https://web.archive.org/web/20250617212320/https://en.wikipedia.org/wiki/Comparison_of_API_simulation_tools
+* https://www.browserstack.com/guide/api-simulation-tools-comparison
 
 </details>
 
