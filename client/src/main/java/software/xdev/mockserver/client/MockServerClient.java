@@ -233,30 +233,12 @@ public class MockServerClient implements Stoppable
 	}
 	
 	/**
-	 * @deprecated use withProxyConfiguration which is more consistent with MockServer API style
-	 */
-	@Deprecated
-	public MockServerClient setProxyConfiguration(final ProxyConfiguration proxyConfiguration)
-	{
-		return this.withProxyConfiguration(proxyConfiguration);
-	}
-	
-	/**
 	 * Configure communication to MockServer to go via a proxy
 	 */
 	public MockServerClient withProxyConfiguration(final ProxyConfiguration proxyConfiguration)
 	{
 		this.proxyConfiguration = proxyConfiguration;
 		return this;
-	}
-	
-	/**
-	 * @deprecated use withRequestOverride which is more consistent with MockServer API style
-	 */
-	@Deprecated
-	public MockServerClient setRequestOverride(final HttpRequest requestOverride)
-	{
-		return this.withRequestOverride(requestOverride);
 	}
 	
 	public MockServerClient withRequestOverride(final HttpRequest requestOverride)
