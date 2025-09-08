@@ -1,5 +1,5 @@
 # 1.1.3
-* Fixed some deprecations
+* Fixed deprecations
 * Updated dependencies
 
 # 1.1.2
