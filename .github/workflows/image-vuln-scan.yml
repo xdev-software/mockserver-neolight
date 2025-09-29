@@ -39,7 +39,7 @@ jobs:
         id: find-issue
         if: ${{ always() }}
         run: |
-          echo "number=$(gh issue list -l 'bug' -l 'automated' -L 1 -S 'in:title \"Trivy Vulnerability Report\"' -s 'open' --json 'number' --jq '.[].number')" >> $GITHUB_OUTPUT
+          echo "number=$(gh issue list -l 'bug' -l 'automated' -L 1 -S 'in:title "Trivy Vulnerability Report"' -s 'open' --json 'number' --jq '.[].number')" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
 
