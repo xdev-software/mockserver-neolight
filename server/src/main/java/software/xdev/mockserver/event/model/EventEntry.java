@@ -19,6 +19,7 @@ import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -114,7 +115,8 @@ public class EventEntry implements EventTranslator<EventEntry>
 	{
 		if(this.timestamp == null)
 		{
-			this.timestamp = LOG_DTF.format(Instant.ofEpochMilli(this.epochTime));
+			this.timestamp = LOG_DTF.format(
+				Instant.ofEpochMilli(this.epochTime).atZone(ZoneId.systemDefault()).toLocalDateTime());
 		}
 		return this.timestamp;
 	}
