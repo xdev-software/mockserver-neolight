@@ -1,8 +1,11 @@
 # 1.2.0
 * Updated docker image to use Java 25
-  * Utilize AOT
+  * Use Ahead-of-Time (AoT) Class Loading & Linking
+    * This should result in a faster start
   * Use Compact Object Headers (COH)
+    * This should result in less memory usage
 * Removed `ToJavaSerializer` because the code is in an unmaintainable state
+* Removed a lot of unused code int the `server` module
 * Minor optimizations
 * Updated dependencies
 
