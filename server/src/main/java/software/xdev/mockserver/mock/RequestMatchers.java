@@ -166,7 +166,7 @@ public class RequestMatchers extends MockServerMatcherNotifier
 							if(httpRequestMatcher.update(expectation))
 							{
 								this.httpRequestMatchers.addPriorityKey(httpRequestMatcher);
-								numberOfChanges.getAndIncrement();
+								numberOfChanges.incrementAndGet();
 								if(LOG.isInfoEnabled())
 								{
 									LOG.info(
@@ -183,13 +183,13 @@ public class RequestMatchers extends MockServerMatcherNotifier
 						else
 						{
 							this.addPrioritisedExpectation(expectation, cause);
-							numberOfChanges.getAndIncrement();
+							numberOfChanges.incrementAndGet();
 						}
 					}
 				});
 			existingKeysForCause
 				.forEach(key -> {
-					numberOfChanges.getAndIncrement();
+					numberOfChanges.incrementAndGet();
 					final HttpRequestMatcher httpRequestMatcher = httpRequestMatchersByKey.get(key);
 					this.removeHttpRequestMatcher(httpRequestMatcher, cause, false);
 				});

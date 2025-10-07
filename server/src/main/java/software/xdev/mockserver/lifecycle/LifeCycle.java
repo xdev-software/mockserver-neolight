@@ -16,6 +16,7 @@
 package software.xdev.mockserver.lifecycle;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static software.xdev.mockserver.configuration.ServerConfiguration.configuration;
 import static software.xdev.mockserver.mock.HttpState.setPort;
@@ -92,7 +93,7 @@ public abstract class LifeCycle implements Stoppable
 					.flatMap(channelFuture -> {
 						try
 						{
-							return Stream.of(channelFuture.get());
+							return Stream.of(channelFuture.get(5, MINUTES));
 						}
 						catch(final Exception ex)
 						{
@@ -106,7 +107,7 @@ public abstract class LifeCycle implements Stoppable
 				{
 					for(final ChannelFuture channelFuture : collect)
 					{
-						channelFuture.get();
+						channelFuture.get(5, MINUTES);
 					}
 				}
 				catch(final Exception ex)

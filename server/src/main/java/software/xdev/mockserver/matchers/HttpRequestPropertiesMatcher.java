@@ -218,7 +218,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		this.protocolMatcher = new ExactStringMatcher(protocol != null ? string(protocol.name()) : null);
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidStringBuilderOrBuffer"})
 	@Override
 	public boolean matches(final MatchDifference context, final RequestDefinition requestDefinition)
 	{

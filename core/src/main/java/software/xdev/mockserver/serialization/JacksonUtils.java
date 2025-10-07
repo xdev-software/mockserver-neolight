@@ -16,7 +16,6 @@
 package software.xdev.mockserver.serialization;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UncheckedIOException;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -43,19 +42,14 @@ public final class JacksonUtils
 	
 	public static String prettyPrint(final JsonNode node)
 	{
-		final StringWriter writer = new StringWriter();
-		
 		try
 		{
-			WRITER.writeValue(writer, node);
-			writer.flush();
+			return WRITER.writeValueAsString(node);
 		}
 		catch(final IOException e)
 		{
 			throw new UncheckedIOException(e);
 		}
-		
-		return writer.toString();
 	}
 	
 	private JacksonUtils()

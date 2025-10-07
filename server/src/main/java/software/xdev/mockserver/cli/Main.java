@@ -268,7 +268,7 @@ public final class Main
 			+ "\n]";
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidImplicitlyRecompilingRegex"})
 	private static Map<String, String> parseArguments(final String... arguments)
 	{
 		final Map<String, String> parsedArguments = new HashMap<>();

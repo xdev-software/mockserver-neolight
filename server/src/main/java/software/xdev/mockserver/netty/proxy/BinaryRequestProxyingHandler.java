@@ -18,7 +18,6 @@ package software.xdev.mockserver.netty.proxy;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static software.xdev.mockserver.exception.ExceptionHandling.closeOnFlush;
 import static software.xdev.mockserver.exception.ExceptionHandling.connectionClosedException;
-import static software.xdev.mockserver.formatting.StringFormatter.formatBytes;
 import static software.xdev.mockserver.mock.action.http.HttpActionHandler.getRemoteAddress;
 import static software.xdev.mockserver.model.BinaryMessage.bytes;
 import static software.xdev.mockserver.netty.unification.PortUnificationHandler.isSslEnabledUpstream;
@@ -40,6 +39,7 @@ import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.event.EventBus;
 import software.xdev.mockserver.event.model.EventEntry;
 import software.xdev.mockserver.httpclient.NettyHttpClient;
+import software.xdev.mockserver.logging.BinaryArrayFormatter;
 import software.xdev.mockserver.model.BinaryMessage;
 import software.xdev.mockserver.model.BinaryProxyListener;
 import software.xdev.mockserver.scheduler.Scheduler;
@@ -148,14 +148,7 @@ public class BinaryRequestProxyingHandler extends SimpleChannelInboundHandler<By
 					binaryResponseFuture.get(this.configuration.maxFutureTimeoutInMillis(), MILLISECONDS);
 				if(binaryResponse != null)
 				{
-					if(LOG.isInfoEnabled())
-					{
-						LOG.info(
-							"Returning binary response: {} from: {} for forwarded binary request: {}",
-							formatBytes(binaryResponse.getBytes()),
-							remoteAddress,
-							formatBytes(binaryRequest.getBytes()));
-					}
+					logReturningBinaryResponse(binaryRequest, remoteAddress, binaryResponse);
 					ctx.writeAndFlush(Unpooled.copiedBuffer(binaryResponse.getBytes()));
 				}
 			}
@@ -171,6 +164,21 @@ public class BinaryRequestProxyingHandler extends SimpleChannelInboundHandler<By
 		}, false);
 	}
 	
+	private static void logReturningBinaryResponse(
+		final BinaryMessage binaryRequest,
+		final InetSocketAddress remoteAddress,
+		final BinaryMessage binaryResponse)
+	{
+		if(LOG.isInfoEnabled())
+		{
+			LOG.info(
+				"Returning binary response: {} from: {} for forwarded binary request: {}",
+				BinaryArrayFormatter.byteArrayToString(binaryResponse.getBytes()),
+				remoteAddress,
+				BinaryArrayFormatter.byteArrayToString(binaryRequest.getBytes()));
+		}
+	}
+	
 	private void processWaitingForResponse(
 		final ChannelHandlerContext ctx,
 		final BinaryMessage binaryRequest,
@@ -182,14 +190,7 @@ public class BinaryRequestProxyingHandler extends SimpleChannelInboundHandler<By
 			{
 				final BinaryMessage binaryResponse =
 					binaryResponseFuture.get(this.configuration.maxFutureTimeoutInMillis(), MILLISECONDS);
-				if(LOG.isInfoEnabled())
-				{
-					LOG.info(
-						"Returning binary response: {} from: {} for forwarded binary request: {}",
-						formatBytes(binaryResponse.getBytes()),
-						remoteAddress,
-						formatBytes(binaryRequest.getBytes()));
-				}
+				logReturningBinaryResponse(binaryRequest, remoteAddress, binaryResponse);
 				if(this.binaryExchangeCallback != null)
 				{
 					this.binaryExchangeCallback.onProxy(

@@ -18,10 +18,9 @@ package software.xdev.mockserver.event.model;
 import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,7 +45,7 @@ public class EventEntry implements EventTranslator<EventEntry>
 {
 	private static final RequestDefinition[] EMPTY_REQUEST_DEFINITIONS = new RequestDefinition[0];
 	private static final RequestDefinition[] DEFAULT_REQUESTS_DEFINITIONS = {request()};
-	private final DateFormat logDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	private static final DateTimeFormatter LOG_DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 	private int hashCode;
 	private String id;
 	private String correlationId;
@@ -115,7 +114,7 @@ public class EventEntry implements EventTranslator<EventEntry>
 	{
 		if(this.timestamp == null)
 		{
-			this.timestamp = this.logDateFormat.format(new Date(this.epochTime));
+			this.timestamp = LOG_DTF.format(Instant.ofEpochMilli(this.epochTime));
 		}
 		return this.timestamp;
 	}

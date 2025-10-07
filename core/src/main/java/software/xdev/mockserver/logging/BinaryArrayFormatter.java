@@ -19,6 +19,9 @@ import static software.xdev.mockserver.character.Character.NEW_LINE;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.regex.Pattern;
+
+import io.netty.buffer.ByteBufUtil;
 
 
 public final class BinaryArrayFormatter
@@ -30,16 +33,20 @@ public final class BinaryArrayFormatter
 			return "base64:" + NEW_LINE + "  " + formatFixedLength(Base64.getEncoder().encodeToString(bytes)) + NEW_LINE
 				+ "hex:" + NEW_LINE + "  " + formatFixedLength(bytesToHex(bytes));
 		}
-		else
-		{
-			return "base64:" + NEW_LINE + NEW_LINE
-				+ "hex:" + NEW_LINE;
-		}
+		return "base64:" + NEW_LINE + NEW_LINE
+			+ "hex:" + NEW_LINE;
+	}
+	
+	private static final Pattern PATTERN_FORMAT_FIXED_LENGTH = Pattern.compile("(?<=\\G.{64})");
+	
+	public static String formatFixedLengthHex(final byte[] bytes)
+	{
+		return formatFixedLength(ByteBufUtil.hexDump(bytes));
 	}
 	
 	private static String formatFixedLength(final String s)
 	{
-		return String.join("\n", s.split("(?<=\\G.{64})"));
+		return String.join("\n", PATTERN_FORMAT_FIXED_LENGTH.split(s));
 	}
 	
 	private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes(StandardCharsets.US_ASCII);

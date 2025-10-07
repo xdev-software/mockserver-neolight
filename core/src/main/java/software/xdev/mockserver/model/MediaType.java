@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -99,80 +100,81 @@ public class MediaType
 	public static final MediaType JPEG = new MediaType("image", "jpeg");
 	public static final MediaType PNG = new MediaType("image", "png");
 	
+	protected static final Pattern QUOTE_PATTERN = Pattern.compile("\"");
+	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	public static MediaType parse(final String mediaTypeHeader)
 	{
-		if(isNotBlank(mediaTypeHeader))
-		{
-			final int typeSeparator = mediaTypeHeader.indexOf(TYPE_SEPARATOR);
-			int typeEndIndex = 0;
-			String type = null;
-			String subType = null;
-			if(typeSeparator != -1)
-			{
-				typeEndIndex = mediaTypeHeader.indexOf(PARAMETER_START);
-				if(typeEndIndex == -1)
-				{
-					typeEndIndex = mediaTypeHeader.length();
-				}
-				final String typeString = mediaTypeHeader.substring(0, typeEndIndex).trim();
-				type = substringBefore(typeString, "/").trim().toLowerCase();
-				subType = substringAfter(typeString, "/").trim().toLowerCase();
-				if(typeEndIndex < mediaTypeHeader.length())
-				{
-					typeEndIndex++;
-				}
-			}
-			final String parameters = mediaTypeHeader.substring(typeEndIndex).trim().toLowerCase().replaceAll(
-				"\"",
-				"");
-			Map<String, String> parameterMap = new ConcurrentHashMap<>();
-			if(isNotBlank(parameters))
-			{
-				try
-				{
-					for(final String parameter : parameters.split(";"))
-					{
-						final String parameterTrimmed = parameter.trim();
-						final String key = substringBefore(parameterTrimmed, "=").trim();
-						final String value = substringAfter(parameterTrimmed, "=").trim();
-						if(isNotBlank(key) && isNotBlank(value))
-						{
-							parameterMap.put(
-								key,
-								value
-							);
-						}
-					}
-					if(parameterMap.size() > 1)
-					{
-						// sort if multiple entries to ensure equals and hashcode is consistent
-						parameterMap = parameterMap.entrySet()
-							.stream()
-							.sorted(Map.Entry.comparingByKey())
-							.collect(Collectors.toMap(
-								Map.Entry::getKey,
-								Map.Entry::getValue,
-								(oldValue, newValue) -> oldValue, LinkedHashMap::new
-							));
-					}
-				}
-				catch(final Exception ex)
-				{
-					LOG.warn(
-						"Invalid parameters format \"{}\", expected {} see: {}",
-						parameters,
-						"Content-Type := type \"/\" subtype *[\";\" parameter]\nparameter := attribute \"=\" value",
-						"https://www.w3.org/Protocols/rfc1341/4_Content-Type.html",
-						ex);
-				}
-			}
-			return new MediaType(type, subType, parameterMap);
-		}
-		else
+		if(isBlank(mediaTypeHeader))
 		{
 			return new MediaType(null, null);
 		}
+		final int typeSeparator = mediaTypeHeader.indexOf(TYPE_SEPARATOR);
+		int typeEndIndex = 0;
+		String type = null;
+		String subType = null;
+		if(typeSeparator != -1)
+		{
+			typeEndIndex = mediaTypeHeader.indexOf(PARAMETER_START);
+			if(typeEndIndex == -1)
+			{
+				typeEndIndex = mediaTypeHeader.length();
+			}
+			final String typeString = mediaTypeHeader.substring(0, typeEndIndex).trim();
+			type = substringBefore(typeString, "/").trim().toLowerCase();
+			subType = substringAfter(typeString, "/").trim().toLowerCase();
+			if(typeEndIndex < mediaTypeHeader.length())
+			{
+				typeEndIndex++;
+			}
+		}
+		final String parameters = QUOTE_PATTERN.matcher(mediaTypeHeader
+				.substring(typeEndIndex)
+				.trim()
+				.toLowerCase())
+			.replaceAll("");
+		Map<String, String> parameterMap = new ConcurrentHashMap<>();
+		if(isNotBlank(parameters))
+		{
+			try
+			{
+				for(final String parameter : parameters.split(";"))
+				{
+					final String parameterTrimmed = parameter.trim();
+					final String key = substringBefore(parameterTrimmed, "=").trim();
+					final String value = substringAfter(parameterTrimmed, "=").trim();
+					if(isNotBlank(key) && isNotBlank(value))
+					{
+						parameterMap.put(
+							key,
+							value
+						);
+					}
+				}
+				if(parameterMap.size() > 1)
+				{
+					// sort if multiple entries to ensure equals and hashcode is consistent
+					parameterMap = parameterMap.entrySet()
+						.stream()
+						.sorted(Map.Entry.comparingByKey())
+						.collect(Collectors.toMap(
+							Map.Entry::getKey,
+							Map.Entry::getValue,
+							(oldValue, newValue) -> oldValue, LinkedHashMap::new
+						));
+				}
+			}
+			catch(final Exception ex)
+			{
+				LOG.warn(
+					"Invalid parameters format \"{}\", expected {} see: {}",
+					parameters,
+					"Content-Type := type \"/\" subtype *[\";\" parameter]\nparameter := attribute \"=\" value",
+					"https://www.w3.org/Protocols/rfc1341/4_Content-Type.html",
+					ex);
+			}
+		}
+		return new MediaType(type, subType, parameterMap);
 	}
 	
 	private static TreeMap<String, String> createParametersMap(final Map<String, String> initialValues)
@@ -244,22 +246,22 @@ public class MediaType
 	
 	private String initialiseToString()
 	{
-		final StringBuilder stringBuilder = new StringBuilder();
+		String string = "";
 		if(this.type != null && this.subtype != null)
 		{
-			stringBuilder.append(this.type).append(TYPE_SEPARATOR).append(this.subtype);
+			string = this.type + TYPE_SEPARATOR + this.subtype;
 		}
 		if(!this.parameters.isEmpty())
 		{
-			if(!stringBuilder.isEmpty())
+			if(!string.isEmpty())
 			{
-				stringBuilder.append(PARAMETER_START).append(' ');
+				string += PARAMETER_START + ' ';
 			}
-			stringBuilder.append(this.parameters.entrySet().stream()
+			string += this.parameters.entrySet().stream()
 				.map(e -> e.getKey() + "=" + e.getValue())
-				.collect(Collectors.joining("; ")));
+				.collect(Collectors.joining("; "));
 		}
-		return stringBuilder.toString();
+		return string;
 	}
 	
 	public static MediaType create(final String type, final String subType)

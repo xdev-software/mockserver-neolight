@@ -17,7 +17,10 @@ package software.xdev.mockserver.model;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
+import java.util.WeakHashMap;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,6 +28,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class PathModifier extends ObjectWithJsonToString
 {
+	private static final Map<String, Pattern> REGEX_PATTERN_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
+	
 	private int hashCode;
 	private String regex;
 	@JsonIgnore
@@ -124,7 +129,7 @@ public class PathModifier extends ObjectWithJsonToString
 	{
 		if(this.pattern == null && this.regex != null)
 		{
-			this.pattern = Pattern.compile(this.regex);
+			this.pattern = REGEX_PATTERN_CACHE.computeIfAbsent(this.regex, Pattern::compile);
 		}
 		return this.pattern;
 	}
@@ -136,17 +141,10 @@ public class PathModifier extends ObjectWithJsonToString
 	
 	public String update(final String path)
 	{
-		final Pattern pattern = this.getPattern();
-		if(pattern != null)
+		final Pattern p = this.getPattern();
+		if(p != null)
 		{
-			if(this.substitution != null)
-			{
-				return pattern.matcher(path).replaceAll(this.substitution);
-			}
-			else
-			{
-				return pattern.matcher(path).replaceAll("");
-			}
+			return p.matcher(path).replaceAll(Objects.requireNonNullElse(this.substitution, ""));
 		}
 		return path;
 	}

@@ -19,7 +19,10 @@ import static software.xdev.mockserver.model.NottableString.string;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +35,8 @@ import software.xdev.mockserver.util.StringUtils;
 public class PathParametersDecoder
 {
 	private static final Pattern PATH_VARIABLE_NAME_PATTERN = Pattern.compile("\\{[.;]?([^*]+)\\*?}");
+	private static final Map<String, Pattern> PATH_VARIABLE_PARAMETER_VALUE_CACHE =
+		Collections.synchronizedMap(new WeakHashMap<>());
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	public NottableString normalisePathWithParametersForMatching(final HttpRequest matcher)
@@ -63,18 +68,12 @@ public class PathParametersDecoder
 				}
 				return string(String.join("/", pathParts) + (value.endsWith("/") ? "/" : ""));
 			}
-			else
-			{
-				return matcher.getPath();
-			}
-		}
-		else
-		{
 			return matcher.getPath();
 		}
+		return matcher.getPath();
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidRecompilingPatterns"})
 	public Parameters extractPathParameters(final HttpRequest matcher, final HttpRequest matched)
 	{
 		final Parameters parsedParameters =
@@ -101,7 +100,10 @@ public class PathParametersDecoder
 					final String parameterName = pathParameterName.group(1);
 					final List<String> parameterValues = new ArrayList<>();
 					final Matcher pathParameterValue =
-						Pattern.compile("[.;]?(?:" + parameterName + "=)?([^,]++)[.,;]?").matcher(matchedPathParts[i]);
+						PATH_VARIABLE_PARAMETER_VALUE_CACHE.computeIfAbsent(
+								parameterName,
+								para -> Pattern.compile("[.;]?(?:" + para + "=)?([^,]++)[.,;]?"))
+							.matcher(matchedPathParts[i]);
 					while(pathParameterValue.find())
 					{
 						parameterValues.add(pathParameterValue.group(1));

@@ -65,18 +65,14 @@ public class LoggingHandler extends ChannelDuplexHandler
 		for(i = 0; i < HEXPADDING.length; i++)
 		{
 			final int padding = HEXPADDING.length - i;
-			final StringBuilder buf = new StringBuilder(padding * 3);
-			buf.append("   ".repeat(Math.max(0, padding)));
-			HEXPADDING[i] = buf.toString();
+			HEXPADDING[i] = "   ".repeat(Math.max(0, padding));
 		}
 		
 		// Generate the lookup table for byte dump paddings
 		for(i = 0; i < BYTEPADDING.length; i++)
 		{
 			final int padding = BYTEPADDING.length - i;
-			final StringBuilder buf = new StringBuilder(padding);
-			buf.append(" ".repeat(Math.max(0, padding)));
-			BYTEPADDING[i] = buf.toString();
+			BYTEPADDING[i] = " ".repeat(Math.max(0, padding));
 		}
 		
 		// Generate the lookup table for byte-to-char conversion
@@ -303,13 +299,10 @@ public class LoggingHandler extends ChannelDuplexHandler
 		{
 			return this.formatByteBufHolder(eventName, byteBufHolder);
 		}
-		else
-		{
-			return this.formatNonByteBuf(eventName, msg);
-		}
+		return this.formatNonByteBuf(eventName, msg);
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidStringBuilderOrBuffer"})
 	private String formatByteBuf(final String eventName, final ByteBuf buf)
 	{
 		final int length = buf.readableBytes();
