@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -55,11 +54,9 @@ import software.xdev.mockserver.event.model.RequestAndExpectationId;
 import software.xdev.mockserver.matchers.HttpRequestMatcher;
 import software.xdev.mockserver.matchers.MatcherBuilder;
 import software.xdev.mockserver.mock.Expectation;
-import software.xdev.mockserver.mock.listeners.MockServerEventLogNotifier;
 import software.xdev.mockserver.model.ExpectationId;
 import software.xdev.mockserver.model.LogEventRequestAndResponse;
 import software.xdev.mockserver.model.RequestDefinition;
-import software.xdev.mockserver.scheduler.Scheduler;
 import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.serialization.RequestDefinitionSerializer;
 import software.xdev.mockserver.uuid.UUIDService;
@@ -67,7 +64,7 @@ import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
 
 
-public class EventBus extends MockServerEventLogNotifier
+public class EventBus
 {
 	private static final Logger LOG = LoggerFactory.getLogger(EventBus.class);
 	
@@ -102,10 +99,8 @@ public class EventBus extends MockServerEventLogNotifier
 	
 	public EventBus(
 		final ServerConfiguration configuration,
-		final Scheduler scheduler,
 		final boolean asynchronousEventProcessing)
 	{
-		super(scheduler);
 		this.configuration = configuration;
 		this.matcherBuilder = new MatcherBuilder(configuration);
 		this.requestDefinitionSerializer = new RequestDefinitionSerializer();
@@ -182,14 +177,12 @@ public class EventBus extends MockServerEventLogNotifier
 	private void processLogEntry(final EventEntry eventEntry)
 	{
 		this.eventLog.add(eventEntry.cloneAndClear());
-		this.notifyListeners(this, false);
 	}
 	
 	public void stop()
 	{
 		try
 		{
-			this.notifyListeners(this, true);
 			this.eventLog.clear();
 			this.disruptor.shutdown(2, SECONDS);
 		}
@@ -210,7 +203,6 @@ public class EventBus extends MockServerEventLogNotifier
 			.setConsumer(() -> {
 				this.eventLog.clear();
 				future.complete("done");
-				this.notifyListeners(this, false);
 			})
 		);
 		try
@@ -270,7 +262,6 @@ public class EventBus extends MockServerEventLogNotifier
 					LOG.info("Cleared logs that match: {}", requestDefinition);
 				}
 				future.complete("done");
-				this.notifyListeners(this, false);
 			})
 		);
 		try
@@ -451,13 +442,6 @@ public class EventBus extends MockServerEventLogNotifier
 		);
 	}
 	
-	public Future<String> verify(final Verification verification)
-	{
-		final CompletableFuture<String> result = new CompletableFuture<>();
-		this.verify(verification, result::complete);
-		return result;
-	}
-	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void verify(final Verification verification, final Consumer<String> resultConsumer)
 	{
@@ -531,13 +515,6 @@ public class EventBus extends MockServerEventLogNotifier
 		}
 	}
 	
-	public Future<String> verify(final VerificationSequence verification)
-	{
-		final CompletableFuture<String> result = new CompletableFuture<>();
-		this.verify(verification, result::complete);
-		return result;
-	}
-	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	public void verify(final VerificationSequence verificationSequence, final Consumer<String> resultConsumer)
 	{
@@ -578,7 +555,6 @@ public class EventBus extends MockServerEventLogNotifier
 								{
 									failureMessage = this.verificationSequenceFailureMessage(
 										verificationSequence,
-										logCorrelationId,
 										requestDefinitions);
 									break;
 								}
@@ -587,7 +563,6 @@ public class EventBus extends MockServerEventLogNotifier
 						this.verificationSequenceSuccessMessage(
 							verificationSequence,
 							resultConsumer,
-							logCorrelationId,
 							failureMessage);
 					}
 					catch(final Exception ex)
@@ -595,7 +570,6 @@ public class EventBus extends MockServerEventLogNotifier
 						this.verificationSequenceExceptionHandler(
 							verificationSequence,
 							resultConsumer,
-							logCorrelationId,
 							ex,
 							"exception while processing verification sequence:{}",
 							"exception while processing verification sequence");
@@ -630,7 +604,6 @@ public class EventBus extends MockServerEventLogNotifier
 								{
 									failureMessage = this.verificationSequenceFailureMessage(
 										verificationSequence,
-										logCorrelationId,
 										allRequests);
 									break;
 								}
@@ -639,7 +612,6 @@ public class EventBus extends MockServerEventLogNotifier
 						this.verificationSequenceSuccessMessage(
 							verificationSequence,
 							resultConsumer,
-							logCorrelationId,
 							failureMessage);
 					}
 					catch(final Exception ex)
@@ -647,7 +619,6 @@ public class EventBus extends MockServerEventLogNotifier
 						this.verificationSequenceExceptionHandler(
 							verificationSequence,
 							resultConsumer,
-							logCorrelationId,
 							ex,
 							"exception:{} while processing verification sequence:{}",
 							"exception while processing verification sequence");
@@ -665,7 +636,6 @@ public class EventBus extends MockServerEventLogNotifier
 	private void verificationSequenceSuccessMessage(
 		final VerificationSequence verificationSequence,
 		final Consumer<String> resultConsumer,
-		final String logCorrelationId,
 		final String failureMessage)
 	{
 		if(isBlank(failureMessage) && LOG.isInfoEnabled())
@@ -678,7 +648,6 @@ public class EventBus extends MockServerEventLogNotifier
 	@SuppressWarnings("PMD.UnusedFormalParameter")
 	private String verificationSequenceFailureMessage(
 		final VerificationSequence verificationSequence,
-		final String logCorrelationId,
 		final List<RequestDefinition> allRequests)
 	{
 		final String failureMessage;
@@ -717,7 +686,6 @@ public class EventBus extends MockServerEventLogNotifier
 	private void verificationSequenceExceptionHandler(
 		final VerificationSequence verificationSequence,
 		final Consumer<String> resultConsumer,
-		final String logCorrelationId,
 		final Exception ex,
 		final String s,
 		final String s2)

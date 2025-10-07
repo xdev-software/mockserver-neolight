@@ -16,9 +16,7 @@
 package software.xdev.mockserver.configuration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,17 +46,5 @@ public class IntegerStringListParser
 			}
 		}
 		return integerList;
-	}
-	
-	public String toString(final Integer[] integers)
-	{
-		return this.toString(Arrays.asList(integers));
-	}
-	
-	public String toString(final List<Integer> integers)
-	{
-		return integers.stream()
-			.map(String::valueOf)
-			.collect(Collectors.joining(","));
 	}
 }

@@ -45,7 +45,6 @@ import software.xdev.mockserver.closurecallback.websocketregistry.WebSocketClien
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.event.EventBus;
 import software.xdev.mockserver.event.model.EventEntry;
-import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier.Cause;
 import software.xdev.mockserver.model.Action;
 import software.xdev.mockserver.model.ClearType;
 import software.xdev.mockserver.model.ExpectationId;
@@ -134,7 +133,7 @@ public class HttpState
 		this.scheduler = scheduler;
 		this.webSocketClientRegistry = new WebSocketClientRegistry(configuration);
 		LocalCallbackRegistry.setMaxWebSocketExpectations(configuration.maxWebSocketExpectations());
-		this.eventBus = new EventBus(configuration, scheduler, true);
+		this.eventBus = new EventBus(configuration, true);
 		this.requestMatchers = new RequestMatchers(configuration, scheduler, this.webSocketClientRegistry);
 		if(LOG.isTraceEnabled())
 		{
@@ -241,7 +240,7 @@ public class HttpState
 		final List<Expectation> upsertedExpectations = new ArrayList<>();
 		for(final Expectation expectation : expectations)
 		{
-			upsertedExpectations.add(this.requestMatchers.add(expectation, Cause.API));
+			upsertedExpectations.add(this.requestMatchers.add(expectation));
 		}
 		return upsertedExpectations;
 	}

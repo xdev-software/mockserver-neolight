@@ -16,9 +16,6 @@
 package software.xdev.mockserver.collections;
 
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,13 +23,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 public class CircularPriorityQueue<K, V, SLK extends Keyed<K>>
 {
-	private int maxSize;
+	private final int maxSize;
 	private final Function<V, SLK> skipListKeyFunction;
 	private final Function<V, K> mapKeyFunction;
 	private final ConcurrentSkipListSet<SLK> sortOrderSkipList;
@@ -49,11 +45,6 @@ public class CircularPriorityQueue<K, V, SLK extends Keyed<K>>
 		this.maxSize = maxSize;
 		this.skipListKeyFunction = skipListKeyFunction;
 		this.mapKeyFunction = mapKeyFunction;
-	}
-	
-	public void setMaxSize(final int maxSize)
-	{
-		this.maxSize = maxSize;
 	}
 	
 	public void removePriorityKey(final V element)
@@ -118,18 +109,8 @@ public class CircularPriorityQueue<K, V, SLK extends Keyed<K>>
 		}
 	}
 	
-	public Map<K, V> keyMap()
-	{
-		return new HashMap<>(this.byKey);
-	}
-	
 	public boolean isEmpty()
 	{
 		return this.insertionOrderQueue.isEmpty();
-	}
-	
-	public List<V> toSortedList()
-	{
-		return this.stream().collect(Collectors.toList());
 	}
 }

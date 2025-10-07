@@ -35,7 +35,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import software.xdev.mockserver.configuration.ServerConfiguration;
-import software.xdev.mockserver.lifecycle.ExpectationsListener;
 import software.xdev.mockserver.lifecycle.LifeCycle;
 import software.xdev.mockserver.mock.action.http.HttpActionHandler;
 import software.xdev.mockserver.proxyconfiguration.ProxyConfiguration;
@@ -232,12 +231,5 @@ public class MockServer extends LifeCycle
 	public InetSocketAddress getRemoteAddress()
 	{
 		return this.remoteSocket;
-	}
-	
-	@Override
-	public MockServer registerListener(final ExpectationsListener expectationsListener)
-	{
-		super.registerListener(expectationsListener);
-		return this;
 	}
 }

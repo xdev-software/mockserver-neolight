@@ -28,8 +28,6 @@ import static software.xdev.mockserver.matchers.MatchDifference.Field.QUERY_PARA
 import static software.xdev.mockserver.model.NottableString.string;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -76,7 +74,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 	private final ExpandedParameterDecoder expandedParameterDecoder;
 	private int hashCode;
 	private HttpRequest httpRequest;
-	private List<HttpRequest> httpRequests;
 	private RegexStringMatcher methodMatcher;
 	private RegexStringMatcher pathMatcher;
 	private MultiValueMapMatcher pathParameterMatcher;
@@ -100,12 +97,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 	}
 	
 	@Override
-	public List<HttpRequest> getHttpRequests()
-	{
-		return this.httpRequests;
-	}
-	
-	@Override
 	public boolean apply(final RequestDefinition requestDefinition)
 	{
 		final HttpRequest httpRequest = requestDefinition instanceof final HttpRequest r ? r : null;
@@ -113,7 +104,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		{
 			this.hashCode = 0;
 			this.httpRequest = httpRequest;
-			this.httpRequests = Collections.singletonList(this.httpRequest);
 			if(httpRequest != null)
 			{
 				this.withMethod(httpRequest.getMethod());

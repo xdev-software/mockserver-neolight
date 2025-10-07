@@ -44,7 +44,6 @@ import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.nio.NioIoHandler;
 import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.mock.HttpState;
-import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.scheduler.Scheduler;
 import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.stop.Stoppable;
@@ -300,16 +299,5 @@ public abstract class LifeCycle implements Stoppable
 				"started on port{}",
 				ports.size() == 1 ? ": " + ports.get(0) : "s: " + ports);
 		}
-	}
-	
-	public LifeCycle registerListener(final ExpectationsListener expectationsListener)
-	{
-		this.httpState.getRequestMatchers().registerListener((requestMatchers, cause) -> {
-			if(cause == MockServerMatcherNotifier.Cause.API)
-			{
-				expectationsListener.updated(requestMatchers.retrieveActiveExpectations(null));
-			}
-		});
-		return this;
 	}
 }

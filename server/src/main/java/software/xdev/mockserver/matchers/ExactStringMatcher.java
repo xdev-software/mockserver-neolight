@@ -15,8 +15,6 @@
  */
 package software.xdev.mockserver.matchers;
 
-import static software.xdev.mockserver.model.NottableString.string;
-
 import java.util.Objects;
 
 import software.xdev.mockserver.model.NottableString;
@@ -53,11 +51,6 @@ public class ExactStringMatcher extends BodyMatcher<NottableString>
 		}
 		
 		return false;
-	}
-	
-	public boolean matches(final MatchDifference context, final String matched)
-	{
-		return this.matches(context, string(matched));
 	}
 	
 	@Override
