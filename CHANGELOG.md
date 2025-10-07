@@ -2,6 +2,8 @@
 * Updated docker image to use Java 25
   * Utilize AOT
   * Use Compact Object Headers (COH)
+* Removed `ToJavaSerializer` because the code is in an unmaintainable state
+* Minor optimizations
 * Updated dependencies
 
 # 1.1.3

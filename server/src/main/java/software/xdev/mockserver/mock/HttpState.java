@@ -19,7 +19,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_ACCEPTABLE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static software.xdev.mockserver.logging.LoggingMessages.RECEIVED_REQUEST_MESSAGE_FORMAT;
 import static software.xdev.mockserver.model.HttpRequest.request;
@@ -34,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -67,7 +65,6 @@ import software.xdev.mockserver.serialization.LogEventRequestAndResponseSerializ
 import software.xdev.mockserver.serialization.RequestDefinitionSerializer;
 import software.xdev.mockserver.serialization.VerificationSequenceSerializer;
 import software.xdev.mockserver.serialization.VerificationSerializer;
-import software.xdev.mockserver.serialization.java.ExpectationToJavaSerializer;
 import software.xdev.mockserver.uuid.UUIDService;
 import software.xdev.mockserver.verify.Verification;
 import software.xdev.mockserver.verify.VerificationSequence;
@@ -93,7 +90,6 @@ public class HttpState
 	private LogEventRequestAndResponseSerializer httpRequestResponseSerializer;
 	private ExpectationSerializer expectationSerializer;
 	private ExpectationSerializer expectationSerializerThatSerializesBodyDefault;
-	private ExpectationToJavaSerializer expectationToJavaSerializer;
 	private VerificationSerializer verificationSerializer;
 	private VerificationSequenceSerializer verificationSequenceSerializer;
 	
@@ -324,19 +320,6 @@ public class HttpState
 						}
 						switch(format)
 						{
-							case JAVA:
-								this.eventBus
-									.retrieveRequests(
-										requestDefinition,
-										requests -> {
-											response.withBody(
-												this.getRequestDefinitionSerializer().serialize(requests),
-												MediaType.create("application", "java").withCharset(UTF_8)
-											);
-											httpResponseFuture.complete(response);
-										}
-									);
-								break;
 							case JSON:
 								this.eventBus
 									.retrieveRequests(
@@ -364,12 +347,6 @@ public class HttpState
 						}
 						switch(format)
 						{
-							case JAVA:
-								response.withBody(
-									"JAVA not supported for REQUEST_RESPONSES",
-									MediaType.create("text", "plain").withCharset(UTF_8));
-								httpResponseFuture.complete(response);
-								break;
 							case JSON:
 								this.eventBus
 									.retrieveRequestResponses(
@@ -398,19 +375,6 @@ public class HttpState
 						}
 						switch(format)
 						{
-							case JAVA:
-								this.eventBus
-									.retrieveRecordedExpectations(
-										requestDefinition,
-										requests -> {
-											response.withBody(
-												this.getExpectationToJavaSerializer().serialize(requests),
-												MediaType.create("application", "java").withCharset(UTF_8)
-											);
-											httpResponseFuture.complete(response);
-										}
-									);
-								break;
 							case JSON:
 								this.eventBus
 									.retrieveRecordedExpectations(
@@ -434,11 +398,6 @@ public class HttpState
 							this.requestMatchers.retrieveActiveExpectations(requestDefinition);
 						switch(format)
 						{
-							case JAVA:
-								response.withBody(
-									this.getExpectationToJavaSerializer().serialize(expectations),
-									MediaType.create("application", "java").withCharset(UTF_8));
-								break;
 							case JSON:
 								response.withBody(
 									this.getExpectationSerializer().serialize(expectations),
@@ -496,13 +455,6 @@ public class HttpState
 		}
 	}
 	
-	public Future<String> verify(final Verification verification)
-	{
-		final CompletableFuture<String> result = new CompletableFuture<>();
-		this.verify(verification, result::complete);
-		return result;
-	}
-	
 	public void verify(final Verification verification, final Consumer<String> resultConsumer)
 	{
 		if(verification.getExpectationId() != null)
@@ -511,13 +463,6 @@ public class HttpState
 			verification.withRequest(this.resolveExpectationId(verification.getExpectationId()));
 		}
 		this.eventBus.verify(verification, resultConsumer);
-	}
-	
-	public Future<String> verify(final VerificationSequence verification)
-	{
-		final CompletableFuture<String> result = new CompletableFuture<>();
-		this.verify(verification, result::complete);
-		return result;
 	}
 	
 	public void verify(final VerificationSequence verificationSequence, final Consumer<String> resultConsumer)
@@ -759,15 +704,6 @@ public class HttpState
 			this.expectationSerializerThatSerializesBodyDefault = new ExpectationSerializer(true);
 		}
 		return this.expectationSerializerThatSerializesBodyDefault;
-	}
-	
-	private ExpectationToJavaSerializer getExpectationToJavaSerializer()
-	{
-		if(this.expectationToJavaSerializer == null)
-		{
-			this.expectationToJavaSerializer = new ExpectationToJavaSerializer();
-		}
-		return this.expectationToJavaSerializer;
 	}
 	
 	private VerificationSerializer getVerificationSerializer()

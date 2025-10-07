@@ -160,9 +160,6 @@ class MockServerContainerTest
 				assertTrue(client
 					.retrieveRecordedRequestsAndResponses(request("/"), Format.JSON)
 					.contains("Welcome to nginx!"));
-				assertTrue(client
-					.retrieveRecordedExpectations(request("/"), Format.JAVA)
-					.contains("Welcome to nginx!"));
 			}
 		}
 	}
