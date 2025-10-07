@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 
-@SuppressWarnings("checkstyle:MagicNumber")
+@SuppressWarnings({"checkstyle:MagicNumber", "PMD.GodClass"})
 public class ServerConfigurationProperties extends ConfigurationProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ServerConfigurationProperties.class);
