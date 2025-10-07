@@ -2,6 +2,7 @@
 * Updated docker image to use Java 25
   * Utilize AOT
   * Use Compact Object Headers (COH)
+* Updated dependencies
 
 # 1.1.3
 * Fixed deprecations
