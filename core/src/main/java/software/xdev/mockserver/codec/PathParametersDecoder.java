@@ -57,18 +57,10 @@ public class PathParametersDecoder
 				for(final String pathPart : matcher.getPath().getValue().split("/"))
 				{
 					final Matcher pathParameterName = PATH_VARIABLE_NAME_PATTERN.matcher(pathPart);
-					if(pathParameterName.matches())
-					{
-						pathParts.add(".*");
-					}
-					else
-					{
-						pathParts.add(pathPart);
-					}
+					pathParts.add(pathParameterName.matches() ? ".*" : pathPart);
 				}
 				return string(String.join("/", pathParts) + (value.endsWith("/") ? "/" : ""));
 			}
-			return matcher.getPath();
 		}
 		return matcher.getPath();
 	}
