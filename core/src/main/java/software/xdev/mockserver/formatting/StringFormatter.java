@@ -39,18 +39,19 @@ public final class StringFormatter
 		return indentAndToString(1, objects);
 	}
 	
+	@SuppressWarnings("checkstyle:MagicNumber")
 	public static StringBuilder[] indentAndToString(final int indent, final Object... objects)
 	{
 		final StringBuilder[] indentedObjects = new StringBuilder[objects.length];
 		for(int i = 0; i < objects.length; i++)
 		{
-			indentedObjects[i] =
-				new StringBuilder(NEW_LINE)
-					.append(NEW_LINE)
-					.append(PATTERN_MULTI_LINE_START
-						.matcher(String.valueOf(objects[i]))
-						.replaceAll(INDENTS.get(indent)))
-					.append(NEW_LINE);
+			indentedObjects[i] = new StringBuilder(64) // Default value of 16 is definitely to small here
+				.append(NEW_LINE)
+				.append(NEW_LINE)
+				.append(PATTERN_MULTI_LINE_START
+					.matcher(String.valueOf(objects[i]))
+					.replaceAll(INDENTS.get(indent)))
+				.append(NEW_LINE);
 		}
 		return indentedObjects;
 	}

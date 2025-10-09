@@ -212,46 +212,44 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 	@Override
 	public boolean matches(final MatchDifference context, final RequestDefinition requestDefinition)
 	{
-		if(requestDefinition instanceof final HttpRequest request)
-		{
-			final StringBuilder becauseBuilder = new StringBuilder();
-			final boolean overallMatch = this.matches(context, request, becauseBuilder);
-			if(!this.controlPlaneMatcher)
-			{
-				if(overallMatch)
-				{
-					if(LOG.isInfoEnabled())
-					{
-						LOG.info(
-							this.expectation == null ? REQUEST_DID_MATCH : EXPECTATION_DID_MATCH,
-							request,
-							this.expectation == null ? this : this.expectation.clone());
-					}
-				}
-				else
-				{
-					becauseBuilder.replace(0, 1, "");
-					final String because = becauseBuilder.toString();
-					if(LOG.isInfoEnabled())
-					{
-						LOG.info(
-							this.expectation == null
-								? this.didNotMatchRequestBecause
-								: !becauseBuilder.isEmpty()
-								? this.didNotMatchExpectationBecause
-								: this.didNotMatchExpectationWithoutBecause,
-							request,
-							this.expectation == null ? this : this.expectation.clone(),
-							because);
-					}
-				}
-			}
-			return overallMatch;
-		}
-		else
+		if(!(requestDefinition instanceof final HttpRequest request))
 		{
 			return requestDefinition == null;
 		}
+		
+		final StringBuilder becauseBuilder = new StringBuilder();
+		final boolean overallMatch = this.matches(context, request, becauseBuilder);
+		if(!this.controlPlaneMatcher)
+		{
+			if(overallMatch)
+			{
+				if(LOG.isInfoEnabled())
+				{
+					LOG.info(
+						this.expectation == null ? REQUEST_DID_MATCH : EXPECTATION_DID_MATCH,
+						request,
+						this.expectation == null ? this : this.expectation.clone());
+				}
+			}
+			else
+			{
+				becauseBuilder.replace(0, 1, "");
+				final String because = becauseBuilder.toString();
+				if(LOG.isInfoEnabled())
+				{
+					LOG.info(
+						this.expectation == null
+							? this.didNotMatchRequestBecause
+							: !becauseBuilder.isEmpty()
+							? this.didNotMatchExpectationBecause
+							: this.didNotMatchExpectationWithoutBecause,
+						request,
+						this.expectation == null ? this : this.expectation.clone(),
+						because);
+				}
+			}
+		}
+		return overallMatch;
 	}
 	
 	@SuppressWarnings({
