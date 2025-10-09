@@ -39,7 +39,7 @@ jobs:
         id: find-issue
         if: ${{ always() }}
         run: |
-          echo "number=$(gh issue list -l 'bug' -l 'automated' -L 1 -S 'in:title \"Trivy Vulnerability Report\"' -s 'open' --json 'number' --jq '.[].number')" >> $GITHUB_OUTPUT
+          echo "number=$(gh issue list -l 'bug' -l 'automated' -L 1 -S 'in:title "Trivy Vulnerability Report"' -s 'open' --json 'number' --jq '.[].number')" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -60,7 +60,7 @@ jobs:
 
       - name: Create Issue From File
         if: ${{ failure() && steps.scan_relevant.conclusion == 'failure' }}
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6
         with:
           issue-number: ${{ steps.find-issue.outputs.number }}
           title: Trivy Vulnerability Report

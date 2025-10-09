@@ -81,11 +81,12 @@ public class ParameterBody extends Body<Parameters>
 		return this.parameters;
 	}
 	
+	@SuppressWarnings("PMD.AvoidStringBuilderOrBuffer")
 	@Override
 	public String toString()
 	{
-		final StringBuilder body = new StringBuilder();
 		final List<Parameter> bodyParameters = this.parameters.getEntries();
+		final StringBuilder body = new StringBuilder(16 + bodyParameters.size() * 64);
 		for(int i = 0; i < bodyParameters.size(); i++)
 		{
 			final Parameter parameter = bodyParameters.get(i);

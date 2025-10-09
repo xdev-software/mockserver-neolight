@@ -22,7 +22,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.UNAUTHORIZED;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static software.xdev.mockserver.configuration.ClientConfiguration.clientConfiguration;
-import static software.xdev.mockserver.formatting.StringFormatter.formatLogMessage;
 import static software.xdev.mockserver.model.ExpectationId.expectationId;
 import static software.xdev.mockserver.model.HttpRequest.request;
 import static software.xdev.mockserver.model.MediaType.APPLICATION_JSON_UTF_8;
@@ -371,7 +370,7 @@ public class MockServerClient implements Stoppable
 				if(throwClientException && response != null && response.getStatusCode() != null
 					&& response.getStatusCode() >= 400)
 				{
-					throw new ClientException(formatLogMessage("error:{}while sending request:{}", response, request));
+					throw new ClientException("error: " + response + " while sending request: " + request);
 				}
 				
 				return response;
@@ -1476,10 +1475,8 @@ public class MockServerClient implements Stoppable
 					);
 				if(httpResponse != null && httpResponse.getStatusCode() != 201)
 				{
-					throw new ClientException(formatLogMessage(
-						"error:{}while submitted expectation:{}",
-						httpResponse,
-						expectations[0]));
+					throw new ClientException(
+						"error: " + httpResponse + "while submitted expectation: " + expectations[0]);
 				}
 			}
 			else if(expectations.length > 1)
@@ -1495,10 +1492,8 @@ public class MockServerClient implements Stoppable
 					);
 				if(httpResponse != null && httpResponse.getStatusCode() != 201)
 				{
-					throw new ClientException(formatLogMessage(
-						"error:{}while submitted expectations:{}",
-						httpResponse,
-						expectations));
+					throw new ClientException(
+						"error: " + httpResponse + " while submitted expectations: " + expectations);
 				}
 			}
 			if(httpResponse != null && isNotBlank(httpResponse.getBodyAsString()))

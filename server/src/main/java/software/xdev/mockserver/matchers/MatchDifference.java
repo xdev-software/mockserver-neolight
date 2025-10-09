@@ -37,11 +37,8 @@ public class MatchDifference
 		COOKIES("cookies"),
 		HEADERS("headers"),
 		BODY("body"),
-		SECURE("secure"),
 		PROTOCOL("protocol"),
-		KEEP_ALIVE("keep-alive"),
-		OPERATION("operation"),
-		OPENAPI("openapi");
+		KEEP_ALIVE("keep-alive");
 		
 		private final String name;
 		
@@ -94,11 +91,6 @@ public class MatchDifference
 		return this.httpRequest;
 	}
 	
-	public String getLogCorrelationId()
-	{
-		return this.httpRequest.getLogCorrelationId();
-	}
-	
 	@SuppressWarnings("UnusedReturnValue")
 	protected MatchDifference currentField(final Field fieldName)
 	{
@@ -114,15 +106,5 @@ public class MatchDifference
 	public Map<Field, List<String>> getAllDifferences()
 	{
 		return this.differences;
-	}
-	
-	public void addDifferences(final Map<Field, List<String>> differences)
-	{
-		for(final Field field : differences.keySet())
-		{
-			this.differences
-				.computeIfAbsent(field, key -> new ArrayList<>())
-				.addAll(differences.get(field));
-		}
 	}
 }

@@ -45,18 +45,6 @@ public class NottableStringHashMap
 		}
 	}
 	
-	public NottableStringHashMap(final boolean controlPlaneMatcher, final NottableString[]... keyAndValues)
-	{
-		this.regexStringMatcher = new RegexStringMatcher(controlPlaneMatcher);
-		for(final NottableString[] keyAndValue : keyAndValues)
-		{
-			if(keyAndValue.length >= 2)
-			{
-				this.put(keyAndValue[0], keyAndValue[1]);
-			}
-		}
-	}
-	
 	public boolean containsAll(final MatchDifference context, final NottableStringHashMap subset)
 	{
 		return containsSubset(context, this.regexStringMatcher, subset.entryList(), this.entryList());

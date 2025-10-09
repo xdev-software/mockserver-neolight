@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1-labs
-ARG JAVA_VERSION=21
+ARG JAVA_VERSION=25
 FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine AS jre-base
 
 
@@ -90,14 +90,20 @@ USER ${user}
 
 COPY --from=builder --chown=${user}:${group} builder/server/target/server-standalone.jar ${APP_DIR}/app.jar
 
-# CDS
-RUN java -XX:ArchiveClassesAtExit=app.jsa -Dexit-immediately-after-start=1 -jar app.jar -serverPort 1080
+# AOT
+RUN java \
+  -XX:+UseCompactObjectHeaders \
+  -XX:AOTCacheOutput=app.aot \
+  -Dexit-immediately-after-start=1 \
+  -jar app.jar \
+  -serverPort 1080
 
 # MaxRAMPercentage: Default value is 25% -> we want to use available memory optimal -> increased, but enough is left for other RAM usages like e.g. Metaspace
 # Min/MaxHeapFreeRatio: Default values cause container reserved memory not to shrink properly/waste memory -> decreased
 # https://stackoverflow.com/questions/16058250/what-is-the-purpose-of-xxminheapfreeratio-and-xxmaxheapfreeratio
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 -Djava.awt.headless=true"
-ENV JAVA_CDS_OPTS="-XX:SharedArchiveFile=app.jsa"
+# UseCompactObjectHeaders: https://openjdk.org/jeps/519
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=30 -XX:MaxHeapFreeRatio=50 -XX:+UseCompactObjectHeaders -Djava.awt.headless=true"
+ENV JAVA_AOT_OPTS="-XX:AOTCache=app.aot"
 ENV ARGS="-serverPort 1080"
 
-CMD [ "/bin/sh", "-c", "java $JAVA_OPTS $JAVA_CDS_OPTS -jar app.jar ${ARGS}" ]
+CMD [ "/bin/sh", "-c", "java $JAVA_OPTS $JAVA_AOT_OPTS -jar app.jar ${ARGS}" ]

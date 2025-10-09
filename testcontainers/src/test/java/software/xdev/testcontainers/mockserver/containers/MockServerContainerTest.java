@@ -27,6 +27,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,7 +51,7 @@ class MockServerContainerTest
 	static DockerImageName image;
 	
 	@BeforeAll
-	static void buildImage()
+	static void buildImage() throws TimeoutException
 	{
 		image = DockerImageName.parse(new AdvancedImageFromDockerFile("mockserver")
 			.withLoggerForBuild(LoggerFactory.getLogger("container.build.mockserver"))
@@ -71,7 +73,7 @@ class MockServerContainerTest
 			.withDockerFilePath(Paths.get("../testcontainers/Standalone.Dockerfile"))
 			.withBaseDir(Paths.get("../"))
 			.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
-			.get());
+			.get(5, TimeUnit.MINUTES));
 	}
 	
 	@Test
@@ -157,9 +159,6 @@ class MockServerContainerTest
 				
 				assertTrue(client
 					.retrieveRecordedRequestsAndResponses(request("/"), Format.JSON)
-					.contains("Welcome to nginx!"));
-				assertTrue(client
-					.retrieveRecordedExpectations(request("/"), Format.JAVA)
 					.contains("Welcome to nginx!"));
 			}
 		}

@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.matchers;
 
-import static software.xdev.mockserver.model.NottableString.string;
 import static software.xdev.mockserver.util.StringUtils.isEmpty;
 
 import java.util.Objects;
@@ -54,11 +53,6 @@ public class SubStringMatcher extends BodyMatcher<NottableString>
 		}
 		
 		return false;
-	}
-	
-	public boolean matches(final MatchDifference context, final String matched)
-	{
-		return this.matches(context, string(matched));
 	}
 	
 	@Override

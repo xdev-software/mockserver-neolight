@@ -24,14 +24,9 @@ import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,7 +40,6 @@ import software.xdev.mockserver.configuration.ServerConfiguration;
 import software.xdev.mockserver.matchers.HttpRequestMatcher;
 import software.xdev.mockserver.matchers.MatchDifference;
 import software.xdev.mockserver.matchers.MatcherBuilder;
-import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
 import software.xdev.mockserver.model.Action;
 import software.xdev.mockserver.model.ExpectationId;
 import software.xdev.mockserver.model.HttpObjectCallback;
@@ -54,7 +48,7 @@ import software.xdev.mockserver.model.RequestDefinition;
 import software.xdev.mockserver.scheduler.Scheduler;
 
 
-public class RequestMatchers extends MockServerMatcherNotifier
+public class RequestMatchers
 {
 	private static final Logger LOG = LoggerFactory.getLogger(RequestMatchers.class);
 	
@@ -70,7 +64,6 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		final Scheduler scheduler,
 		final WebSocketClientRegistry webSocketClientRegistry)
 	{
-		super(scheduler);
 		this.configuration = configuration;
 		this.scheduler = scheduler;
 		this.matcherBuilder = new MatcherBuilder(configuration);
@@ -92,7 +85,7 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		}
 	}
 	
-	public Expectation add(final Expectation expectation, final Cause cause)
+	public Expectation add(final Expectation expectation)
 	{
 		Expectation upsertedExpectation = null;
 		if(expectation != null)
@@ -121,90 +114,16 @@ public class RequestMatchers extends MockServerMatcherNotifier
 					}
 					return httpRequestMatcher;
 				})
-				.orElseGet(() -> this.addPrioritisedExpectation(expectation, cause))
+				.orElseGet(() -> this.addPrioritisedExpectation(expectation))
 				.getExpectation();
-			this.notifyListeners(this, cause);
 		}
 		return upsertedExpectation;
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
-	public void update(final Expectation[] expectations, final Cause cause)
-	{
-		final AtomicInteger numberOfChanges = new AtomicInteger(0);
-		if(expectations != null)
-		{
-			final Map<String, HttpRequestMatcher> httpRequestMatchersByKey = this.httpRequestMatchers.keyMap();
-			final Set<String> existingKeysForCause = httpRequestMatchersByKey
-				.entrySet()
-				.stream()
-				.filter(entry -> entry.getValue().getSource().equals(cause))
-				.map(Map.Entry::getKey)
-				.collect(Collectors.toSet());
-			final Set<String> addedIds = new HashSet<>();
-			Arrays
-				.stream(expectations)
-				.forEach(expectation -> {
-					// ensure duplicate ids are skipped in input array
-					if(!addedIds.contains(expectation.getId()))
-					{
-						addedIds.add(expectation.getId());
-						this.expectationRequestDefinitions.put(expectation.getId(), expectation.getHttpRequest());
-						existingKeysForCause.remove(expectation.getId());
-						if(httpRequestMatchersByKey.containsKey(expectation.getId()))
-						{
-							final HttpRequestMatcher httpRequestMatcher =
-								httpRequestMatchersByKey.get(expectation.getId());
-							// update source to new cause
-							httpRequestMatcher.withSource(cause);
-							if(httpRequestMatcher.getExpectation() != null)
-							{
-								// propagate created time from previous entry to avoid re-ordering on update
-								expectation.withCreated(httpRequestMatcher.getExpectation().getCreated());
-							}
-							this.httpRequestMatchers.removePriorityKey(httpRequestMatcher);
-							if(httpRequestMatcher.update(expectation))
-							{
-								this.httpRequestMatchers.addPriorityKey(httpRequestMatcher);
-								numberOfChanges.getAndIncrement();
-								if(LOG.isInfoEnabled())
-								{
-									LOG.info(
-										UPDATED_EXPECTATION_MESSAGE_FORMAT,
-										expectation.clone(),
-										expectation.getId());
-								}
-							}
-							else
-							{
-								this.httpRequestMatchers.addPriorityKey(httpRequestMatcher);
-							}
-						}
-						else
-						{
-							this.addPrioritisedExpectation(expectation, cause);
-							numberOfChanges.getAndIncrement();
-						}
-					}
-				});
-			existingKeysForCause
-				.forEach(key -> {
-					numberOfChanges.getAndIncrement();
-					final HttpRequestMatcher httpRequestMatcher = httpRequestMatchersByKey.get(key);
-					this.removeHttpRequestMatcher(httpRequestMatcher, cause, false);
-				});
-			if(numberOfChanges.get() > 0)
-			{
-				this.notifyListeners(this, cause);
-			}
-		}
-	}
-	
-	private HttpRequestMatcher addPrioritisedExpectation(final Expectation expectation, final Cause cause)
+	private HttpRequestMatcher addPrioritisedExpectation(final Expectation expectation)
 	{
 		final HttpRequestMatcher httpRequestMatcher = this.matcherBuilder.transformsToMatcher(expectation);
 		this.httpRequestMatchers.add(httpRequestMatcher);
-		httpRequestMatcher.withSource(cause);
 		if(LOG.isInfoEnabled())
 		{
 			LOG.info(CREATED_EXPECTATION_MESSAGE_FORMAT, expectation.clone(), expectation.getId());
@@ -217,20 +136,11 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		return this.httpRequestMatchers.size();
 	}
 	
-	public void reset(final Cause cause)
-	{
-		this.httpRequestMatchers.stream()
-			.forEach(httpRequestMatcher -> this.removeHttpRequestMatcher(
-				httpRequestMatcher,
-				cause,
-				false));
-		this.expectationRequestDefinitions.clear();
-		this.notifyListeners(this, cause);
-	}
-	
 	public void reset()
 	{
-		this.reset(Cause.API);
+		this.httpRequestMatchers.stream()
+			.forEach(this::removeHttpRequestMatcher);
+		this.expectationRequestDefinitions.clear();
 	}
 	
 	public Expectation firstMatchingExpectation(final HttpRequest httpRequest)
@@ -238,25 +148,17 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		final Optional<Expectation> first = this.getHttpRequestMatchersCopy()
 			.map(httpRequestMatcher -> {
 				Expectation matchingExpectation = null;
-				boolean remainingMatchesDecremented = false;
 				if(httpRequestMatcher.matches(LOG.isDebugEnabled()
 					? new MatchDifference(this.configuration.detailedMatchFailures(), httpRequest)
 					: null, httpRequest))
 				{
 					matchingExpectation = httpRequestMatcher.getExpectation();
 					httpRequestMatcher.setResponseInProgress(true);
-					if(matchingExpectation.decrementRemainingMatches())
-					{
-						remainingMatchesDecremented = true;
-					}
+					matchingExpectation.decrementRemainingMatches();
 				}
 				else if(!httpRequestMatcher.isResponseInProgress() && !httpRequestMatcher.isActive())
 				{
 					this.scheduler.submit(() -> this.removeHttpRequestMatcher(httpRequestMatcher));
-				}
-				if(remainingMatchesDecremented)
-				{
-					this.notifyListeners(this, Cause.API);
 				}
 				return matchingExpectation;
 			})
@@ -333,16 +235,9 @@ public class RequestMatchers extends MockServerMatcherNotifier
 		return expectation;
 	}
 	
-	private void removeHttpRequestMatcher(final HttpRequestMatcher httpRequestMatcher)
-	{
-		this.removeHttpRequestMatcher(httpRequestMatcher, Cause.API, true);
-	}
-	
 	@SuppressWarnings("rawtypes")
 	private void removeHttpRequestMatcher(
-		final HttpRequestMatcher httpRequestMatcher,
-		final Cause cause,
-		final boolean notifyAndUpdateMetrics)
+		final HttpRequestMatcher httpRequestMatcher)
 	{
 		if(this.httpRequestMatchers.remove(httpRequestMatcher))
 		{
@@ -358,10 +253,6 @@ public class RequestMatchers extends MockServerMatcherNotifier
 				{
 					this.webSocketClientRegistry.unregisterClient(callback.getClientId());
 				}
-			}
-			if(notifyAndUpdateMetrics)
-			{
-				this.notifyListeners(this, cause);
 			}
 		}
 	}
@@ -433,12 +324,6 @@ public class RequestMatchers extends MockServerMatcherNotifier
 	public boolean isEmpty()
 	{
 		return this.httpRequestMatchers.isEmpty();
-	}
-	
-	@Override
-	protected void notifyListeners(final RequestMatchers notifier, final Cause cause)
-	{
-		super.notifyListeners(notifier, cause);
 	}
 	
 	private Stream<HttpRequestMatcher> getHttpRequestMatchersCopy()

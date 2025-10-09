@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.configuration;
 
-import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.logging.MockServerLoggerConfiguration.configureLogger;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
@@ -24,16 +23,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 
-@SuppressWarnings("checkstyle:MagicNumber")
+@SuppressWarnings({"checkstyle:MagicNumber", "PMD.GodClass"})
 public class ServerConfigurationProperties extends ConfigurationProperties
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ServerConfigurationProperties.class);
@@ -833,7 +832,7 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 		setProperty(MOCKSERVER_LIVENESS_HTTP_GET_PATH, livenessPath);
 	}
 	
-	@SuppressWarnings({"ConstantConditions", "PMD.CognitiveComplexity"})
+	@SuppressWarnings({"ConstantConditions", "PMD.CognitiveComplexity", "java:S2629"})
 	private static Properties readPropertyFile()
 	{
 		final Properties properties = new Properties();
@@ -875,30 +874,13 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 				}
 			}
 		}
-		catch(final IOException ioe)
+		catch(final IOException ignore)
 		{
 			// ignore
 		}
 		
 		if(!properties.isEmpty())
 		{
-			final Enumeration<?> propertyNames = properties.propertyNames();
-			
-			final StringBuilder propertiesLogDump = new StringBuilder(50);
-			propertiesLogDump.append("Reading properties from property file [")
-				.append(propertyFile())
-				.append("]:")
-				.append(NEW_LINE);
-			while(propertyNames.hasMoreElements())
-			{
-				final String propertyName = String.valueOf(propertyNames.nextElement());
-				propertiesLogDump.append("  ")
-					.append(propertyName)
-					.append(" = ")
-					.append(properties.getProperty(propertyName))
-					.append(NEW_LINE);
-			}
-			
 			final Level logLevel =
 				Level.valueOf(getSLF4JOrJavaLoggerToSLF4JLevelMapping().get(readPropertyHierarchically(
 					properties,
@@ -907,7 +889,13 @@ public class ServerConfigurationProperties extends ConfigurationProperties
 					DEFAULT_LOG_LEVEL).toUpperCase()));
 			if(LOG.isEnabledForLevel(logLevel))
 			{
-				LOG.info(propertiesLogDump.toString());
+				LOG.info(
+					"Reading properties from property file [{}]:\n{}",
+					propertyFile(),
+					properties.entrySet()
+						.stream()
+						.map(e -> e.getKey() + "=" + e.getValue())
+						.collect(Collectors.joining("\n")));
 			}
 		}
 		

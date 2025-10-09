@@ -351,13 +351,10 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 		{
 			final String portExtension =
 				this.calculatePortExtension(inetSocketAddress, isSslEnabledUpstream(ctx.channel()));
-			final PortBinding cacheKey = new PortBinding(inetSocketAddress, portExtension);
-			localAddresses = LOCAL_ADDRESSES_CACHE.get(cacheKey);
-			if(localAddresses == null)
-			{
-				localAddresses = this.calculateLocalAddresses(inetSocketAddress, portExtension);
-				LOCAL_ADDRESSES_CACHE.put(cacheKey, localAddresses);
-			}
+			
+			localAddresses = LOCAL_ADDRESSES_CACHE.computeIfAbsent(
+				new PortBinding(inetSocketAddress, portExtension),
+				pb -> this.calculateLocalAddresses(pb.inetSocketAddress(), pb.portExtension()));
 		}
 		return (localAddresses == null) ? Collections.emptySet() : localAddresses;
 	}
@@ -426,5 +423,9 @@ public class PortUnificationHandler extends ReplayingDecoder<Void>
 			}
 		}
 		closeOnFlush(ctx.channel());
+	}
+	
+	record PortBinding(InetSocketAddress inetSocketAddress, String portExtension)
+	{
 	}
 }

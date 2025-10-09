@@ -17,11 +17,8 @@ package software.xdev.mockserver.collections;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -126,95 +123,5 @@ public class ImmutableEntry extends Pair<NottableString, NottableString>
 	public int hashCode()
 	{
 		return Objects.hash(this.key, this.value);
-	}
-	
-	public static <T> boolean listsEqual(final List<T> matcher, final List<T> matched)
-	{
-		boolean matches = false;
-		if(matcher.size() == matched.size())
-		{
-			final Set<Integer> matchedIndexes = new HashSet<>();
-			final Set<Integer> matcherIndexes = new HashSet<>();
-			for(int i = 0; i < matcher.size(); i++)
-			{
-				final T matcherItem = matcher.get(i);
-				for(int j = 0; j < matched.size(); j++)
-				{
-					final T matchedItem = matched.get(j);
-					if(matcherItem != null && matcherItem.equals(matchedItem))
-					{
-						matchedIndexes.add(j);
-						matcherIndexes.add(i);
-					}
-				}
-			}
-			matches = matchedIndexes.size() == matched.size() && matcherIndexes.size() == matcher.size();
-		}
-		return matches;
-	}
-	
-	@SuppressWarnings("PMD.CognitiveComplexity")
-	public static boolean listsEqualWithOptionals(
-		final RegexStringMatcher regexStringMatcher,
-		final List<ImmutableEntry> matcher,
-		final List<ImmutableEntry> matched)
-	{
-		final Set<Integer> matchingMatchedIndexes = new HashSet<>();
-		final Set<Integer> matchingMatcherIndexes = new HashSet<>();
-		final Set<NottableString> matcherKeys = new HashSet<>();
-		matcher.forEach(matcherItem -> matcherKeys.add(matcherItem.getKey()));
-		final Set<NottableString> matchedKeys = new HashSet<>();
-		matched.forEach(matchedItem -> matchedKeys.add(matchedItem.getKey()));
-		for(int i = 0; i < matcher.size(); i++)
-		{
-			final ImmutableEntry matcherItem = matcher.get(i);
-			if(matcherItem != null)
-			{
-				for(int j = 0; j < matched.size(); j++)
-				{
-					final ImmutableEntry matchedItem = matched.get(j);
-					if(matchedItem != null)
-					{
-						if(matcherItem.equals(matchedItem))
-						{
-							matchingMatchedIndexes.add(j);
-							matchingMatcherIndexes.add(i);
-						}
-						else if(matcherItem.getKey().isOptional() && !contains(
-							regexStringMatcher,
-							matchedKeys,
-							matcherItem.getKey()))
-						{
-							matchingMatchedIndexes.add(j);
-							matchingMatcherIndexes.add(i);
-						}
-						else if(matchedItem.getKey().isOptional() && !contains(
-							regexStringMatcher,
-							matcherKeys,
-							matchedItem.getKey()))
-						{
-							matchingMatchedIndexes.add(j);
-							matchingMatcherIndexes.add(i);
-						}
-					}
-				}
-			}
-		}
-		return matchingMatchedIndexes.size() == matched.size() && matchingMatcherIndexes.size() == matcher.size();
-	}
-	
-	private static boolean contains(
-		final RegexStringMatcher regexStringMatcher,
-		final Set<NottableString> matchedKeys,
-		final NottableString matcherItem)
-	{
-		for(final NottableString matchedKey : matchedKeys)
-		{
-			if(regexStringMatcher.matches(matchedKey, matcherItem))
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 }

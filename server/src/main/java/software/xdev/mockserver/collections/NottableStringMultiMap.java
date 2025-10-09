@@ -19,7 +19,6 @@ import static software.xdev.mockserver.collections.ImmutableEntry.entry;
 import static software.xdev.mockserver.collections.SubSetMatcher.containsSubset;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,26 +48,6 @@ public class NottableStringMultiMap
 		for(final KeyToMultiValue keyToMultiValue : entries)
 		{
 			this.backingMap.put(keyToMultiValue.getName(), keyToMultiValue.getValues());
-		}
-	}
-	
-	public NottableStringMultiMap(
-		final boolean controlPlaneMatcher,
-		final KeyMatchStyle keyMatchStyle,
-		final NottableString[]... keyAndValues)
-	{
-		this.keyMatchStyle = keyMatchStyle;
-		this.regexStringMatcher = new RegexStringMatcher(controlPlaneMatcher);
-		for(final NottableString[] keyAndValue : keyAndValues)
-		{
-			if(keyAndValue.length > 0)
-			{
-				this.backingMap.put(
-					keyAndValue[0],
-					keyAndValue.length > 1
-						? Arrays.asList(keyAndValue).subList(1, keyAndValue.length)
-						: Collections.emptyList());
-			}
 		}
 	}
 	

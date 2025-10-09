@@ -15,8 +15,6 @@
  */
 package software.xdev.mockserver.matchers;
 
-import static software.xdev.mockserver.model.NottableString.string;
-
 import java.util.Objects;
 import java.util.regex.PatternSyntaxException;
 
@@ -44,11 +42,6 @@ public class RegexStringMatcher extends BodyMatcher<NottableString>
 	{
 		this.controlPlaneMatcher = controlPlaneMatcher;
 		this.matcher = matcher;
-	}
-	
-	public boolean matches(final String matched)
-	{
-		return this.matches((MatchDifference)null, string(matched));
 	}
 	
 	@Override

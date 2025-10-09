@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public class CircularConcurrentLinkedDeque<E> extends ConcurrentLinkedDeque<E>
 {
-	private int maxSize;
+	private final int maxSize;
 	private final Consumer<E> onEvictCallback;
 	
 	public CircularConcurrentLinkedDeque(final int maxSize, final Consumer<E> onEvictCallback)
@@ -31,58 +31,45 @@ public class CircularConcurrentLinkedDeque<E> extends ConcurrentLinkedDeque<E>
 		this.onEvictCallback = onEvictCallback;
 	}
 	
-	public void setMaxSize(final int maxSize)
-	{
-		this.maxSize = maxSize;
-	}
-	
 	@Override
 	public boolean add(final E element)
 	{
-		if(this.maxSize > 0)
-		{
-			this.evictExcessElements();
-			return super.add(element);
-		}
-		else
+		if(this.maxSize <= 0)
 		{
 			return false;
 		}
+		
+		this.evictExcessElements();
+		return super.add(element);
 	}
 	
 	@Override
 	public boolean addAll(final Collection<? extends E> collection)
 	{
-		if(this.maxSize > 0)
-		{
-			boolean result = false;
-			for(final E element : collection)
-			{
-				if(this.add(element))
-				{
-					result = true;
-				}
-			}
-			return result;
-		}
-		else
+		if(this.maxSize <= 0)
 		{
 			return false;
 		}
+		boolean result = false;
+		for(final E element : collection)
+		{
+			if(this.add(element))
+			{
+				result = true;
+			}
+		}
+		return result;
 	}
 	
 	@Override
 	public boolean offer(final E element)
 	{
-		if(this.maxSize > 0)
-		{
-			this.evictExcessElements();
-			return super.offer(element);
-		}
-		else
+		if(this.maxSize <= 0)
 		{
 			return false;
 		}
+		this.evictExcessElements();
+		return super.offer(element);
 	}
 	
 	private void evictExcessElements()

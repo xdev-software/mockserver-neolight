@@ -28,8 +28,6 @@ import static software.xdev.mockserver.matchers.MatchDifference.Field.QUERY_PARA
 import static software.xdev.mockserver.model.NottableString.string;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -76,7 +74,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 	private final ExpandedParameterDecoder expandedParameterDecoder;
 	private int hashCode;
 	private HttpRequest httpRequest;
-	private List<HttpRequest> httpRequests;
 	private RegexStringMatcher methodMatcher;
 	private RegexStringMatcher pathMatcher;
 	private MultiValueMapMatcher pathParameterMatcher;
@@ -100,12 +97,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 	}
 	
 	@Override
-	public List<HttpRequest> getHttpRequests()
-	{
-		return this.httpRequests;
-	}
-	
-	@Override
 	public boolean apply(final RequestDefinition requestDefinition)
 	{
 		final HttpRequest httpRequest = requestDefinition instanceof final HttpRequest r ? r : null;
@@ -113,7 +104,6 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		{
 			this.hashCode = 0;
 			this.httpRequest = httpRequest;
-			this.httpRequests = Collections.singletonList(this.httpRequest);
 			if(httpRequest != null)
 			{
 				this.withMethod(httpRequest.getMethod());
@@ -218,50 +208,48 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		this.protocolMatcher = new ExactStringMatcher(protocol != null ? string(protocol.name()) : null);
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidStringBuilderOrBuffer"})
 	@Override
 	public boolean matches(final MatchDifference context, final RequestDefinition requestDefinition)
 	{
-		if(requestDefinition instanceof final HttpRequest request)
-		{
-			final StringBuilder becauseBuilder = new StringBuilder();
-			final boolean overallMatch = this.matches(context, request, becauseBuilder);
-			if(!this.controlPlaneMatcher)
-			{
-				if(overallMatch)
-				{
-					if(LOG.isInfoEnabled())
-					{
-						LOG.info(
-							this.expectation == null ? REQUEST_DID_MATCH : EXPECTATION_DID_MATCH,
-							request,
-							this.expectation == null ? this : this.expectation.clone());
-					}
-				}
-				else
-				{
-					becauseBuilder.replace(0, 1, "");
-					final String because = becauseBuilder.toString();
-					if(LOG.isInfoEnabled())
-					{
-						LOG.info(
-							this.expectation == null
-								? this.didNotMatchRequestBecause
-								: !becauseBuilder.isEmpty()
-								? this.didNotMatchExpectationBecause
-								: this.didNotMatchExpectationWithoutBecause,
-							request,
-							this.expectation == null ? this : this.expectation.clone(),
-							because);
-					}
-				}
-			}
-			return overallMatch;
-		}
-		else
+		if(!(requestDefinition instanceof final HttpRequest request))
 		{
 			return requestDefinition == null;
 		}
+		
+		final StringBuilder becauseBuilder = new StringBuilder();
+		final boolean overallMatch = this.matches(context, request, becauseBuilder);
+		if(!this.controlPlaneMatcher)
+		{
+			if(overallMatch)
+			{
+				if(LOG.isInfoEnabled())
+				{
+					LOG.info(
+						this.expectation == null ? REQUEST_DID_MATCH : EXPECTATION_DID_MATCH,
+						request,
+						this.expectation == null ? this : this.expectation.clone());
+				}
+			}
+			else
+			{
+				becauseBuilder.replace(0, 1, "");
+				final String because = becauseBuilder.toString();
+				if(LOG.isInfoEnabled())
+				{
+					LOG.info(
+						this.expectation == null
+							? this.didNotMatchRequestBecause
+							: !becauseBuilder.isEmpty()
+							? this.didNotMatchExpectationBecause
+							: this.didNotMatchExpectationWithoutBecause,
+						request,
+						this.expectation == null ? this : this.expectation.clone(),
+						because);
+				}
+			}
+		}
+		return overallMatch;
 	}
 	
 	@SuppressWarnings({

@@ -15,18 +15,12 @@
  */
 package software.xdev.mockserver.matchers;
 
-import java.util.List;
-
 import software.xdev.mockserver.mock.Expectation;
-import software.xdev.mockserver.mock.listeners.MockServerMatcherNotifier;
-import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.RequestDefinition;
 
 
 public interface HttpRequestMatcher extends Matcher<RequestDefinition>
 {
-	List<HttpRequest> getHttpRequests();
-	
 	boolean matches(final RequestDefinition request);
 	
 	@Override
@@ -42,11 +36,6 @@ public interface HttpRequestMatcher extends Matcher<RequestDefinition>
 	HttpRequestMatcher setResponseInProgress(boolean responseInProgress);
 	
 	boolean isResponseInProgress();
-	
-	MockServerMatcherNotifier.Cause getSource();
-	
-	@SuppressWarnings("UnusedReturnValue")
-	HttpRequestMatcher withSource(MockServerMatcherNotifier.Cause source);
 	
 	boolean isActive();
 }

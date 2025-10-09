@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,8 @@ import software.xdev.mockserver.util.StringUtils;
 public class ConfigurationProperties
 {
 	protected static final Logger LOG = LoggerFactory.getLogger(ConfigurationProperties.class);
+	
+	protected static final Pattern UNESCAPE_QUOTES_PATTERN = Pattern.compile("(^\")|(\"$)");
 	
 	protected static final String MOCKSERVER_MAX_WEB_SOCKET_EXPECTATIONS = "mockserver.maxWebSocketExpectations";
 	
@@ -519,26 +522,25 @@ public class ConfigurationProperties
 		{
 			return cachedPropertyValue;
 		}
-		else
+		
+		if(isBlank(environmentVariableKey))
 		{
-			if(isBlank(environmentVariableKey))
-			{
-				throw new IllegalArgumentException("environment property name cannot be null for " + systemPropertyKey);
-			}
-			final String defaultOrEnvironmentVariable = isNotBlank(System.getenv(environmentVariableKey))
-				? System.getenv(environmentVariableKey)
-				: defaultValue;
-			String propertyValue = System.getProperty(
-				systemPropertyKey,
-				properties != null
-					? properties.getProperty(systemPropertyKey, defaultOrEnvironmentVariable)
-					: defaultOrEnvironmentVariable);
-			if(propertyValue != null && propertyValue.startsWith("\"") && propertyValue.endsWith("\""))
-			{
-				propertyValue = propertyValue.replaceAll("(^\")|(\"$)", "");
-			}
-			getPropertyCache().put(systemPropertyKey, propertyValue);
-			return propertyValue;
+			throw new IllegalArgumentException("environment property name cannot be null for " + systemPropertyKey);
 		}
+		
+		final String defaultOrEnvironmentVariable = isNotBlank(System.getenv(environmentVariableKey))
+			? System.getenv(environmentVariableKey)
+			: defaultValue;
+		String propertyValue = System.getProperty(
+			systemPropertyKey,
+			properties != null
+				? properties.getProperty(systemPropertyKey, defaultOrEnvironmentVariable)
+				: defaultOrEnvironmentVariable);
+		if(propertyValue != null && propertyValue.startsWith("\"") && propertyValue.endsWith("\""))
+		{
+			propertyValue = UNESCAPE_QUOTES_PATTERN.matcher(propertyValue).replaceAll("");
+		}
+		getPropertyCache().put(systemPropertyKey, propertyValue);
+		return propertyValue;
 	}
 }
