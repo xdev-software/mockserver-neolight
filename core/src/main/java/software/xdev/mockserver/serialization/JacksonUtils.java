@@ -1,0 +1,58 @@
+/*
+ * Copyright © 2024 XDEV Software (https://xdev.software)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package software.xdev.mockserver.serialization;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
+
+/**
+ * Emulation of
+ * https://github.com/fge/jackson-coreutils/blob/master/src/main/java/com/github/fge/jackson/JacksonUtils.java
+ */
+public final class JacksonUtils
+{
+	private static final ObjectWriter WRITER = new ObjectMapper()
+		.setNodeFactory(JsonNodeFactory.instance)
+		.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+		.enable(SerializationFeature.INDENT_OUTPUT)
+		.writer()
+		.with(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN);
+	
+	public static String prettyPrint(final JsonNode node)
+	{
+		try
+		{
+			return WRITER.writeValueAsString(node);
+		}
+		catch(final IOException e)
+		{
+			throw new UncheckedIOException(e);
+		}
+	}
+	
+	private JacksonUtils()
+	{
+	}
+}
