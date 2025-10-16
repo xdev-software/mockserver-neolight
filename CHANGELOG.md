@@ -1,3 +1,6 @@
+# 1.3.0
+* Update Testcontainers to v2
+
 # 1.2.0
 * Updated docker image to use Java 25
   * Use Ahead-of-Time (AoT) Class Loading & Linking

@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.mockserver</groupId>
 	<artifactId>core</artifactId>
-	<version>1.2.1-SNAPSHOT</version>
+	<version>1.3.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>core</name>
@@ -61,7 +61,7 @@
 			<dependency>
 				<groupId>io.netty</groupId>
 				<artifactId>netty-bom</artifactId>
-				<version>4.2.6.Final</version>
+				<version>4.2.7.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -281,7 +281,7 @@
 							<dependency>
 								<groupId>com.puppycrawl.tools</groupId>
 								<artifactId>checkstyle</artifactId>
-								<version>11.1.0</version>
+								<version>12.0.1</version>
 							</dependency>
 						</dependencies>
 						<configuration>
@@ -306,7 +306,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-pmd-plugin</artifactId>
-						<version>3.27.0</version>
+						<version>3.28.0</version>
 						<configuration>
 							<analysisCache>true</analysisCache>
 							<includeTests>true</includeTests>

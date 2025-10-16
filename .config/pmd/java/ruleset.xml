@@ -204,7 +204,7 @@
 
 	<rule name="AvoidStringBuilderOrBuffer"
 		language="java"
-		message="StringBuilder/ should not be used"
+		message="StringBuilder/StringBuffer should not be used"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>
 			Usually all cases where `StringBuilder` (or the outdated `StringBuffer`) is used are either due to confusing (legacy) logic or may be replaced by a simpler string concatenation.
@@ -310,6 +310,28 @@
 				<value>
 <![CDATA[
 //MethodCall[pmd-java:matchesSig('java.lang.Thread#start()') or pmd-java:matchesSig('java.lang.Thread#startVirtualThread(java.lang.Runnable)') or pmd-java:matchesSig('java.lang.Thread$Builder#start(java.lang.Runnable)')]
+]]>
+				</value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule name="EnsureZipEntryNameIsSanitized"
+		language="java"
+		message="ZipEntry name should be sanitized"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>
+			ZipEntry name should be sanitized.
+			Unsanitized names may contain '..' which can result in path traversal ("ZipSlip").
+
+			You can suppress this warning when you properly sanitized the name.
+		</description>
+		<priority>4</priority>
+		<properties>
+			<property name="xpath">
+				<value>
+<![CDATA[
+//MethodCall[pmd-java:matchesSig('java.util.zip.ZipEntry#getName()') or pmd-java:matchesSig('org.apache.commons.compress.archivers.ArchiveEntry#getName()')]
 ]]>
 				</value>
 			</property>
