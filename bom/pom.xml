@@ -6,7 +6,7 @@
 
 	<groupId>software.xdev.mockserver</groupId>
 	<artifactId>bom</artifactId>
-	<version>1.2.1-SNAPSHOT</version>
+	<version>1.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>bom</name>
@@ -51,22 +51,22 @@
 			<dependency>
 				<groupId>software.xdev.mockserver</groupId>
 				<artifactId>client</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
+				<version>1.3.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.mockserver</groupId>
 				<artifactId>core</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
+				<version>1.3.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.mockserver</groupId>
 				<artifactId>server</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
+				<version>1.3.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>software.xdev.mockserver</groupId>
 				<artifactId>testcontainers</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
+				<version>1.3.0-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
