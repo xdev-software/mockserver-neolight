@@ -1,5 +1,6 @@
 # 1.3.0
 * Update Testcontainers to v2
+* Updated dependencies
 
 # 1.2.0
 * Updated docker image to use Java 25
