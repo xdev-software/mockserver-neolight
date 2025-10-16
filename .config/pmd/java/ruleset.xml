@@ -316,6 +316,28 @@
 		</properties>
 	</rule>
 
+	<rule name="EnsureZipEntryNameIsSanitized"
+		language="java"
+		message="ZipEntry name should be sanitized"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>
+			ZipEntry name should be sanitized.
+			Unsanitized names may contain '..' which can result in path traversal ("ZipSlip").
+
+			You can suppress this warning when you properly sanitized the name.
+		</description>
+		<priority>4</priority>
+		<properties>
+			<property name="xpath">
+				<value>
+<![CDATA[
+//MethodCall[pmd-java:matchesSig('java.util.zip.ZipEntry#getName()') or pmd-java:matchesSig('org.apache.commons.compress.archivers.ArchiveEntry#getName()')]
+]]>
+				</value>
+			</property>
+		</properties>
+	</rule>
+
 	<rule name="JavaObjectSerializationIsUnsafe"
 		language="java"
 		message="Using Java Object (De-)Serialization is unsafe and has led to too many security vulnerabilities"
