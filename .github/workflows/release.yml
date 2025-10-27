@@ -224,7 +224,7 @@ jobs:
         git pull
 
     - name: Download server JAR
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: server-standalone
         path: server/target
