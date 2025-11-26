@@ -34,7 +34,7 @@ public class HttpResponseDTOSerializer extends StdSerializer<HttpResponseDTO>
 		super(HttpResponseDTO.class);
 	}
 	
-	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
+	@SuppressWarnings({"PMD.NPathComplexity"})
 	@Override
 	public void serialize(
 		final HttpResponseDTO httpResponseDTO,

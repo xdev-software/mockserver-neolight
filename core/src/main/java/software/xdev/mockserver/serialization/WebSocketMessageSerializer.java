@@ -28,7 +28,7 @@ import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.serialization.model.WebSocketMessageDTO;
 
 
-@SuppressWarnings({"rawtypes", "unchecked", "PMD"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class WebSocketMessageSerializer
 {
 	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);

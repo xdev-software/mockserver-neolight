@@ -47,7 +47,6 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
 		super(RequestDefinitionDTO.class);
 	}
 	
-	@SuppressWarnings("PMD.NcssCount")
 	@Override
 	public RequestDefinitionDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
 		throws IOException

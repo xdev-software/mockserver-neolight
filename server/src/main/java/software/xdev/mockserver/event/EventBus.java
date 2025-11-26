@@ -515,7 +515,7 @@ public class EventBus
 		}
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
 	public void verify(final VerificationSequence verificationSequence, final Consumer<String> resultConsumer)
 	{
 		if(verificationSequence != null)
@@ -632,7 +632,6 @@ public class EventBus
 		}
 	}
 	
-	@SuppressWarnings("PMD.UnusedFormalParameter")
 	private void verificationSequenceSuccessMessage(
 		final VerificationSequence verificationSequence,
 		final Consumer<String> resultConsumer,
@@ -645,7 +644,6 @@ public class EventBus
 		resultConsumer.accept(failureMessage);
 	}
 	
-	@SuppressWarnings("PMD.UnusedFormalParameter")
 	private String verificationSequenceFailureMessage(
 		final VerificationSequence verificationSequence,
 		final List<RequestDefinition> allRequests)
@@ -682,7 +680,6 @@ public class EventBus
 		return failureMessage;
 	}
 	
-	@SuppressWarnings("PMD.UnusedFormalParameter")
 	private void verificationSequenceExceptionHandler(
 		final VerificationSequence verificationSequence,
 		final Consumer<String> resultConsumer,

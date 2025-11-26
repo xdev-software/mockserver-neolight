@@ -277,11 +277,8 @@ public class HttpState
 	@SuppressWarnings({
 		"checkstyle:MethodLength",
 		"checkstyle:MagicNumber",
-		"PMD.NcssCount",
 		"PMD.CognitiveComplexity",
-		"PMD.CyclomaticComplexity",
-		"PMD.PreserveStackTrace",
-		"PMD.SwitchDensity"})
+		"PMD.PreserveStackTrace"})
 	public HttpResponse retrieve(final HttpRequest request)
 	{
 		final String logCorrelationId = UUIDService.getUUID();

@@ -36,7 +36,6 @@ public class HttpResponseSerializer implements Serializer<HttpResponse>
 	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
 	
-	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
 	public String serialize(final HttpResponse httpResponse)
 	{

@@ -78,7 +78,7 @@ public class RegexStringMatcher extends BodyMatcher<NottableString>
 		}
 	}
 	
-	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
+	@SuppressWarnings({"PMD.CognitiveComplexity"})
 	private boolean matchesByStrings(
 		final MatchDifference context,
 		final NottableString matcher,

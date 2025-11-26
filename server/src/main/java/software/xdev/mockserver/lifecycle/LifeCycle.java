@@ -77,7 +77,6 @@ public abstract class LifeCycle implements Stoppable
 		this.httpState = new HttpState(this.configuration, this.scheduler);
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
 	public CompletableFuture<Void> stopAsync()
 	{
 		if(!this.stopFuture.isDone() && this.stopping.compareAndSet(false, true))

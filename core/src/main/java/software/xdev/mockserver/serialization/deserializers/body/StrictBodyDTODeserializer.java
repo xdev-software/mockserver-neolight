@@ -78,7 +78,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
 		"PMD.CognitiveComplexity",
 		"PMD.NPathComplexity",
 		"PMD.CyclomaticComplexity",
-		"PMD.NcssCount",
 		"PMD.AvoidDeeplyNestedIfStmts"})
 	@Override
 	public BodyDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException

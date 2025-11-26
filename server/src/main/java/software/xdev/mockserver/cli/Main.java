@@ -44,7 +44,6 @@ import software.xdev.mockserver.logging.MockServerLoggerConfiguration;
 import software.xdev.mockserver.netty.MockServer;
 
 
-@SuppressWarnings("PMD.GodClass")
 public final class Main
 {
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);

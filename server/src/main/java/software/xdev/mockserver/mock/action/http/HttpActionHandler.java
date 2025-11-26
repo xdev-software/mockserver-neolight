@@ -105,7 +105,6 @@ public class HttpActionHandler
 	
 	@SuppressWarnings({
 		"checkstyle:MethodLength",
-		"PMD.NcssCount",
 		"PMD.CognitiveComplexity",
 		"PMD.CyclomaticComplexity",
 		"PMD.NPathComplexity"
