@@ -15,16 +15,13 @@
  */
 package software.xdev.mockserver.serialization.serializers.response;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.serialization.model.BinaryBodyDTO;
 import software.xdev.mockserver.serialization.model.BodyWithContentTypeDTO;
 import software.xdev.mockserver.serialization.model.HttpResponseDTO;
 import software.xdev.mockserver.serialization.model.StringBodyDTO;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class HttpResponseDTOSerializer extends StdSerializer<HttpResponseDTO>
@@ -36,49 +33,45 @@ public class HttpResponseDTOSerializer extends StdSerializer<HttpResponseDTO>
 	
 	@SuppressWarnings({"PMD.NPathComplexity"})
 	@Override
-	public void serialize(
-		final HttpResponseDTO httpResponseDTO,
-		final JsonGenerator jgen,
-		final SerializerProvider provider)
-		throws IOException
+	public void serialize(final HttpResponseDTO value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(httpResponseDTO.getStatusCode() != null)
+		gen.writeStartObject();
+		if(value.getStatusCode() != null)
 		{
-			jgen.writeObjectField("statusCode", httpResponseDTO.getStatusCode());
+			gen.writePOJOProperty("statusCode", value.getStatusCode());
 		}
-		if(httpResponseDTO.getReasonPhrase() != null)
+		if(value.getReasonPhrase() != null)
 		{
-			jgen.writeObjectField("reasonPhrase", httpResponseDTO.getReasonPhrase());
+			gen.writePOJOProperty("reasonPhrase", value.getReasonPhrase());
 		}
-		if(httpResponseDTO.getHeaders() != null && !httpResponseDTO.getHeaders().isEmpty())
+		if(value.getHeaders() != null && !value.getHeaders().isEmpty())
 		{
-			jgen.writeObjectField("headers", httpResponseDTO.getHeaders());
+			gen.writePOJOProperty("headers", value.getHeaders());
 		}
-		if(httpResponseDTO.getCookies() != null && !httpResponseDTO.getCookies().isEmpty())
+		if(value.getCookies() != null && !value.getCookies().isEmpty())
 		{
-			jgen.writeObjectField("cookies", httpResponseDTO.getCookies());
+			gen.writePOJOProperty("cookies", value.getCookies());
 		}
-		final BodyWithContentTypeDTO body = httpResponseDTO.getBody();
+		final BodyWithContentTypeDTO body = value.getBody();
 		if(body != null)
 		{
 			if(body instanceof StringBodyDTO && !((StringBodyDTO)body).getString().isEmpty())
 			{
-				jgen.writeObjectField("body", body);
+				gen.writePOJOProperty("body", body);
 			}
 			else if(body instanceof BinaryBodyDTO)
 			{
-				jgen.writeObjectField("body", body);
+				gen.writePOJOProperty("body", body);
 			}
 		}
-		if(httpResponseDTO.getDelay() != null)
+		if(value.getDelay() != null)
 		{
-			jgen.writeObjectField("delay", httpResponseDTO.getDelay());
+			gen.writePOJOProperty("delay", value.getDelay());
 		}
-		if(httpResponseDTO.getConnectionOptions() != null)
+		if(value.getConnectionOptions() != null)
 		{
-			jgen.writeObjectField("connectionOptions", httpResponseDTO.getConnectionOptions());
+			gen.writePOJOProperty("connectionOptions", value.getConnectionOptions());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.matcher;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.matchers.HttpRequestPropertiesMatcher;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class HttpRequestPropertiesMatcherSerializer extends StdSerializer<HttpRequestPropertiesMatcher>
@@ -33,13 +30,13 @@ public class HttpRequestPropertiesMatcherSerializer extends StdSerializer<HttpRe
 	
 	@Override
 	public void serialize(
-		final HttpRequestPropertiesMatcher requestPropertiesMatcher,
-		final JsonGenerator jgen,
-		final SerializerProvider provider) throws IOException
+		final HttpRequestPropertiesMatcher value,
+		final JsonGenerator gen,
+		final SerializationContext provider)
 	{
-		if(requestPropertiesMatcher.getHttpRequest() != null)
+		if(value.getHttpRequest() != null)
 		{
-			jgen.writeObject(requestPropertiesMatcher.getHttpRequest());
+			gen.writePOJO(value.getHttpRequest());
 		}
 	}
 }

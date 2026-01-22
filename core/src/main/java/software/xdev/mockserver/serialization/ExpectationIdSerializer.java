@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import software.xdev.mockserver.model.ExpectationId;
+import tools.jackson.databind.JsonNode;
 
 
 public class ExpectationIdSerializer extends AbstractSerializer<ExpectationId>

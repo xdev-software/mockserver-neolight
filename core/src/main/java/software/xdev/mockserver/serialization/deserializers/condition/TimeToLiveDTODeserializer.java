@@ -15,19 +15,17 @@
  */
 package software.xdev.mockserver.serialization.deserializers.condition;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
 import software.xdev.mockserver.matchers.TimeToLive;
 import software.xdev.mockserver.serialization.model.TimeToLiveDTO;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
@@ -41,7 +39,7 @@ public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	public TimeToLiveDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
+	public TimeToLiveDTO deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
 		TimeToLiveDTO timeToLiveDTO = null;
 		TimeToLive timeToLive = null;
@@ -50,7 +48,7 @@ public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
 		final long endDate;
 		boolean unlimited = false;
 		
-		final JsonNode timeToLiveDTONode = jsonParser.getCodec().readTree(jsonParser);
+		final JsonNode timeToLiveDTONode = p.objectReadContext().readTree(p);
 		final JsonNode unlimitedNode = timeToLiveDTONode.get("unlimited");
 		if(unlimitedNode != null)
 		{
@@ -68,7 +66,7 @@ public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
 			{
 				try
 				{
-					timeUnit = Enum.valueOf(TimeUnit.class, timeUnitNode.asText());
+					timeUnit = Enum.valueOf(TimeUnit.class, timeUnitNode.asString());
 					timeToLive = TimeToLive.exactly(timeUnit, ttl);
 				}
 				catch(final IllegalArgumentException iae)

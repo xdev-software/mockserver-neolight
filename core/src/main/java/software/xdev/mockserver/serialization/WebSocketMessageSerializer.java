@@ -15,11 +15,7 @@
  */
 package software.xdev.mockserver.serialization;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
@@ -44,21 +40,14 @@ public class WebSocketMessageSerializer extends AbstractSerializer<Object>
 	@Override
 	public String serialize(final Object message)
 	{
-		try
+		if(this.serializers.containsKey(message.getClass()))
 		{
-			if(this.serializers.containsKey(message.getClass()))
-			{
-				final WebSocketMessageDTO value = new WebSocketMessageDTO().setType(message.getClass().getName())
-					.setValue(this.serializers.get(message.getClass()).serialize(message));
-				return this.objectWriter.writeValueAsString(value);
-			}
-			return this.objectWriter.writeValueAsString(new WebSocketMessageDTO().setType(message.getClass().getName())
-				.setValue(this.objectMapper.writeValueAsString(message)));
+			final WebSocketMessageDTO value = new WebSocketMessageDTO().setType(message.getClass().getName())
+				.setValue(this.serializers.get(message.getClass()).serialize(message));
+			return this.objectWriter.writeValueAsString(value);
 		}
-		catch(final JsonProcessingException jpe)
-		{
-			throw new UncheckedIOException(jpe);
-		}
+		return this.objectWriter.writeValueAsString(new WebSocketMessageDTO().setType(message.getClass().getName())
+			.setValue(this.objectMapper.writeValueAsString(message)));
 	}
 	
 	@Override
@@ -82,10 +71,6 @@ public class WebSocketMessageSerializer extends AbstractSerializer<Object>
 		catch(final ClassNotFoundException cnfe)
 		{
 			throw new IllegalStateException(cnfe);
-		}
-		catch(final IOException ioe)
-		{
-			throw new UncheckedIOException(ioe);
 		}
 	}
 }

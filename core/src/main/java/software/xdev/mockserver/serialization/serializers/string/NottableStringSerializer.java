@@ -17,13 +17,10 @@ package software.xdev.mockserver.serialization.serializers.string;
 
 import static software.xdev.mockserver.model.NottableString.serialiseNottableString;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.model.NottableString;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class NottableStringSerializer extends StdSerializer<NottableString>
@@ -37,8 +34,7 @@ public class NottableStringSerializer extends StdSerializer<NottableString>
 	public void serialize(
 		final NottableString nottableString,
 		final JsonGenerator jgen,
-		final SerializerProvider provider)
-		throws IOException
+		final SerializationContext provider)
 	{
 		if(nottableString.getParameterStyle() != null)
 		{
@@ -55,22 +51,21 @@ public class NottableStringSerializer extends StdSerializer<NottableString>
 		final JsonGenerator jgen,
 		final String valueFieldName,
 		final Object value)
-		throws IOException
 	{
 		jgen.writeStartObject();
 		if(Boolean.TRUE.equals(nottableString.isNot()))
 		{
-			jgen.writeBooleanField("not", true);
+			jgen.writeBooleanProperty("not", true);
 		}
 		if(Boolean.TRUE.equals(nottableString.isOptional()))
 		{
-			jgen.writeBooleanField("optional", true);
+			jgen.writeBooleanProperty("optional", true);
 		}
 		if(nottableString.getParameterStyle() != null)
 		{
-			jgen.writeObjectField("parameterStyle", nottableString.getParameterStyle());
+			jgen.writePOJOProperty("parameterStyle", nottableString.getParameterStyle());
 		}
-		jgen.writeObjectField(valueFieldName, value);
+		jgen.writePOJOProperty(valueFieldName, value);
 		jgen.writeEndObject();
 	}
 }

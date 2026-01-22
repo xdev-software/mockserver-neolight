@@ -15,16 +15,14 @@
  */
 package software.xdev.mockserver.serialization;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.core.StreamWriteFeature;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 
 /**
@@ -33,23 +31,17 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
  */
 public final class JacksonUtils
 {
-	private static final ObjectWriter WRITER = new ObjectMapper()
-		.setNodeFactory(JsonNodeFactory.instance)
+	private static final ObjectWriter WRITER = JsonMapper.builder(new JsonFactory())
+		.nodeFactory(JsonNodeFactory.instance)
 		.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
 		.enable(SerializationFeature.INDENT_OUTPUT)
+		.build()
 		.writer()
-		.with(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN);
+		.with(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN);
 	
 	public static String prettyPrint(final JsonNode node)
 	{
-		try
-		{
-			return WRITER.writeValueAsString(node);
-		}
-		catch(final IOException e)
-		{
-			throw new UncheckedIOException(e);
-		}
+		return WRITER.writeValueAsString(node);
 	}
 	
 	private JacksonUtils()

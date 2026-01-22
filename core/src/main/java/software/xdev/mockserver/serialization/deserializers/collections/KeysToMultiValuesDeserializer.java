@@ -17,17 +17,14 @@ package software.xdev.mockserver.serialization.deserializers.collections;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
 import software.xdev.mockserver.model.KeyMatchStyle;
 import software.xdev.mockserver.model.KeysToMultiValues;
 import software.xdev.mockserver.model.NottableString;
 import software.xdev.mockserver.model.ParameterStyle;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 public abstract class KeysToMultiValuesDeserializer<T extends KeysToMultiValues<?, ?>> extends StdDeserializer<T>
@@ -40,7 +37,7 @@ public abstract class KeysToMultiValuesDeserializer<T extends KeysToMultiValues<
 	public abstract T build();
 	
 	@Override
-	public T deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException
+	public T deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
 		if(p.isExpectedStartArrayToken())
 		{
@@ -50,13 +47,10 @@ public abstract class KeysToMultiValuesDeserializer<T extends KeysToMultiValues<
 		{
 			return this.deserializeObject(p, ctxt);
 		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 	
-	private T deserializeObject(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
+	private T deserializeObject(final JsonParser jsonParser, final DeserializationContext ctxt)
 	{
 		final T entries = this.build();
 		NottableString key = string("");
@@ -65,8 +59,8 @@ public abstract class KeysToMultiValuesDeserializer<T extends KeysToMultiValues<
 			JsonToken token = jsonParser.nextToken();
 			switch(token)
 			{
-				case FIELD_NAME:
-					key = string(jsonParser.getText());
+				case PROPERTY_NAME:
+					key = string(jsonParser.getString());
 					if("keyMatchStyle".equals(key.getValue()))
 					{
 						jsonParser.nextToken();
@@ -106,12 +100,12 @@ public abstract class KeysToMultiValuesDeserializer<T extends KeysToMultiValues<
 				default:
 					throw new RuntimeException("Unexpected token: \"" + token + "\" id: \"" + token.id() + "\" text:"
 						+ " \""
-						+ jsonParser.getText());
+						+ jsonParser.getString());
 			}
 		}
 	}
 	
-	private T deserializeArray(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
+	private T deserializeArray(final JsonParser jsonParser, final DeserializationContext ctxt)
 	{
 		final T entries = this.build();
 		NottableString key = string("");
@@ -140,7 +134,7 @@ public abstract class KeysToMultiValuesDeserializer<T extends KeysToMultiValues<
 				case END_OBJECT:
 					entries.withEntry(key, values);
 					break;
-				case FIELD_NAME:
+				case PROPERTY_NAME:
 					break;
 				case VALUE_STRING:
 					key = ctxt.readValue(jsonParser, NottableString.class);
@@ -148,7 +142,7 @@ public abstract class KeysToMultiValuesDeserializer<T extends KeysToMultiValues<
 				default:
 					throw new RuntimeException("Unexpected token: \"" + token + "\" id: \"" + token.id() + "\" text:"
 						+ " \""
-						+ jsonParser.getText());
+						+ jsonParser.getString());
 			}
 		}
 	}

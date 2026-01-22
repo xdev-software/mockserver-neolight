@@ -1,13 +1,13 @@
 package software.xdev.mockserver.serialization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
 
 
 public abstract class AbstractSerializer<T> implements Serializer<T>
 {
 	protected final ObjectWriter objectWriter;
-	protected final ObjectMapper objectMapper;
+	protected final JsonMapper objectMapper;
 	
 	protected AbstractSerializer()
 	{
@@ -19,7 +19,7 @@ public abstract class AbstractSerializer<T> implements Serializer<T>
 		this(objectWriter, ObjectMappers.DEFAULT_MAPPER);
 	}
 	
-	protected AbstractSerializer(final ObjectWriter objectWriter, final ObjectMapper objectMapper)
+	protected AbstractSerializer(final ObjectWriter objectWriter, final JsonMapper objectMapper)
 	{
 		this.objectWriter = objectWriter;
 		this.objectMapper = objectMapper;

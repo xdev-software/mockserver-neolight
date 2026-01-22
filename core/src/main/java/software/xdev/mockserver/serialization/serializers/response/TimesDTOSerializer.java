@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.response;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.serialization.model.TimesDTO;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class TimesDTOSerializer extends StdSerializer<TimesDTO>
@@ -32,18 +29,17 @@ public class TimesDTOSerializer extends StdSerializer<TimesDTO>
 	}
 	
 	@Override
-	public void serialize(final TimesDTO times, final JsonGenerator jgen, final SerializerProvider provider)
-		throws IOException
+	public void serialize(final TimesDTO value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(!times.isUnlimited())
+		gen.writeStartObject();
+		if(!value.isUnlimited())
 		{
-			jgen.writeNumberField("remainingTimes", times.getRemainingTimes());
+			gen.writeNumberProperty("remainingTimes", value.getRemainingTimes());
 		}
 		else
 		{
-			jgen.writeBooleanField("unlimited", times.isUnlimited());
+			gen.writeBooleanProperty("unlimited", value.isUnlimited());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

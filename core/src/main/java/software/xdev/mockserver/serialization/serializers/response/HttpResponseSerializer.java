@@ -15,17 +15,14 @@
  */
 package software.xdev.mockserver.serialization.serializers.response;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.model.BinaryBody;
 import software.xdev.mockserver.model.Body;
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.model.ParameterBody;
 import software.xdev.mockserver.model.StringBody;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class HttpResponseSerializer extends StdSerializer<HttpResponse>
@@ -37,50 +34,49 @@ public class HttpResponseSerializer extends StdSerializer<HttpResponse>
 	
 	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
-	public void serialize(final HttpResponse httpResponse, final JsonGenerator jgen, final SerializerProvider provider)
-		throws IOException
+	public void serialize(final HttpResponse value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(httpResponse.getStatusCode() != null)
+		gen.writeStartObject();
+		if(value.getStatusCode() != null)
 		{
-			jgen.writeObjectField("statusCode", httpResponse.getStatusCode());
+			gen.writePOJOProperty("statusCode", value.getStatusCode());
 		}
-		if(httpResponse.getReasonPhrase() != null)
+		if(value.getReasonPhrase() != null)
 		{
-			jgen.writeObjectField("reasonPhrase", httpResponse.getReasonPhrase());
+			gen.writePOJOProperty("reasonPhrase", value.getReasonPhrase());
 		}
-		if(httpResponse.getHeaderList() != null && !httpResponse.getHeaderList().isEmpty())
+		if(value.getHeaderList() != null && !value.getHeaderList().isEmpty())
 		{
-			jgen.writeObjectField("headers", httpResponse.getHeaders());
+			gen.writePOJOProperty("headers", value.getHeaders());
 		}
-		if(httpResponse.getCookieList() != null && !httpResponse.getCookieList().isEmpty())
+		if(value.getCookieList() != null && !value.getCookieList().isEmpty())
 		{
-			jgen.writeObjectField("cookies", httpResponse.getCookies());
+			gen.writePOJOProperty("cookies", value.getCookies());
 		}
-		final Body<?> body = httpResponse.getBody();
+		final Body<?> body = value.getBody();
 		if(body != null)
 		{
 			if(body instanceof final StringBody stringBody && !stringBody.getValue().isEmpty())
 			{
-				jgen.writeObjectField("body", body);
+				gen.writePOJOProperty("body", body);
 			}
 			else if(body instanceof final BinaryBody binaryBody && binaryBody.getValue().length > 0)
 			{
-				jgen.writeObjectField("body", body);
+				gen.writePOJOProperty("body", body);
 			}
 			else if(body instanceof final ParameterBody parameterBody && !parameterBody.getValue().isEmpty())
 			{
-				jgen.writeObjectField("body", body);
+				gen.writePOJOProperty("body", body);
 			}
 		}
-		if(httpResponse.getDelay() != null)
+		if(value.getDelay() != null)
 		{
-			jgen.writeObjectField("delay", httpResponse.getDelay());
+			gen.writePOJOProperty("delay", value.getDelay());
 		}
-		if(httpResponse.getConnectionOptions() != null)
+		if(value.getConnectionOptions() != null)
 		{
-			jgen.writeObjectField("connectionOptions", httpResponse.getConnectionOptions());
+			gen.writePOJOProperty("connectionOptions", value.getConnectionOptions());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

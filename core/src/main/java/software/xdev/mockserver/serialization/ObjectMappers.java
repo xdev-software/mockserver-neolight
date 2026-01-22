@@ -24,19 +24,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import software.xdev.mockserver.serialization.deserializers.body.BodyDTODeserializer;
 import software.xdev.mockserver.serialization.deserializers.body.BodyWithContentTypeDTODeserializer;
@@ -68,15 +55,27 @@ import software.xdev.mockserver.serialization.serializers.response.TimeToLiveSer
 import software.xdev.mockserver.serialization.serializers.response.TimesDTOSerializer;
 import software.xdev.mockserver.serialization.serializers.response.TimesSerializer;
 import software.xdev.mockserver.serialization.serializers.string.NottableStringSerializer;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class ObjectMappers
 {
 	public static final ObjectWriter BASE_WRITER_PRETTY =
-		buildObjectMapperWithoutRemovingEmptyValues().writerWithDefaultPrettyPrinter();
+		builderWithoutRemovingEmptyValues().build().writerWithDefaultPrettyPrinter();
 	
-	public static final ObjectMapper DEFAULT_MAPPER =
+	public static final JsonMapper DEFAULT_MAPPER =
 		buildObjectMapperWithDeserializerAndSerializers(Collections.emptyList(), Collections.emptyList(), false);
 	public static final ObjectWriter DEFAULT_WRITER_PRETTY = DEFAULT_MAPPER.writerWithDefaultPrettyPrinter();
 	
@@ -91,7 +90,7 @@ public final class ObjectMappers
 			Collections.emptyList(),
 			true).writerWithDefaultPrettyPrinter();
 	
-	public static ObjectMapper createObjectMapper(final JsonDeserializer... replacementJsonDeserializers)
+	public static JsonMapper createObjectMapper(final ValueDeserializer<?>... replacementJsonDeserializers)
 	{
 		if(replacementJsonDeserializers == null || replacementJsonDeserializers.length == 0)
 		{
@@ -104,7 +103,7 @@ public final class ObjectMappers
 			false);
 	}
 	
-	private static ObjectMapper buildObjectMapperWithoutRemovingEmptyValues()
+	private static JsonMapper.Builder builderWithoutRemovingEmptyValues()
 	{
 		return JsonMapper.builder(JsonFactory.builder()
 			// relax parsing
@@ -118,56 +117,51 @@ public final class ObjectMappers
 			// ignore failures
 			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 			.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
-			.configure(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS, false)
+			.configure(EnumFeature.FAIL_ON_NUMBERS_FOR_ENUMS, false)
 			.configure(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, false)
 			.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
 			// relax parsing
 			.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
 			.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true)
-			.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-			.configure(JsonParser.Feature.ALLOW_COMMENTS, true)
-			.configure(JsonParser.Feature.ALLOW_YAML_COMMENTS, true)
-			.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-			.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-			.configure(JsonParser.Feature.IGNORE_UNDEFINED, true)
+			.configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+			.configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
+			.configure(JsonReadFeature.ALLOW_YAML_COMMENTS, true)
+			.configure(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES, true)
+			.configure(JsonReadFeature.ALLOW_SINGLE_QUOTES, true)
+			.configure(StreamReadFeature.IGNORE_UNDEFINED, true)
 			// use arrays
 			.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true)
 			// consistent json output
-			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
-			.build();
+			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
 	}
 	
-	private static ObjectMapper buildObjectMapperWithOnlyConfigurationDefaults()
+	private static JsonMapper.Builder buildObjectMapperWithOnlyConfigurationDefaults()
 	{
-		return buildObjectMapperWithoutRemovingEmptyValues()
+		return builderWithoutRemovingEmptyValues()
 			// remove empty values from JSON
-			.setDefaultPropertyInclusion(JsonInclude.Include.NON_DEFAULT)
-			.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
-			.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY)
-			// add support for java date time serialisation and de-serialisation
-			.registerModule(new JavaTimeModule());
+			.changeDefaultPropertyInclusion(v -> v.withValueInclusion(JsonInclude.Include.NON_EMPTY));
 	}
 	
-	private static ObjectMapper buildObjectMapperWithDeserializerAndSerializers(
-		final List<JsonDeserializer> replacementJsonDeserializers,
-		final List<JsonSerializer> replacementJsonSerializers,
+	private static JsonMapper buildObjectMapperWithDeserializerAndSerializers(
+		final List<ValueDeserializer<?>> replacementJsonDeserializers,
+		final List<ValueSerializer<?>> replacementJsonSerializers,
 		final boolean serialiseDefaultValues)
 	{
-		final ObjectMapper objectMapper = buildObjectMapperWithOnlyConfigurationDefaults();
+		final JsonMapper.Builder builder = buildObjectMapperWithOnlyConfigurationDefaults();
 		
 		// register our own module with our serializers and deserializers
 		final SimpleModule module = new SimpleModule();
-		addDeserializers(module, replacementJsonDeserializers.toArray(new JsonDeserializer[0]));
-		addSerializers(module, replacementJsonSerializers.toArray(new JsonSerializer[0]), serialiseDefaultValues);
-		objectMapper.registerModule(module);
-		return objectMapper;
+		addDeserializers(module, replacementJsonDeserializers.toArray(new ValueDeserializer[0]));
+		addSerializers(module, replacementJsonSerializers.toArray(new ValueSerializer[0]), serialiseDefaultValues);
+		builder.addModule(module);
+		return builder.build();
 	}
 	
 	private static void addDeserializers(
 		final SimpleModule module,
-		final JsonDeserializer[] replacementJsonDeserializers)
+		final ValueDeserializer[] replacementJsonDeserializers)
 	{
-		final List<JsonDeserializer> jsonDeserializers = Arrays.asList(
+		final List<ValueDeserializer<?>> jsonDeserializers = Arrays.asList(
 			// request
 			new RequestDefinitionDTODeserializer(),
 			// times
@@ -184,17 +178,17 @@ public final class ObjectMappers
 			new ParametersDeserializer(),
 			new CookiesDeserializer()
 		);
-		final Map<Class, JsonDeserializer> jsonDeserializersByType = new HashMap<>();
-		for(final JsonDeserializer jsonDeserializer : jsonDeserializers)
+		final Map<Class, ValueDeserializer<?>> jsonDeserializersByType = new HashMap<>();
+		for(final ValueDeserializer<?> jsonDeserializer : jsonDeserializers)
 		{
 			jsonDeserializersByType.put(jsonDeserializer.handledType(), jsonDeserializer);
 		}
 		// override any existing deserializers
-		for(final JsonDeserializer additionJsonDeserializer : replacementJsonDeserializers)
+		for(final ValueDeserializer<?> additionJsonDeserializer : replacementJsonDeserializers)
 		{
 			jsonDeserializersByType.put(additionJsonDeserializer.handledType(), additionJsonDeserializer);
 		}
-		for(final Map.Entry<Class, JsonDeserializer> additionJsonDeserializer : jsonDeserializersByType.entrySet())
+		for(final Map.Entry<Class, ValueDeserializer<?>> additionJsonDeserializer : jsonDeserializersByType.entrySet())
 		{
 			module.addDeserializer(additionJsonDeserializer.getKey(), additionJsonDeserializer.getValue());
 		}
@@ -202,10 +196,10 @@ public final class ObjectMappers
 	
 	private static void addSerializers(
 		final SimpleModule module,
-		final JsonSerializer[] replacementJsonSerializers,
+		final ValueSerializer[] replacementJsonSerializers,
 		final boolean serialiseDefaultValues)
 	{
-		final List<JsonSerializer> jsonSerializers = new ArrayList<>(List.of(
+		final List<ValueSerializer<?>> jsonSerializers = new ArrayList<>(List.of(
 			// times
 			new TimesSerializer(),
 			new TimesDTOSerializer(),
@@ -239,17 +233,17 @@ public final class ObjectMappers
 		customizers().stream()
 			.flatMap(c -> c.additionalSerializers().stream())
 			.forEach(jsonSerializers::add);
-		final Map<Class, JsonSerializer> jsonSerializersByType = new HashMap<>();
-		for(final JsonSerializer jsonSerializer : jsonSerializers)
+		final Map<Class, ValueSerializer<?>> jsonSerializersByType = new HashMap<>();
+		for(final ValueSerializer<?> jsonSerializer : jsonSerializers)
 		{
 			jsonSerializersByType.put(jsonSerializer.handledType(), jsonSerializer);
 		}
 		// override any existing serializers
-		for(final JsonSerializer additionJsonSerializer : replacementJsonSerializers)
+		for(final ValueSerializer<?> additionJsonSerializer : replacementJsonSerializers)
 		{
 			jsonSerializersByType.put(additionJsonSerializer.handledType(), additionJsonSerializer);
 		}
-		for(final Map.Entry<Class, JsonSerializer> additionJsonSerializer : jsonSerializersByType.entrySet())
+		for(final Map.Entry<Class, ValueSerializer<?>> additionJsonSerializer : jsonSerializersByType.entrySet())
 		{
 			module.addSerializer(additionJsonSerializer.getKey(), additionJsonSerializer.getValue());
 		}

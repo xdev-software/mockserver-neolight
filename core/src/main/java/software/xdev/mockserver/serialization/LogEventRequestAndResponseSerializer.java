@@ -22,12 +22,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.model.LogEventRequestAndResponse;
 import software.xdev.mockserver.serialization.model.LogEventRequestAndResponseDTO;
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.databind.ObjectWriter;
 
 
 public class LogEventRequestAndResponseSerializer
@@ -40,7 +39,8 @@ public class LogEventRequestAndResponseSerializer
 		if(objectWriterCached == null)
 		{
 			objectWriterCached = ObjectMappers.DEFAULT_MAPPER
-				.writer(
+				.writer()
+				.with(
 					new DefaultPrettyPrinter()
 						.withArrayIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
 						.withObjectIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE));

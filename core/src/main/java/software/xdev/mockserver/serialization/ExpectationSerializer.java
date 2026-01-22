@@ -27,10 +27,9 @@ import java.util.function.BiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.serialization.model.ExpectationDTO;
+import tools.jackson.databind.JsonNode;
 
 
 public class ExpectationSerializer extends AbstractSerializer<Expectation>

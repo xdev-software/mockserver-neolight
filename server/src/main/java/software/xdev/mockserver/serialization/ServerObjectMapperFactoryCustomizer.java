@@ -18,15 +18,14 @@ package software.xdev.mockserver.serialization;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
-
 import software.xdev.mockserver.serialization.serializers.matcher.HttpRequestPropertiesMatcherSerializer;
+import tools.jackson.databind.ValueSerializer;
 
 
 public class ServerObjectMapperFactoryCustomizer implements ObjectMapperFactoryCustomizer
 {
 	@Override
-	public Collection<JsonSerializer> additionalSerializers()
+	public Collection<ValueSerializer<?>> additionalSerializers()
 	{
 		return List.of(
 			// matcher

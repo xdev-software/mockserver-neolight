@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.body;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.serialization.model.StringBodyDTO;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class StringBodyDTOSerializer extends StdSerializer<StringBodyDTO>
@@ -36,49 +33,45 @@ public class StringBodyDTOSerializer extends StdSerializer<StringBodyDTO>
 	
 	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
-	public void serialize(
-		final StringBodyDTO stringBodyDTO,
-		final JsonGenerator jgen,
-		final SerializerProvider provider)
-		throws IOException
+	public void serialize(final StringBodyDTO value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		final boolean notFieldSetAndNotDefault = stringBodyDTO.getNot() != null && stringBodyDTO.getNot();
+		final boolean notFieldSetAndNotDefault = value.getNot() != null && value.getNot();
 		final boolean optionalFieldSetAndNotDefault =
-			stringBodyDTO.getOptional() != null && stringBodyDTO.getOptional();
-		final boolean subStringFieldNotDefault = stringBodyDTO.isSubString();
-		final boolean contentTypeFields = stringBodyDTO.getContentType() != null;
+			value.getOptional() != null && value.getOptional();
+		final boolean subStringFieldNotDefault = value.isSubString();
+		final boolean contentTypeFields = value.getContentType() != null;
 		if(this.serialiseDefaultValues || notFieldSetAndNotDefault || optionalFieldSetAndNotDefault
 			|| contentTypeFields
 			|| subStringFieldNotDefault)
 		{
-			jgen.writeStartObject();
+			gen.writeStartObject();
 			if(notFieldSetAndNotDefault)
 			{
-				jgen.writeBooleanField("not", true);
+				gen.writeBooleanProperty("not", true);
 			}
 			if(optionalFieldSetAndNotDefault)
 			{
-				jgen.writeBooleanField("optional", true);
+				gen.writeBooleanProperty("optional", true);
 			}
-			jgen.writeStringField("type", stringBodyDTO.getType().name());
-			jgen.writeStringField("string", stringBodyDTO.getString());
-			if(stringBodyDTO.getRawBytes() != null)
+			gen.writeStringProperty("type", value.getType().name());
+			gen.writeStringProperty("string", value.getString());
+			if(value.getRawBytes() != null)
 			{
-				jgen.writeObjectField("rawBytes", stringBodyDTO.getRawBytes());
+				gen.writePOJOProperty("rawBytes", value.getRawBytes());
 			}
 			if(subStringFieldNotDefault)
 			{
-				jgen.writeBooleanField("subString", true);
+				gen.writeBooleanProperty("subString", true);
 			}
 			if(contentTypeFields)
 			{
-				jgen.writeStringField("contentType", stringBodyDTO.getContentType());
+				gen.writeStringProperty("contentType", value.getContentType());
 			}
-			jgen.writeEndObject();
+			gen.writeEndObject();
 		}
 		else
 		{
-			jgen.writeString(stringBodyDTO.getString());
+			gen.writeString(value.getString());
 		}
 	}
 }
