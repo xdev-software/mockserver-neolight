@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Set up JDK
       uses: actions/setup-java@v5
@@ -25,7 +25,7 @@ jobs:
 
     # Try to reuse existing cache from check-build
     - name: Try restore Maven Cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-mvn-build-${{ hashFiles('**/pom.xml') }}
@@ -61,7 +61,7 @@ jobs:
       upload_url: ${{ steps.create-release.outputs.upload_url }}
       version: ${{ steps.version.outputs.release }}
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Configure Git
       run: |
@@ -88,7 +88,7 @@ jobs:
 
     - name: Create Release
       id: create-release
-      uses: shogo82148/actions-create-release@7b89596097b26731bda0852f1504f813499079ee # v1
+      uses: shogo82148/actions-create-release@559c27ce7eb834825e2b55927c64f6d1bd1db716 # v1
       with:
         tag_name: v${{ steps.version.outputs.release }}
         release_name: v${{ steps.version.outputs.release }}
@@ -139,7 +139,7 @@ jobs:
     needs: [prepare-release]
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Init Git and pull
       run: |
@@ -193,7 +193,7 @@ jobs:
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
     
     - name: Upload server standalone JAR
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: server-standalone
         path: server/target/server-standalone.jar
@@ -215,7 +215,7 @@ jobs:
       attestations: write
       id-token: write
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Init Git and pull
       run: |
@@ -224,7 +224,7 @@ jobs:
         git pull
 
     - name: Download server JAR
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: server-standalone
         path: server/target
@@ -281,7 +281,7 @@ jobs:
     needs: [publish-maven]
     timeout-minutes: 15
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Init Git and pull
       run: |
@@ -297,7 +297,7 @@ jobs:
 
     # Try to reuse existing cache from check-build
     - name: Try restore Maven Cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-mvn-build-${{ hashFiles('**/pom.xml') }}
@@ -329,7 +329,7 @@ jobs:
     needs: [publish-maven, publish-docker]
     timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Init Git and pull
       run: |

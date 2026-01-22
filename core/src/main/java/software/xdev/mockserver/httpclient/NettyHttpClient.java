@@ -157,27 +157,23 @@ public class NettyHttpClient
 			
 			responseFuture
 				.whenComplete((message, throwable) -> {
-					if(throwable == null)
+					if(throwable != null)
 					{
-						if(message != null)
-						{
-							if(this.forwardProxyClient)
-							{
-								httpResponseFuture.complete(HOP_BY_HOP_HEADER_FILTER.onResponse((HttpResponse)message));
-							}
-							else
-							{
-								httpResponseFuture.complete((HttpResponse)message);
-							}
-						}
-						else
-						{
-							httpResponseFuture.complete(response());
-						}
+						httpResponseFuture.completeExceptionally(throwable);
+						return;
+					}
+					if(message == null)
+					{
+						httpResponseFuture.complete(response());
+						return;
+					}
+					if(this.forwardProxyClient)
+					{
+						httpResponseFuture.complete(HOP_BY_HOP_HEADER_FILTER.onResponse((HttpResponse)message));
 					}
 					else
 					{
-						httpResponseFuture.completeExceptionally(throwable);
+						httpResponseFuture.complete((HttpResponse)message);
 					}
 				});
 			

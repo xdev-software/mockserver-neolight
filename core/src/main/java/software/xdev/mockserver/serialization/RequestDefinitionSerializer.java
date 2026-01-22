@@ -167,16 +167,16 @@ public class RequestDefinitionSerializer implements Serializer<RequestDefinition
 		}
 		else
 		{
-			final List<String> jsonRequestList = this.jsonArraySerializer.splitJSONArray(jsonRequestDefinitions);
-			if(jsonRequestList.isEmpty())
+			final List<String> jsonRequests = this.jsonArraySerializer.splitJSONArray(jsonRequestDefinitions);
+			if(jsonRequests.isEmpty())
 			{
 				throw new IllegalArgumentException(
 					"1 error:" + NEW_LINE + " - a request or array of request is required");
 			}
 			else
 			{
-				final List<String> validationErrorsList = new ArrayList<>();
-				for(final String jsonRequest : jsonRequestList)
+				final List<String> validationErrors = new ArrayList<>();
+				for(final String jsonRequest : jsonRequests)
 				{
 					try
 					{
@@ -184,14 +184,14 @@ public class RequestDefinitionSerializer implements Serializer<RequestDefinition
 					}
 					catch(final IllegalArgumentException iae)
 					{
-						validationErrorsList.add(iae.getMessage());
+						validationErrors.add(iae.getMessage());
 					}
 				}
-				if(!validationErrorsList.isEmpty())
+				if(!validationErrors.isEmpty())
 				{
-					throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
-						+ String.join("," + NEW_LINE, validationErrorsList)
-						+ (validationErrorsList.size() > 1 ? "]" : ""));
+					throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
+						+ String.join("," + NEW_LINE, validationErrors)
+						+ (validationErrors.size() > 1 ? "]" : ""));
 				}
 			}
 		}

@@ -72,7 +72,7 @@ public abstract class ResponseWriter
 		this.writeResponse(request, response, true);
 	}
 	
-	@SuppressWarnings({"checkstyle:FinalParameters", "PMD.NPathComplexity"})
+	@SuppressWarnings({"checkstyle:FinalParameters"})
 	public void writeResponse(final HttpRequest request, HttpResponse response, final boolean apiResponse)
 	{
 		if(response == null)

@@ -64,13 +64,13 @@ public class ExpandedParameterDecoder
 	public Parameters retrieveFormParameters(final String parameterString, boolean hasPath)
 	{
 		final Parameters parameters = new Parameters();
-		final Map<String, List<String>> parameterMap = new HashMap<>();
+		final Map<String, List<String>> parameterValues = new HashMap<>();
 		if(isNotBlank(parameterString))
 		{
 			try
 			{
 				hasPath = parameterString.startsWith("/") || parameterString.contains("?") || hasPath;
-				parameterMap.putAll(new QueryStringDecoder(
+				parameterValues.putAll(new QueryStringDecoder(
 					parameterString,
 					HttpConstants.DEFAULT_CHARSET,
 					hasPath,
@@ -82,7 +82,7 @@ public class ExpandedParameterDecoder
 				LOG.error("Exception while parsing query string {}", parameterString, iae);
 			}
 		}
-		return parameters.withEntries(parameterMap);
+		return parameters.withEntries(parameterValues);
 	}
 	
 	@SuppressWarnings("checkstyle:FinalParameters")
@@ -92,11 +92,11 @@ public class ExpandedParameterDecoder
 		{
 			final String rawParameterString =
 				parameterString.contains("?") ? StringUtils.substringAfter(parameterString, "?") : parameterString;
-			final Map<String, List<String>> parameterMap = new HashMap<>();
+			final Map<String, List<String>> parameterValues = new HashMap<>();
 			try
 			{
 				hasPath = parameterString.startsWith("/") || parameterString.contains("?") || hasPath;
-				parameterMap.putAll(new QueryStringDecoder(
+				parameterValues.putAll(new QueryStringDecoder(
 					parameterString,
 					HttpConstants.DEFAULT_CHARSET,
 					parameterString.contains("/") || hasPath,
@@ -107,7 +107,7 @@ public class ExpandedParameterDecoder
 			{
 				LOG.error("Exception while parsing query string {}", parameterString, iae);
 			}
-			return new Parameters().withEntries(parameterMap).withRawParameterString(rawParameterString);
+			return new Parameters().withEntries(parameterValues).withRawParameterString(rawParameterString);
 		}
 		return null;
 	}

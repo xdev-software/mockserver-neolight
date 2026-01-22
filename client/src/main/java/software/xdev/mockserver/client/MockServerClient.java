@@ -327,8 +327,7 @@ public class MockServerClient implements Stoppable
 	@SuppressWarnings({
 		"checkstyle:FinalParameters",
 		"checkstyle:MagicNumber",
-		"PMD.CognitiveComplexity",
-		"PMD.NPathComplexity"})
+		"PMD.CognitiveComplexity"})
 	private HttpResponse sendRequest(
 		HttpRequest request,
 		final boolean ignoreErrors,

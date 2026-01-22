@@ -67,7 +67,7 @@ public final class ExceptionHandling
 	/**
 	 * returns true is the exception was caused by the connection being closed
 	 */
-	@SuppressWarnings({"java:S1872", "PMD.CognitiveComplexity", "PMD.NPathComplexity"}) // Not always given
+	@SuppressWarnings({"java:S1872", "PMD.CognitiveComplexity"}) // Not always given
 	public static boolean connectionClosedException(final Throwable throwable)
 	{
 		// is ssl exception

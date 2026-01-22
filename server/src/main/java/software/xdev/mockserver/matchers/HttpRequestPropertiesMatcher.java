@@ -257,7 +257,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		"PMD.CognitiveComplexity",
 		"PMD.NPathComplexity",
 		"PMD.CyclomaticComplexity",
-		"PMD.NcssCount"})
+		"PMD.AvoidDeeplyNestedIfStmts"})
 	private boolean matches(
 		final MatchDifference context,
 		final HttpRequest request,
@@ -550,7 +550,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		return count % 2 != 0;
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
 	private boolean bodyMatches(final MatchDifference context, final HttpRequest request)
 	{
 		boolean bodyMatches;

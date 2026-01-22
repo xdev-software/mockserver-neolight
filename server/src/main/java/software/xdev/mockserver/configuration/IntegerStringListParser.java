@@ -33,18 +33,18 @@ public class IntegerStringListParser
 	
 	List<Integer> toList(final String integers)
 	{
-		final List<Integer> integerList = new ArrayList<>();
+		final List<Integer> ints = new ArrayList<>();
 		for(final String integer : integers.split(","))
 		{
 			try
 			{
-				integerList.add(Integer.parseInt(integer.trim()));
+				ints.add(Integer.parseInt(integer.trim()));
 			}
 			catch(final NumberFormatException nfe)
 			{
-				LOG.error("NumberFormatException converting {} to integer", integer, nfe);
+				LOG.warn("NumberFormatException converting {} to integer", integer, nfe);
 			}
 		}
-		return integerList;
+		return ints;
 	}
 }

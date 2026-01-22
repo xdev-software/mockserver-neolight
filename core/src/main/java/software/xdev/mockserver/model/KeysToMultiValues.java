@@ -294,7 +294,7 @@ public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends Key
 		}
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
 	String getFirstValue(final String name)
 	{
 		if(!this.isEmpty())
@@ -338,7 +338,7 @@ public abstract class KeysToMultiValues<T extends KeyToMultiValue, K extends Key
 		return this.containsEntry(string(name), string(value));
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
 	boolean containsEntry(final NottableString name, final NottableString value)
 	{
 		if(!this.isEmpty() && name != null && value != null)

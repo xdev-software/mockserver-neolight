@@ -36,7 +36,6 @@ public class HttpResponseSerializer implements Serializer<HttpResponse>
 	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
 	
-	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
 	public String serialize(final HttpResponse httpResponse)
 	{
@@ -141,32 +140,30 @@ public class HttpResponseSerializer implements Serializer<HttpResponse>
 		}
 		else
 		{
-			final List<String> jsonResponseList = this.jsonArraySerializer.splitJSONArray(jsonHttpResponses);
-			if(jsonResponseList.isEmpty())
+			final List<String> jsonResponses = this.jsonArraySerializer.splitJSONArray(jsonHttpResponses);
+			if(jsonResponses.isEmpty())
 			{
 				throw new IllegalArgumentException(
 					"1 error:" + NEW_LINE + " - a response or array of response is required");
 			}
-			else
+			
+			final List<String> validationErrors = new ArrayList<>();
+			for(final String jsonExpectation : jsonResponses)
 			{
-				final List<String> validationErrorsList = new ArrayList<>();
-				for(final String jsonExpectation : jsonResponseList)
+				try
 				{
-					try
-					{
-						httpResponses.add(this.deserialize(jsonExpectation));
-					}
-					catch(final IllegalArgumentException iae)
-					{
-						validationErrorsList.add(iae.getMessage());
-					}
+					httpResponses.add(this.deserialize(jsonExpectation));
 				}
-				if(!validationErrorsList.isEmpty())
+				catch(final IllegalArgumentException iae)
 				{
-					throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
-						+ String.join("," + NEW_LINE, validationErrorsList)
-						+ (validationErrorsList.size() > 1 ? "]" : ""));
+					validationErrors.add(iae.getMessage());
 				}
+			}
+			if(!validationErrors.isEmpty())
+			{
+				throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
+					+ String.join("," + NEW_LINE, validationErrors)
+					+ (validationErrors.size() > 1 ? "]" : ""));
 			}
 		}
 		return httpResponses.toArray(new HttpResponse[0]);

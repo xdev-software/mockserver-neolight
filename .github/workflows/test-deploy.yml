@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Set up JDK
       uses: actions/setup-java@v5
@@ -56,7 +56,7 @@ jobs:
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
 
     - name: Upload server standalone JAR
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: server-standalone
         path: server/target/server-standalone.jar
@@ -71,10 +71,10 @@ jobs:
       attestations: write
       id-token: write
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Download server JAR
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: server-standalone
         path: server/target

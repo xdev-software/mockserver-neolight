@@ -63,7 +63,6 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 		"PMD.CognitiveComplexity",
 		"PMD.NPathComplexity",
 		"PMD.CyclomaticComplexity",
-		"PMD.NcssCount",
 		"PMD.AvoidDeeplyNestedIfStmts"})
 	@Override
 	public BodyWithContentTypeDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)

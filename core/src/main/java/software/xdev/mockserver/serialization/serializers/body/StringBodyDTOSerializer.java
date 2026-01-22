@@ -46,9 +46,9 @@ public class StringBodyDTOSerializer extends StdSerializer<StringBodyDTO>
 		final boolean optionalFieldSetAndNotDefault =
 			stringBodyDTO.getOptional() != null && stringBodyDTO.getOptional();
 		final boolean subStringFieldNotDefault = stringBodyDTO.isSubString();
-		final boolean contentTypeFieldSet = stringBodyDTO.getContentType() != null;
+		final boolean contentTypeFields = stringBodyDTO.getContentType() != null;
 		if(this.serialiseDefaultValues || notFieldSetAndNotDefault || optionalFieldSetAndNotDefault
-			|| contentTypeFieldSet
+			|| contentTypeFields
 			|| subStringFieldNotDefault)
 		{
 			jgen.writeStartObject();
@@ -70,7 +70,7 @@ public class StringBodyDTOSerializer extends StdSerializer<StringBodyDTO>
 			{
 				jgen.writeBooleanField("subString", true);
 			}
-			if(contentTypeFieldSet)
+			if(contentTypeFields)
 			{
 				jgen.writeStringField("contentType", stringBodyDTO.getContentType());
 			}

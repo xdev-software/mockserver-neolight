@@ -33,7 +33,7 @@ import software.xdev.mockserver.model.NottableString;
 
 public class NottableStringHashMap
 {
-	private final Map<NottableString, NottableString> backingMap = new LinkedHashMap<>();
+	private final Map<NottableString, NottableString> keyValues = new LinkedHashMap<>();
 	private final RegexStringMatcher regexStringMatcher;
 	
 	public NottableStringHashMap(final boolean controlPlaneMatcher, final List<? extends KeyAndValue> entries)
@@ -52,7 +52,7 @@ public class NottableStringHashMap
 	
 	public boolean allKeysNotted()
 	{
-		for(final NottableString key : this.backingMap.keySet())
+		for(final NottableString key : this.keyValues.keySet())
 		{
 			if(!key.isNot())
 			{
@@ -64,7 +64,7 @@ public class NottableStringHashMap
 	
 	public boolean allKeysOptional()
 	{
-		for(final NottableString key : this.backingMap.keySet())
+		for(final NottableString key : this.keyValues.keySet())
 		{
 			if(!key.isOptional())
 			{
@@ -76,24 +76,24 @@ public class NottableStringHashMap
 	
 	public boolean isEmpty()
 	{
-		return this.backingMap.isEmpty();
+		return this.keyValues.isEmpty();
 	}
 	
 	private void put(final NottableString key, final NottableString value)
 	{
-		this.backingMap.put(key, value != null ? value : string(""));
+		this.keyValues.put(key, value != null ? value : string(""));
 	}
 	
 	private List<ImmutableEntry> entryList()
 	{
-		if(!this.backingMap.isEmpty())
+		if(!this.keyValues.isEmpty())
 		{
-			final List<ImmutableEntry> entrySet = new ArrayList<>();
-			for(final Map.Entry<NottableString, NottableString> entry : this.backingMap.entrySet())
+			final List<ImmutableEntry> entries = new ArrayList<>();
+			for(final Map.Entry<NottableString, NottableString> entry : this.keyValues.entrySet())
 			{
-				entrySet.add(entry(this.regexStringMatcher, entry.getKey(), entry.getValue()));
+				entries.add(entry(this.regexStringMatcher, entry.getKey(), entry.getValue()));
 			}
-			return entrySet;
+			return entries;
 		}
 		else
 		{

@@ -1319,7 +1319,6 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 		return this;
 	}
 	
-	@SuppressWarnings({"PMD.NPathComplexity"})
 	@Override
 	public boolean equals(final Object o)
 	{
