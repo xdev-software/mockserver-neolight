@@ -59,13 +59,13 @@ public abstract class Body<T> extends Not
 	}
 	
 	@JsonIgnore
-	public Charset getCharset(final Charset defaultIfNotSet)
+	public Charset getCharset(final Charset defaultCharset)
 	{
 		if(this instanceof BodyWithContentType)
 		{
-			return this.getCharset(defaultIfNotSet);
+			return this.getCharset(defaultCharset);
 		}
-		return defaultIfNotSet;
+		return defaultCharset;
 	}
 	
 	public String getContentType()

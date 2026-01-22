@@ -48,9 +48,9 @@ public abstract class BodyWithContentType<T> extends Body<T>
 	
 	@Override
 	@JsonIgnore
-	public Charset getCharset(final Charset defaultIfNotSet)
+	public Charset getCharset(final Charset defaultCharset)
 	{
-		return this.determineCharacterSet(this.contentType, defaultIfNotSet);
+		return this.determineCharacterSet(this.contentType, defaultCharset);
 	}
 	
 	@Override

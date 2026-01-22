@@ -31,6 +31,7 @@ public class CircularPriorityQueue<K, V, SLK extends Keyed<K>>
 	private final int maxSize;
 	private final Function<V, SLK> skipListKeyFunction;
 	private final Function<V, K> mapKeyFunction;
+	@SuppressWarnings("checkstyle:IllegalIdentifierName")
 	private final ConcurrentSkipListSet<SLK> sortOrderSkipList;
 	private final ConcurrentLinkedQueue<V> insertionOrderQueue = new ConcurrentLinkedQueue<>();
 	private final ConcurrentMap<K, V> byKey = new ConcurrentHashMap<>();

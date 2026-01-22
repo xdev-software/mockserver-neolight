@@ -42,9 +42,9 @@ public class StringBodySerializer extends StdSerializer<StringBody>
 		final boolean notFieldSetAndNotDefault = stringBody.getNot() != null && stringBody.getNot();
 		final boolean optionalFieldSetAndNotDefault = stringBody.getOptional() != null && stringBody.getOptional();
 		final boolean subStringFieldNotDefault = stringBody.isSubString();
-		final boolean contentTypeFieldSet = stringBody.getContentType() != null;
+		final boolean contentTypeFields = stringBody.getContentType() != null;
 		if(this.serialiseDefaultValues || notFieldSetAndNotDefault || optionalFieldSetAndNotDefault
-			|| contentTypeFieldSet
+			|| contentTypeFields
 			|| subStringFieldNotDefault)
 		{
 			jgen.writeStartObject();
@@ -62,7 +62,7 @@ public class StringBodySerializer extends StdSerializer<StringBody>
 			{
 				jgen.writeBooleanField("subString", true);
 			}
-			if(contentTypeFieldSet)
+			if(contentTypeFields)
 			{
 				jgen.writeStringField("contentType", stringBody.getContentType());
 			}

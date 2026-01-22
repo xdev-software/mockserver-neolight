@@ -135,33 +135,31 @@ public class LogEventRequestAndResponseSerializer
 		}
 		else
 		{
-			final List<String> jsonRequestList =
+			final List<String> jsonRequests =
 				this.jsonArraySerializer.splitJSONArray(jsonHttpRequestAndHttpResponse);
-			if(jsonRequestList.isEmpty())
+			if(jsonRequests.isEmpty())
 			{
 				throw new IllegalArgumentException(
 					"1 error:" + NEW_LINE + " - a request or array of request is required");
 			}
-			else
+			
+			final List<String> validationErrors = new ArrayList<>();
+			for(final String jsonRequest : jsonRequests)
 			{
-				final List<String> validationErrorsList = new ArrayList<>();
-				for(final String jsonRequest : jsonRequestList)
+				try
 				{
-					try
-					{
-						httpRequestAndHttpResponses.add(this.deserialize(jsonRequest));
-					}
-					catch(final IllegalArgumentException iae)
-					{
-						validationErrorsList.add(iae.getMessage());
-					}
+					httpRequestAndHttpResponses.add(this.deserialize(jsonRequest));
 				}
-				if(!validationErrorsList.isEmpty())
+				catch(final IllegalArgumentException iae)
 				{
-					throw new IllegalArgumentException((validationErrorsList.size() > 1 ? "[" : "")
-						+ String.join("," + NEW_LINE, validationErrorsList)
-						+ (validationErrorsList.size() > 1 ? "]" : ""));
+					validationErrors.add(iae.getMessage());
 				}
+			}
+			if(!validationErrors.isEmpty())
+			{
+				throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
+					+ String.join("," + NEW_LINE, validationErrors)
+					+ (validationErrors.size() > 1 ? "]" : ""));
 			}
 		}
 		return httpRequestAndHttpResponses.toArray(new LogEventRequestAndResponse[0]);

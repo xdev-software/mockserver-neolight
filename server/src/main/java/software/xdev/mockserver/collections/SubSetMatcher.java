@@ -64,12 +64,12 @@ public final class SubSetMatcher
 		final MatchDifference context,
 		final RegexStringMatcher regexStringMatcher,
 		final ImmutableEntry matcherItem,
-		final List<ImmutableEntry> matchedList)
+		final List<ImmutableEntry> matches)
 	{
 		final Set<Integer> matchingIndexes = new HashSet<>();
-		for(int i = 0; i < matchedList.size(); i++)
+		for(int i = 0; i < matches.size(); i++)
 		{
-			final ImmutableEntry matchedItem = matchedList.get(i);
+			final ImmutableEntry matchedItem = matches.get(i);
 			final boolean keyMatches = regexStringMatcher.matches(context, matcherItem.getKey(), matchedItem.getKey());
 			final boolean valueMatches =
 				regexStringMatcher.matches(context, matcherItem.getValue(), matchedItem.getValue());
@@ -84,9 +84,9 @@ public final class SubSetMatcher
 	private static boolean containsKey(
 		final RegexStringMatcher regexStringMatcher,
 		final ImmutableEntry matcherItem,
-		final List<ImmutableEntry> matchedList)
+		final List<ImmutableEntry> matches)
 	{
-		for(final ImmutableEntry matchedItem : matchedList)
+		for(final ImmutableEntry matchedItem : matches)
 		{
 			if(regexStringMatcher.matches(matcherItem.getKey(), matchedItem.getKey()))
 			{
@@ -99,12 +99,12 @@ public final class SubSetMatcher
 	private static boolean nottedAndPresent(
 		final RegexStringMatcher regexStringMatcher,
 		final ImmutableEntry matcherItem,
-		final List<ImmutableEntry> matchedList)
+		final List<ImmutableEntry> matches)
 	{
 		if(matcherItem.getKey().isNot())
 		{
 			final NottableString unNottedMatcherItemKey = string(matcherItem.getKey().getValue());
-			for(final ImmutableEntry matchedItem : matchedList)
+			for(final ImmutableEntry matchedItem : matches)
 			{
 				if(!matchedItem.getKey().isNot() && regexStringMatcher.matches(
 					unNottedMatcherItemKey,

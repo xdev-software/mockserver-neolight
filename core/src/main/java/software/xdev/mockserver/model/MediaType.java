@@ -133,7 +133,7 @@ public class MediaType
 				.trim()
 				.toLowerCase())
 			.replaceAll("");
-		Map<String, String> parameterMap = new ConcurrentHashMap<>();
+		Map<String, String> parameterValues = new ConcurrentHashMap<>();
 		if(isNotBlank(parameters))
 		{
 			try
@@ -145,16 +145,16 @@ public class MediaType
 					final String value = substringAfter(parameterTrimmed, "=").trim();
 					if(isNotBlank(key) && isNotBlank(value))
 					{
-						parameterMap.put(
+						parameterValues.put(
 							key,
 							value
 						);
 					}
 				}
-				if(parameterMap.size() > 1)
+				if(parameterValues.size() > 1)
 				{
 					// sort if multiple entries to ensure equals and hashcode is consistent
-					parameterMap = parameterMap.entrySet()
+					parameterValues = parameterValues.entrySet()
 						.stream()
 						.sorted(Map.Entry.comparingByKey())
 						.collect(Collectors.toMap(
@@ -174,7 +174,7 @@ public class MediaType
 					ex);
 			}
 		}
-		return new MediaType(type, subType, parameterMap);
+		return new MediaType(type, subType, parameterValues);
 	}
 	
 	private static TreeMap<String, String> createParametersMap(final Map<String, String> initialValues)
@@ -204,14 +204,14 @@ public class MediaType
 		final String type,
 		final String subtype,
 		final String charset,
-		final Map<String, String> parameterMap)
+		final Map<String, String> parameterValues)
 	{
 		this.type = isBlank(type) ? null : type;
 		this.subtype = isBlank(subtype) ? null : subtype;
 		this.parameters = new TreeMap<>(String::compareToIgnoreCase);
-		if(parameterMap != null)
+		if(parameterValues != null)
 		{
-			parameterMap.forEach((key, value) -> this.parameters.put(key.toLowerCase(), value));
+			parameterValues.forEach((key, value) -> this.parameters.put(key.toLowerCase(), value));
 		}
 		Charset parsedCharset = null;
 		if(isNotBlank(charset))

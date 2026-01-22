@@ -134,38 +134,38 @@ public class ExpectationSerializer implements Serializer<Expectation>
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	public Expectation[] deserializeArray(
-		final String jsonExpectations,
+		final String strJsonExpectations,
 		final boolean allowEmpty,
 		final BiFunction<String, List<Expectation>, List<Expectation>> expectationModifier)
 	{
-		if(isBlank(jsonExpectations))
+		if(isBlank(strJsonExpectations))
 		{
 			throw new IllegalArgumentException(
 				"1 error:" + NEW_LINE + " - an expectation or expectation array is required but value was \""
-					+ jsonExpectations + "\"");
+					+ strJsonExpectations + "\"");
 		}
 		final List<Expectation> expectations = new ArrayList<>();
-		final List<String> validationErrorsList = new ArrayList<>();
-		final List<JsonNode> jsonExpectationList =
-			this.jsonArraySerializer.splitJSONArrayToJSONNodes(jsonExpectations);
-		if(!jsonExpectationList.isEmpty())
+		final List<String> validationErrors = new ArrayList<>();
+		final List<JsonNode> jsonExpectations =
+			this.jsonArraySerializer.splitJSONArrayToJSONNodes(strJsonExpectations);
+		if(!jsonExpectations.isEmpty())
 		{
-			for(int i = 0; i < jsonExpectationList.size(); i++)
+			for(int i = 0; i < jsonExpectations.size(); i++)
 			{
-				final String jsonExpectation = JacksonUtils.prettyPrint(jsonExpectationList.get(i));
-				if(jsonExpectationList.size() > 100)
+				final String jsonExpectation = JacksonUtils.prettyPrint(jsonExpectations.get(i));
+				if(jsonExpectations.size() > 100)
 				{
 					if(LOG.isDebugEnabled())
 					{
 						LOG.debug(
 							"Processing JSON expectation {} of {}: {}",
 							i + 1,
-							jsonExpectationList.size(),
+							jsonExpectations.size(),
 							jsonExpectation);
 					}
 					else if(LOG.isInfoEnabled())
 					{
-						LOG.info("Processing JSON expectation {} of {}", i + 1, jsonExpectationList.size());
+						LOG.info("Processing JSON expectation {} of {}", i + 1, jsonExpectations.size());
 					}
 				}
 				try
@@ -176,21 +176,21 @@ public class ExpectationSerializer implements Serializer<Expectation>
 				}
 				catch(final IllegalArgumentException iae)
 				{
-					validationErrorsList.add(iae.getMessage());
+					validationErrors.add(iae.getMessage());
 				}
 			}
-			if(!validationErrorsList.isEmpty())
+			if(!validationErrors.isEmpty())
 			{
-				if(validationErrorsList.size() > 1)
+				if(validationErrors.size() > 1)
 				{
 					throw new IllegalArgumentException(("[" + NEW_LINE
-						+ String.join("," + NEW_LINE + NEW_LINE, validationErrorsList))
+						+ String.join("," + NEW_LINE + NEW_LINE, validationErrors))
 						.replaceAll(NEW_LINE, NEW_LINE + "  ")
 						+ NEW_LINE + "]");
 				}
 				else
 				{
-					throw new IllegalArgumentException(validationErrorsList.get(0));
+					throw new IllegalArgumentException(validationErrors.get(0));
 				}
 			}
 		}

@@ -34,7 +34,7 @@ import software.xdev.mockserver.model.NottableString;
 
 public class NottableStringMultiMap
 {
-	private final Map<NottableString, List<NottableString>> backingMap = new LinkedHashMap<>();
+	private final Map<NottableString, List<NottableString>> keyValues = new LinkedHashMap<>();
 	private final RegexStringMatcher regexStringMatcher;
 	private final KeyMatchStyle keyMatchStyle;
 	
@@ -47,7 +47,7 @@ public class NottableStringMultiMap
 		this.regexStringMatcher = new RegexStringMatcher(controlPlaneMatcher);
 		for(final KeyToMultiValue keyToMultiValue : entries)
 		{
-			this.backingMap.put(keyToMultiValue.getName(), keyToMultiValue.getValues());
+			this.keyValues.put(keyToMultiValue.getName(), keyToMultiValue.getValues());
 		}
 	}
 	
@@ -76,7 +76,7 @@ public class NottableStringMultiMap
 			}
 			case MATCHING_KEY:
 			{
-				for(final NottableString matcherKey : subset.backingMap.keySet())
+				for(final NottableString matcherKey : subset.keyValues.keySet())
 				{
 					final List<NottableString> matchedValuesForKey = this.getAll(matcherKey);
 					if(matchedValuesForKey.isEmpty() && !matcherKey.isOptional())
@@ -128,7 +128,7 @@ public class NottableStringMultiMap
 	{
 		if(!this.isEmpty())
 		{
-			for(final NottableString key : this.backingMap.keySet())
+			for(final NottableString key : this.keyValues.keySet())
 			{
 				if(!key.isNot())
 				{
@@ -143,7 +143,7 @@ public class NottableStringMultiMap
 	{
 		if(!this.isEmpty())
 		{
-			for(final NottableString key : this.backingMap.keySet())
+			for(final NottableString key : this.keyValues.keySet())
 			{
 				if(!key.isOptional())
 				{
@@ -156,47 +156,43 @@ public class NottableStringMultiMap
 	
 	public boolean isEmpty()
 	{
-		return this.backingMap.isEmpty();
+		return this.keyValues.isEmpty();
 	}
 	
 	private List<NottableString> getAll(final NottableString key)
 	{
-		if(!this.isEmpty())
-		{
-			final List<NottableString> values = new ArrayList<>();
-			for(final Map.Entry<NottableString, List<NottableString>> entry : this.backingMap.entrySet())
-			{
-				if(this.regexStringMatcher.matches(key, entry.getKey()))
-				{
-					values.addAll(entry.getValue());
-				}
-			}
-			return values;
-		}
-		else
+		if(this.isEmpty())
 		{
 			return Collections.emptyList();
 		}
+		
+		final List<NottableString> values = new ArrayList<>();
+		for(final Map.Entry<NottableString, List<NottableString>> entry : this.keyValues.entrySet())
+		{
+			if(this.regexStringMatcher.matches(key, entry.getKey()))
+			{
+				values.addAll(entry.getValue());
+			}
+		}
+		return values;
 	}
 	
 	private List<ImmutableEntry> entryList()
 	{
-		if(!this.isEmpty())
-		{
-			final List<ImmutableEntry> entrySet = new ArrayList<>();
-			for(final Map.Entry<NottableString, List<NottableString>> entry : this.backingMap.entrySet())
-			{
-				for(final NottableString value : entry.getValue())
-				{
-					entrySet.add(entry(this.regexStringMatcher, entry.getKey(), value));
-				}
-			}
-			return entrySet;
-		}
-		else
+		if(this.isEmpty())
 		{
 			return Collections.emptyList();
 		}
+		
+		final List<ImmutableEntry> entries = new ArrayList<>();
+		for(final Map.Entry<NottableString, List<NottableString>> entry : this.keyValues.entrySet())
+		{
+			for(final NottableString value : entry.getValue())
+			{
+				entries.add(entry(this.regexStringMatcher, entry.getKey(), value));
+			}
+		}
+		return entries;
 	}
 	
 	@Override
@@ -214,7 +210,7 @@ public class NottableStringMultiMap
 		{
 			return false;
 		}
-		return Objects.equals(this.backingMap, that.backingMap)
+		return Objects.equals(this.keyValues, that.keyValues)
 			&& Objects.equals(this.regexStringMatcher, that.regexStringMatcher)
 			&& this.getKeyMatchStyle() == that.getKeyMatchStyle();
 	}
@@ -222,7 +218,7 @@ public class NottableStringMultiMap
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(super.hashCode(), this.backingMap, this.regexStringMatcher, this.getKeyMatchStyle());
+		return Objects.hash(super.hashCode(), this.keyValues, this.regexStringMatcher, this.getKeyMatchStyle());
 	}
 }
 
