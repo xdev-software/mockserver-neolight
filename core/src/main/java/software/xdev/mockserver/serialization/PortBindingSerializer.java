@@ -15,17 +15,11 @@
  */
 package software.xdev.mockserver.serialization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.model.PortBinding;
 
 
-public class PortBindingSerializer implements Serializer<PortBinding>
+public class PortBindingSerializer extends AbstractSerializer<PortBinding>
 {
-	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-	
 	@Override
 	public String serialize(final PortBinding portBinding)
 	{
@@ -59,11 +53,5 @@ public class PortBindingSerializer implements Serializer<PortBinding>
 			}
 		}
 		return portBinding;
-	}
-	
-	@Override
-	public Class<PortBinding> supportsType()
-	{
-		return PortBinding.class;
 	}
 }

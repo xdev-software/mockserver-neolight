@@ -15,7 +15,7 @@
  */
 package software.xdev.mockserver.model;
 
-import software.xdev.mockserver.serialization.ObjectMapperFactory;
+import software.xdev.mockserver.serialization.ObjectMappers;
 
 
 public abstract class ObjectWithJsonToString
@@ -27,9 +27,7 @@ public abstract class ObjectWithJsonToString
 	{
 		try
 		{
-			String valueAsString = ObjectMapperFactory
-				.createObjectMapper(true, false)
-				.writeValueAsString(this);
+			String valueAsString = ObjectMappers.PRETTY_PRINT_WRITER.writeValueAsString(this);
 			if(valueAsString.startsWith(ESCAPED_QUOTE) && valueAsString.endsWith(ESCAPED_QUOTE))
 			{
 				valueAsString = valueAsString.substring(1, valueAsString.length() - 1);

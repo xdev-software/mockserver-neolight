@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.RequestDefinition;
@@ -33,10 +31,8 @@ import software.xdev.mockserver.serialization.model.HttpRequestPrettyPrintedDTO;
 import software.xdev.mockserver.serialization.model.RequestDefinitionDTO;
 
 
-public class RequestDefinitionSerializer implements Serializer<RequestDefinition>
+public class RequestDefinitionSerializer extends AbstractSerializer<RequestDefinition>
 {
-	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
 	
 	@Override
@@ -147,12 +143,6 @@ public class RequestDefinitionSerializer implements Serializer<RequestDefinition
 				"exception while parsing [" + jsonRequestDefinition + "] for RequestDefinition",
 				ex);
 		}
-	}
-	
-	@Override
-	public Class<RequestDefinition> supportsType()
-	{
-		return RequestDefinition.class;
 	}
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")

@@ -71,99 +71,40 @@ import software.xdev.mockserver.serialization.serializers.string.NottableStringS
 
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public final class ObjectMapperFactory
+public final class ObjectMappers
 {
-	private static ObjectMapper objectMapper =
+	public static final ObjectWriter BASE_WRITER_PRETTY =
+		buildObjectMapperWithoutRemovingEmptyValues().writerWithDefaultPrettyPrinter();
+	
+	public static final ObjectMapper DEFAULT_MAPPER =
 		buildObjectMapperWithDeserializerAndSerializers(Collections.emptyList(), Collections.emptyList(), false);
-	private static final ObjectWriter PRETTY_PRINT_WRITER =
+	public static final ObjectWriter DEFAULT_WRITER_PRETTY = DEFAULT_MAPPER.writerWithDefaultPrettyPrinter();
+	
+	public static final ObjectWriter PRETTY_PRINT_WRITER =
 		buildObjectMapperWithDeserializerAndSerializers(
 			Collections.emptyList(),
 			Collections.emptyList(),
 			false).writerWithDefaultPrettyPrinter();
-	private static final ObjectWriter PRETTY_PRINT_WRITER_THAT_SERIALISES_DEFAULT_FIELDS =
+	public static final ObjectWriter PRETTY_PRINT_WRITER_THAT_SERIALISES_DEFAULT_FIELDS =
 		buildObjectMapperWithDeserializerAndSerializers(
 			Collections.emptyList(),
 			Collections.emptyList(),
 			true).writerWithDefaultPrettyPrinter();
-	private static final ObjectWriter WRITER = buildObjectMapperWithDeserializerAndSerializers(
-		Collections.emptyList(),
-		Collections.emptyList(),
-		false).writer();
-	
-	public static ObjectMapper createObjectMapper()
-	{
-		if(objectMapper == null)
-		{
-			objectMapper = buildObjectMapperWithDeserializerAndSerializers(
-				Collections.emptyList(),
-				Collections.emptyList(),
-				false);
-		}
-		return objectMapper;
-	}
 	
 	public static ObjectMapper createObjectMapper(final JsonDeserializer... replacementJsonDeserializers)
 	{
 		if(replacementJsonDeserializers == null || replacementJsonDeserializers.length == 0)
 		{
-			if(objectMapper == null)
-			{
-				objectMapper = buildObjectMapperWithDeserializerAndSerializers(
-					Collections.emptyList(),
-					Collections.emptyList(),
-					false);
-			}
-			return objectMapper;
+			return DEFAULT_MAPPER;
 		}
-		else
-		{
-			return buildObjectMapperWithDeserializerAndSerializers(
-				Arrays.asList(replacementJsonDeserializers),
-				Collections.emptyList(),
-				false);
-		}
+		
+		return buildObjectMapperWithDeserializerAndSerializers(
+			Arrays.asList(replacementJsonDeserializers),
+			Collections.emptyList(),
+			false);
 	}
 	
-	public static ObjectWriter createObjectMapper(
-		final boolean pretty,
-		final boolean serialiseDefaultValues,
-		final JsonSerializer... additionJsonSerializers)
-	{
-		if(additionJsonSerializers == null || additionJsonSerializers.length == 0)
-		{
-			if(pretty && serialiseDefaultValues)
-			{
-				return PRETTY_PRINT_WRITER_THAT_SERIALISES_DEFAULT_FIELDS;
-			}
-			else if(pretty)
-			{
-				return PRETTY_PRINT_WRITER;
-			}
-			else
-			{
-				return WRITER;
-			}
-		}
-		else
-		{
-			if(pretty)
-			{
-				return buildObjectMapperWithDeserializerAndSerializers(
-					Collections.emptyList(),
-					Arrays.asList(additionJsonSerializers),
-					serialiseDefaultValues).writerWithDefaultPrettyPrinter();
-			}
-			else
-			{
-				return buildObjectMapperWithDeserializerAndSerializers(
-					Collections.emptyList(),
-					Arrays.asList(additionJsonSerializers),
-					serialiseDefaultValues).writer();
-			}
-		}
-	}
-	
-	public static ObjectMapper buildObjectMapperWithoutRemovingEmptyValues()
+	private static ObjectMapper buildObjectMapperWithoutRemovingEmptyValues()
 	{
 		return JsonMapper.builder(JsonFactory.builder()
 			// relax parsing
@@ -196,7 +137,7 @@ public final class ObjectMapperFactory
 			.build();
 	}
 	
-	public static ObjectMapper buildObjectMapperWithOnlyConfigurationDefaults()
+	private static ObjectMapper buildObjectMapperWithOnlyConfigurationDefaults()
 	{
 		return buildObjectMapperWithoutRemovingEmptyValues()
 			// remove empty values from JSON
@@ -327,7 +268,7 @@ public final class ObjectMapperFactory
 		return customizers;
 	}
 	
-	private ObjectMapperFactory()
+	private ObjectMappers()
 	{
 	}
 }

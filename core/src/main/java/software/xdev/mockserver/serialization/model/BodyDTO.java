@@ -23,21 +23,18 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import software.xdev.mockserver.model.BinaryBody;
 import software.xdev.mockserver.model.Body;
 import software.xdev.mockserver.model.ParameterBody;
 import software.xdev.mockserver.model.RegexBody;
 import software.xdev.mockserver.model.StringBody;
-import software.xdev.mockserver.serialization.ObjectMapperFactory;
+import software.xdev.mockserver.serialization.ObjectMappers;
 
 
 public abstract class BodyDTO extends NotDTO implements DTO<Body<?>>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BodyDTO.class);
 	
-	private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.createObjectMapper();
 	private final Body.Type type;
 	private Boolean optional;
 	
@@ -86,7 +83,7 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>>
 		{
 			try
 			{
-				return OBJECT_MAPPER.writeValueAsString(typedDTO.getParameters().getMultimap());
+				return ObjectMappers.DEFAULT_MAPPER.writeValueAsString(typedDTO.getParameters().getMultimap());
 			}
 			catch(final Exception ex)
 			{

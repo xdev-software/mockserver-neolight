@@ -18,23 +18,21 @@ package software.xdev.mockserver.serialization;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestPrettyPrintedDTO;
 
 
-public class HttpRequestSerializer implements Serializer<HttpRequest>
+public class HttpRequestSerializer extends AbstractSerializer<HttpRequest>
 {
-	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
 	
 	@Override
@@ -51,14 +49,13 @@ public class HttpRequestSerializer implements Serializer<HttpRequest>
 			{
 				return this.objectWriter.writeValueAsString(new HttpRequestPrettyPrintedDTO(httpRequest));
 			}
-			else
-			{
-				return this.objectWriter.writeValueAsString(new HttpRequestDTO(httpRequest));
-			}
+			return this.objectWriter.writeValueAsString(new HttpRequestDTO(httpRequest));
 		}
-		catch(final Exception e)
+		catch(final JsonProcessingException e)
 		{
-			throw new RuntimeException("Exception while serializing HttpRequest to JSON with value " + httpRequest, e);
+			throw new UncheckedIOException(
+				"Exception while serializing HttpRequest to JSON with value " + httpRequest,
+				e);
 		}
 	}
 	
@@ -155,13 +152,6 @@ public class HttpRequestSerializer implements Serializer<HttpRequest>
 		return httpRequest;
 	}
 	
-	@Override
-	public Class<HttpRequest> supportsType()
-	{
-		return HttpRequest.class;
-	}
-	
-	@SuppressWarnings("PMD.CognitiveComplexity")
 	public HttpRequest[] deserializeArray(final String jsonHttpRequests)
 	{
 		final List<HttpRequest> httpRequests = new ArrayList<>();
@@ -171,33 +161,31 @@ public class HttpRequestSerializer implements Serializer<HttpRequest>
 				"1 error:" + NEW_LINE + " - a request or request array is required but value was \"" + jsonHttpRequests
 					+ "\"");
 		}
-		else
+		
+		final List<String> jsonRequests = this.jsonArraySerializer.splitJSONArray(jsonHttpRequests);
+		if(jsonRequests.isEmpty())
 		{
-			final List<String> jsonRequests = this.jsonArraySerializer.splitJSONArray(jsonHttpRequests);
-			if(jsonRequests.isEmpty())
+			throw new IllegalArgumentException(
+				"1 error:" + NEW_LINE + " - a request or array of request is required");
+		}
+		
+		final List<String> validationErrors = new ArrayList<>();
+		for(final String jsonRequest : jsonRequests)
+		{
+			try
 			{
-				throw new IllegalArgumentException(
-					"1 error:" + NEW_LINE + " - a request or array of request is required");
+				httpRequests.add(this.deserialize(jsonRequest));
 			}
-			
-			final List<String> validationErrors = new ArrayList<>();
-			for(final String jsonRequest : jsonRequests)
+			catch(final IllegalArgumentException iae)
 			{
-				try
-				{
-					httpRequests.add(this.deserialize(jsonRequest));
-				}
-				catch(final IllegalArgumentException iae)
-				{
-					validationErrors.add(iae.getMessage());
-				}
+				validationErrors.add(iae.getMessage());
 			}
-			if(!validationErrors.isEmpty())
-			{
-				throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
-					+ String.join("," + NEW_LINE, validationErrors)
-					+ (validationErrors.size() > 1 ? "]" : ""));
-			}
+		}
+		if(!validationErrors.isEmpty())
+		{
+			throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
+				+ String.join("," + NEW_LINE, validationErrors)
+				+ (validationErrors.size() > 1 ? "]" : ""));
 		}
 		return httpRequests.toArray(new HttpRequest[0]);
 	}

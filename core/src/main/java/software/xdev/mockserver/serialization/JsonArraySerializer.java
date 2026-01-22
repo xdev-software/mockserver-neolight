@@ -21,14 +21,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 
 public class JsonArraySerializer
 {
-	private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.createObjectMapper();
-	
 	public List<String> splitJSONArray(final String jsonArray)
 	{
 		return this.splitJSONArrayToJSONNodes(jsonArray).stream()
@@ -41,7 +38,7 @@ public class JsonArraySerializer
 		final List<JsonNode> arrayItems = new ArrayList<>();
 		try
 		{
-			final JsonNode jsonNode = OBJECT_MAPPER.readTree(jsonArray);
+			final JsonNode jsonNode = ObjectMappers.DEFAULT_MAPPER.readTree(jsonArray);
 			if(jsonNode instanceof ArrayNode)
 			{
 				for(final JsonNode arrayElement : jsonNode)

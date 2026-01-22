@@ -15,7 +15,6 @@
  */
 package software.xdev.mockserver.serialization.deserializers.body;
 
-import static software.xdev.mockserver.serialization.ObjectMapperFactory.buildObjectMapperWithoutRemovingEmptyValues;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
 import java.io.IOException;
@@ -32,8 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import software.xdev.mockserver.model.BinaryBody;
@@ -43,7 +40,7 @@ import software.xdev.mockserver.model.ParameterBody;
 import software.xdev.mockserver.model.Parameters;
 import software.xdev.mockserver.model.RegexBody;
 import software.xdev.mockserver.model.StringBody;
-import software.xdev.mockserver.serialization.ObjectMapperFactory;
+import software.xdev.mockserver.serialization.ObjectMappers;
 import software.xdev.mockserver.serialization.model.BinaryBodyDTO;
 import software.xdev.mockserver.serialization.model.BodyDTO;
 import software.xdev.mockserver.serialization.model.ParameterBodyDTO;
@@ -64,9 +61,6 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
 		Map.entry("string", Body.Type.STRING)
 	));
 	private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
-	private static ObjectWriter objectWriter;
-	private static ObjectMapper objectMapper;
-	private static ObjectWriter jsonBodyObjectWriter;
 	
 	public StrictBodyDTODeserializer()
 	{
@@ -127,12 +121,7 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
 							|| this.containsIgnoreCase(key, "json", "jsonSchema")
 							&& !String.class.isAssignableFrom(entry.getValue().getClass()))
 						{
-							if(jsonBodyObjectWriter == null)
-							{
-								jsonBodyObjectWriter =
-									buildObjectMapperWithoutRemovingEmptyValues().writerWithDefaultPrettyPrinter();
-							}
-							valueJsonValue = jsonBodyObjectWriter.writeValueAsString(entry.getValue());
+							valueJsonValue = ObjectMappers.BASE_WRITER_PRETTY.writeValueAsString(entry.getValue());
 						}
 						else
 						{
@@ -227,18 +216,9 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
 					}
 					if("parameters".equalsIgnoreCase(key))
 					{
-						if(objectMapper == null)
-						{
-							objectMapper = ObjectMapperFactory.createObjectMapper();
-						}
-						if(objectWriter == null)
-						{
-							objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
-						}
-						parameters =
-							objectMapper.readValue(
-								objectWriter.writeValueAsString(entry.getValue()),
-								Parameters.class);
+						parameters = ObjectMappers.DEFAULT_MAPPER.readValue(
+							ObjectMappers.DEFAULT_WRITER_PRETTY.writeValueAsString(entry.getValue()),
+							Parameters.class);
 					}
 				}
 			}

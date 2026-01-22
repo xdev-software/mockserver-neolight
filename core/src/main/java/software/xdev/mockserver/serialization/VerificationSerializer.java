@@ -15,18 +15,12 @@
  */
 package software.xdev.mockserver.serialization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.serialization.model.VerificationDTO;
 import software.xdev.mockserver.verify.Verification;
 
 
-public class VerificationSerializer implements Serializer<Verification>
+public class VerificationSerializer extends AbstractSerializer<Verification>
 {
-	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-	
 	@Override
 	public String serialize(final Verification verification)
 	{
@@ -61,11 +55,5 @@ public class VerificationSerializer implements Serializer<Verification>
 				ex);
 		}
 		return null;
-	}
-	
-	@Override
-	public Class<Verification> supportsType()
-	{
-		return Verification.class;
 	}
 }

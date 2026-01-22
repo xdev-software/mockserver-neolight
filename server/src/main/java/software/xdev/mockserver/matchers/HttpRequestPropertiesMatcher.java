@@ -51,7 +51,7 @@ import software.xdev.mockserver.model.Protocol;
 import software.xdev.mockserver.model.RegexBody;
 import software.xdev.mockserver.model.RequestDefinition;
 import software.xdev.mockserver.model.StringBody;
-import software.xdev.mockserver.serialization.ObjectMapperFactory;
+import software.xdev.mockserver.serialization.ObjectMappers;
 import software.xdev.mockserver.serialization.deserializers.body.StrictBodyDTODeserializer;
 import software.xdev.mockserver.serialization.model.BodyDTO;
 import software.xdev.mockserver.util.StringUtils;
@@ -70,7 +70,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 	private static final String EXPECTATION_REQUEST_MATCHER_NOT_OPERATOR_IS_ENABLED =
 		COMMA + NEW_LINE + "expectation's request matcher 'not' operator is enabled";
 	private static final PathParametersDecoder PATH_PARAMETERS_DECODER = new PathParametersDecoder();
-	private static final ObjectWriter TO_STRING_OBJECT_WRITER = ObjectMapperFactory.createObjectMapper(true, false);
+	private static final ObjectWriter TO_STRING_OBJECT_WRITER = ObjectMappers.PRETTY_PRINT_WRITER;
 	private final ExpandedParameterDecoder expandedParameterDecoder;
 	private int hashCode;
 	private HttpRequest httpRequest;
@@ -711,7 +711,7 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 		if(this.objectMapperWithStrictBodyDTODeserializer == null)
 		{
 			this.objectMapperWithStrictBodyDTODeserializer =
-				ObjectMapperFactory.createObjectMapper(new StrictBodyDTODeserializer());
+				ObjectMappers.createObjectMapper(new StrictBodyDTODeserializer());
 		}
 		return this.objectMapperWithStrictBodyDTODeserializer;
 	}
