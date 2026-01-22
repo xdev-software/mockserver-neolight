@@ -22,10 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.serialization.model.HttpResponseDTO;
+import tools.jackson.databind.JsonNode;
 
 
 public class HttpResponseSerializer extends AbstractSerializer<HttpResponse>

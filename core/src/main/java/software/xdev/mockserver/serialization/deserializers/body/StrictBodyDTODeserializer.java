@@ -17,7 +17,6 @@ package software.xdev.mockserver.serialization.deserializers.body;
 
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -27,11 +26,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import software.xdev.mockserver.model.BinaryBody;
 import software.xdev.mockserver.model.Body;
@@ -46,6 +40,10 @@ import software.xdev.mockserver.serialization.model.BodyDTO;
 import software.xdev.mockserver.serialization.model.ParameterBodyDTO;
 import software.xdev.mockserver.serialization.model.RegexBodyDTO;
 import software.xdev.mockserver.serialization.model.StringBodyDTO;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 @SuppressWarnings("PMD.GodClass")
@@ -74,10 +72,10 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
 		"PMD.CyclomaticComplexity",
 		"PMD.AvoidDeeplyNestedIfStmts"})
 	@Override
-	public BodyDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
+	public BodyDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
 	{
 		BodyDTO result = null;
-		final JsonToken currentToken = jsonParser.getCurrentToken();
+		final JsonToken currentToken = jsonParser.currentToken();
 		String valueJsonValue = "";
 		byte[] rawBytes = null;
 		Body.Type type = null;

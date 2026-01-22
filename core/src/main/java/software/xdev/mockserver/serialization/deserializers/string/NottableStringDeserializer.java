@@ -19,15 +19,12 @@ import static software.xdev.mockserver.model.NottableOptionalString.optional;
 import static software.xdev.mockserver.model.NottableString.string;
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
 import software.xdev.mockserver.model.NottableString;
 import software.xdev.mockserver.model.ParameterStyle;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 public class NottableStringDeserializer extends StdDeserializer<NottableString>
@@ -39,37 +36,37 @@ public class NottableStringDeserializer extends StdDeserializer<NottableString>
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	public NottableString deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException
+	public NottableString deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
-		if(jsonParser.getCurrentToken() == JsonToken.START_OBJECT)
+		if(p.currentToken() == JsonToken.START_OBJECT)
 		{
 			Boolean not = null;
 			Boolean optional = null;
 			String value = null;
 			ParameterStyle parameterStyle = null;
 			
-			while(jsonParser.nextToken() != JsonToken.END_OBJECT)
+			while(p.nextToken() != JsonToken.END_OBJECT)
 			{
-				final String fieldName = jsonParser.currentName();
+				final String fieldName = p.currentName();
 				if("not".equals(fieldName))
 				{
-					jsonParser.nextToken();
-					not = jsonParser.getBooleanValue();
+					p.nextToken();
+					not = p.getBooleanValue();
 				}
 				else if("optional".equals(fieldName))
 				{
-					jsonParser.nextToken();
-					optional = jsonParser.getBooleanValue();
+					p.nextToken();
+					optional = p.getBooleanValue();
 				}
 				else if("value".equals(fieldName))
 				{
-					jsonParser.nextToken();
-					value = ctxt.readValue(jsonParser, String.class);
+					p.nextToken();
+					value = ctxt.readValue(p, String.class);
 				}
 				else if("parameterStyle".equals(fieldName))
 				{
-					jsonParser.nextToken();
-					parameterStyle = ctxt.readValue(jsonParser, ParameterStyle.class);
+					p.nextToken();
+					parameterStyle = ctxt.readValue(p, ParameterStyle.class);
 				}
 			}
 			
@@ -90,10 +87,10 @@ public class NottableStringDeserializer extends StdDeserializer<NottableString>
 			
 			return result;
 		}
-		else if(jsonParser.getCurrentToken() == JsonToken.VALUE_STRING
-			|| jsonParser.getCurrentToken() == JsonToken.FIELD_NAME)
+		else if(p.currentToken() == JsonToken.VALUE_STRING
+			|| p.currentToken() == JsonToken.PROPERTY_NAME)
 		{
-			return string(ctxt.readValue(jsonParser, String.class));
+			return string(ctxt.readValue(p, String.class));
 		}
 		return null;
 	}

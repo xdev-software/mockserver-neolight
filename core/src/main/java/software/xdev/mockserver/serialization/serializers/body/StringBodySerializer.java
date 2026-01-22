@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.body;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.model.StringBody;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class StringBodySerializer extends StdSerializer<StringBody>
@@ -36,41 +33,40 @@ public class StringBodySerializer extends StdSerializer<StringBody>
 	
 	@SuppressWarnings("PMD.NPathComplexity")
 	@Override
-	public void serialize(final StringBody stringBody, final JsonGenerator jgen, final SerializerProvider provider)
-		throws IOException
+	public void serialize(final StringBody value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		final boolean notFieldSetAndNotDefault = stringBody.getNot() != null && stringBody.getNot();
-		final boolean optionalFieldSetAndNotDefault = stringBody.getOptional() != null && stringBody.getOptional();
-		final boolean subStringFieldNotDefault = stringBody.isSubString();
-		final boolean contentTypeFields = stringBody.getContentType() != null;
+		final boolean notFieldSetAndNotDefault = value.getNot() != null && value.getNot();
+		final boolean optionalFieldSetAndNotDefault = value.getOptional() != null && value.getOptional();
+		final boolean subStringFieldNotDefault = value.isSubString();
+		final boolean contentTypeFields = value.getContentType() != null;
 		if(this.serialiseDefaultValues || notFieldSetAndNotDefault || optionalFieldSetAndNotDefault
 			|| contentTypeFields
 			|| subStringFieldNotDefault)
 		{
-			jgen.writeStartObject();
+			gen.writeStartObject();
 			if(notFieldSetAndNotDefault)
 			{
-				jgen.writeBooleanField("not", true);
+				gen.writeBooleanProperty("not", true);
 			}
 			if(optionalFieldSetAndNotDefault)
 			{
-				jgen.writeBooleanField("optional", true);
+				gen.writeBooleanProperty("optional", true);
 			}
-			jgen.writeStringField("type", stringBody.getType().name());
-			jgen.writeStringField("string", stringBody.getValue());
+			gen.writeStringProperty("type", value.getType().name());
+			gen.writeStringProperty("string", value.getValue());
 			if(subStringFieldNotDefault)
 			{
-				jgen.writeBooleanField("subString", true);
+				gen.writeBooleanProperty("subString", true);
 			}
 			if(contentTypeFields)
 			{
-				jgen.writeStringField("contentType", stringBody.getContentType());
+				gen.writeStringProperty("contentType", value.getContentType());
 			}
-			jgen.writeEndObject();
+			gen.writeEndObject();
 		}
 		else
 		{
-			jgen.writeString(stringBody.getValue());
+			gen.writeString(value.getValue());
 		}
 	}
 }

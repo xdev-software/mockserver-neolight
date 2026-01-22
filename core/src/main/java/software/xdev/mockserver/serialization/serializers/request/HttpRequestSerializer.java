@@ -17,13 +17,10 @@ package software.xdev.mockserver.serialization.serializers.request;
 
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.model.HttpRequest;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class HttpRequestSerializer extends StdSerializer<HttpRequest>
@@ -35,62 +32,61 @@ public class HttpRequestSerializer extends StdSerializer<HttpRequest>
 	
 	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
-	public void serialize(final HttpRequest httpRequest, final JsonGenerator jgen, final SerializerProvider provider)
-		throws IOException
+	public void serialize(final HttpRequest value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(httpRequest.getNot() != null && httpRequest.getNot())
+		gen.writeStartObject();
+		if(value.getNot() != null && value.getNot())
 		{
-			jgen.writeBooleanField("not", httpRequest.getNot());
+			gen.writeBooleanProperty("not", value.getNot());
 		}
-		if(httpRequest.getMethod() != null && !httpRequest.getMethod().isBlank())
+		if(value.getMethod() != null && !value.getMethod().isBlank())
 		{
-			jgen.writeObjectField("method", httpRequest.getMethod());
+			gen.writePOJOProperty("method", value.getMethod());
 		}
-		if(httpRequest.getPath() != null && !httpRequest.getPath().isBlank())
+		if(value.getPath() != null && !value.getPath().isBlank())
 		{
-			jgen.writeObjectField("path", httpRequest.getPath());
+			gen.writePOJOProperty("path", value.getPath());
 		}
-		if(httpRequest.getPathParameters() != null && !httpRequest.getPathParameters().isEmpty())
+		if(value.getPathParameters() != null && !value.getPathParameters().isEmpty())
 		{
-			jgen.writeObjectField("pathParameters", httpRequest.getPathParameters());
+			gen.writePOJOProperty("pathParameters", value.getPathParameters());
 		}
-		if(httpRequest.getQueryStringParameterList() != null && !httpRequest.getQueryStringParameterList().isEmpty())
+		if(value.getQueryStringParameterList() != null && !value.getQueryStringParameterList().isEmpty())
 		{
-			jgen.writeObjectField("queryStringParameters", httpRequest.getQueryStringParameters());
+			gen.writePOJOProperty("queryStringParameters", value.getQueryStringParameters());
 		}
-		if(httpRequest.getHeaderList() != null && !httpRequest.getHeaderList().isEmpty())
+		if(value.getHeaderList() != null && !value.getHeaderList().isEmpty())
 		{
-			jgen.writeObjectField("headers", httpRequest.getHeaders());
+			gen.writePOJOProperty("headers", value.getHeaders());
 		}
-		if(httpRequest.getCookieList() != null && !httpRequest.getCookieList().isEmpty())
+		if(value.getCookieList() != null && !value.getCookieList().isEmpty())
 		{
-			jgen.writeObjectField("cookies", httpRequest.getCookies());
+			gen.writePOJOProperty("cookies", value.getCookies());
 		}
-		if(httpRequest.isKeepAlive() != null)
+		if(value.isKeepAlive() != null)
 		{
-			jgen.writeBooleanField("keepAlive", httpRequest.isKeepAlive());
+			gen.writeBooleanProperty("keepAlive", value.isKeepAlive());
 		}
-		if(httpRequest.getSocketAddress() != null)
+		if(value.getSocketAddress() != null)
 		{
-			jgen.writeObjectField("socketAddress", httpRequest.getSocketAddress());
+			gen.writePOJOProperty("socketAddress", value.getSocketAddress());
 		}
-		if(httpRequest.getProtocol() != null)
+		if(value.getProtocol() != null)
 		{
-			jgen.writeStringField("protocol", httpRequest.getProtocol().name());
+			gen.writeStringProperty("protocol", value.getProtocol().name());
 		}
-		if(isNotBlank(httpRequest.getLocalAddress()))
+		if(isNotBlank(value.getLocalAddress()))
 		{
-			jgen.writeObjectField("localAddress", httpRequest.getLocalAddress());
+			gen.writePOJOProperty("localAddress", value.getLocalAddress());
 		}
-		if(isNotBlank(httpRequest.getRemoteAddress()))
+		if(isNotBlank(value.getRemoteAddress()))
 		{
-			jgen.writeObjectField("remoteAddress", httpRequest.getRemoteAddress());
+			gen.writePOJOProperty("remoteAddress", value.getRemoteAddress());
 		}
-		if(httpRequest.getBody() != null && isNotBlank(String.valueOf(httpRequest.getBody().getValue())))
+		if(value.getBody() != null && isNotBlank(String.valueOf(value.getBody().getValue())))
 		{
-			jgen.writeObjectField("body", httpRequest.getBody());
+			gen.writePOJOProperty("body", value.getBody());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

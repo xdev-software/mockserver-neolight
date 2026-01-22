@@ -18,12 +18,12 @@ package software.xdev.mockserver.serialization;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
+import tools.jackson.databind.ValueSerializer;
 
 
 public interface ObjectMapperFactoryCustomizer
 {
-	default Collection<JsonSerializer> additionalSerializers()
+	default Collection<ValueSerializer<?>> additionalSerializers()
 	{
 		return List.of();
 	}

@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.body;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.serialization.model.BinaryBodyDTO;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class BinaryBodyDTOSerializer extends StdSerializer<BinaryBodyDTO>
@@ -32,27 +29,23 @@ public class BinaryBodyDTOSerializer extends StdSerializer<BinaryBodyDTO>
 	}
 	
 	@Override
-	public void serialize(
-		final BinaryBodyDTO binaryBodyDTO,
-		final JsonGenerator jgen,
-		final SerializerProvider provider)
-		throws IOException
+	public void serialize(final BinaryBodyDTO value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(binaryBodyDTO.getNot() != null && binaryBodyDTO.getNot())
+		gen.writeStartObject();
+		if(value.getNot() != null && value.getNot())
 		{
-			jgen.writeBooleanField("not", binaryBodyDTO.getNot());
+			gen.writeBooleanProperty("not", value.getNot());
 		}
-		if(binaryBodyDTO.getOptional() != null && binaryBodyDTO.getOptional())
+		if(value.getOptional() != null && value.getOptional())
 		{
-			jgen.writeBooleanField("optional", binaryBodyDTO.getOptional());
+			gen.writeBooleanProperty("optional", value.getOptional());
 		}
-		jgen.writeStringField("type", binaryBodyDTO.getType().name());
-		jgen.writeObjectField("base64Bytes", binaryBodyDTO.getBase64Bytes());
-		if(binaryBodyDTO.getContentType() != null)
+		gen.writeStringProperty("type", value.getType().name());
+		gen.writePOJOProperty("base64Bytes", value.getBase64Bytes());
+		if(value.getContentType() != null)
 		{
-			jgen.writeStringField("contentType", binaryBodyDTO.getContentType());
+			gen.writeStringProperty("contentType", value.getContentType());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

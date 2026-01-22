@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.response;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.serialization.model.TimeToLiveDTO;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class TimeToLiveDTOSerializer extends StdSerializer<TimeToLiveDTO>
@@ -32,19 +29,18 @@ public class TimeToLiveDTOSerializer extends StdSerializer<TimeToLiveDTO>
 	}
 	
 	@Override
-	public void serialize(final TimeToLiveDTO timeToLive, final JsonGenerator jgen, final SerializerProvider provider)
-		throws IOException
+	public void serialize(final TimeToLiveDTO value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(!timeToLive.isUnlimited())
+		gen.writeStartObject();
+		if(!value.isUnlimited())
 		{
-			jgen.writeObjectField("timeUnit", timeToLive.getTimeUnit());
-			jgen.writeNumberField("timeToLive", timeToLive.getTimeToLive());
+			gen.writePOJOProperty("timeUnit", value.getTimeUnit());
+			gen.writeNumberProperty("timeToLive", value.getTimeToLive());
 		}
 		else
 		{
-			jgen.writeBooleanField("unlimited", timeToLive.isUnlimited());
+			gen.writeBooleanProperty("unlimited", value.isUnlimited());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

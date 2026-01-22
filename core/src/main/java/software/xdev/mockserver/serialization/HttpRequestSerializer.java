@@ -18,17 +18,14 @@ package software.xdev.mockserver.serialization;
 import static software.xdev.mockserver.character.Character.NEW_LINE;
 import static software.xdev.mockserver.util.StringUtils.isBlank;
 
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestPrettyPrintedDTO;
+import tools.jackson.databind.JsonNode;
 
 
 public class HttpRequestSerializer extends AbstractSerializer<HttpRequest>
@@ -43,20 +40,11 @@ public class HttpRequestSerializer extends AbstractSerializer<HttpRequest>
 	
 	public String serialize(final boolean prettyPrint, final HttpRequest httpRequest)
 	{
-		try
+		if(prettyPrint)
 		{
-			if(prettyPrint)
-			{
-				return this.objectWriter.writeValueAsString(new HttpRequestPrettyPrintedDTO(httpRequest));
-			}
-			return this.objectWriter.writeValueAsString(new HttpRequestDTO(httpRequest));
+			return this.objectWriter.writeValueAsString(new HttpRequestPrettyPrintedDTO(httpRequest));
 		}
-		catch(final JsonProcessingException e)
-		{
-			throw new UncheckedIOException(
-				"Exception while serializing HttpRequest to JSON with value " + httpRequest,
-				e);
-		}
+		return this.objectWriter.writeValueAsString(new HttpRequestDTO(httpRequest));
 	}
 	
 	public String serialize(final List<HttpRequest> httpRequests)

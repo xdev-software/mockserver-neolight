@@ -33,9 +33,6 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.codec.ExpandedParameterDecoder;
 import software.xdev.mockserver.codec.PathParametersDecoder;
 import software.xdev.mockserver.configuration.ServerConfiguration;
@@ -55,6 +52,8 @@ import software.xdev.mockserver.serialization.ObjectMappers;
 import software.xdev.mockserver.serialization.deserializers.body.StrictBodyDTODeserializer;
 import software.xdev.mockserver.serialization.model.BodyDTO;
 import software.xdev.mockserver.util.StringUtils;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
 
 
 @SuppressWarnings({"rawtypes", "PMD.GodClass"})
