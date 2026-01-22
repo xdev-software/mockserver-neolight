@@ -22,18 +22,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
 import software.xdev.mockserver.serialization.model.HttpRequestAndHttpResponseDTO;
+import tools.jackson.databind.JsonNode;
 
 
-public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequestAndHttpResponse>
+public class HttpRequestAndHttpResponseSerializer extends AbstractSerializer<HttpRequestAndHttpResponse>
 {
-	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
 	
 	@Override
@@ -41,7 +36,8 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 	{
 		try
 		{
-			return this.objectWriter.writeValueAsString(new HttpRequestAndHttpResponseDTO(httpRequestAndHttpResponse));
+			return this.objectWriter
+				.writeValueAsString(new HttpRequestAndHttpResponseDTO(httpRequestAndHttpResponse));
 		}
 		catch(final Exception e)
 		{
@@ -119,12 +115,6 @@ public class HttpRequestAndHttpResponseSerializer implements Serializer<HttpRequ
 				"exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
 		}
 		return httpRequestAndHttpResponse;
-	}
-	
-	@Override
-	public Class<HttpRequestAndHttpResponse> supportsType()
-	{
-		return HttpRequestAndHttpResponse.class;
 	}
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")

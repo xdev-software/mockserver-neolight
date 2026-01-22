@@ -36,7 +36,7 @@ import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.model.HttpError;
 import software.xdev.mockserver.model.HttpResponse;
 import software.xdev.mockserver.model.RequestDefinition;
-import software.xdev.mockserver.serialization.ObjectMapperFactory;
+import software.xdev.mockserver.serialization.ObjectMappers;
 import software.xdev.mockserver.time.EpochService;
 import software.xdev.mockserver.uuid.UUIDService;
 
@@ -394,9 +394,7 @@ public class EventEntry implements EventTranslator<EventEntry>
 	{
 		try
 		{
-			return ObjectMapperFactory
-				.createObjectMapper(true, false)
-				.writeValueAsString(this);
+			return ObjectMappers.PRETTY_PRINT_WRITER.writeValueAsString(this);
 		}
 		catch(final Exception e)
 		{

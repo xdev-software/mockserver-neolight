@@ -15,18 +15,12 @@
  */
 package software.xdev.mockserver.serialization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.serialization.model.VerificationSequenceDTO;
 import software.xdev.mockserver.verify.VerificationSequence;
 
 
-public class VerificationSequenceSerializer implements Serializer<VerificationSequence>
+public class VerificationSequenceSerializer extends AbstractSerializer<VerificationSequence>
 {
-	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
-	
 	@Override
 	public String serialize(final VerificationSequence verificationSequence)
 	{
@@ -59,11 +53,5 @@ public class VerificationSequenceSerializer implements Serializer<VerificationSe
 				"exception while parsing [" + jsonVerificationSequence + "] for VerificationSequence", ex);
 		}
 		return null;
-	}
-	
-	@Override
-	public Class<VerificationSequence> supportsType()
-	{
-		return VerificationSequence.class;
 	}
 }

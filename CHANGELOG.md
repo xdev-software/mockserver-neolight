@@ -1,3 +1,6 @@
+# 2.0.0
+* Updated Jackson Databind to v3
+
 # 1.3.1
 * Updated dependencies
 

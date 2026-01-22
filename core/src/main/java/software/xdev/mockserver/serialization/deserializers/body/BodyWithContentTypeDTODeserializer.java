@@ -17,7 +17,6 @@ package software.xdev.mockserver.serialization.deserializers.body;
 
 import static software.xdev.mockserver.util.StringUtils.isNotBlank;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -28,11 +27,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
 import software.xdev.mockserver.model.BinaryBody;
 import software.xdev.mockserver.model.Body;
 import software.xdev.mockserver.model.MediaType;
@@ -40,6 +34,10 @@ import software.xdev.mockserver.model.StringBody;
 import software.xdev.mockserver.serialization.model.BinaryBodyDTO;
 import software.xdev.mockserver.serialization.model.BodyWithContentTypeDTO;
 import software.xdev.mockserver.serialization.model.StringBodyDTO;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWithContentTypeDTO>
@@ -65,11 +63,10 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 		"PMD.CyclomaticComplexity",
 		"PMD.AvoidDeeplyNestedIfStmts"})
 	@Override
-	public BodyWithContentTypeDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
-		throws IOException
+	public BodyWithContentTypeDTO deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
 		BodyWithContentTypeDTO result = null;
-		final JsonToken currentToken = jsonParser.getCurrentToken();
+		final JsonToken currentToken = p.currentToken();
 		String valueJsonValue = "";
 		byte[] rawBytes = null;
 		Body.Type type = null;
@@ -80,7 +77,7 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 		if(currentToken == JsonToken.START_OBJECT)
 		{
 			@SuppressWarnings("unchecked")
-			final Map<Object, Object> body = (Map<Object, Object>)ctxt.readValue(jsonParser, Map.class);
+			final Map<Object, Object> body = (Map<Object, Object>)ctxt.readValue(p, Map.class);
 			for(final Map.Entry<Object, Object> entry : body.entrySet())
 			{
 				if(entry.getKey() instanceof final String key)
@@ -225,7 +222,7 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 		}
 		else if(currentToken == JsonToken.VALUE_STRING)
 		{
-			result = new StringBodyDTO(new StringBody(jsonParser.getText()));
+			result = new StringBodyDTO(new StringBody(p.getString()));
 		}
 		if(result != null)
 		{

@@ -17,14 +17,11 @@ package software.xdev.mockserver.serialization.serializers.collections;
 
 import static software.xdev.mockserver.model.NottableString.serialiseNottableString;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.model.Cookie;
 import software.xdev.mockserver.model.Cookies;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class CookiesSerializer extends StdSerializer<Cookies>
@@ -35,14 +32,13 @@ public class CookiesSerializer extends StdSerializer<Cookies>
 	}
 	
 	@Override
-	public void serialize(final Cookies collection, final JsonGenerator jgen, final SerializerProvider provider)
-		throws IOException
+	public void serialize(final Cookies value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		for(final Cookie cookie : collection.getEntries())
+		gen.writeStartObject();
+		for(final Cookie cookie : value.getEntries())
 		{
-			jgen.writeObjectField(serialiseNottableString(cookie.getName()), cookie.getValue());
+			gen.writePOJOProperty(serialiseNottableString(cookie.getName()), cookie.getValue());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

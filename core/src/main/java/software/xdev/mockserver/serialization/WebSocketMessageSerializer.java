@@ -15,12 +15,7 @@
  */
 package software.xdev.mockserver.serialization;
 
-import java.io.IOException;
 import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
@@ -29,10 +24,8 @@ import software.xdev.mockserver.serialization.model.WebSocketMessageDTO;
 
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class WebSocketMessageSerializer
+public class WebSocketMessageSerializer extends AbstractSerializer<Object>
 {
-	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final Map<Class, Serializer> serializers;
 	
 	public WebSocketMessageSerializer()
@@ -44,7 +37,8 @@ public class WebSocketMessageSerializer
 		);
 	}
 	
-	public String serialize(final Object message) throws JsonProcessingException
+	@Override
+	public String serialize(final Object message)
 	{
 		if(this.serializers.containsKey(message.getClass()))
 		{
@@ -52,32 +46,31 @@ public class WebSocketMessageSerializer
 				.setValue(this.serializers.get(message.getClass()).serialize(message));
 			return this.objectWriter.writeValueAsString(value);
 		}
-		else
-		{
-			return this.objectWriter.writeValueAsString(new WebSocketMessageDTO().setType(message.getClass().getName())
-				.setValue(this.objectMapper.writeValueAsString(message)));
-		}
+		return this.objectWriter.writeValueAsString(new WebSocketMessageDTO().setType(message.getClass().getName())
+			.setValue(this.objectMapper.writeValueAsString(message)));
 	}
 	
-	public Object deserialize(final String messageJson) throws ClassNotFoundException, IOException
+	@Override
+	public Object deserialize(final String messageJson)
 	{
-		final WebSocketMessageDTO webSocketMessageDTO =
-			this.objectMapper.readValue(messageJson, WebSocketMessageDTO.class);
-		if(webSocketMessageDTO.getType() != null && webSocketMessageDTO.getValue() != null)
+		try
 		{
-			final Class format = Class.forName(webSocketMessageDTO.getType());
-			if(this.serializers.containsKey(format))
+			final WebSocketMessageDTO webSocketMessageDTO =
+				this.objectMapper.readValue(messageJson, WebSocketMessageDTO.class);
+			if(webSocketMessageDTO.getType() != null && webSocketMessageDTO.getValue() != null)
 			{
-				return this.serializers.get(format).deserialize(webSocketMessageDTO.getValue());
-			}
-			else
-			{
+				final Class format = Class.forName(webSocketMessageDTO.getType());
+				if(this.serializers.containsKey(format))
+				{
+					return this.serializers.get(format).deserialize(webSocketMessageDTO.getValue());
+				}
 				return this.objectMapper.readValue(webSocketMessageDTO.getValue(), format);
 			}
-		}
-		else
-		{
 			return null;
+		}
+		catch(final ClassNotFoundException cnfe)
+		{
+			throw new IllegalStateException(cnfe);
 		}
 	}
 }

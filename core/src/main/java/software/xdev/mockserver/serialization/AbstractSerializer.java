@@ -15,16 +15,28 @@
  */
 package software.xdev.mockserver.serialization;
 
-import java.util.Collection;
-import java.util.List;
-
-import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
 
 
-public interface ObjectMapperFactoryCustomizer
+public abstract class AbstractSerializer<T> implements Serializer<T>
 {
-	default Collection<ValueSerializer<?>> additionalSerializers()
+	protected final ObjectWriter objectWriter;
+	protected final JsonMapper objectMapper;
+	
+	protected AbstractSerializer()
 	{
-		return List.of();
+		this(ObjectMappers.PRETTY_PRINT_WRITER);
+	}
+	
+	protected AbstractSerializer(final ObjectWriter objectWriter)
+	{
+		this(objectWriter, ObjectMappers.DEFAULT_MAPPER);
+	}
+	
+	protected AbstractSerializer(final ObjectWriter objectWriter, final JsonMapper objectMapper)
+	{
+		this.objectWriter = objectWriter;
+		this.objectMapper = objectMapper;
 	}
 }

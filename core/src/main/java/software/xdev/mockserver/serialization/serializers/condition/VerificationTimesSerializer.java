@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.condition;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.verify.VerificationTimes;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class VerificationTimesSerializer extends StdSerializer<VerificationTimes>
@@ -32,21 +29,17 @@ public class VerificationTimesSerializer extends StdSerializer<VerificationTimes
 	}
 	
 	@Override
-	public void serialize(
-		final VerificationTimes verificationTimesDTO,
-		final JsonGenerator jgen,
-		final SerializerProvider provider)
-		throws IOException
+	public void serialize(final VerificationTimes value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(verificationTimesDTO.getAtLeast() != -1)
+		gen.writeStartObject();
+		if(value.getAtLeast() != -1)
 		{
-			jgen.writeNumberField("atLeast", verificationTimesDTO.getAtLeast());
+			gen.writeNumberProperty("atLeast", value.getAtLeast());
 		}
-		if(verificationTimesDTO.getAtMost() != -1)
+		if(value.getAtMost() != -1)
 		{
-			jgen.writeNumberField("atMost", verificationTimesDTO.getAtMost());
+			gen.writeNumberProperty("atMost", value.getAtMost());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

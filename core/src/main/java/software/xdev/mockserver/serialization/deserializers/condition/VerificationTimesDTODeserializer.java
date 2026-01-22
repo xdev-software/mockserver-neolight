@@ -15,15 +15,12 @@
  */
 package software.xdev.mockserver.serialization.deserializers.condition;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
 import software.xdev.mockserver.serialization.model.VerificationTimesDTO;
 import software.xdev.mockserver.verify.VerificationTimes;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 public class VerificationTimesDTODeserializer extends StdDeserializer<VerificationTimesDTO>
@@ -35,8 +32,7 @@ public class VerificationTimesDTODeserializer extends StdDeserializer<Verificati
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	public VerificationTimesDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
-		throws IOException
+	public VerificationTimesDTO deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
 		VerificationTimesDTO verificationTimesDTO = null;
 		
@@ -45,28 +41,28 @@ public class VerificationTimesDTODeserializer extends StdDeserializer<Verificati
 		Integer atLeast = null;
 		Integer atMost = null;
 		
-		while(jsonParser.nextToken() != JsonToken.END_OBJECT)
+		while(p.nextToken() != JsonToken.END_OBJECT)
 		{
-			final String fieldName = jsonParser.currentName();
+			final String fieldName = p.currentName();
 			if("count".equals(fieldName))
 			{
-				jsonParser.nextToken();
-				count = jsonParser.getIntValue();
+				p.nextToken();
+				count = p.getIntValue();
 			}
 			else if("exact".equals(fieldName))
 			{
-				jsonParser.nextToken();
-				exact = jsonParser.getBooleanValue();
+				p.nextToken();
+				exact = p.getBooleanValue();
 			}
 			else if("atLeast".equals(fieldName))
 			{
-				jsonParser.nextToken();
-				atLeast = jsonParser.getIntValue();
+				p.nextToken();
+				atLeast = p.getIntValue();
 			}
 			else if("atMost".equals(fieldName))
 			{
-				jsonParser.nextToken();
-				atMost = jsonParser.getIntValue();
+				p.nextToken();
+				atMost = p.getIntValue();
 			}
 			
 			if(atLeast != null || atMost != null)

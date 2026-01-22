@@ -27,31 +27,27 @@ import java.util.function.BiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.mock.Expectation;
 import software.xdev.mockserver.serialization.model.ExpectationDTO;
+import tools.jackson.databind.JsonNode;
 
 
-public class ExpectationSerializer implements Serializer<Expectation>
+public class ExpectationSerializer extends AbstractSerializer<Expectation>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ExpectationSerializer.class);
 	
-	private final ObjectWriter objectWriter;
-	private final ObjectMapper objectMapper;
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
 	
 	public ExpectationSerializer()
 	{
-		this(false);
+		super();
 	}
 	
 	public ExpectationSerializer(final boolean serialiseDefaultValues)
 	{
-		this.objectWriter = ObjectMapperFactory.createObjectMapper(true, serialiseDefaultValues);
-		this.objectMapper = ObjectMapperFactory.createObjectMapper();
+		super(serialiseDefaultValues
+			? ObjectMappers.PRETTY_PRINT_WRITER_THAT_SERIALISES_DEFAULT_FIELDS
+			: ObjectMappers.PRETTY_PRINT_WRITER);
 	}
 	
 	@Override
@@ -121,12 +117,6 @@ public class ExpectationSerializer implements Serializer<Expectation>
 		return null;
 	}
 	
-	@Override
-	public Class<Expectation> supportsType()
-	{
-		return Expectation.class;
-	}
-	
 	public Expectation[] deserializeArray(final String jsonExpectations, final boolean allowEmpty)
 	{
 		return this.deserializeArray(jsonExpectations, allowEmpty, (s, expectation) -> expectation);
@@ -188,10 +178,7 @@ public class ExpectationSerializer implements Serializer<Expectation>
 						.replaceAll(NEW_LINE, NEW_LINE + "  ")
 						+ NEW_LINE + "]");
 				}
-				else
-				{
-					throw new IllegalArgumentException(validationErrors.get(0));
-				}
+				throw new IllegalArgumentException(validationErrors.get(0));
 			}
 		}
 		else if(!allowEmpty)

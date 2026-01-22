@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.body;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.model.BinaryBody;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class BinaryBodySerializer extends StdSerializer<BinaryBody>
@@ -32,24 +29,23 @@ public class BinaryBodySerializer extends StdSerializer<BinaryBody>
 	}
 	
 	@Override
-	public void serialize(final BinaryBody binaryBody, final JsonGenerator jgen, final SerializerProvider provider)
-		throws IOException
+	public void serialize(final BinaryBody value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(binaryBody.getNot() != null && binaryBody.getNot())
+		gen.writeStartObject();
+		if(value.getNot() != null && value.getNot())
 		{
-			jgen.writeBooleanField("not", binaryBody.getNot());
+			gen.writeBooleanProperty("not", value.getNot());
 		}
-		if(binaryBody.getOptional() != null && binaryBody.getOptional())
+		if(value.getOptional() != null && value.getOptional())
 		{
-			jgen.writeBooleanField("optional", binaryBody.getOptional());
+			gen.writeBooleanProperty("optional", value.getOptional());
 		}
-		if(binaryBody.getContentType() != null)
+		if(value.getContentType() != null)
 		{
-			jgen.writeStringField("contentType", binaryBody.getContentType());
+			gen.writeStringProperty("contentType", value.getContentType());
 		}
-		jgen.writeStringField("type", binaryBody.getType().name());
-		jgen.writeStringField("base64Bytes", binaryBody.toString());
-		jgen.writeEndObject();
+		gen.writeStringProperty("type", value.getType().name());
+		gen.writeStringProperty("base64Bytes", value.toString());
+		gen.writeEndObject();
 	}
 }

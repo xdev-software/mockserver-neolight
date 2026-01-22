@@ -15,13 +15,10 @@
  */
 package software.xdev.mockserver.serialization.serializers.body;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import software.xdev.mockserver.serialization.model.ParameterBodyDTO;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public class ParameterBodyDTOSerializer extends StdSerializer<ParameterBodyDTO>
@@ -33,25 +30,24 @@ public class ParameterBodyDTOSerializer extends StdSerializer<ParameterBodyDTO>
 	
 	@Override
 	public void serialize(
-		final ParameterBodyDTO parameterBodyDTO,
-		final JsonGenerator jgen,
-		final SerializerProvider provider)
-		throws IOException
+		final ParameterBodyDTO value,
+		final JsonGenerator gen,
+		final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(parameterBodyDTO.getNot() != null && parameterBodyDTO.getNot())
+		gen.writeStartObject();
+		if(value.getNot() != null && value.getNot())
 		{
-			jgen.writeBooleanField("not", parameterBodyDTO.getNot());
+			gen.writeBooleanProperty("not", value.getNot());
 		}
-		if(parameterBodyDTO.getOptional() != null && parameterBodyDTO.getOptional())
+		if(value.getOptional() != null && value.getOptional())
 		{
-			jgen.writeBooleanField("optional", parameterBodyDTO.getOptional());
+			gen.writeBooleanProperty("optional", value.getOptional());
 		}
-		jgen.writeStringField("type", parameterBodyDTO.getType().name());
-		if(!parameterBodyDTO.getParameters().isEmpty())
+		gen.writeStringProperty("type", value.getType().name());
+		if(!value.getParameters().isEmpty())
 		{
-			jgen.writeObjectField("parameters", parameterBodyDTO.getParameters());
+			gen.writePOJOProperty("parameters", value.getParameters());
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 }

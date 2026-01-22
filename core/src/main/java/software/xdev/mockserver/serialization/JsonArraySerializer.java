@@ -15,20 +15,16 @@
  */
 package software.xdev.mockserver.serialization;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 
 public class JsonArraySerializer
 {
-	private static final ObjectMapper OBJECT_MAPPER = ObjectMapperFactory.createObjectMapper();
-	
 	public List<String> splitJSONArray(final String jsonArray)
 	{
 		return this.splitJSONArrayToJSONNodes(jsonArray).stream()
@@ -39,24 +35,17 @@ public class JsonArraySerializer
 	public List<JsonNode> splitJSONArrayToJSONNodes(final String jsonArray)
 	{
 		final List<JsonNode> arrayItems = new ArrayList<>();
-		try
+		final JsonNode jsonNode = ObjectMappers.DEFAULT_MAPPER.readTree(jsonArray);
+		if(jsonNode instanceof ArrayNode)
 		{
-			final JsonNode jsonNode = OBJECT_MAPPER.readTree(jsonArray);
-			if(jsonNode instanceof ArrayNode)
+			for(final JsonNode arrayElement : jsonNode)
 			{
-				for(final JsonNode arrayElement : jsonNode)
-				{
-					arrayItems.add(arrayElement);
-				}
-			}
-			else
-			{
-				arrayItems.add(jsonNode);
+				arrayItems.add(arrayElement);
 			}
 		}
-		catch(final IOException e)
+		else
 		{
-			throw new IllegalArgumentException(e);
+			arrayItems.add(jsonNode);
 		}
 		return arrayItems;
 	}

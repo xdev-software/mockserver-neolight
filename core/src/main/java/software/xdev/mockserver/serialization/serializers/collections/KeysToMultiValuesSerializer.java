@@ -17,19 +17,17 @@ package software.xdev.mockserver.serialization.serializers.collections;
 
 import static software.xdev.mockserver.model.NottableString.serialiseNottableString;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import software.xdev.mockserver.model.KeyMatchStyle;
 import software.xdev.mockserver.model.KeyToMultiValue;
 import software.xdev.mockserver.model.KeysToMultiValues;
 import software.xdev.mockserver.model.NottableString;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 
 public abstract class KeysToMultiValuesSerializer<T extends KeysToMultiValues<? extends KeyToMultiValue, T>>
@@ -41,44 +39,42 @@ public abstract class KeysToMultiValuesSerializer<T extends KeysToMultiValues<? 
 	}
 	
 	@Override
-	public void serialize(final T collection, final JsonGenerator jgen, final SerializerProvider provider)
-		throws IOException
+	public void serialize(final T value, final JsonGenerator gen, final SerializationContext provider)
 	{
-		jgen.writeStartObject();
-		if(collection.getKeyMatchStyle() != null && collection.getKeyMatchStyle() != KeyMatchStyle.SUB_SET)
+		gen.writeStartObject();
+		if(value.getKeyMatchStyle() != null && value.getKeyMatchStyle() != KeyMatchStyle.SUB_SET)
 		{
-			jgen.writeObjectField("keyMatchStyle", collection.getKeyMatchStyle());
+			gen.writePOJOProperty("keyMatchStyle", value.getKeyMatchStyle());
 		}
-		final ArrayList<NottableString> keys = new ArrayList<>(collection.keySet());
+		final ArrayList<NottableString> keys = new ArrayList<>(value.keySet());
 		Collections.sort(keys);
 		for(final NottableString key : keys)
 		{
-			jgen.writeFieldName(serialiseNottableString(key));
+			gen.writeName(serialiseNottableString(key));
 			if(key.getParameterStyle() != null)
 			{
-				jgen.writeStartObject();
-				jgen.writeObjectField("parameterStyle", key.getParameterStyle());
-				jgen.writeFieldName("values");
-				this.writeValuesArray(collection, jgen, key);
-				jgen.writeEndObject();
+				gen.writeStartObject();
+				gen.writePOJOProperty("parameterStyle", key.getParameterStyle());
+				gen.writeName("values");
+				this.writeValuesArray(value, gen, key);
+				gen.writeEndObject();
 			}
 			else
 			{
-				this.writeValuesArray(collection, jgen, key);
+				this.writeValuesArray(value, gen, key);
 			}
 		}
-		jgen.writeEndObject();
+		gen.writeEndObject();
 	}
 	
-	private void writeValuesArray(final T collection, final JsonGenerator jgen, final NottableString key)
-		throws IOException
+	private void writeValuesArray(final T collection, final JsonGenerator gen, final NottableString key)
 	{
 		final Collection<NottableString> values = collection.getValues(key);
-		jgen.writeStartArray(values, values.size());
+		gen.writeStartArray(values, values.size());
 		for(final NottableString nottableString : values)
 		{
-			jgen.writeObject(nottableString);
+			gen.writePOJO(nottableString);
 		}
-		jgen.writeEndArray();
+		gen.writeEndArray();
 	}
 }

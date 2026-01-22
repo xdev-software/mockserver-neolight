@@ -22,17 +22,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.model.ExpectationId;
+import tools.jackson.databind.JsonNode;
 
 
-public class ExpectationIdSerializer implements Serializer<ExpectationId>
+public class ExpectationIdSerializer extends AbstractSerializer<ExpectationId>
 {
-	private final ObjectWriter objectWriter = ObjectMapperFactory.createObjectMapper(true, false);
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
 	
 	@Override
@@ -105,12 +100,6 @@ public class ExpectationIdSerializer implements Serializer<ExpectationId>
 		}
 	}
 	
-	@Override
-	public Class<ExpectationId> supportsType()
-	{
-		return ExpectationId.class;
-	}
-	
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	public ExpectationId[] deserializeArray(final String jsonExpectationIds)
 	{
@@ -129,26 +118,24 @@ public class ExpectationIdSerializer implements Serializer<ExpectationId>
 				throw new IllegalArgumentException(
 					"1 error:" + NEW_LINE + " - a request or array of request is required");
 			}
-			else
+			
+			final List<String> validationErrors = new ArrayList<>();
+			for(final String jsonRequest : jsonRequests)
 			{
-				final List<String> validationErrors = new ArrayList<>();
-				for(final String jsonRequest : jsonRequests)
+				try
 				{
-					try
-					{
-						expectationIds.add(this.deserialize(jsonRequest));
-					}
-					catch(final IllegalArgumentException iae)
-					{
-						validationErrors.add(iae.getMessage());
-					}
+					expectationIds.add(this.deserialize(jsonRequest));
 				}
-				if(!validationErrors.isEmpty())
+				catch(final IllegalArgumentException iae)
 				{
-					throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
-						+ String.join("," + NEW_LINE, validationErrors)
-						+ (validationErrors.size() > 1 ? "]" : ""));
+					validationErrors.add(iae.getMessage());
 				}
+			}
+			if(!validationErrors.isEmpty())
+			{
+				throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
+					+ String.join("," + NEW_LINE, validationErrors)
+					+ (validationErrors.size() > 1 ? "]" : ""));
 			}
 		}
 		return expectationIds.toArray(new ExpectationId[0]);

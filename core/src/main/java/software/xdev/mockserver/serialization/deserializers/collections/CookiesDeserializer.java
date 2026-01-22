@@ -17,16 +17,13 @@ package software.xdev.mockserver.serialization.deserializers.collections;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.JsonTokenId;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
 import software.xdev.mockserver.model.Cookies;
 import software.xdev.mockserver.model.NottableString;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.core.JsonTokenId;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 public class CookiesDeserializer extends StdDeserializer<Cookies>
@@ -37,7 +34,7 @@ public class CookiesDeserializer extends StdDeserializer<Cookies>
 	}
 	
 	@Override
-	public Cookies deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException
+	public Cookies deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
 		if(p.isExpectedStartArrayToken())
 		{
@@ -56,7 +53,6 @@ public class CookiesDeserializer extends StdDeserializer<Cookies>
 	private Cookies deserializeObject(
 		final JsonParser jsonParser,
 		final DeserializationContext ctxt)
-		throws IOException
 	{
 		final Cookies cookies = new Cookies();
 		NottableString key = string("");
@@ -65,8 +61,8 @@ public class CookiesDeserializer extends StdDeserializer<Cookies>
 			final JsonToken t = jsonParser.nextToken();
 			switch(t.id())
 			{
-				case JsonTokenId.ID_FIELD_NAME:
-					key = string(jsonParser.getText());
+				case JsonTokenId.ID_PROPERTY_NAME:
+					key = string(jsonParser.getString());
 					break;
 				case JsonTokenId.ID_STRING:
 					cookies.withEntry(key, ctxt.readValue(jsonParser, NottableString.class));
@@ -78,7 +74,7 @@ public class CookiesDeserializer extends StdDeserializer<Cookies>
 					return cookies;
 				default:
 					throw new RuntimeException(
-						"Unexpected token: \"" + t + "\" id: \"" + t.id() + "\" text: \"" + jsonParser.getText());
+						"Unexpected token: \"" + t + "\" id: \"" + t.id() + "\" text: \"" + jsonParser.getString());
 			}
 		}
 	}
@@ -86,7 +82,6 @@ public class CookiesDeserializer extends StdDeserializer<Cookies>
 	private Cookies deserializeArray(
 		final JsonParser jsonParser,
 		final DeserializationContext ctxt)
-		throws IOException
 	{
 		final Cookies headers = new Cookies();
 		NottableString key = null;
@@ -103,8 +98,8 @@ public class CookiesDeserializer extends StdDeserializer<Cookies>
 					key = null;
 					value = null;
 					break;
-				case JsonTokenId.ID_FIELD_NAME:
-					fieldName = jsonParser.getText();
+				case JsonTokenId.ID_PROPERTY_NAME:
+					fieldName = jsonParser.getString();
 					break;
 				case JsonTokenId.ID_STRING:
 					if("name".equals(fieldName))
@@ -121,7 +116,7 @@ public class CookiesDeserializer extends StdDeserializer<Cookies>
 					break;
 				default:
 					throw new RuntimeException(
-						"Unexpected token: \"" + t + "\" id: \"" + t.id() + "\" text: \"" + jsonParser.getText());
+						"Unexpected token: \"" + t + "\" id: \"" + t.id() + "\" text: \"" + jsonParser.getString());
 			}
 		}
 	}

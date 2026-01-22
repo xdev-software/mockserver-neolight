@@ -22,31 +22,37 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import software.xdev.mockserver.model.LogEventRequestAndResponse;
 import software.xdev.mockserver.serialization.model.LogEventRequestAndResponseDTO;
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.databind.ObjectWriter;
 
 
 public class LogEventRequestAndResponseSerializer
 {
-	private final ObjectMapper objectMapper = ObjectMapperFactory.createObjectMapper();
 	private final JsonArraySerializer jsonArraySerializer = new JsonArraySerializer();
-	private static final ObjectWriter OBJECT_WRITER = ObjectMapperFactory
-		.createObjectMapper()
-		.writer(
-			new DefaultPrettyPrinter()
-				.withArrayIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
-				.withObjectIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE));
+	private static ObjectWriter objectWriterCached;
+	
+	private static ObjectWriter objectWriter()
+	{
+		if(objectWriterCached == null)
+		{
+			objectWriterCached = ObjectMappers.DEFAULT_MAPPER
+				.writer()
+				.with(
+					new DefaultPrettyPrinter()
+						.withArrayIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE)
+						.withObjectIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE));
+		}
+		return objectWriterCached;
+	}
 	
 	public String serialize(final LogEventRequestAndResponse httpRequestAndHttpResponse)
 	{
 		try
 		{
-			return OBJECT_WRITER.writeValueAsString(new LogEventRequestAndResponseDTO(httpRequestAndHttpResponse));
+			return objectWriter().writeValueAsString(new LogEventRequestAndResponseDTO(httpRequestAndHttpResponse));
 		}
 		catch(final Exception e)
 		{
@@ -75,14 +81,11 @@ public class LogEventRequestAndResponseSerializer
 					httpRequestAndHttpResponseDTOS[i] =
 						new LogEventRequestAndResponseDTO(httpRequestAndHttpResponses[i]);
 				}
-				return OBJECT_WRITER
+				return objectWriter()
 					.withDefaultPrettyPrinter()
 					.writeValueAsString(httpRequestAndHttpResponseDTOS);
 			}
-			else
-			{
-				return "[]";
-			}
+			return "[]";
 		}
 		catch(final Exception e)
 		{
@@ -101,29 +104,28 @@ public class LogEventRequestAndResponseSerializer
 				"1 error:" + NEW_LINE + " - a request is required but value was \"" + jsonHttpRequestAndHttpResponse
 					+ "\"");
 		}
-		else
+		
+		LogEventRequestAndResponse httpRequestAndHttpResponse = null;
+		try
 		{
-			LogEventRequestAndResponse httpRequestAndHttpResponse = null;
-			try
+			final LogEventRequestAndResponseDTO httpRequestAndHttpResponseDTO =
+				ObjectMappers.DEFAULT_MAPPER.readValue(
+					jsonHttpRequestAndHttpResponse,
+					LogEventRequestAndResponseDTO.class);
+			if(httpRequestAndHttpResponseDTO != null)
 			{
-				final LogEventRequestAndResponseDTO httpRequestAndHttpResponseDTO =
-					this.objectMapper.readValue(jsonHttpRequestAndHttpResponse, LogEventRequestAndResponseDTO.class);
-				if(httpRequestAndHttpResponseDTO != null)
-				{
-					httpRequestAndHttpResponse = httpRequestAndHttpResponseDTO.buildObject();
-				}
+				httpRequestAndHttpResponse = httpRequestAndHttpResponseDTO.buildObject();
 			}
-			catch(final Exception ex)
-			{
-				throw new IllegalArgumentException(
-					"exception while parsing [" + jsonHttpRequestAndHttpResponse + "] for HttpRequestAndHttpResponse",
-					ex);
-			}
-			return httpRequestAndHttpResponse;
 		}
+		catch(final Exception ex)
+		{
+			throw new IllegalArgumentException(
+				"exception while parsing [" + jsonHttpRequestAndHttpResponse + "] for HttpRequestAndHttpResponse",
+				ex);
+		}
+		return httpRequestAndHttpResponse;
 	}
 	
-	@SuppressWarnings("PMD.CognitiveComplexity")
 	public LogEventRequestAndResponse[] deserializeArray(final String jsonHttpRequestAndHttpResponse)
 	{
 		final List<LogEventRequestAndResponse> httpRequestAndHttpResponses = new ArrayList<>();
@@ -133,35 +135,33 @@ public class LogEventRequestAndResponseSerializer
 				"1 error:" + NEW_LINE + " - a request or request array is required but value was \""
 					+ jsonHttpRequestAndHttpResponse + "\"");
 		}
-		else
+		final List<String> jsonRequests =
+			this.jsonArraySerializer.splitJSONArray(jsonHttpRequestAndHttpResponse);
+		if(jsonRequests.isEmpty())
 		{
-			final List<String> jsonRequests =
-				this.jsonArraySerializer.splitJSONArray(jsonHttpRequestAndHttpResponse);
-			if(jsonRequests.isEmpty())
+			throw new IllegalArgumentException(
+				"1 error:" + NEW_LINE + " - a request or array of request is required");
+		}
+		
+		final List<String> validationErrors = new ArrayList<>();
+		for(final String jsonRequest : jsonRequests)
+		{
+			try
 			{
-				throw new IllegalArgumentException(
-					"1 error:" + NEW_LINE + " - a request or array of request is required");
+				httpRequestAndHttpResponses.add(this.deserialize(jsonRequest));
 			}
-			
-			final List<String> validationErrors = new ArrayList<>();
-			for(final String jsonRequest : jsonRequests)
+			catch(final IllegalArgumentException iae)
 			{
-				try
-				{
-					httpRequestAndHttpResponses.add(this.deserialize(jsonRequest));
-				}
-				catch(final IllegalArgumentException iae)
-				{
-					validationErrors.add(iae.getMessage());
-				}
-			}
-			if(!validationErrors.isEmpty())
-			{
-				throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
-					+ String.join("," + NEW_LINE, validationErrors)
-					+ (validationErrors.size() > 1 ? "]" : ""));
+				validationErrors.add(iae.getMessage());
 			}
 		}
+		if(!validationErrors.isEmpty())
+		{
+			throw new IllegalArgumentException((validationErrors.size() > 1 ? "[" : "")
+				+ String.join("," + NEW_LINE, validationErrors)
+				+ (validationErrors.size() > 1 ? "]" : ""));
+		}
+		
 		return httpRequestAndHttpResponses.toArray(new LogEventRequestAndResponse[0]);
 	}
 }

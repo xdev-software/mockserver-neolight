@@ -17,15 +17,8 @@ package software.xdev.mockserver.serialization.deserializers.request;
 
 import static software.xdev.mockserver.model.NottableString.string;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import software.xdev.mockserver.model.Cookies;
 import software.xdev.mockserver.model.Headers;
@@ -36,6 +29,10 @@ import software.xdev.mockserver.model.SocketAddress;
 import software.xdev.mockserver.serialization.model.BodyDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
 import software.xdev.mockserver.serialization.model.RequestDefinitionDTO;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDefinitionDTO>
@@ -48,10 +45,11 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
 	}
 	
 	@Override
-	public RequestDefinitionDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
-		throws IOException
+	public RequestDefinitionDTO deserialize(
+		final JsonParser p,
+		final DeserializationContext ctxt)
 	{
-		if(jsonParser.getCurrentToken() != JsonToken.START_OBJECT)
+		if(p.currentToken() != JsonToken.START_OBJECT)
 		{
 			return null;
 		}
@@ -67,79 +65,79 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
 		Boolean keepAlive = null;
 		Protocol protocol = null;
 		SocketAddress socketAddress = null;
-		while(jsonParser.nextToken() != JsonToken.END_OBJECT)
+		while(p.nextToken() != JsonToken.END_OBJECT)
 		{
-			final String fieldName = jsonParser.currentName();
+			final String fieldName = p.currentName();
 			if(fieldName != null)
 			{
 				switch(fieldName)
 				{
 					case "not":
 					{
-						jsonParser.nextToken();
-						not = jsonParser.getBooleanValue();
+						p.nextToken();
+						not = p.getBooleanValue();
 						break;
 					}
 					case "method":
 					{
-						jsonParser.nextToken();
-						method = ctxt.readValue(jsonParser, NottableString.class);
+						p.nextToken();
+						method = ctxt.readValue(p, NottableString.class);
 						break;
 					}
 					case "path":
 					{
-						jsonParser.nextToken();
-						path = ctxt.readValue(jsonParser, NottableString.class);
+						p.nextToken();
+						path = ctxt.readValue(p, NottableString.class);
 						break;
 					}
 					case "pathParameters":
 					{
-						jsonParser.nextToken();
-						pathParameters = ctxt.readValue(jsonParser, Parameters.class);
+						p.nextToken();
+						pathParameters = ctxt.readValue(p, Parameters.class);
 						break;
 					}
 					case "queryStringParameters":
 					{
-						jsonParser.nextToken();
-						queryStringParameters = ctxt.readValue(jsonParser, Parameters.class);
+						p.nextToken();
+						queryStringParameters = ctxt.readValue(p, Parameters.class);
 						break;
 					}
 					case "body":
 					{
-						jsonParser.nextToken();
-						body = ctxt.readValue(jsonParser, BodyDTO.class);
+						p.nextToken();
+						body = ctxt.readValue(p, BodyDTO.class);
 						break;
 					}
 					case "cookies":
 					{
-						jsonParser.nextToken();
-						cookies = ctxt.readValue(jsonParser, Cookies.class);
+						p.nextToken();
+						cookies = ctxt.readValue(p, Cookies.class);
 						break;
 					}
 					case "headers":
 					{
-						jsonParser.nextToken();
-						headers = ctxt.readValue(jsonParser, Headers.class);
+						p.nextToken();
+						headers = ctxt.readValue(p, Headers.class);
 						break;
 					}
 					case "keepAlive":
 					{
-						jsonParser.nextToken();
-						keepAlive = ctxt.readValue(jsonParser, Boolean.class);
+						p.nextToken();
+						keepAlive = ctxt.readValue(p, Boolean.class);
 						break;
 					}
 					case "socketAddress":
 					{
-						jsonParser.nextToken();
-						socketAddress = ctxt.readValue(jsonParser, SocketAddress.class);
+						p.nextToken();
+						socketAddress = ctxt.readValue(p, SocketAddress.class);
 						break;
 					}
 					case "protocol":
 					{
-						jsonParser.nextToken();
+						p.nextToken();
 						try
 						{
-							protocol = Protocol.valueOf(ctxt.readValue(jsonParser, String.class));
+							protocol = Protocol.valueOf(ctxt.readValue(p, String.class));
 						}
 						catch(final Exception ex)
 						{
