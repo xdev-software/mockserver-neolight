@@ -24,16 +24,25 @@ jobs:
         with:
           image-ref: ${{ env.TRIVYY_IMAGE_REF }}
 
+      - name: Write not configurable options to trivy.yml
+        run: |
+          cat > trivy.yml <<EOL
+          # Only display CVE details otherwise they will get cut off in the issue
+          table-mode:
+            - detailed
+          EOL
+
       - name: Scan - Relevant
         id: scan_relevant
         uses: aquasecurity/trivy-action@0.33.1
         with:
+          trivy-config: trivy.yml
           image-ref: ${{ env.TRIVYY_IMAGE_REF }}
           exit-code: 1
-          severity: 'HIGH,CRITICAL,UNKNOWN'
+          severity: 'HIGH,CRITICAL'
           output: reported.txt
         env:
-          TRIVY_DISABLE_VEX_NOTICE: 1
+          TRIVY_DISABLE_VEX_NOTICE: '1'
 
       - name: Find already existing issue
         id: find-issue
