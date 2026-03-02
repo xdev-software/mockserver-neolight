@@ -81,11 +81,20 @@ jobs:
       with:
         context: ./server
         push: false
-        load: true
         tags: mockserver-standalone:experimental
         platforms: linux/amd64,linux/arm64
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=build
+        cache-to: type=gha,mode=max,scope=build
+
+    # 2 steps required because "failed to build: docker exporter does not currently support exporting manifest lists"
+    - uses: docker/build-push-action@v6
+      with:
+        context: ./server
+        push: false
+        load: true
+        tags: mockserver-standalone:experimental
+        cache-from: type=gha,scope=build-for-it
+        cache-to: type=gha,mode=max,scope=build-for-it
 
     - name: Run integration tests
       run: |
