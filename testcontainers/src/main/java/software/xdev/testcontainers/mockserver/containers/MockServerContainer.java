@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.images.RemoteDockerImage;
 import org.testcontainers.utility.DockerImageName;
 
 
@@ -27,6 +28,14 @@ public class MockServerContainer extends GenericContainer<MockServerContainer>
 	public static final String DEFAULT_IMAGE = "xdevsoftware/mockserver";
 	public static final String DEFAULT_TAG = MockServerUtils.DEFAULT_VERSION;
 	public static final int PORT = 1080;
+	
+	public MockServerContainer(final RemoteDockerImage image)
+	{
+		super(image);
+		
+		this.waitingFor(Wait.forLogMessage(".*started on port: " + PORT + ".*", 1));
+		this.addExposedPort(PORT);
+	}
 	
 	public MockServerContainer(final DockerImageName dockerImageName)
 	{
