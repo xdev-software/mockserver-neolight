@@ -73,6 +73,14 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Workaround 2026-03 -->
+		<!-- Testcontainers brings an outdated version of jackson annotations which causes a conflict -->
+		<dependency>
+			<groupId>tools.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>3.1.0</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
