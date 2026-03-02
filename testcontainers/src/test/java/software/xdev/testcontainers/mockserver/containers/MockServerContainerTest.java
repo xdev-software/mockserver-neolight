@@ -113,7 +113,7 @@ class MockServerContainerTest
 	
 	static class NGINXContainer extends GenericContainer<NGINXContainer>
 	{
-		public NGINXContainer()
+		NGINXContainer()
 		{
 			super(DockerImageName.parse("nginx:stable-alpine"));
 			this.addExposedPort(80);
