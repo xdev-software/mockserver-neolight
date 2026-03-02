@@ -53,7 +53,18 @@ class MockServerContainerTest
 	@BeforeAll
 	static void buildImage() throws TimeoutException
 	{
-		image = DockerImageName.parse(new AdvancedImageFromDockerFile("mockserver")
+		image = DockerImageName.parse(getOrBuildImage());
+	}
+	
+	static String getOrBuildImage() throws TimeoutException
+	{
+		final String imageName = System.getProperty("mockserver-image");
+		if(imageName != null)
+		{
+			return imageName;
+		}
+		
+		return new AdvancedImageFromDockerFile("mockserver")
 			.withLoggerForBuild(LoggerFactory.getLogger("container.build.mockserver"))
 			.withPostGitIgnoreLines(
 				// Ignore files that aren't related to the built code
@@ -73,7 +84,7 @@ class MockServerContainerTest
 			.withDockerFilePath(Paths.get("../testcontainers/Standalone.Dockerfile"))
 			.withBaseDir(Paths.get("../"))
 			.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
-			.get(5, TimeUnit.MINUTES));
+			.get(5, TimeUnit.MINUTES);
 	}
 	
 	@Test
