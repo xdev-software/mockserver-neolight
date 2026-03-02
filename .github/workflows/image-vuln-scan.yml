@@ -50,7 +50,7 @@ jobs:
 
       - name: Find already existing issue
         id: find-issue
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: |
           echo "number=$(gh issue list -l 'bug' -l 'automated' -L 1 -S 'in:title "Trivy Vulnerability Report"' -s 'open' --json 'number' --jq '.[].number')" >> $GITHUB_OUTPUT
         env:
