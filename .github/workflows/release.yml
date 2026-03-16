@@ -88,7 +88,7 @@ jobs:
 
     - name: Create Release
       id: create-release
-      uses: shogo82148/actions-create-release@559c27ce7eb834825e2b55927c64f6d1bd1db716 # v1
+      uses: shogo82148/actions-create-release@6a396031bc74c57403da1018fec74d24c6aa03cd # v1
       with:
         tag_name: v${{ steps.version.outputs.release }}
         release_name: v${{ steps.version.outputs.release }}
@@ -213,6 +213,7 @@ jobs:
       packages: write
       contents: read
       attestations: write
+      artifact-metadata: write
       id-token: write
     steps:
     - uses: actions/checkout@v6
@@ -229,18 +230,18 @@ jobs:
         name: server-standalone
         path: server/target
 
-    - uses: docker/setup-qemu-action@v3
+    - uses: docker/setup-qemu-action@v4
 
-    - uses: docker/setup-buildx-action@v3
+    - uses: docker/setup-buildx-action@v4
 
     - name: Login to DockerHub
-      uses: docker/login-action@v3
+      uses: docker/login-action@v4
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     
     - name: Login to ghcr.io
-      uses: docker/login-action@v3
+      uses: docker/login-action@v4
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
@@ -248,7 +249,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for Docker
       id: meta
-      uses: docker/metadata-action@v5
+      uses: docker/metadata-action@v6
       with:
         images: |
           ${{ secrets.DOCKERHUB_USERNAME }}/mockserver
@@ -259,7 +260,7 @@ jobs:
           type=semver,pattern={{major}},value=${{ needs.prepare-release.outputs.version }}
           latest
 
-    - uses: docker/build-push-action@v6
+    - uses: docker/build-push-action@v7
       id: push
       with:
         context: ./server
