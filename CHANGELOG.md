@@ -1,3 +1,6 @@
+# 2.0.4
+* Updated dependencies
+
 # 2.0.3
 * Updated dependencies
   * `testcontainers` is currently using an outdated versions of `jackson-annotations` which may override the version required by `jackson-databind`, you may be required to manually update this in your project.
