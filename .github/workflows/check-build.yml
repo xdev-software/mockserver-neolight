@@ -77,7 +77,7 @@ jobs:
 
     - uses: docker/setup-buildx-action@v3
 
-    - uses: docker/build-push-action@v6
+    - uses: docker/build-push-action@v7
       with:
         context: ./server
         push: false
@@ -87,7 +87,7 @@ jobs:
         cache-to: type=gha,mode=max,scope=build
 
     # 2 steps required because "failed to build: docker exporter does not currently support exporting manifest lists"
-    - uses: docker/build-push-action@v6
+    - uses: docker/build-push-action@v7
       with:
         context: ./server
         push: false
