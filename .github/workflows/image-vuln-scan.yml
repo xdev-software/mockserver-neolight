@@ -22,8 +22,6 @@ jobs:
       - name: Scan - Full
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
         with:
-          # https://github.com/aquasecurity/trivy-action/issues/516
-          version: 'v0.69.2'
           image-ref: ${{ env.TRIVYY_IMAGE_REF }}
 
       - name: Write not configurable options to trivy.yml
@@ -38,8 +36,6 @@ jobs:
         id: scan_relevant
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
         with:
-          # https://github.com/aquasecurity/trivy-action/issues/516
-          version: 'v0.69.2'
           trivy-config: trivy.yml
           image-ref: ${{ env.TRIVYY_IMAGE_REF }}
           exit-code: 1
