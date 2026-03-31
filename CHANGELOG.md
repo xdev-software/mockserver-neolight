@@ -1,3 +1,7 @@
+# 2.50.5
+* Bumped version to one that does not conflict with testcontainers (and will likely not do so in the foreseeable future) #403
+* Updated dependencies
+
 # 2.0.4
 * Updated dependencies
 
