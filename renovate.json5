@@ -26,7 +26,7 @@
       "datasources": [
         "docker"
       ],
-      "allowedVersions": "/^21\\-alpine$/"
+      "allowedVersions": "/^25\\-alpine$/"
     },
     {
       "description": "Alpine - Ignore YYYYMMDD releases",
