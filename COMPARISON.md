@@ -13,7 +13,7 @@ This list contains a comparison with the most popular open source API simulation
 
 Sources:
 * https://web.archive.org/web/20250617212320/https://en.wikipedia.org/wiki/Comparison_of_API_simulation_tools
-* https://www.browserstack.com/guide/api-simulation-tools-comparison
+* https://web.archive.org/web/20251127104432/https://www.browserstack.com/guide/api-simulation-tools-comparison
 
 </details>
 
