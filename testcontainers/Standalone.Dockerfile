@@ -98,11 +98,13 @@ RUN java \
   -jar app.jar \
   -serverPort 1080
 
+# UseG1GC: Force the use of G1 GC (https://bugs.openjdk.org/browse/JDK-8359802) - As of Java 25 Serial GC is selected if cores < 2 OR memory < 1792MiB
 # MaxRAMPercentage: Default value is 25% -> we want to use available memory optimal -> increased, but enough is left for other RAM usages like e.g. Metaspace
 # Min/MaxHeapFreeRatio: Default values cause container reserved memory not to shrink properly/waste memory -> decreased
 # https://stackoverflow.com/questions/16058250/what-is-the-purpose-of-xxminheapfreeratio-and-xxmaxheapfreeratio
 # UseCompactObjectHeaders: https://openjdk.org/jeps/519
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=30 -XX:MaxHeapFreeRatio=50 -XX:+UseCompactObjectHeaders -Djava.awt.headless=true"
+# UseStringDeduplication: Lower RAM usage
+ENV JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=75 -XX:MinHeapFreeRatio=30 -XX:MaxHeapFreeRatio=50 -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication -Djava.awt.headless=true"
 ENV JAVA_AOT_OPTS="-XX:AOTCache=app.aot"
 ENV ARGS="-serverPort 1080"
 
