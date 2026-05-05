@@ -1,3 +1,6 @@
+# 2.50.8
+* Updated dependencies
+
 # 2.50.7
 * Improved default Java Options used in Dockerfile
 * Updated dependencies
