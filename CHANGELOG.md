@@ -167,11 +167,11 @@ Minimalistic fork of [mock-server/mockserver](https://github.com/mock-server/moc
 * Change all occurrences of ``org.mockserver`` to ``software.xdev.mockserver``
 
 ### Fixes the following issues from the [original project](https://github.com/mock-server/mockserver)
-* Removed useless/Minimize dependencies of ``mockserver-client-java`` [#1494](https://github.com/mock-server/mockserver/issues/1494)
-* ARM image doesn't include ARM binaries [#1568](https://github.com/mock-server/mockserver/issues/1568)
-* Add any Shell to Docker Container [#1593](https://github.com/mock-server/mockserver/issues/1593)
-* io.netty 4.1.89.Final is using unsupported JDK internal APIs [#1812](https://github.com/mock-server/mockserver/issues/1812)
-*  MockServerClient.verify(RequestDefinition requestDefinition, VerificationTimes times) not works correctly after update to 5.14.0 [#1524](https://github.com/mock-server/mockserver/issues/1524) (Ported fix from @szada92)
+* Removed useless/Minimize dependencies of ``mockserver-client-java`` [#1494](https://web.archive.org/web/20260513070329/https://github.com/mock-server/mockserver-monorepo/issues/1494)
+* ARM image doesn't include ARM binaries [#1568](https://web.archive.org/web/20260513070357/https://github.com/mock-server/mockserver-monorepo/issues/1568)
+* Add any Shell to Docker Container [#1593](https://web.archive.org/web/20260513070323/https://github.com/mock-server/mockserver-monorepo/issues/1593)
+* io.netty 4.1.89.Final is using unsupported JDK internal APIs [#1812](https://web.archive.org/web/20260513070253/https://github.com/mock-server/mockserver-monorepo/issues/1812)
+*  MockServerClient.verify(RequestDefinition requestDefinition, VerificationTimes times) not works correctly after update to 5.14.0 [#1524](https://web.archive.org/web/20260513070405/https://github.com/mock-server/mockserver-monorepo/issues/1524) (Ported fix from @szada92)
 * ... and probably many more
 
 ## Testcontainers
