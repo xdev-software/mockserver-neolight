@@ -52,7 +52,7 @@ Sources:
             ✔ Provides a Java client that is used to create responses for certain requests <sup><a href="https://www.mock-server.com/">Docs</a> <a href="https://java.testcontainers.org/modules/mockserver/">Testcontainer-Docs</a></sup>
         </td>
         <td>
-            ⚠ Split into a <a href="https://github.com/mock-server/mockserver/issues/1494">un-optimized</a> client and server module
+            ⚠ Split into a <a href="https://web.archive.org/web/20260513070329/https://github.com/mock-server/mockserver-monorepo/issues/1494">un-optimized</a> client and server module
         </td>
         <td>
             ✔ <a href="https://java.testcontainers.org/modules/mockserver/">Yes</a>
