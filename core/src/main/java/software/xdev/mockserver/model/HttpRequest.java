@@ -35,7 +35,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
-@SuppressWarnings({"rawtypes", "UnusedReturnValue", "PMD.CyclomaticComplexity"})
+@SuppressWarnings({"rawtypes", "UnusedReturnValue", "PMD.CyclomaticComplexity", "PMD.GodClass"})
 public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRequest, Body>
 {
 	private int hashCode;
@@ -61,6 +61,46 @@ public class HttpRequest extends RequestDefinition implements HttpMessage<HttpRe
 	public static HttpRequest request(final String path)
 	{
 		return new HttpRequest().withPath(path);
+	}
+	
+	public static HttpRequest request(final String method, final String path)
+	{
+		return new HttpRequest().withMethod(method).withPath(path);
+	}
+	
+	public static HttpRequest get(final String path)
+	{
+		return request("GET", path);
+	}
+	
+	public static HttpRequest head(final String path)
+	{
+		return request("HEAD", path);
+	}
+	
+	public static HttpRequest post(final String path)
+	{
+		return request("POST", path);
+	}
+	
+	public static HttpRequest put(final String path)
+	{
+		return request("PUT", path);
+	}
+	
+	public static HttpRequest delete(final String path)
+	{
+		return request("DELETE", path);
+	}
+	
+	public static HttpRequest options(final String path)
+	{
+		return request("OPTIONS", path);
+	}
+	
+	public static HttpRequest patch(final String path)
+	{
+		return request("PATCH", path);
 	}
 	
 	public Boolean isKeepAlive()

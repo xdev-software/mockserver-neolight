@@ -52,7 +52,7 @@ Sources:
             ✔ Provides a Java client that is used to create responses for certain requests <sup><a href="https://www.mock-server.com/">Docs</a> <a href="https://java.testcontainers.org/modules/mockserver/">Testcontainer-Docs</a></sup>
         </td>
         <td>
-            ⚠ Split into a <a href="https://github.com/mock-server/mockserver/issues/1494">un-optimized</a> client and server module
+            ⚠ Split into a <a href="https://web.archive.org/web/20260513070329/https://github.com/mock-server/mockserver-monorepo/issues/1494">un-optimized</a> client and server module
         </td>
         <td>
             ✔ <a href="https://java.testcontainers.org/modules/mockserver/">Yes</a>
@@ -106,7 +106,7 @@ Sources:
             </a>
         </td>
         <td>
-            Custom programming language/syntax files <sup><a href="https://github.com/karatelabs/karate/tree/master/examples">Docs</a></sup>
+            Custom programming language/syntax files <sup><a href="https://github.com/karatelabs/karate/tree/c07caae8b5fadaf535d0074db948911b62bae6f9/examples">Docs</a></sup>
         </td>
         <td>
             ❌ Monolithic - nearly all code in "core" module

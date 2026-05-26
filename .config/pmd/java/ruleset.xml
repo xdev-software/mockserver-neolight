@@ -440,7 +440,7 @@ A `Set` also prevents duplicates when the ORM reads multiple identical rows from
 				<value>
 <![CDATA[
 //ClassDeclaration[pmd-java:hasAnnotation('jakarta.persistence.Entity')]
-//FieldDeclaration[pmd-java:hasAnnotation('jakarta.persistence.ManyToMany') or pmd-java:hasAnnotation('jakarta.persistence.OneToMany')]
+//FieldDeclaration[pmd-java:hasAnnotation('jakarta.persistence.ManyToMany') or pmd-java:hasAnnotation('jakarta.persistence.OneToMany') or pmd-java:hasAnnotation('jakarta.persistence.ElementCollection')]
 /ClassType[pmd-java:typeIs('java.util.List')]
 ]]>
 				</value>
