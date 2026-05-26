@@ -106,7 +106,7 @@ Sources:
             </a>
         </td>
         <td>
-            Custom programming language/syntax files <sup><a href="https://github.com/karatelabs/karate/tree/master/examples">Docs</a></sup>
+            Custom programming language/syntax files <sup><a href="https://github.com/karatelabs/karate/tree/c07caae8b5fadaf535d0074db948911b62bae6f9/examples">Docs</a></sup>
         </td>
         <td>
             ❌ Monolithic - nearly all code in "core" module
