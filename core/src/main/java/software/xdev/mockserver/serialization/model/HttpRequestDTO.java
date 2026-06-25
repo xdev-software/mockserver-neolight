@@ -34,7 +34,7 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
 	private NottableString path = string("");
 	private Parameters pathParameters;
 	private Parameters queryStringParameters;
-	private BodyDTO body;
+	private BodyDTO<?> body;
 	private Cookies cookies;
 	private Headers headers;
 	private Boolean keepAlive;
@@ -131,12 +131,12 @@ public class HttpRequestDTO extends RequestDefinitionDTO implements DTO<HttpRequ
 		return this;
 	}
 	
-	public BodyDTO getBody()
+	public BodyDTO<?> getBody()
 	{
 		return this.body;
 	}
 	
-	public HttpRequestDTO setBody(final BodyDTO body)
+	public HttpRequestDTO setBody(final BodyDTO<?> body)
 	{
 		this.body = body;
 		return this;

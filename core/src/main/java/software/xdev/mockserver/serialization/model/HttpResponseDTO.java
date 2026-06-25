@@ -26,7 +26,7 @@ public class HttpResponseDTO implements DTO<HttpResponse>
 {
 	private Integer statusCode;
 	private String reasonPhrase;
-	private BodyWithContentTypeDTO body;
+	private BodyWithContentTypeDTO<?> body;
 	private Cookies cookies;
 	private Headers headers;
 	private DelayDTO delay;
@@ -58,11 +58,11 @@ public class HttpResponseDTO implements DTO<HttpResponse>
 		return new HttpResponse()
 			.withStatusCode(this.statusCode)
 			.withReasonPhrase(this.reasonPhrase)
-			.withBody(this.body != null ? this.body.buildObject() : null)
+			.withBody(DTO.buildObjectIfNotNull(this.body))
 			.withHeaders(this.headers)
 			.withCookies(this.cookies)
-			.withDelay(this.delay != null ? this.delay.buildObject() : null)
-			.withConnectionOptions(this.connectionOptions != null ? this.connectionOptions.buildObject() : null);
+			.withDelay(DTO.buildObjectIfNotNull(this.delay))
+			.withConnectionOptions(DTO.buildObjectIfNotNull(this.connectionOptions));
 	}
 	
 	public Integer getStatusCode()
@@ -87,12 +87,12 @@ public class HttpResponseDTO implements DTO<HttpResponse>
 		return this;
 	}
 	
-	public BodyWithContentTypeDTO getBody()
+	public BodyWithContentTypeDTO<?> getBody()
 	{
 		return this.body;
 	}
 	
-	public HttpResponseDTO setBody(final BodyWithContentTypeDTO body)
+	public HttpResponseDTO setBody(final BodyWithContentTypeDTO<?> body)
 	{
 		this.body = body;
 		return this;

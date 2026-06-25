@@ -16,7 +16,6 @@
 package software.xdev.mockserver.serialization.model;
 
 import static software.xdev.mockserver.verify.Verification.verification;
-import static software.xdev.mockserver.verify.VerificationTimes.once;
 
 import java.util.Objects;
 
@@ -24,6 +23,7 @@ import software.xdev.mockserver.model.ExpectationId;
 import software.xdev.mockserver.model.HttpRequest;
 import software.xdev.mockserver.model.ObjectWithJsonToString;
 import software.xdev.mockserver.verify.Verification;
+import software.xdev.mockserver.verify.VerificationTimes;
 
 
 public class VerificationDTO extends ObjectWithJsonToString implements DTO<Verification>
@@ -58,7 +58,7 @@ public class VerificationDTO extends ObjectWithJsonToString implements DTO<Verif
 		return verification()
 			.withRequest(this.httpRequest != null ? this.httpRequest.buildObject() : null)
 			.withExpectationId(this.expectationId)
-			.withTimes(this.times != null ? this.times.buildObject() : once())
+			.withTimes(DTO.buildObjectIfNotNull(this.times, VerificationTimes::once))
 			.withMaximumNumberOfRequestToReturnInVerificationFailure(
 				this.maximumNumberOfRequestToReturnInVerificationFailure);
 	}

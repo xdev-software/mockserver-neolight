@@ -41,8 +41,6 @@ public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
 	@Override
 	public TimeToLiveDTO deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
-		TimeToLiveDTO timeToLiveDTO = null;
-		TimeToLive timeToLive = null;
 		final TimeUnit timeUnit;
 		long ttl = 0L;
 		final long endDate;
@@ -62,6 +60,7 @@ public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
 				ttl = timeToLiveNode.asLong();
 			}
 			final JsonNode timeUnitNode = timeToLiveDTONode.get("timeUnit");
+			TimeToLive timeToLive = null;
 			if(timeUnitNode != null)
 			{
 				try
@@ -85,14 +84,10 @@ public class TimeToLiveDTODeserializer extends StdDeserializer<TimeToLiveDTO>
 					endDate = endDateNode.asLong();
 					timeToLive.setEndDate(endDate);
 				}
-				timeToLiveDTO = new TimeToLiveDTO(timeToLive);
+				return new TimeToLiveDTO(timeToLive);
 			}
+			return null;
 		}
-		else
-		{
-			timeToLiveDTO = new TimeToLiveDTO(TimeToLive.unlimited());
-		}
-		
-		return timeToLiveDTO;
+		return new TimeToLiveDTO(TimeToLive.unlimited());
 	}
 }

@@ -15,6 +15,7 @@
  */
 package software.xdev.mockserver.serialization;
 
+import software.xdev.mockserver.serialization.model.DTO;
 import software.xdev.mockserver.serialization.model.VerificationDTO;
 import software.xdev.mockserver.verify.Verification;
 
@@ -41,12 +42,8 @@ public class VerificationSerializer extends AbstractSerializer<Verification>
 	{
 		try
 		{
-			final VerificationDTO verificationDTO =
-				this.objectMapper.readValue(jsonVerification, VerificationDTO.class);
-			if(verificationDTO != null)
-			{
-				return verificationDTO.buildObject();
-			}
+			return DTO.buildObjectIfNotNull(
+				this.objectMapper.readValue(jsonVerification, VerificationDTO.class));
 		}
 		catch(final Exception ex)
 		{
@@ -54,6 +51,5 @@ public class VerificationSerializer extends AbstractSerializer<Verification>
 				"exception while parsing [" + jsonVerification + "] for Verification",
 				ex);
 		}
-		return null;
 	}
 }

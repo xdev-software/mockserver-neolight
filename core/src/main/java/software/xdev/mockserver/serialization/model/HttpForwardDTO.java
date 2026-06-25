@@ -17,7 +17,6 @@ package software.xdev.mockserver.serialization.model;
 
 import java.util.Objects;
 
-import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpForward;
 
 
@@ -50,16 +49,11 @@ public class HttpForwardDTO implements DTO<HttpForward>
 	@Override
 	public HttpForward buildObject()
 	{
-		Delay delay = null;
-		if(this.delay != null)
-		{
-			delay = this.delay.buildObject();
-		}
 		return new HttpForward()
 			.withHost(this.host)
 			.withPort(this.port != null ? this.port : 80)
 			.withScheme(this.scheme != null ? this.scheme : HttpForward.Scheme.HTTP)
-			.withDelay(delay);
+			.withDelay(DTO.buildObjectIfNotNull(this.delay));
 	}
 	
 	public String getHost()

@@ -573,9 +573,8 @@ public class HttpRequestPropertiesMatcher extends AbstractHttpRequestMatcher
 					{
 						try
 						{
-							final BodyDTO bodyDTO = this.getObjectMapperWithStrictBodyDTODeserializer().readValue(
-								request.getBodyAsJsonOrXmlString(),
-								BodyDTO.class);
+							final BodyDTO<?> bodyDTO = this.getObjectMapperWithStrictBodyDTODeserializer()
+								.readValue(request.getBodyAsJsonOrXmlString(), BodyDTO.class);
 							if(bodyDTO != null)
 							{
 								bodyMatches = this.bodyMatches(

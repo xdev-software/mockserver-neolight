@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import static software.xdev.mockserver.serialization.model.DTO.buildObjectIfNotNull;
+
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -74,32 +76,12 @@ public class HttpOverrideForwardedRequestDTO implements DTO<HttpOverrideForwarde
 	@Override
 	public HttpOverrideForwardedRequest buildObject()
 	{
-		HttpRequest overrideHttpRequest = null;
-		if(this.requestOverride != null)
-		{
-			overrideHttpRequest = this.requestOverride.buildObject();
-		}
-		HttpRequestModifier modifyHttpRequest = null;
-		if(this.requestModifier != null)
-		{
-			modifyHttpRequest = this.requestModifier.buildObject();
-		}
-		HttpResponse overrideHttpResponse = null;
-		if(this.responseOverride != null)
-		{
-			overrideHttpResponse = this.responseOverride.buildObject();
-		}
-		HttpResponseModifier modifyHttpResponse = null;
-		if(this.responseModifier != null)
-		{
-			modifyHttpResponse = this.responseModifier.buildObject();
-		}
 		return new HttpOverrideForwardedRequest()
-			.withRequestOverride(overrideHttpRequest)
-			.withRequestModifier(modifyHttpRequest)
-			.withResponseOverride(overrideHttpResponse)
-			.withResponseModifier(modifyHttpResponse)
-			.withDelay(this.delay != null ? this.delay.buildObject() : null);
+			.withRequestOverride(buildObjectIfNotNull(this.requestOverride))
+			.withRequestModifier(buildObjectIfNotNull(this.requestModifier))
+			.withResponseOverride(buildObjectIfNotNull(this.responseOverride))
+			.withResponseModifier(buildObjectIfNotNull(this.responseModifier))
+			.withDelay(buildObjectIfNotNull(this.delay));
 	}
 	
 	public HttpRequestDTO getRequestOverride()

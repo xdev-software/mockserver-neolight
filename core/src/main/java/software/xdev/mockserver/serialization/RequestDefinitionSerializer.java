@@ -130,11 +130,7 @@ public class RequestDefinitionSerializer extends AbstractSerializer<RequestDefin
 			}
 			final RequestDefinitionDTO requestDefinitionDTO =
 				this.objectMapper.readValue(jsonRequestDefinition, RequestDefinitionDTO.class);
-			if(requestDefinitionDTO != null)
-			{
-				return requestDefinitionDTO.buildObject();
-			}
-			return null;
+			return requestDefinitionDTO != null ? requestDefinitionDTO.buildObject() : null;
 		}
 		catch(final Exception ex)
 		{

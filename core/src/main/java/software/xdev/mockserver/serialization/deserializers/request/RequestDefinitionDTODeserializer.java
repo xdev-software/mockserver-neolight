@@ -44,6 +44,7 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
 		super(RequestDefinitionDTO.class);
 	}
 	
+	@SuppressWarnings("PMD.VariableDeclarationUsageDistance")
 	@Override
 	public RequestDefinitionDTO deserialize(
 		final JsonParser p,
@@ -59,7 +60,7 @@ public class RequestDefinitionDTODeserializer extends StdDeserializer<RequestDef
 		NottableString path = string("");
 		Parameters pathParameters = null;
 		Parameters queryStringParameters = null;
-		BodyDTO body = null;
+		BodyDTO<?> body = null;
 		Cookies cookies = null;
 		Headers headers = null;
 		Boolean keepAlive = null;

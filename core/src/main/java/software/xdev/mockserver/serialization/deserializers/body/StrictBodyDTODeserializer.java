@@ -47,7 +47,7 @@ import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 @SuppressWarnings("PMD.GodClass")
-public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
+public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO<?>>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(StrictBodyDTODeserializer.class);
 	
@@ -70,25 +70,26 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO>
 		"PMD.CognitiveComplexity",
 		"PMD.NPathComplexity",
 		"PMD.CyclomaticComplexity",
-		"PMD.AvoidDeeplyNestedIfStmts"})
+		"PMD.AvoidDeeplyNestedIfStmts",
+		"PMD.VariableDeclarationUsageDistance"})
 	@Override
-	public BodyDTO deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
+	public BodyDTO<?> deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
 	{
-		BodyDTO result = null;
+		BodyDTO<?> result = null;
 		final JsonToken currentToken = jsonParser.currentToken();
-		String valueJsonValue = "";
-		byte[] rawBytes = null;
-		Body.Type type = null;
-		Boolean not = null;
 		Boolean optional = null;
-		MediaType contentType = null;
-		Charset charset = null;
-		boolean subString = false;
-		Parameters parameters = null;
 		if(currentToken == JsonToken.START_OBJECT)
 		{
 			@SuppressWarnings("unchecked")
 			final Map<Object, Object> body = (Map<Object, Object>)ctxt.readValue(jsonParser, Map.class);
+			String valueJsonValue = "";
+			byte[] rawBytes = null;
+			Body.Type type = null;
+			Boolean not = null;
+			MediaType contentType = null;
+			Charset charset = null;
+			boolean subString = false;
+			Parameters parameters = null;
 			for(final Map.Entry<Object, Object> entry : body.entrySet())
 			{
 				if(entry.getKey() instanceof final String key)

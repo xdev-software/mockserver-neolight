@@ -31,7 +31,6 @@ import software.xdev.mockserver.model.BinaryBody;
 import software.xdev.mockserver.model.Body;
 import software.xdev.mockserver.model.MediaType;
 import software.xdev.mockserver.model.ParameterBody;
-import software.xdev.mockserver.model.ParameterStyle;
 import software.xdev.mockserver.model.Parameters;
 import software.xdev.mockserver.model.RegexBody;
 import software.xdev.mockserver.model.StringBody;
@@ -48,7 +47,7 @@ import tools.jackson.databind.deser.std.StdDeserializer;
 
 
 @SuppressWarnings("PMD.GodClass")
-public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
+public class BodyDTODeserializer extends StdDeserializer<BodyDTO<?>>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BodyDTODeserializer.class);
 	
@@ -71,27 +70,26 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 		"PMD.CognitiveComplexity",
 		"PMD.NPathComplexity",
 		"PMD.CyclomaticComplexity",
-		"PMD.AvoidDeeplyNestedIfStmts"})
+		"PMD.AvoidDeeplyNestedIfStmts",
+		"PMD.VariableDeclarationUsageDistance"})
 	@Override
-	public BodyDTO deserialize(final JsonParser p, final DeserializationContext ctxt)
+	public BodyDTO<?> deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
-		BodyDTO result = null;
 		final JsonToken currentToken = p.currentToken();
-		String valueJsonValue = "";
-		byte[] rawBytes = null;
-		Body.Type type = null;
-		Boolean not = null;
+		BodyDTO<?> result = null;
 		Boolean optional = null;
-		MediaType contentType = null;
-		Charset charset = null;
-		boolean subString = false;
-		Parameters parameters = null;
-		Map<String, ParameterStyle> parameterStyles;
-		Map<String, String> namespacePrefixes;
 		if(currentToken == JsonToken.START_OBJECT)
 		{
 			@SuppressWarnings("unchecked")
 			final Map<Object, Object> body = (Map<Object, Object>)ctxt.readValue(p, Map.class);
+			Body.Type type = null;
+			Boolean not = null;
+			MediaType contentType = null;
+			Charset charset = null;
+			boolean subString = false;
+			Parameters parameters = null;
+			byte[] rawBytes = null;
+			String valueJsonValue = "";
 			for(final Map.Entry<Object, Object> entry : body.entrySet())
 			{
 				if(entry.getKey() instanceof final String key)
@@ -164,48 +162,6 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO>
 							if(LOG.isDebugEnabled())
 							{
 								LOG.debug("Ignoring unsupported boolean with value \"{}\"",
-									entry.getValue(), uce);
-							}
-						}
-					}
-					if("parameterStyles".equalsIgnoreCase(key) && entry.getValue() instanceof Map)
-					{
-						try
-						{
-							parameterStyles = new HashMap<>();
-							for(final Map.Entry<?, ?> parameterStyle : ((Map<?, ?>)entry.getValue()).entrySet())
-							{
-								parameterStyles.put(
-									String.valueOf(parameterStyle.getKey()),
-									ParameterStyle.valueOf(String.valueOf(parameterStyle.getValue())));
-							}
-						}
-						catch(final IllegalArgumentException uce)
-						{
-							if(LOG.isDebugEnabled())
-							{
-								LOG.debug("Ignoring unsupported boolean with value \"{}\"",
-									entry.getValue(), uce);
-							}
-						}
-					}
-					if("namespacePrefixes".equalsIgnoreCase(key) && entry.getValue() instanceof Map)
-					{
-						try
-						{
-							namespacePrefixes = new HashMap<>();
-							for(final Map.Entry<?, ?> namespacePrefixEntry : ((Map<?, ?>)entry.getValue()).entrySet())
-							{
-								namespacePrefixes.put(
-									String.valueOf(namespacePrefixEntry.getKey()),
-									String.valueOf(namespacePrefixEntry.getValue()));
-							}
-						}
-						catch(final IllegalArgumentException uce)
-						{
-							if(LOG.isDebugEnabled())
-							{
-								LOG.debug("Ignoring unsupported namespacePrefixEntry with value \"{}\"",
 									entry.getValue(), uce);
 							}
 						}

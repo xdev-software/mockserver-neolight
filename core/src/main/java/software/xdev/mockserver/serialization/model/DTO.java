@@ -15,7 +15,20 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import java.util.function.Supplier;
+
+
 public interface DTO<T>
 {
 	T buildObject();
+	
+	static <D extends DTO<T>, T> T buildObjectIfNotNull(final D dto)
+	{
+		return buildObjectIfNotNull(dto, null);
+	}
+	
+	static <D extends DTO<T>, T> T buildObjectIfNotNull(final D dto, final Supplier<T> defaultValSuppl)
+	{
+		return dto != null ? dto.buildObject() : defaultValSuppl.get();
+	}
 }

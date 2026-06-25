@@ -31,7 +31,7 @@ import software.xdev.mockserver.model.StringBody;
 import software.xdev.mockserver.serialization.ObjectMappers;
 
 
-public abstract class BodyDTO extends NotDTO implements DTO<Body<?>>
+public abstract class BodyDTO<B extends Body<?>> extends NotDTO implements DTO<B>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BodyDTO.class);
 	
@@ -44,9 +44,9 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>>
 		this.type = type;
 	}
 	
-	public static BodyDTO createDTO(final Body<?> body)
+	public static BodyDTO<?> createDTO(final Body<?> body)
 	{
-		BodyDTO result = null;
+		BodyDTO<?> result = null;
 		
 		if(body instanceof final BinaryBody typedDTO)
 		{
@@ -73,7 +73,7 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>>
 		return result;
 	}
 	
-	public static String toString(final BodyDTO body)
+	public static String toString(final BodyDTO<?> body)
 	{
 		if(body instanceof final BinaryBodyDTO typedDTO)
 		{
@@ -116,14 +116,14 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>>
 		return this.optional;
 	}
 	
-	public BodyDTO withOptional(final Boolean optional)
+	public BodyDTO<?> withOptional(final Boolean optional)
 	{
 		this.optional = optional;
 		return this;
 	}
 	
 	@Override
-	public abstract Body<?> buildObject();
+	public abstract B buildObject();
 	
 	@Override
 	public boolean equals(final Object o)
@@ -132,7 +132,7 @@ public abstract class BodyDTO extends NotDTO implements DTO<Body<?>>
 		{
 			return true;
 		}
-		if(!(o instanceof final BodyDTO bodyDTO))
+		if(!(o instanceof final BodyDTO<?> bodyDTO))
 		{
 			return false;
 		}

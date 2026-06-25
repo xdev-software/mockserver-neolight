@@ -21,7 +21,7 @@ import software.xdev.mockserver.model.ParameterBody;
 import software.xdev.mockserver.model.Parameters;
 
 
-public class ParameterBodyDTO extends BodyDTO
+public class ParameterBodyDTO extends BodyDTO<ParameterBody>
 {
 	private final Parameters parameters;
 	

@@ -55,19 +55,9 @@ public class LogEventRequestAndResponseDTO extends ObjectWithJsonToString implem
 	@Override
 	public LogEventRequestAndResponse buildObject()
 	{
-		RequestDefinition httpRequest = null;
-		HttpResponse httpResponse = null;
-		if(this.httpRequest != null)
-		{
-			httpRequest = this.httpRequest.buildObject();
-		}
-		if(this.httpResponse != null)
-		{
-			httpResponse = this.httpResponse.buildObject();
-		}
 		return new LogEventRequestAndResponse()
-			.withHttpRequest(httpRequest)
-			.withHttpResponse(httpResponse)
+			.withHttpRequest(this.httpRequest != null ? this.httpRequest.buildObject() : null)
+			.withHttpResponse(DTO.buildObjectIfNotNull(this.httpResponse))
 			.withTimestamp(this.timestamp);
 	}
 	

@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import software.xdev.mockserver.mock.Expectation;
+import software.xdev.mockserver.serialization.model.DTO;
 import software.xdev.mockserver.serialization.model.ExpectationDTO;
 import tools.jackson.databind.JsonNode;
 
@@ -102,11 +103,8 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 	{
 		try
 		{
-			final ExpectationDTO expectationDTO = this.objectMapper.readValue(jsonExpectation, ExpectationDTO.class);
-			if(expectationDTO != null)
-			{
-				return expectationDTO.buildObject();
-			}
+			return DTO.buildObjectIfNotNull(
+				this.objectMapper.readValue(jsonExpectation, ExpectationDTO.class));
 		}
 		catch(final Exception ex)
 		{
@@ -114,7 +112,6 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 				"exception while parsing [" + jsonExpectation + "] for Expectation",
 				ex);
 		}
-		return null;
 	}
 	
 	public Expectation[] deserializeArray(final String jsonExpectations, final boolean allowEmpty)
