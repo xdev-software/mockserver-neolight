@@ -1,3 +1,6 @@
+# 2.50.10
+* Updated dependencies
+
 # 2.50.9
 * Updated dependencies
 * Add shorthand methods for `HttpRequest`
