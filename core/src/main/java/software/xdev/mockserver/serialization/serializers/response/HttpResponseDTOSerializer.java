@@ -52,17 +52,11 @@ public class HttpResponseDTOSerializer extends StdSerializer<HttpResponseDTO>
 		{
 			gen.writePOJOProperty("cookies", value.getCookies());
 		}
-		final BodyWithContentTypeDTO body = value.getBody();
-		if(body != null)
+		final BodyWithContentTypeDTO<?> body = value.getBody();
+		if(body instanceof final StringBodyDTO stringBodyDTO && !stringBodyDTO.getString().isEmpty()
+			|| body instanceof BinaryBodyDTO)
 		{
-			if(body instanceof StringBodyDTO && !((StringBodyDTO)body).getString().isEmpty())
-			{
-				gen.writePOJOProperty("body", body);
-			}
-			else if(body instanceof BinaryBodyDTO)
-			{
-				gen.writePOJOProperty("body", body);
-			}
+			gen.writePOJOProperty("body", body);
 		}
 		if(value.getDelay() != null)
 		{

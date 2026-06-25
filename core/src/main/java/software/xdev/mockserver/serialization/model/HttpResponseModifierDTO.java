@@ -46,8 +46,8 @@ public class HttpResponseModifierDTO implements DTO<HttpResponseModifier>
 	public HttpResponseModifier buildObject()
 	{
 		return new HttpResponseModifier()
-			.withHeaders(this.headers != null ? this.headers.buildObject() : null)
-			.withCookies(this.cookies != null ? this.cookies.buildObject() : null);
+			.withHeaders(DTO.buildObjectIfNotNull(this.headers))
+			.withCookies(DTO.buildObjectIfNotNull(this.cookies));
 	}
 	
 	public HeadersModifierDTO getHeaders()

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import software.xdev.mockserver.model.HttpRequest;
+import software.xdev.mockserver.serialization.model.DTO;
 import software.xdev.mockserver.serialization.model.HttpRequestDTO;
 import software.xdev.mockserver.serialization.model.HttpRequestPrettyPrintedDTO;
 import tools.jackson.databind.JsonNode;
@@ -122,14 +123,10 @@ public class HttpRequestSerializer extends AbstractSerializer<HttpRequest>
 					ex);
 			}
 		}
-		HttpRequest httpRequest = null;
 		try
 		{
-			final HttpRequestDTO httpRequestDTO = this.objectMapper.readValue(jsonHttpRequest, HttpRequestDTO.class);
-			if(httpRequestDTO != null)
-			{
-				httpRequest = httpRequestDTO.buildObject();
-			}
+			return DTO.buildObjectIfNotNull(
+				this.objectMapper.readValue(jsonHttpRequest, HttpRequestDTO.class));
 		}
 		catch(final Exception ex)
 		{
@@ -137,7 +134,6 @@ public class HttpRequestSerializer extends AbstractSerializer<HttpRequest>
 				"exception while parsing [" + jsonHttpRequest + "] for HttpRequest",
 				ex);
 		}
-		return httpRequest;
 	}
 	
 	public HttpRequest[] deserializeArray(final String jsonHttpRequests)

@@ -21,7 +21,7 @@ import software.xdev.mockserver.model.Body;
 import software.xdev.mockserver.model.RegexBody;
 
 
-public class RegexBodyDTO extends BodyDTO
+public class RegexBodyDTO extends BodyDTO<RegexBody>
 {
 	private final String regex;
 	

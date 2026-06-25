@@ -17,7 +17,6 @@ package software.xdev.mockserver.serialization.model;
 
 import java.util.Objects;
 
-import software.xdev.mockserver.model.Delay;
 import software.xdev.mockserver.model.HttpObjectCallback;
 
 
@@ -47,15 +46,10 @@ public class HttpObjectCallbackDTO implements DTO<HttpObjectCallback>
 	@Override
 	public HttpObjectCallback buildObject()
 	{
-		Delay delay = null;
-		if(this.delay != null)
-		{
-			delay = this.delay.buildObject();
-		}
 		return new HttpObjectCallback()
 			.withClientId(this.clientId)
 			.withResponseCallback(this.responseCallback)
-			.withDelay(delay);
+			.withDelay(DTO.buildObjectIfNotNull(this.delay));
 	}
 	
 	public String getClientId()

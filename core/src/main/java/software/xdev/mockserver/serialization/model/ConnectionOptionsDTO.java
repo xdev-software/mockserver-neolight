@@ -63,7 +63,7 @@ public class ConnectionOptionsDTO extends ObjectWithJsonToString implements DTO<
 			.withChunkSize(this.chunkSize)
 			.withKeepAliveOverride(this.keepAliveOverride)
 			.withCloseSocket(this.closeSocket)
-			.withCloseSocketDelay(this.closeSocketDelay != null ? this.closeSocketDelay.buildObject() : null);
+			.withCloseSocketDelay(DTO.buildObjectIfNotNull(this.closeSocketDelay));
 	}
 	
 	public Boolean getSuppressContentLengthHeader()

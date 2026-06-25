@@ -26,7 +26,7 @@ import software.xdev.mockserver.model.MediaType;
 import software.xdev.mockserver.model.StringBody;
 
 
-public abstract class BodyWithContentTypeDTO extends BodyDTO
+public abstract class BodyWithContentTypeDTO<B extends BodyWithContentType<?>> extends BodyDTO<B>
 {
 	protected final String contentType;
 	
@@ -37,9 +37,9 @@ public abstract class BodyWithContentTypeDTO extends BodyDTO
 		this.withOptional(body.getOptional());
 	}
 	
-	public static BodyWithContentTypeDTO createWithContentTypeDTO(final BodyWithContentType<?> body)
+	public static BodyWithContentTypeDTO<?> createWithContentTypeDTO(final BodyWithContentType<?> body)
 	{
-		BodyWithContentTypeDTO result = null;
+		BodyWithContentTypeDTO<?> result = null;
 		
 		if(body instanceof final BinaryBody binaryBody)
 		{
@@ -70,7 +70,7 @@ public abstract class BodyWithContentTypeDTO extends BodyDTO
 	}
 	
 	@Override
-	public abstract BodyWithContentType<?> buildObject();
+	public abstract B buildObject();
 	
 	@Override
 	public boolean equals(final Object o)
@@ -79,7 +79,7 @@ public abstract class BodyWithContentTypeDTO extends BodyDTO
 		{
 			return true;
 		}
-		if(!(o instanceof final BodyWithContentTypeDTO that))
+		if(!(o instanceof final BodyWithContentTypeDTO<?> that))
 		{
 			return false;
 		}

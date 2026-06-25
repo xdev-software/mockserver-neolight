@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import software.xdev.mockserver.model.HttpRequestAndHttpResponse;
+import software.xdev.mockserver.serialization.model.DTO;
 import software.xdev.mockserver.serialization.model.HttpRequestAndHttpResponseDTO;
 import tools.jackson.databind.JsonNode;
 
@@ -99,22 +100,16 @@ public class HttpRequestAndHttpResponseSerializer extends AbstractSerializer<Htt
 					"exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
 			}
 		}
-		HttpRequestAndHttpResponse httpRequestAndHttpResponse = null;
 		try
 		{
-			final HttpRequestAndHttpResponseDTO httpRequestDTO =
-				this.objectMapper.readValue(jsonHttpRequest, HttpRequestAndHttpResponseDTO.class);
-			if(httpRequestDTO != null)
-			{
-				httpRequestAndHttpResponse = httpRequestDTO.buildObject();
-			}
+			return DTO.buildObjectIfNotNull(
+				this.objectMapper.readValue(jsonHttpRequest, HttpRequestAndHttpResponseDTO.class));
 		}
 		catch(final Exception ex)
 		{
 			throw new IllegalArgumentException(
 				"exception while parsing [" + jsonHttpRequest + "] for HttpRequestAndHttpResponse", ex);
 		}
-		return httpRequestAndHttpResponse;
 	}
 	
 	@SuppressWarnings("PMD.CognitiveComplexity")

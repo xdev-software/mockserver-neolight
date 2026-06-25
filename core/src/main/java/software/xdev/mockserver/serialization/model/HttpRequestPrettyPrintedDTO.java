@@ -35,7 +35,7 @@ public class HttpRequestPrettyPrintedDTO extends RequestDefinition
 	private String method = "";
 	private String path = "";
 	private final Map<String, List<String>> queryStringParameters = new HashMap<>();
-	private BodyDTO body;
+	private BodyDTO<?> body;
 	private final Map<String, String> cookies = new HashMap<>();
 	private final Map<String, List<String>> headers = new HashMap<>();
 	private Boolean keepAlive;
@@ -83,7 +83,7 @@ public class HttpRequestPrettyPrintedDTO extends RequestDefinition
 		return this.queryStringParameters;
 	}
 	
-	public BodyDTO getBody()
+	public BodyDTO<?> getBody()
 	{
 		return this.body;
 	}

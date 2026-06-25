@@ -21,7 +21,7 @@ import java.util.Objects;
 import software.xdev.mockserver.model.BinaryBody;
 
 
-public class BinaryBodyDTO extends BodyWithContentTypeDTO
+public class BinaryBodyDTO extends BodyWithContentTypeDTO<BinaryBody>
 {
 	private final byte[] base64Bytes;
 	

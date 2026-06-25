@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import software.xdev.mockserver.model.LogEventRequestAndResponse;
+import software.xdev.mockserver.serialization.model.DTO;
 import software.xdev.mockserver.serialization.model.LogEventRequestAndResponseDTO;
 import tools.jackson.core.util.DefaultIndenter;
 import tools.jackson.core.util.DefaultPrettyPrinter;
@@ -105,17 +106,11 @@ public class LogEventRequestAndResponseSerializer
 					+ "\"");
 		}
 		
-		LogEventRequestAndResponse httpRequestAndHttpResponse = null;
 		try
 		{
-			final LogEventRequestAndResponseDTO httpRequestAndHttpResponseDTO =
-				ObjectMappers.DEFAULT_MAPPER.readValue(
-					jsonHttpRequestAndHttpResponse,
-					LogEventRequestAndResponseDTO.class);
-			if(httpRequestAndHttpResponseDTO != null)
-			{
-				httpRequestAndHttpResponse = httpRequestAndHttpResponseDTO.buildObject();
-			}
+			return DTO.buildObjectIfNotNull(ObjectMappers.DEFAULT_MAPPER.readValue(
+				jsonHttpRequestAndHttpResponse,
+				LogEventRequestAndResponseDTO.class));
 		}
 		catch(final Exception ex)
 		{
@@ -123,7 +118,6 @@ public class LogEventRequestAndResponseSerializer
 				"exception while parsing [" + jsonHttpRequestAndHttpResponse + "] for HttpRequestAndHttpResponse",
 				ex);
 		}
-		return httpRequestAndHttpResponse;
 	}
 	
 	public LogEventRequestAndResponse[] deserializeArray(final String jsonHttpRequestAndHttpResponse)

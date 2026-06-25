@@ -40,7 +40,7 @@ import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.deser.std.StdDeserializer;
 
 
-public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWithContentTypeDTO>
+public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWithContentTypeDTO<?>>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(BodyWithContentTypeDTODeserializer.class);
 	
@@ -63,21 +63,21 @@ public class BodyWithContentTypeDTODeserializer extends StdDeserializer<BodyWith
 		"PMD.CyclomaticComplexity",
 		"PMD.AvoidDeeplyNestedIfStmts"})
 	@Override
-	public BodyWithContentTypeDTO deserialize(final JsonParser p, final DeserializationContext ctxt)
+	public BodyWithContentTypeDTO<?> deserialize(final JsonParser p, final DeserializationContext ctxt)
 	{
-		BodyWithContentTypeDTO result = null;
+		BodyWithContentTypeDTO<?> result = null;
 		final JsonToken currentToken = p.currentToken();
-		String valueJsonValue = "";
-		byte[] rawBytes = null;
-		Body.Type type = null;
-		Boolean not = null;
 		Boolean optional = null;
-		MediaType contentType = null;
-		Charset charset = null;
 		if(currentToken == JsonToken.START_OBJECT)
 		{
 			@SuppressWarnings("unchecked")
 			final Map<Object, Object> body = (Map<Object, Object>)ctxt.readValue(p, Map.class);
+			String valueJsonValue = "";
+			byte[] rawBytes = null;
+			Body.Type type = null;
+			Boolean not = null;
+			MediaType contentType = null;
+			Charset charset = null;
 			for(final Map.Entry<Object, Object> entry : body.entrySet())
 			{
 				if(entry.getKey() instanceof final String key)

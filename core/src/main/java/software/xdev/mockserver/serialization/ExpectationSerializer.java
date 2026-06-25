@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import software.xdev.mockserver.mock.Expectation;
+import software.xdev.mockserver.serialization.model.DTO;
 import software.xdev.mockserver.serialization.model.ExpectationDTO;
 import tools.jackson.databind.JsonNode;
 
@@ -102,11 +103,8 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 	{
 		try
 		{
-			final ExpectationDTO expectationDTO = this.objectMapper.readValue(jsonExpectation, ExpectationDTO.class);
-			if(expectationDTO != null)
-			{
-				return expectationDTO.buildObject();
-			}
+			return DTO.buildObjectIfNotNull(
+				this.objectMapper.readValue(jsonExpectation, ExpectationDTO.class));
 		}
 		catch(final Exception ex)
 		{
@@ -114,7 +112,6 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 				"exception while parsing [" + jsonExpectation + "] for Expectation",
 				ex);
 		}
-		return null;
 	}
 	
 	public Expectation[] deserializeArray(final String jsonExpectations, final boolean allowEmpty)
@@ -135,7 +132,7 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 					+ strJsonExpectations + "\"");
 		}
 		final List<Expectation> expectations = new ArrayList<>();
-		final List<String> validationErrors = new ArrayList<>();
+		final List<Exception> validationErrors = new ArrayList<>();
 		final List<JsonNode> jsonExpectations =
 			this.jsonArraySerializer.splitJSONArrayToJSONNodes(strJsonExpectations);
 		if(!jsonExpectations.isEmpty())
@@ -166,17 +163,17 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 				}
 				catch(final IllegalArgumentException iae)
 				{
-					validationErrors.add(iae.getMessage());
+					validationErrors.add(iae);
 				}
 			}
 			if(!validationErrors.isEmpty())
 			{
 				if(validationErrors.size() > 1)
 				{
-					throw new IllegalArgumentException(("[" + NEW_LINE
-						+ String.join("," + NEW_LINE + NEW_LINE, validationErrors))
-						.replaceAll(NEW_LINE, NEW_LINE + "  ")
-						+ NEW_LINE + "]");
+					final IllegalArgumentException multipleValidationErrorsEx =
+						new IllegalArgumentException("Multiple validation errors");
+					validationErrors.forEach(multipleValidationErrorsEx::addSuppressed);
+					throw multipleValidationErrorsEx;
 				}
 				throw new IllegalArgumentException(validationErrors.get(0));
 			}

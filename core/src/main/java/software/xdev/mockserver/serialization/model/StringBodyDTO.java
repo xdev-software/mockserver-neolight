@@ -21,7 +21,7 @@ import java.util.Objects;
 import software.xdev.mockserver.model.StringBody;
 
 
-public class StringBodyDTO extends BodyWithContentTypeDTO
+public class StringBodyDTO extends BodyWithContentTypeDTO<StringBody>
 {
 	private final String string;
 	private final boolean subString;

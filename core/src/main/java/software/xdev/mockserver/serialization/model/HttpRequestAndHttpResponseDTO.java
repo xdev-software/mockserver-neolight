@@ -52,19 +52,9 @@ public class HttpRequestAndHttpResponseDTO extends ObjectWithJsonToString implem
 	@Override
 	public HttpRequestAndHttpResponse buildObject()
 	{
-		HttpRequest httpRequest = null;
-		HttpResponse httpResponse = null;
-		if(this.httpRequest != null)
-		{
-			httpRequest = this.httpRequest.buildObject();
-		}
-		if(this.httpResponse != null)
-		{
-			httpResponse = this.httpResponse.buildObject();
-		}
 		return new HttpRequestAndHttpResponse()
-			.withHttpRequest(httpRequest)
-			.withHttpResponse(httpResponse);
+			.withHttpRequest(DTO.buildObjectIfNotNull(this.httpRequest))
+			.withHttpResponse(DTO.buildObjectIfNotNull(this.httpResponse));
 	}
 	
 	public HttpRequestDTO getHttpRequest()

@@ -1,3 +1,7 @@
+# 2.51.0
+* Updated dependencies
+* Code cleanup and improved error reporting
+
 # 2.50.9
 * Updated dependencies
 * Add shorthand methods for `HttpRequest`

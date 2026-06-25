@@ -54,11 +54,9 @@ public class HttpRequestModifierDTO implements DTO<HttpRequestModifier>
 	{
 		return new HttpRequestModifier()
 			.withPath(this.path)
-			.withQueryStringParameters(this.queryStringParameters != null
-				? this.queryStringParameters.buildObject()
-				: null)
-			.withHeaders(this.headers != null ? this.headers.buildObject() : null)
-			.withCookies(this.cookies != null ? this.cookies.buildObject() : null);
+			.withQueryStringParameters(DTO.buildObjectIfNotNull(this.queryStringParameters))
+			.withHeaders(DTO.buildObjectIfNotNull(this.headers))
+			.withCookies(DTO.buildObjectIfNotNull(this.cookies));
 	}
 	
 	public PathModifier getPath()

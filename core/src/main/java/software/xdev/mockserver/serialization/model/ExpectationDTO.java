@@ -15,6 +15,8 @@
  */
 package software.xdev.mockserver.serialization.model;
 
+import static software.xdev.mockserver.serialization.model.DTO.buildObjectIfNotNull;
+
 import java.util.Objects;
 
 import software.xdev.mockserver.matchers.TimeToLive;
@@ -122,92 +124,23 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
 	{
 	}
 	
-	@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
 	@Override
 	public Expectation buildObject()
 	{
-		RequestDefinition httpRequest = null;
-		HttpResponse httpResponse = null;
-		HttpClassCallback httpResponseClassCallback = null;
-		HttpObjectCallback httpResponseObjectCallback = null;
-		HttpForward httpForward = null;
-		HttpClassCallback httpForwardClassCallback = null;
-		HttpObjectCallback httpForwardObjectCallback = null;
-		HttpOverrideForwardedRequest httpOverrideForwardedRequest = null;
-		HttpError httpError = null;
-		final Times times;
-		final TimeToLive timeToLive;
-		final int priority;
-		if(this.httpRequest != null)
-		{
-			httpRequest = this.httpRequest.buildObject();
-		}
-		if(this.httpResponse != null)
-		{
-			httpResponse = this.httpResponse.buildObject();
-		}
-		if(this.httpResponseClassCallback != null)
-		{
-			httpResponseClassCallback = this.httpResponseClassCallback.buildObject();
-		}
-		if(this.httpResponseObjectCallback != null)
-		{
-			httpResponseObjectCallback = this.httpResponseObjectCallback.buildObject();
-		}
-		if(this.httpForward != null)
-		{
-			httpForward = this.httpForward.buildObject();
-		}
-		if(this.httpForwardClassCallback != null)
-		{
-			httpForwardClassCallback = this.httpForwardClassCallback.buildObject();
-		}
-		if(this.httpForwardObjectCallback != null)
-		{
-			httpForwardObjectCallback = this.httpForwardObjectCallback.buildObject();
-		}
-		if(this.httpOverrideForwardedRequest != null)
-		{
-			httpOverrideForwardedRequest = this.httpOverrideForwardedRequest.buildObject();
-		}
-		if(this.httpError != null)
-		{
-			httpError = this.httpError.buildObject();
-		}
-		if(this.times != null)
-		{
-			times = this.times.buildObject();
-		}
-		else
-		{
-			times = Times.unlimited();
-		}
-		if(this.timeToLive != null)
-		{
-			timeToLive = this.timeToLive.buildObject();
-		}
-		else
-		{
-			timeToLive = TimeToLive.unlimited();
-		}
-		if(this.priority != null)
-		{
-			priority = this.priority;
-		}
-		else
-		{
-			priority = 0;
-		}
-		return new Expectation(httpRequest, times, timeToLive, priority)
+		return new Expectation(
+			this.httpRequest != null ? this.httpRequest.buildObject() : null,
+			DTO.buildObjectIfNotNullSupplier(this.times, Times::unlimited),
+			DTO.buildObjectIfNotNullSupplier(this.timeToLive, TimeToLive::unlimited),
+			Objects.requireNonNullElse(this.priority, 0))
 			.withId(this.id)
-			.thenRespond(httpResponse)
-			.thenRespond(httpResponseClassCallback)
-			.thenRespond(httpResponseObjectCallback)
-			.thenForward(httpForward)
-			.thenForward(httpForwardClassCallback)
-			.thenForward(httpForwardObjectCallback)
-			.thenForward(httpOverrideForwardedRequest)
-			.thenError(httpError);
+			.thenRespond(buildObjectIfNotNull(this.httpResponse))
+			.thenRespond(buildObjectIfNotNull(this.httpResponseClassCallback))
+			.thenRespond(buildObjectIfNotNull(this.httpResponseObjectCallback))
+			.thenForward(buildObjectIfNotNull(this.httpForward))
+			.thenForward(buildObjectIfNotNull(this.httpForwardClassCallback))
+			.thenForward(buildObjectIfNotNull(this.httpForwardObjectCallback))
+			.thenForward(buildObjectIfNotNull(this.httpOverrideForwardedRequest))
+			.thenError(buildObjectIfNotNull(this.httpError));
 	}
 	
 	public String getId()
