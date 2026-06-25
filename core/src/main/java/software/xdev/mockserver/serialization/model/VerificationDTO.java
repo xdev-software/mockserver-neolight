@@ -58,7 +58,7 @@ public class VerificationDTO extends ObjectWithJsonToString implements DTO<Verif
 		return verification()
 			.withRequest(this.httpRequest != null ? this.httpRequest.buildObject() : null)
 			.withExpectationId(this.expectationId)
-			.withTimes(DTO.buildObjectIfNotNull(this.times, VerificationTimes::once))
+			.withTimes(DTO.buildObjectIfNotNullSupplier(this.times, VerificationTimes::once))
 			.withMaximumNumberOfRequestToReturnInVerificationFailure(
 				this.maximumNumberOfRequestToReturnInVerificationFailure);
 	}

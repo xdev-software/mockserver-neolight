@@ -129,8 +129,8 @@ public class ExpectationDTO extends ObjectWithJsonToString implements DTO<Expect
 	{
 		return new Expectation(
 			this.httpRequest != null ? this.httpRequest.buildObject() : null,
-			buildObjectIfNotNull(this.times, Times::unlimited),
-			buildObjectIfNotNull(this.timeToLive, TimeToLive::unlimited),
+			DTO.buildObjectIfNotNullSupplier(this.times, Times::unlimited),
+			DTO.buildObjectIfNotNullSupplier(this.timeToLive, TimeToLive::unlimited),
 			Objects.requireNonNullElse(this.priority, 0))
 			.withId(this.id)
 			.thenRespond(buildObjectIfNotNull(this.httpResponse))

@@ -132,7 +132,7 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 					+ strJsonExpectations + "\"");
 		}
 		final List<Expectation> expectations = new ArrayList<>();
-		final List<String> validationErrors = new ArrayList<>();
+		final List<Exception> validationErrors = new ArrayList<>();
 		final List<JsonNode> jsonExpectations =
 			this.jsonArraySerializer.splitJSONArrayToJSONNodes(strJsonExpectations);
 		if(!jsonExpectations.isEmpty())
@@ -163,17 +163,17 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 				}
 				catch(final IllegalArgumentException iae)
 				{
-					validationErrors.add(iae.getMessage());
+					validationErrors.add(iae);
 				}
 			}
 			if(!validationErrors.isEmpty())
 			{
 				if(validationErrors.size() > 1)
 				{
-					throw new IllegalArgumentException(("[" + NEW_LINE
-						+ String.join("," + NEW_LINE + NEW_LINE, validationErrors))
-						.replaceAll(NEW_LINE, NEW_LINE + "  ")
-						+ NEW_LINE + "]");
+					final IllegalArgumentException multipleValidationErrorsEx =
+						new IllegalArgumentException("Multiple validation errors");
+					validationErrors.forEach(multipleValidationErrorsEx::addSuppressed);
+					throw multipleValidationErrorsEx;
 				}
 				throw new IllegalArgumentException(validationErrors.get(0));
 			}
