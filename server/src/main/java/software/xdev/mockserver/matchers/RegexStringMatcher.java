@@ -71,11 +71,9 @@ public class RegexStringMatcher extends BodyMatcher<NottableString>
 			// mutual notted control plane match
 			return this.matchesByStrings(context, matcher, matched);
 		}
-		else
-		{
-			// data plane & control plan match
-			return (matcher.isNot() || matched.isNot()) ^ this.matchesByStrings(context, matcher, matched);
-		}
+		
+		// data plane & control plan match
+		return (matcher.isNot() || matched.isNot()) ^ this.matchesByStrings(context, matcher, matched);
 	}
 	
 	@SuppressWarnings({"PMD.CognitiveComplexity"})
@@ -93,56 +91,54 @@ public class RegexStringMatcher extends BodyMatcher<NottableString>
 		{
 			return true;
 		}
-		else
+		
+		if(matched != null)
 		{
-			if(matched != null)
+			final String matchedValue = matched.getValue();
+			if(matchedValue != null)
 			{
-				final String matchedValue = matched.getValue();
-				if(matchedValue != null)
+				// match as exact string
+				if(matchedValue.equals(matcherValue) || matchedValue.equalsIgnoreCase(matcherValue))
 				{
-					// match as exact string
-					if(matchedValue.equals(matcherValue) || matchedValue.equalsIgnoreCase(matcherValue))
+					return true;
+				}
+				
+				// match as regex - matcher -> matched (data plane or control plane)
+				try
+				{
+					if(matcher.matches(matchedValue))
 					{
 						return true;
 					}
-					
-					// match as regex - matcher -> matched (data plane or control plane)
-					try
+				}
+				catch(final PatternSyntaxException pse)
+				{
+					if(LOG.isDebugEnabled())
 					{
-						if(matcher.matches(matchedValue))
-						{
-							return true;
-						}
+						LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
 					}
-					catch(final PatternSyntaxException pse)
+				}
+				// match as regex - matched -> matcher (control plane only)
+				try
+				{
+					if(this.controlPlaneMatcher && matched.matches(matcherValue))
 					{
-						if(LOG.isDebugEnabled())
-						{
-							LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
-						}
+						return true;
 					}
-					// match as regex - matched -> matcher (control plane only)
-					try
+					else if(LOG.isDebugEnabled() && matched.matches(matcherValue))
 					{
-						if(this.controlPlaneMatcher && matched.matches(matcherValue))
-						{
-							return true;
-						}
-						else if(LOG.isDebugEnabled() && matched.matches(matcherValue))
-						{
-							LOG.debug(
-								"Matcher {} would match {} if matcher was used for control plane",
-								matcher,
-								matched);
-						}
+						LOG.debug(
+							"Matcher {} would match {} if matcher was used for control plane",
+							matcher,
+							matched);
 					}
-					catch(final PatternSyntaxException pse)
+				}
+				catch(final PatternSyntaxException pse)
+				{
+					if(this.controlPlaneMatcher
+						&& LOG.isDebugEnabled())
 					{
-						if(this.controlPlaneMatcher
-							&& LOG.isDebugEnabled())
-						{
-							LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
-						}
+						LOG.debug("Error while matching regex [{}] for string [{}]", matcher, matched, pse);
 					}
 				}
 			}

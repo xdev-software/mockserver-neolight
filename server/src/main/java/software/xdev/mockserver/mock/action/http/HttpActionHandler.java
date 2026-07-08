@@ -107,8 +107,8 @@ public class HttpActionHandler
 		"checkstyle:MethodLength",
 		"PMD.CognitiveComplexity",
 		"PMD.CyclomaticComplexity",
-		"PMD.NPathComplexity"
-	})
+		"PMD.NPathComplexity",
+		"PMD.AvoidDeeplyNestedIfStmts"})
 	public void processAction(
 		final HttpRequest request,
 		final ResponseWriter responseWriter,
@@ -138,7 +138,6 @@ public class HttpActionHandler
 		
 		if(expectation != null && expectation.getAction() != null)
 		{
-			
 			final Action action = expectation.getAction();
 			switch(action.getType())
 			{
@@ -292,7 +291,6 @@ public class HttpActionHandler
 		else if(CORSHeaders.isPreflightRequest(this.configuration, request) && (this.configuration.enableCORSForAPI()
 			|| this.configuration.enableCORSForAllResponses()))
 		{
-			
 			responseWriter.writeResponse(request, OK);
 			if(LOG.isInfoEnabled())
 			{
@@ -301,13 +299,11 @@ public class HttpActionHandler
 		}
 		else if(proxyingRequest || potentiallyHttpProxy)
 		{
-			
 			if(request.getHeaders() != null && request.getHeaders()
 				.containsEntry(
 					this.httpStateHandler.getUniqueLoopPreventionHeaderName(),
 					this.httpStateHandler.getUniqueLoopPreventionHeaderValue()))
 			{
-				
 				if(LOG.isTraceEnabled())
 				{
 					LOG.trace(
@@ -347,7 +343,6 @@ public class HttpActionHandler
 				}
 				else
 				{
-					
 					final InetSocketAddress remoteAddress = getRemoteAddress(ctx);
 					final HttpRequest clonedRequest = this.hopByHopHeaderFilter.onRequest(request)
 						.withHeader(
@@ -451,7 +446,6 @@ public class HttpActionHandler
 		}
 		else
 		{
-			
 			this.returnNotFound(responseWriter, request, null);
 		}
 	}
