@@ -28,12 +28,13 @@ public class MockServerContainer extends GenericContainer<MockServerContainer>
 	public static final String DEFAULT_IMAGE = "xdevsoftware/mockserver";
 	public static final String DEFAULT_TAG = MockServerUtils.DEFAULT_VERSION;
 	public static final int PORT = 1080;
+	public static final String LOG_MSG_WAIT_STRATEGY_REGEX = ".*started on port: " + PORT + ".*";
 	
 	public MockServerContainer(final RemoteDockerImage image)
 	{
 		super(image);
 		
-		this.waitingFor(Wait.forLogMessage(".*started on port: " + PORT + ".*", 1));
+		this.waitingFor(Wait.forLogMessage(LOG_MSG_WAIT_STRATEGY_REGEX, 1));
 		this.addExposedPort(PORT);
 	}
 	
@@ -41,7 +42,7 @@ public class MockServerContainer extends GenericContainer<MockServerContainer>
 	{
 		super(dockerImageName);
 		
-		this.waitingFor(Wait.forLogMessage(".*started on port: " + PORT + ".*", 1));
+		this.waitingFor(Wait.forLogMessage(LOG_MSG_WAIT_STRATEGY_REGEX, 1));
 		this.addExposedPort(PORT);
 	}
 	

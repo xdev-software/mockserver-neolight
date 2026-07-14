@@ -1,3 +1,7 @@
+# 2.52.0
+* Testcontainers: Extract wait strategy constants
+* Updated dependencies
+
 # 2.51.0
 * Updated dependencies
 * Code cleanup and improved error reporting
