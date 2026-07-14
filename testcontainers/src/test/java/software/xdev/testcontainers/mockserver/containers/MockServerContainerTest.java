@@ -27,8 +27,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -51,12 +49,12 @@ class MockServerContainerTest
 	static DockerImageName image;
 	
 	@BeforeAll
-	static void buildImage() throws TimeoutException
+	static void buildImage()
 	{
 		image = DockerImageName.parse(getOrBuildImage());
 	}
 	
-	static String getOrBuildImage() throws TimeoutException
+	static String getOrBuildImage()
 	{
 		final String imageName = System.getProperty("mockserver-image");
 		if(imageName != null)
@@ -66,25 +64,27 @@ class MockServerContainerTest
 		
 		return new AdvancedImageFromDockerFile("mockserver")
 			.withLoggerForBuild(LoggerFactory.getLogger("container.build.mockserver"))
-			.withPostGitIgnoreLines(
-				// Ignore files that aren't related to the built code
-				".git/**",
-				".config/**",
-				".github/**",
-				".idea/**",
-				".run/**",
-				"assets/**",
-				"docs/**",
-				"Dockerfile",
-				"*.md",
-				"*.cmd",
-				"/renovate.json5",
-				"/client/src/**",
-				"/testcontainers/src/**")
 			.withDockerFilePath(Paths.get("../testcontainers/Standalone.Dockerfile"))
 			.withBaseDir(Paths.get("../"))
-			.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
-			.get(5, TimeUnit.MINUTES);
+			.configureFilesToTransferHandler(h -> h
+				.withPostGitIgnoreLines(
+					// Ignore files that aren't related to the built code
+					".git/**",
+					".config/**",
+					".github/**",
+					".idea/**",
+					".run/**",
+					"assets/**",
+					"docs/**",
+					"Dockerfile",
+					"*.md",
+					"*.cmd",
+					"/renovate.json5",
+					"/client/src/**",
+					"/testcontainers/src/**")
+				.withDockerFileLinesModifier(new DockerfileCOPYParentsEmulator())
+			)
+			.build(Duration.ofMinutes(5));
 	}
 	
 	@Test
