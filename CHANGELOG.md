@@ -1,3 +1,6 @@
+# 2.51.2
+* Updated dependencies
+
 # 2.51.1
 * Testcontainers: Extract wait strategy constants
 * Updated dependencies
