@@ -70,8 +70,7 @@ public class StrictBodyDTODeserializer extends StdDeserializer<BodyDTO<?>>
 		"PMD.CognitiveComplexity",
 		"PMD.NPathComplexity",
 		"PMD.CyclomaticComplexity",
-		"PMD.AvoidDeeplyNestedIfStmts",
-		"PMD.VariableDeclarationUsageDistance"})
+		"PMD.AvoidDeeplyNestedIfStmts"})
 	@Override
 	public BodyDTO<?> deserialize(final JsonParser jsonParser, final DeserializationContext ctxt)
 	{

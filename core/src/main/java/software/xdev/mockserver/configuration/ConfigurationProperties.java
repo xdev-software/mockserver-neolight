@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import software.xdev.mockserver.util.StringUtils;
 
 
-@SuppressWarnings({"checkstyle:MagicNumber", "PMD.UseUtilityClass", "PMD.AvoidSystemSetterCall"})
+@SuppressWarnings({"checkstyle:MagicNumber", "PMD.AvoidSystemSetterCall", "PMD.InstantiableUtilityClass"})
 public class ConfigurationProperties
 {
 	protected static final Logger LOG = LoggerFactory.getLogger(ConfigurationProperties.class);

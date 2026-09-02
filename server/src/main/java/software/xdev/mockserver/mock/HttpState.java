@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -169,9 +170,9 @@ public class HttpState
 		}
 		try
 		{
-			final ClearType type =
-				ClearType.valueOf(defaultIfEmpty(request.getFirstQueryStringParameter("type").toUpperCase(), "ALL"));
-			switch(type)
+			switch(Optional.ofNullable(request.getFirstQueryStringParameter("type").toUpperCase())
+				.map(ClearType::valueOf)
+				.orElse(ClearType.ALL))
 			{
 				case LOG:
 					this.eventBus.clear(requestDefinition);

@@ -48,7 +48,6 @@ import software.xdev.mockserver.scheduler.SchedulerThreadFactory;
 import software.xdev.mockserver.stop.Stoppable;
 
 
-@SuppressWarnings("PMD.AvoidUnmanagedThreads") // WebServer that manages channels with threads
 public abstract class LifeCycle implements Stoppable
 {
 	private static final Logger LOG = LoggerFactory.getLogger(LifeCycle.class);
