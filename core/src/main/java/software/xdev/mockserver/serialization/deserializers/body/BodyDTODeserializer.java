@@ -224,16 +224,12 @@ public class BodyDTODeserializer extends StdDeserializer<BodyDTO<?>>
 				switch(type)
 				{
 					case BINARY:
-						if(contentType != null && isNotBlank(contentType.toString()))
-						{
-							result = new BinaryBodyDTO(new BinaryBody(rawBytes, contentType), not);
-							break;
-						}
-						else
-						{
-							result = new BinaryBodyDTO(new BinaryBody(rawBytes), not);
-							break;
-						}
+						result = new BinaryBodyDTO(
+							new BinaryBody(
+								rawBytes,
+								contentType != null && isNotBlank(contentType.toString()) ? contentType : null),
+							not);
+						break;
 					case PARAMETERS:
 						result = new ParameterBodyDTO(new ParameterBody(parameters), not);
 						break;
