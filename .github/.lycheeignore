@@ -1,5 +1,6 @@
 # Ignorefile for broken link check
 localhost
 mvnrepository.com
+stackoverflow.com
 testcontainers.com
 web.archive.org
