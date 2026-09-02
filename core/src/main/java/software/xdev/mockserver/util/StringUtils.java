@@ -20,6 +20,7 @@ package software.xdev.mockserver.util;
  * <p/>
  * <b>DO NOT USE</b>
  */
+@SuppressWarnings("checkstyle:IllegalIdentifierName")
 public final class StringUtils
 {
 	public static String removeStart(final String str, final String remove)

@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v7
 
     - name: Set up JDK
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -88,7 +88,7 @@ jobs:
 
     - name: Create Release
       id: create-release
-      uses: shogo82148/actions-create-release@6a396031bc74c57403da1018fec74d24c6aa03cd # v1
+      uses: shogo82148/actions-create-release@8674c0ecee617c8dfb006526bcc22a362c70b88a # v1
       with:
         tag_name: v${{ steps.version.outputs.release }}
         release_name: v${{ steps.version.outputs.release }}
@@ -148,7 +148,7 @@ jobs:
         git pull
 
     - name: Set up JDK
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with: # running setup-java overwrites the settings.xml
         distribution: 'temurin'
         java-version: '17'
@@ -170,7 +170,7 @@ jobs:
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
   
     - name: Set up JDK
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with: # running setup-java again overwrites the settings.xml
         distribution: 'temurin'
         java-version: '17'
@@ -291,7 +291,7 @@ jobs:
         git pull
 
     - name: Setup - Java
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with:
         java-version: '17'
         distribution: 'temurin'

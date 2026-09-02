@@ -25,11 +25,6 @@ public class BinaryBodyDTO extends BodyWithContentTypeDTO<BinaryBody>
 {
 	private final byte[] base64Bytes;
 	
-	public BinaryBodyDTO(final BinaryBody binaryBody)
-	{
-		this(binaryBody, null);
-	}
-	
 	public BinaryBodyDTO(final BinaryBody binaryBody, final Boolean not)
 	{
 		super(binaryBody.getType(), not, binaryBody);

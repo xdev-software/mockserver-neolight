@@ -29,7 +29,7 @@ import tools.jackson.databind.node.JsonNodeFactory;
  * Emulation of
  * https://github.com/fge/jackson-coreutils/blob/master/src/main/java/com/github/fge/jackson/JacksonUtils.java
  */
-public final class JacksonUtils
+public final class JacksonPrettyPrinter
 {
 	private static final ObjectWriter WRITER = JsonMapper.builder(new JsonFactory())
 		.nodeFactory(JsonNodeFactory.instance)
@@ -44,7 +44,7 @@ public final class JacksonUtils
 		return WRITER.writeValueAsString(node);
 	}
 	
-	private JacksonUtils()
+	private JacksonPrettyPrinter()
 	{
 	}
 }

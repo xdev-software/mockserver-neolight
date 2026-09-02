@@ -56,7 +56,7 @@ public class MockServerContainer extends GenericContainer<MockServerContainer>
 	
 	public MockServerContainer()
 	{
-		this(MockServerUtils.getClasspathMockserverVersion());
+		this(MockServerVersionDetector.getClasspathMockserverVersion());
 	}
 	
 	public MockServerContainer withArgOverride(final String args)

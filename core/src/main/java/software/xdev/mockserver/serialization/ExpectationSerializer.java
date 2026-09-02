@@ -139,7 +139,7 @@ public class ExpectationSerializer extends AbstractSerializer<Expectation>
 		{
 			for(int i = 0; i < jsonExpectations.size(); i++)
 			{
-				final String jsonExpectation = JacksonUtils.prettyPrint(jsonExpectations.get(i));
+				final String jsonExpectation = JacksonPrettyPrinter.prettyPrint(jsonExpectations.get(i));
 				if(jsonExpectations.size() > 100)
 				{
 					if(LOG.isDebugEnabled())

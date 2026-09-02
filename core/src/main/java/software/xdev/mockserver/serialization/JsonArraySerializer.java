@@ -28,7 +28,7 @@ public class JsonArraySerializer
 	public List<String> splitJSONArray(final String jsonArray)
 	{
 		return this.splitJSONArrayToJSONNodes(jsonArray).stream()
-			.map(JacksonUtils::prettyPrint)
+			.map(JacksonPrettyPrinter::prettyPrint)
 			.collect(Collectors.toList());
 	}
 	
