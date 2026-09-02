@@ -19,13 +19,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-class MockServerUtilTest
+class MockServerVersionDetectorTest
 {
 	@Test
 	void checkVersionDetection()
 	{
 		Assertions.assertEquals(
 			"9999.2.3",
-			MockServerUtils.determineClasspathMockserverVersion());
+			MockServerVersionDetector.determineClasspathMockserverVersion());
 	}
 }
