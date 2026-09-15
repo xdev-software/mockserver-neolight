@@ -20,7 +20,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v6
       with:
-        java-version: '17'
+        java-version: '26.0.2+10'
         distribution: 'temurin'
 
     # Try to reuse existing cache from check-build
@@ -151,7 +151,7 @@ jobs:
       uses: actions/setup-java@v6
       with: # running setup-java overwrites the settings.xml
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '26.0.2+10'
         server-id: github-central
         server-password: PACKAGES_CENTRAL_TOKEN
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
@@ -173,7 +173,7 @@ jobs:
       uses: actions/setup-java@v6
       with: # running setup-java again overwrites the settings.xml
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '26.0.2+10'
         server-id: sonatype-central-portal
         server-username: MAVEN_CENTRAL_USERNAME
         server-password: MAVEN_CENTRAL_TOKEN
@@ -293,7 +293,7 @@ jobs:
     - name: Setup - Java
       uses: actions/setup-java@v6
       with:
-        java-version: '17'
+        java-version: '26.0.2+10'
         distribution: 'temurin'
 
     # Try to reuse existing cache from check-build
