@@ -16,6 +16,10 @@
 	<name>server</name>
 	<description>MockServer NeoLight - Netty Server</description>
 
+	<properties>
+		<mainClass>software.xdev.mockserver.cli.Main</mainClass>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
