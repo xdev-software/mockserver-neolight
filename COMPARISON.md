@@ -58,7 +58,16 @@ Sources:
             ✔ <a href="https://java.testcontainers.org/modules/mockserver/">Yes</a>
         </td>
         <td>
-            ❌ Inactive since >1 year
+            ❓Maintainer (or AI agent?) came back in May 2026 but seems to appear in full "AI-mania" mode:
+            <ul>
+                <li>All issues have been closed (regardless of whether <a href="https://github.com/mock-server/mockserver-monorepo/issues/1494#issuecomment-4438268487">they were valid or not</a>)</li>
+                <li>Comments are answered using AI</li>
+                <li>Added <a href="https://github.com/mock-server/mockserver-monorepo/graphs/contributors?from=2026-05-01&to=2026-07-01">~1 Mio lines of AI generated code in just 2 months</a> - impossible to inspect from the outside</li>
+                <li>Reading/Understanding changes is next to impossible because every commit/change is a page full of text</li>
+                <li>Non-Transparent deployment process</li>
+                <li>No focus on code quality</li>
+            </ul>
+            ❌ inactive for 3 years
         </td>
     </tr>
     <tr>
@@ -139,4 +148,4 @@ Sources:
     </tr>
 </table>
 
-<sub>All values as of 2025-02</sub>
+<sub>All values as of 2026-09</sub>

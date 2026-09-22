@@ -1,35 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	child.project.url.inherit.append.path="false">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>software.xdev.mockserver</groupId>
 	<artifactId>root</artifactId>
-	<version>2.51.3-SNAPSHOT</version>
+	<version>2.52.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-
-	<name>MockServer NeoLight</name>
-	<description>A lightweight rewrite of the MockServer project with focus on simplicity, maintainability and Testcontainers</description>
 	<url>https://github.com/xdev-software/mockserver-neolight</url>
+
+	<modules>
+		<module>src</module>
+	</modules>
+
+	<properties>
+		<javaVersion>17</javaVersion>
+		<maven.compiler.release>${javaVersion}</maven.compiler.release>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<scm
+		child.scm.connection.inherit.append.path="false"
+		child.scm.developerConnection.inherit.append.path="false"
+		child.scm.url.inherit.append.path="false">
+		<url>https://github.com/xdev-software/mockserver-neolight</url>
+		<connection>scm:git:https://github.com/xdev-software/mockserver-neolight.git</connection>
+	</scm>
+
+	<inceptionYear>2024</inceptionYear>
 
 	<organization>
 		<name>XDEV Software</name>
 		<url>https://xdev.software</url>
 	</organization>
 
-	<modules>
-		<module>bom</module>
-		<module>client</module>
-		<module>core</module>
-		<module>server</module>
-		<module>testcontainers</module>
-	</modules>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
+	<developers>
+		<developer>
+			<name>XDEV Software</name>
+			<organization>XDEV Software</organization>
+			<url>https://xdev.software</url>
+		</developer>
+	</developers>
 
 	<licenses>
 		<license>
@@ -44,13 +59,14 @@
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>4.0.0-M16</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>3.9.0</version>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.16.0</version>
+					<configuration>
+						<release>${maven.compiler.release}</release>
+						<compilerArgs>
+							<arg>-proc:none</arg>
+						</compilerArgs>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>

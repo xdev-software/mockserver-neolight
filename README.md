@@ -4,7 +4,7 @@
 
 # <img src="./assets/logo.avif" height=34 /> MockServer NeoLight
 
-A lightweight rewrite of the abandoned [MockServer project](https://github.com/mock-server/mockserver) with focus on simplicity, maintainability and [Testcontainers](https://java.testcontainers.org/).
+A lightweight rewrite of the abandoned [MockServer project](https://github.com/mock-server/mockserver) (based on v5) with focus on simplicity, maintainability, security hardening and [Testcontainers](https://java.testcontainers.org/).
 
 > [!NOTE]
 > The full list of changes can be found in the [changelog](./CHANGELOG.md#100).<br/>

@@ -3,9 +3,21 @@
   "rebaseWhen": "behind-base-branch",
   "packageRules": [
     {
+      "description": "Don't manage Java version in actions",
+      "matchDepTypes": [
+        "uses-with"
+      ],
+      "matchDatasources": [
+        "java-version"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Ignore project internal dependencies",
-      "packagePattern": "^software.xdev.mockserver",
-      "datasources": [
+      "matchPackagePatterns": [
+        "^software.xdev.mockserver"
+      ],
+      "matchDatasources": [
         "maven"
       ],
       "enabled": false
@@ -15,7 +27,7 @@
       "matchPackagePatterns": [
         "^net.sourceforge.pmd"
       ],
-      "datasources": [
+      "matchDatasources": [
         "maven"
       ],
       "groupName": "net.sourceforge.pmd"
