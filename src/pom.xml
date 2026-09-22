@@ -1,59 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-<<<<<<<< HEAD:client/pom.xml
-	<groupId>software.xdev.mockserver</groupId>
-	<artifactId>client</artifactId>
-	<version>2.51.3-SNAPSHOT</version>
-	<packaging>jar</packaging>
-
-	<name>client</name>
-	<description>MockServer NeoLight - Client</description>
-	<url>https://github.com/xdev-software/mockserver-neolight</url>
-
-	<scm>
-		<url>https://github.com/xdev-software/mockserver-neolight</url>
-		<connection>scm:git:https://github.com/xdev-software/mockserver-neolight.git</connection>
-	</scm>
-
-	<inceptionYear>2024</inceptionYear>
-
-	<organization>
-		<name>XDEV Software</name>
-		<url>https://xdev.software</url>
-	</organization>
-
-	<developers>
-		<developer>
-			<name>XDEV Software</name>
-			<organization>XDEV Software</organization>
-			<url>https://xdev.software</url>
-		</developer>
-	</developers>
-
-	<licenses>
-		<license>
-			<name>Apache-2.0</name>
-			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<properties>
-		<javaVersion>17</javaVersion>
-		<maven.compiler.release>${javaVersion}</maven.compiler.release>
-
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
-========
 	<parent>
-		<groupId>software.xdev</groupId>
+		<groupId>software.xdev.mockserver</groupId>
 		<artifactId>root</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>2.51.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>src</artifactId>
@@ -62,15 +16,6 @@
 	<modules>
 		<module>template-placeholder</module>
 	</modules>
->>>>>>>> origin/update-from-template-github_com_xdev-software_standard-maven-template_master:src/pom.xml
-
-	<dependencies>
-		<dependency>
-			<groupId>software.xdev.mockserver</groupId>
-			<artifactId>core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<pluginManagement>

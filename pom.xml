@@ -9,11 +9,10 @@
 	<artifactId>root</artifactId>
 	<version>2.51.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<url>https://github.com/xdev-software/template-placeholder</url>
+	<url>https://github.com/xdev-software/mockserver-neolight</url>
 
 	<modules>
 		<module>src</module>
-		<module>demos</module>
 	</modules>
 
 	<properties>
@@ -28,15 +27,11 @@
 		child.scm.connection.inherit.append.path="false"
 		child.scm.developerConnection.inherit.append.path="false"
 		child.scm.url.inherit.append.path="false">
-		<url>https://github.com/xdev-software/template-placeholder</url>
-		<connection>scm:git:https://github.com/xdev-software/template-placeholder.git</connection>
+		<url>https://github.com/xdev-software/mockserver-neolight</url>
+		<connection>scm:git:https://github.com/xdev-software/mockserver-neolight.git</connection>
 	</scm>
 
-	<inceptionYear>2026</inceptionYear>
-
-	<name>MockServer NeoLight</name>
-	<description>A lightweight rewrite of the MockServer project with focus on simplicity, maintainability and Testcontainers</description>
-	<url>https://github.com/xdev-software/mockserver-neolight</url>
+	<inceptionYear>2024</inceptionYear>
 
 	<organization>
 		<name>XDEV Software</name>
