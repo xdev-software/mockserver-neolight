@@ -26,7 +26,7 @@ import org.testcontainers.utility.DockerImageName;
 public class MockServerContainer extends GenericContainer<MockServerContainer>
 {
 	public static final String DEFAULT_IMAGE = "xdevsoftware/mockserver";
-	public static final String DEFAULT_TAG = MockServerUtils.DEFAULT_VERSION;
+	public static final String DEFAULT_TAG = MockServerVersionDetector.DEFAULT_VERSION;
 	public static final int PORT = 1080;
 	public static final String LOG_MSG_WAIT_STRATEGY_REGEX = ".*started on port: " + PORT + ".*";
 	
