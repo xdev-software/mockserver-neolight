@@ -14,7 +14,11 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>template-placeholder</module>
+		<module>bom</module>
+		<module>client</module>
+		<module>core</module>
+		<module>server</module>
+		<module>testcontainers</module>
 	</modules>
 
 	<build>
