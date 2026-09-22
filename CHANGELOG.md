@@ -1,4 +1,4 @@
-# 2.52.1-SNAPSHOT
+# 2.52.1
 * Internal restructuring
 * Updated dependencies
 
