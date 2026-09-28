@@ -182,4 +182,4 @@ If you need support as soon as possible and you can't wait for any pull request,
 See the [contributing guide](./CONTRIBUTING.md) for detailed instructions on how to get started with our project.
 
 ## Dependencies and Licenses
-View the [license of the current project](LICENSE) or the [docs that contain a dependency summary (per module)](https://xdev-software.github.io/mockserver-neolight/)
+View the [license of the current project](LICENSE) or the [summary including all dependencies](https://xdev-software.github.io/mockserver-neolight)
