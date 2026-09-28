@@ -36,7 +36,7 @@ Sources:
             ✔ Split into a optimized client and server module
         </td>
         <td>
-            ✔ <a href="./testcontainers/">Yes</a>
+            ✔ <a href="./src/testcontainers/">Yes</a>
         </td>
         <td>
             ✔ <a href="./README.md#support">Yes</a>

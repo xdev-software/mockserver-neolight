@@ -138,7 +138,7 @@ Note: MockServer also works really well together with a network failure simulati
     <th>Distribution via</th>
   </tr>
   <tr>
-    <td><a href="./client/">client</a></td>
+    <td><a href="./src/client/">client</a></td>
     <td>
       <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/client">
         <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/client?logo=apache%20maven"/>
@@ -146,7 +146,7 @@ Note: MockServer also works really well together with a network failure simulati
     </td>
   </tr>
   <tr>
-    <td><a href="./server/">server</a></td>
+    <td><a href="./src/server/">server</a></td>
     <td>
       <a href="https://hub.docker.com/r/xdevsoftware/mockserver">
         <img src="https://img.shields.io/docker/v/xdevsoftware/mockserver?sort=semver&logo=docker&label=DockerHub"/>
@@ -166,7 +166,7 @@ Note: MockServer also works really well together with a network failure simulati
     </td>
   </tr>
   <tr>
-    <td><a href="./testcontainers/">testcontainers</a></td>
+    <td><a href="./src/testcontainers/">testcontainers</a></td>
     <td>
       <a href="https://mvnrepository.com/artifact/software.xdev.mockserver/testcontainers">
         <img src="https://img.shields.io/maven-central/v/software.xdev.mockserver/testcontainers?logo=apache%20maven"/>
