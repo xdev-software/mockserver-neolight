@@ -5,16 +5,20 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>software.xdev</groupId>
+		<groupId>software.xdev.mockserver</groupId>
 		<artifactId>root</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>2.52.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>src</artifactId>
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>template-placeholder</module>
+		<module>bom</module>
+		<module>client</module>
+		<module>core</module>
+		<module>server</module>
+		<module>testcontainers</module>
 	</modules>
 
 	<build>
@@ -67,6 +71,12 @@
 					<groupId>org.sonatype.central</groupId>
 					<artifactId>central-publishing-maven-plugin</artifactId>
 					<version>0.11.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.6.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
