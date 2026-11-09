@@ -1,3 +1,6 @@
+# 2.52.2
+* Updated dependencies
+
 # 2.52.1
 * Internal restructuring
 * Updated dependencies

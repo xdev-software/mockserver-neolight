@@ -88,7 +88,7 @@ jobs:
 
     - name: Create Release
       id: create-release
-      uses: shogo82148/actions-create-release@8674c0ecee617c8dfb006526bcc22a362c70b88a # v1
+      uses: shogo82148/actions-create-release@c172624cc9dcd7e0a2211b7337e6860b882fc030 # v1
       with:
         tag_name: v${{ steps.version.outputs.release }}
         release_name: v${{ steps.version.outputs.release }}
@@ -305,7 +305,7 @@ jobs:
       run: |
         # Compile is required, otherwise dep resolution failure
         echo "Looking up modules"
-        module_dirs=($(../mvnw -B -q --also-make compile exec:exec -Dexec.executable="pwd" -Dmaven.main.skip))
+        module_dirs=($(../mvnw -B -q --also-make compile exec:exec -P site -Dexec.executable="pwd" -Dmaven.main.skip))
         base_module_full="${module_dirs[0]}"
 
         echo "Found modules - Src: $base_module_full"
